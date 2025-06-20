@@ -5,6 +5,7 @@ Version : 2.0.0.51 (16 Juni 2025)
 # [Bug Fix] Memperbaiki Bug pada Daftar Registrasi Pasien Ketika Cari Data
 # [New Feature] Pemotongan Paket Tindakan dari dalam Ketika mengambil Tindakan pada LaLumire
 # [New Feature] Penambahan Menu Dashboard (Masih dalam pengembangan lebih lanjut)
+# [Usability Improvement] Pengubahan Jenis Error Agar Mudah Terbaca pada Pencarian Diagnosa
 
 Version : 2.0.0.50 (02 Juni 2025)
 # [Usability Improvement] Efisiensi dalam Pencarian Riwayat Kunjungan pada Laporan Kunjungan.

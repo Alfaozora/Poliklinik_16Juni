@@ -1519,7 +1519,6 @@ Public Class FormPendaftaranAwal
             'MessageBox.Show("Gambar tidak ditemukan di path: " & fullPath, "Info", MessageBoxButtons.OK, MessageBoxIcon.Warning)
         End If
 
-
         ComboBoxPoliTujuan.Enabled = True
     End Sub
 

@@ -40,29 +40,33 @@ Partial Class FormReservasi
         Me.TabPage1 = New System.Windows.Forms.TabPage
         Me.PanelLayoutMenu1TopMain = New System.Windows.Forms.Panel
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer
-        Me.ButtonCari = New System.Windows.Forms.Button
-        Me.ButtonSimpan = New System.Windows.Forms.Button
+        Me.ButtonFindPasien = New System.Windows.Forms.Button
+        Me.TextBoxNoHP = New System.Windows.Forms.TextBox
+        Me.Label6 = New System.Windows.Forms.Label
+        Me.Label5 = New System.Windows.Forms.Label
+        Me.Label4 = New System.Windows.Forms.Label
+        Me.TextBoxCatatan = New System.Windows.Forms.TextBox
+        Me.Label3 = New System.Windows.Forms.Label
+        Me.TextBoxNamaPasien = New System.Windows.Forms.TextBox
+        Me.Label2 = New System.Windows.Forms.Label
+        Me.dtSelesai = New System.Windows.Forms.DateTimePicker
+        Me.dtReservasi = New System.Windows.Forms.DateTimePicker
+        Me.ComboBoxRuangan = New System.Windows.Forms.ComboBox
+        Me.Label1 = New System.Windows.Forms.Label
+        Me.DataGridViewReservasi = New System.Windows.Forms.DataGridView
         Me.TabPage2 = New System.Windows.Forms.TabPage
         Me.PanelLayoutMenu2TopMain = New System.Windows.Forms.Panel
         Me.TabPage3 = New System.Windows.Forms.TabPage
         Me.PanelLayoutMenu3TopMain = New System.Windows.Forms.Panel
         Me.TabPage4 = New System.Windows.Forms.TabPage
         Me.PanelLayoutMenu4TopMain = New System.Windows.Forms.Panel
+        Me.ButtonCari = New System.Windows.Forms.Button
+        Me.ButtonSimpan = New System.Windows.Forms.Button
         Me.SplitContainer9 = New System.Windows.Forms.SplitContainer
         Me.PanelButton = New System.Windows.Forms.Panel
-        Me.Label1 = New System.Windows.Forms.Label
-        Me.ComboBoxRuangan = New System.Windows.Forms.ComboBox
-        Me.dtReservasi = New System.Windows.Forms.DateTimePicker
-        Me.dtSelesai = New System.Windows.Forms.DateTimePicker
-        Me.Label2 = New System.Windows.Forms.Label
-        Me.TextBoxNamaPasien = New System.Windows.Forms.TextBox
-        Me.Label3 = New System.Windows.Forms.Label
-        Me.TextBoxCatatan = New System.Windows.Forms.TextBox
-        Me.Label4 = New System.Windows.Forms.Label
-        Me.Label5 = New System.Windows.Forms.Label
-        Me.Label6 = New System.Windows.Forms.Label
-        Me.TextBoxNoHP = New System.Windows.Forms.TextBox
-        Me.DataGridViewReservasi = New System.Windows.Forms.DataGridView
+        Me.ContextMenuStatus = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.CancelToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.RescheduleToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.PanelTop.SuspendLayout()
         Me.PanelSide.SuspendLayout()
         Me.TabControlMenu.SuspendLayout()
@@ -71,6 +75,7 @@ Partial Class FormReservasi
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
+        CType(Me.DataGridViewReservasi, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage2.SuspendLayout()
         Me.TabPage3.SuspendLayout()
         Me.TabPage4.SuspendLayout()
@@ -78,7 +83,7 @@ Partial Class FormReservasi
         Me.SplitContainer9.Panel2.SuspendLayout()
         Me.SplitContainer9.SuspendLayout()
         Me.PanelButton.SuspendLayout()
-        CType(Me.DataGridViewReservasi, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.ContextMenuStatus.SuspendLayout()
         Me.SuspendLayout()
         '
         'PanelTop
@@ -250,6 +255,7 @@ Partial Class FormReservasi
         '
         'SplitContainer1.Panel1
         '
+        Me.SplitContainer1.Panel1.Controls.Add(Me.ButtonFindPasien)
         Me.SplitContainer1.Panel1.Controls.Add(Me.TextBoxNoHP)
         Me.SplitContainer1.Panel1.Controls.Add(Me.Label6)
         Me.SplitContainer1.Panel1.Controls.Add(Me.Label5)
@@ -270,154 +276,123 @@ Partial Class FormReservasi
         Me.SplitContainer1.SplitterDistance = 200
         Me.SplitContainer1.TabIndex = 0
         '
-        'ButtonCari
+        'ButtonFindPasien
         '
-        Me.ButtonCari.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
-        Me.ButtonCari.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
-        Me.ButtonCari.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.ButtonCari.FlatAppearance.BorderSize = 0
-        Me.ButtonCari.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
-        Me.ButtonCari.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.ButtonCari.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.ButtonCari.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.ButtonCari.ForeColor = System.Drawing.Color.White
-        Me.ButtonCari.Image = Global.PoliKlinik_Net2.My.Resources.Resources.icons8_search_24
-        Me.ButtonCari.Location = New System.Drawing.Point(133, 3)
-        Me.ButtonCari.Name = "ButtonCari"
-        Me.ButtonCari.Size = New System.Drawing.Size(147, 35)
-        Me.ButtonCari.TabIndex = 502
-        Me.ButtonCari.Text = "Cek Ketersediaan"
-        Me.ButtonCari.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.ButtonCari.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-        Me.ButtonCari.UseVisualStyleBackColor = False
+        Me.ButtonFindPasien.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonFindPasien.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
+        Me.ButtonFindPasien.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonFindPasien.FlatAppearance.BorderSize = 0
+        Me.ButtonFindPasien.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonFindPasien.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.ButtonFindPasien.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonFindPasien.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.ButtonFindPasien.ForeColor = System.Drawing.Color.White
+        Me.ButtonFindPasien.Image = Global.PoliKlinik_Net2.My.Resources.Resources.icons8_find_user_male_24
+        Me.ButtonFindPasien.Location = New System.Drawing.Point(394, 139)
+        Me.ButtonFindPasien.Name = "ButtonFindPasien"
+        Me.ButtonFindPasien.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.ButtonFindPasien.Size = New System.Drawing.Size(33, 30)
+        Me.ButtonFindPasien.TabIndex = 529
+        Me.ButtonFindPasien.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.ButtonFindPasien.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.ButtonFindPasien.UseVisualStyleBackColor = False
         '
-        'ButtonSimpan
+        'TextBoxNoHP
         '
-        Me.ButtonSimpan.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
-        Me.ButtonSimpan.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
-        Me.ButtonSimpan.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.ButtonSimpan.FlatAppearance.BorderSize = 0
-        Me.ButtonSimpan.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
-        Me.ButtonSimpan.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.ButtonSimpan.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.ButtonSimpan.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.ButtonSimpan.ForeColor = System.Drawing.Color.White
-        Me.ButtonSimpan.Image = Global.PoliKlinik_Net2.My.Resources.Resources.icons8_save_24
-        Me.ButtonSimpan.Location = New System.Drawing.Point(7, 3)
-        Me.ButtonSimpan.Name = "ButtonSimpan"
-        Me.ButtonSimpan.Size = New System.Drawing.Size(120, 35)
-        Me.ButtonSimpan.TabIndex = 499
-        Me.ButtonSimpan.Text = " Simpan Data"
-        Me.ButtonSimpan.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.ButtonSimpan.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-        Me.ButtonSimpan.UseVisualStyleBackColor = False
+        Me.TextBoxNoHP.Location = New System.Drawing.Point(494, 15)
+        Me.TextBoxNoHP.Name = "TextBoxNoHP"
+        Me.TextBoxNoHP.Size = New System.Drawing.Size(194, 23)
+        Me.TextBoxNoHP.TabIndex = 528
         '
-        'TabPage2
+        'Label6
         '
-        Me.TabPage2.Controls.Add(Me.PanelLayoutMenu2TopMain)
-        Me.TabPage2.Location = New System.Drawing.Point(4, 27)
-        Me.TabPage2.Name = "TabPage2"
-        Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage2.Size = New System.Drawing.Size(942, 563)
-        Me.TabPage2.TabIndex = 1
-        Me.TabPage2.Text = "Tab Menu 2"
-        Me.TabPage2.UseVisualStyleBackColor = True
+        Me.Label6.AutoSize = True
+        Me.Label6.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label6.Location = New System.Drawing.Point(421, 18)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(48, 17)
+        Me.Label6.TabIndex = 527
+        Me.Label6.Text = "No HP"
         '
-        'PanelLayoutMenu2TopMain
+        'Label5
         '
-        Me.PanelLayoutMenu2TopMain.AutoScroll = True
-        Me.PanelLayoutMenu2TopMain.BackColor = System.Drawing.Color.White
-        Me.PanelLayoutMenu2TopMain.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.PanelLayoutMenu2TopMain.Location = New System.Drawing.Point(3, 3)
-        Me.PanelLayoutMenu2TopMain.Name = "PanelLayoutMenu2TopMain"
-        Me.PanelLayoutMenu2TopMain.Size = New System.Drawing.Size(936, 557)
-        Me.PanelLayoutMenu2TopMain.TabIndex = 3
+        Me.Label5.AutoSize = True
+        Me.Label5.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label5.Location = New System.Drawing.Point(18, 101)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(52, 17)
+        Me.Label5.TabIndex = 526
+        Me.Label5.Text = "Sampai"
         '
-        'TabPage3
+        'Label4
         '
-        Me.TabPage3.Controls.Add(Me.PanelLayoutMenu3TopMain)
-        Me.TabPage3.Location = New System.Drawing.Point(4, 25)
-        Me.TabPage3.Name = "TabPage3"
-        Me.TabPage3.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage3.Size = New System.Drawing.Size(942, 565)
-        Me.TabPage3.TabIndex = 2
-        Me.TabPage3.Text = "Tab Menu 3"
-        Me.TabPage3.UseVisualStyleBackColor = True
+        Me.Label4.AutoSize = True
+        Me.Label4.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label4.Location = New System.Drawing.Point(421, 66)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(55, 17)
+        Me.Label4.TabIndex = 525
+        Me.Label4.Text = "Catatan"
         '
-        'PanelLayoutMenu3TopMain
+        'TextBoxCatatan
         '
-        Me.PanelLayoutMenu3TopMain.AutoScroll = True
-        Me.PanelLayoutMenu3TopMain.BackColor = System.Drawing.Color.White
-        Me.PanelLayoutMenu3TopMain.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.PanelLayoutMenu3TopMain.Location = New System.Drawing.Point(3, 3)
-        Me.PanelLayoutMenu3TopMain.Name = "PanelLayoutMenu3TopMain"
-        Me.PanelLayoutMenu3TopMain.Size = New System.Drawing.Size(936, 559)
-        Me.PanelLayoutMenu3TopMain.TabIndex = 5
+        Me.TextBoxCatatan.BackColor = System.Drawing.SystemColors.ButtonHighlight
+        Me.TextBoxCatatan.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.TextBoxCatatan.Location = New System.Drawing.Point(494, 58)
+        Me.TextBoxCatatan.Multiline = True
+        Me.TextBoxCatatan.Name = "TextBoxCatatan"
+        Me.TextBoxCatatan.Size = New System.Drawing.Size(194, 70)
+        Me.TextBoxCatatan.TabIndex = 524
         '
-        'TabPage4
+        'Label3
         '
-        Me.TabPage4.Controls.Add(Me.PanelLayoutMenu4TopMain)
-        Me.TabPage4.Location = New System.Drawing.Point(4, 25)
-        Me.TabPage4.Name = "TabPage4"
-        Me.TabPage4.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage4.Size = New System.Drawing.Size(942, 565)
-        Me.TabPage4.TabIndex = 3
-        Me.TabPage4.Text = "Tab Menu 4"
-        Me.TabPage4.UseVisualStyleBackColor = True
+        Me.Label3.AutoSize = True
+        Me.Label3.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label3.Location = New System.Drawing.Point(18, 145)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(87, 17)
+        Me.Label3.TabIndex = 523
+        Me.Label3.Text = "Nama Pasien"
         '
-        'PanelLayoutMenu4TopMain
+        'TextBoxNamaPasien
         '
-        Me.PanelLayoutMenu4TopMain.AutoScroll = True
-        Me.PanelLayoutMenu4TopMain.BackColor = System.Drawing.Color.White
-        Me.PanelLayoutMenu4TopMain.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.PanelLayoutMenu4TopMain.Location = New System.Drawing.Point(3, 3)
-        Me.PanelLayoutMenu4TopMain.Name = "PanelLayoutMenu4TopMain"
-        Me.PanelLayoutMenu4TopMain.Size = New System.Drawing.Size(936, 559)
-        Me.PanelLayoutMenu4TopMain.TabIndex = 7
+        Me.TextBoxNamaPasien.Location = New System.Drawing.Point(111, 139)
+        Me.TextBoxNamaPasien.Multiline = True
+        Me.TextBoxNamaPasien.Name = "TextBoxNamaPasien"
+        Me.TextBoxNamaPasien.Size = New System.Drawing.Size(277, 30)
+        Me.TextBoxNamaPasien.TabIndex = 522
         '
-        'SplitContainer9
+        'Label2
         '
-        Me.SplitContainer9.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.SplitContainer9.FixedPanel = System.Windows.Forms.FixedPanel.Panel1
-        Me.SplitContainer9.IsSplitterFixed = True
-        Me.SplitContainer9.Location = New System.Drawing.Point(150, 40)
-        Me.SplitContainer9.Name = "SplitContainer9"
-        Me.SplitContainer9.Orientation = System.Windows.Forms.Orientation.Horizontal
+        Me.Label2.AutoSize = True
+        Me.Label2.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label2.Location = New System.Drawing.Point(16, 61)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(86, 17)
+        Me.Label2.TabIndex = 521
+        Me.Label2.Text = "Tgl Reservasi"
         '
-        'SplitContainer9.Panel1
+        'dtSelesai
         '
-        Me.SplitContainer9.Panel1.AutoScroll = True
-        Me.SplitContainer9.Panel1.Controls.Add(Me.PanelButton)
+        Me.dtSelesai.CalendarFont = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.dtSelesai.CustomFormat = "dd-MMM-yyyy HH:mm"
+        Me.dtSelesai.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.dtSelesai.Format = System.Windows.Forms.DateTimePickerFormat.Custom
+        Me.dtSelesai.Location = New System.Drawing.Point(111, 95)
+        Me.dtSelesai.Name = "dtSelesai"
+        Me.dtSelesai.Size = New System.Drawing.Size(151, 25)
+        Me.dtSelesai.TabIndex = 520
         '
-        'SplitContainer9.Panel2
+        'dtReservasi
         '
-        Me.SplitContainer9.Panel2.AutoScroll = True
-        Me.SplitContainer9.Panel2.Controls.Add(Me.TabControlMenu)
-        Me.SplitContainer9.Size = New System.Drawing.Size(950, 644)
-        Me.SplitContainer9.SplitterDistance = 45
-        Me.SplitContainer9.SplitterWidth = 5
-        Me.SplitContainer9.TabIndex = 461
-        '
-        'PanelButton
-        '
-        Me.PanelButton.BackColor = System.Drawing.Color.FromArgb(CType(CType(240, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(240, Byte), Integer))
-        Me.PanelButton.Controls.Add(Me.ButtonCari)
-        Me.PanelButton.Controls.Add(Me.ButtonSimpan)
-        Me.PanelButton.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.PanelButton.Location = New System.Drawing.Point(0, 0)
-        Me.PanelButton.Name = "PanelButton"
-        Me.PanelButton.Size = New System.Drawing.Size(950, 45)
-        Me.PanelButton.TabIndex = 3
-        '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label1.Location = New System.Drawing.Point(16, 18)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(30, 17)
-        Me.Label1.TabIndex = 509
-        Me.Label1.Text = "Poli"
+        Me.dtReservasi.CalendarFont = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.dtReservasi.CustomFormat = "dd-MMM-yyyy HH:mm"
+        Me.dtReservasi.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.dtReservasi.Format = System.Windows.Forms.DateTimePickerFormat.Custom
+        Me.dtReservasi.Location = New System.Drawing.Point(111, 55)
+        Me.dtReservasi.Name = "dtReservasi"
+        Me.dtReservasi.Size = New System.Drawing.Size(151, 25)
+        Me.dtReservasi.TabIndex = 519
         '
         'ComboBoxRuangan
         '
@@ -433,101 +408,15 @@ Partial Class FormReservasi
         Me.ComboBoxRuangan.Size = New System.Drawing.Size(277, 25)
         Me.ComboBoxRuangan.TabIndex = 510
         '
-        'dtReservasi
+        'Label1
         '
-        Me.dtReservasi.CalendarFont = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.dtReservasi.CustomFormat = "dd-MMM-yyyy HH:mm"
-        Me.dtReservasi.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.dtReservasi.Format = System.Windows.Forms.DateTimePickerFormat.Custom
-        Me.dtReservasi.Location = New System.Drawing.Point(111, 55)
-        Me.dtReservasi.Name = "dtReservasi"
-        Me.dtReservasi.Size = New System.Drawing.Size(151, 25)
-        Me.dtReservasi.TabIndex = 519
-        '
-        'dtSelesai
-        '
-        Me.dtSelesai.CalendarFont = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.dtSelesai.CustomFormat = "dd-MMM-yyyy HH:mm"
-        Me.dtSelesai.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.dtSelesai.Format = System.Windows.Forms.DateTimePickerFormat.Custom
-        Me.dtSelesai.Location = New System.Drawing.Point(111, 95)
-        Me.dtSelesai.Name = "dtSelesai"
-        Me.dtSelesai.Size = New System.Drawing.Size(151, 25)
-        Me.dtSelesai.TabIndex = 520
-        '
-        'Label2
-        '
-        Me.Label2.AutoSize = True
-        Me.Label2.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label2.Location = New System.Drawing.Point(16, 61)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(86, 17)
-        Me.Label2.TabIndex = 521
-        Me.Label2.Text = "Tgl Reservasi"
-        '
-        'TextBoxNamaPasien
-        '
-        Me.TextBoxNamaPasien.Location = New System.Drawing.Point(111, 139)
-        Me.TextBoxNamaPasien.Name = "TextBoxNamaPasien"
-        Me.TextBoxNamaPasien.Size = New System.Drawing.Size(277, 23)
-        Me.TextBoxNamaPasien.TabIndex = 522
-        '
-        'Label3
-        '
-        Me.Label3.AutoSize = True
-        Me.Label3.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label3.Location = New System.Drawing.Point(18, 145)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(87, 17)
-        Me.Label3.TabIndex = 523
-        Me.Label3.Text = "Nama Pasien"
-        '
-        'TextBoxCatatan
-        '
-        Me.TextBoxCatatan.BackColor = System.Drawing.SystemColors.ButtonHighlight
-        Me.TextBoxCatatan.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextBoxCatatan.Location = New System.Drawing.Point(494, 58)
-        Me.TextBoxCatatan.Multiline = True
-        Me.TextBoxCatatan.Name = "TextBoxCatatan"
-        Me.TextBoxCatatan.Size = New System.Drawing.Size(194, 70)
-        Me.TextBoxCatatan.TabIndex = 524
-        '
-        'Label4
-        '
-        Me.Label4.AutoSize = True
-        Me.Label4.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label4.Location = New System.Drawing.Point(421, 66)
-        Me.Label4.Name = "Label4"
-        Me.Label4.Size = New System.Drawing.Size(55, 17)
-        Me.Label4.TabIndex = 525
-        Me.Label4.Text = "Catatan"
-        '
-        'Label5
-        '
-        Me.Label5.AutoSize = True
-        Me.Label5.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label5.Location = New System.Drawing.Point(18, 101)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(52, 17)
-        Me.Label5.TabIndex = 526
-        Me.Label5.Text = "Sampai"
-        '
-        'Label6
-        '
-        Me.Label6.AutoSize = True
-        Me.Label6.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label6.Location = New System.Drawing.Point(421, 18)
-        Me.Label6.Name = "Label6"
-        Me.Label6.Size = New System.Drawing.Size(48, 17)
-        Me.Label6.TabIndex = 527
-        Me.Label6.Text = "No HP"
-        '
-        'TextBoxNoHP
-        '
-        Me.TextBoxNoHP.Location = New System.Drawing.Point(494, 15)
-        Me.TextBoxNoHP.Name = "TextBoxNoHP"
-        Me.TextBoxNoHP.Size = New System.Drawing.Size(194, 23)
-        Me.TextBoxNoHP.TabIndex = 528
+        Me.Label1.AutoSize = True
+        Me.Label1.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label1.Location = New System.Drawing.Point(16, 18)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(30, 17)
+        Me.Label1.TabIndex = 509
+        Me.Label1.Text = "Poli"
         '
         'DataGridViewReservasi
         '
@@ -585,6 +474,163 @@ Partial Class FormReservasi
         Me.DataGridViewReservasi.StandardTab = True
         Me.DataGridViewReservasi.TabIndex = 520
         '
+        'TabPage2
+        '
+        Me.TabPage2.Controls.Add(Me.PanelLayoutMenu2TopMain)
+        Me.TabPage2.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage2.Name = "TabPage2"
+        Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage2.Size = New System.Drawing.Size(942, 565)
+        Me.TabPage2.TabIndex = 1
+        Me.TabPage2.Text = "Tab Menu 2"
+        Me.TabPage2.UseVisualStyleBackColor = True
+        '
+        'PanelLayoutMenu2TopMain
+        '
+        Me.PanelLayoutMenu2TopMain.AutoScroll = True
+        Me.PanelLayoutMenu2TopMain.BackColor = System.Drawing.Color.White
+        Me.PanelLayoutMenu2TopMain.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.PanelLayoutMenu2TopMain.Location = New System.Drawing.Point(3, 3)
+        Me.PanelLayoutMenu2TopMain.Name = "PanelLayoutMenu2TopMain"
+        Me.PanelLayoutMenu2TopMain.Size = New System.Drawing.Size(936, 559)
+        Me.PanelLayoutMenu2TopMain.TabIndex = 3
+        '
+        'TabPage3
+        '
+        Me.TabPage3.Controls.Add(Me.PanelLayoutMenu3TopMain)
+        Me.TabPage3.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage3.Name = "TabPage3"
+        Me.TabPage3.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage3.Size = New System.Drawing.Size(942, 565)
+        Me.TabPage3.TabIndex = 2
+        Me.TabPage3.Text = "Tab Menu 3"
+        Me.TabPage3.UseVisualStyleBackColor = True
+        '
+        'PanelLayoutMenu3TopMain
+        '
+        Me.PanelLayoutMenu3TopMain.AutoScroll = True
+        Me.PanelLayoutMenu3TopMain.BackColor = System.Drawing.Color.White
+        Me.PanelLayoutMenu3TopMain.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.PanelLayoutMenu3TopMain.Location = New System.Drawing.Point(3, 3)
+        Me.PanelLayoutMenu3TopMain.Name = "PanelLayoutMenu3TopMain"
+        Me.PanelLayoutMenu3TopMain.Size = New System.Drawing.Size(936, 559)
+        Me.PanelLayoutMenu3TopMain.TabIndex = 5
+        '
+        'TabPage4
+        '
+        Me.TabPage4.Controls.Add(Me.PanelLayoutMenu4TopMain)
+        Me.TabPage4.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage4.Name = "TabPage4"
+        Me.TabPage4.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage4.Size = New System.Drawing.Size(942, 565)
+        Me.TabPage4.TabIndex = 3
+        Me.TabPage4.Text = "Tab Menu 4"
+        Me.TabPage4.UseVisualStyleBackColor = True
+        '
+        'PanelLayoutMenu4TopMain
+        '
+        Me.PanelLayoutMenu4TopMain.AutoScroll = True
+        Me.PanelLayoutMenu4TopMain.BackColor = System.Drawing.Color.White
+        Me.PanelLayoutMenu4TopMain.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.PanelLayoutMenu4TopMain.Location = New System.Drawing.Point(3, 3)
+        Me.PanelLayoutMenu4TopMain.Name = "PanelLayoutMenu4TopMain"
+        Me.PanelLayoutMenu4TopMain.Size = New System.Drawing.Size(936, 559)
+        Me.PanelLayoutMenu4TopMain.TabIndex = 7
+        '
+        'ButtonCari
+        '
+        Me.ButtonCari.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonCari.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+        Me.ButtonCari.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonCari.FlatAppearance.BorderSize = 0
+        Me.ButtonCari.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonCari.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.ButtonCari.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonCari.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ButtonCari.ForeColor = System.Drawing.Color.White
+        Me.ButtonCari.Image = Global.PoliKlinik_Net2.My.Resources.Resources.icons8_search_24
+        Me.ButtonCari.Location = New System.Drawing.Point(133, 3)
+        Me.ButtonCari.Name = "ButtonCari"
+        Me.ButtonCari.Size = New System.Drawing.Size(147, 35)
+        Me.ButtonCari.TabIndex = 502
+        Me.ButtonCari.Text = "Cek Ketersediaan"
+        Me.ButtonCari.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.ButtonCari.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.ButtonCari.UseVisualStyleBackColor = False
+        '
+        'ButtonSimpan
+        '
+        Me.ButtonSimpan.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonSimpan.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+        Me.ButtonSimpan.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonSimpan.FlatAppearance.BorderSize = 0
+        Me.ButtonSimpan.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonSimpan.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.ButtonSimpan.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonSimpan.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ButtonSimpan.ForeColor = System.Drawing.Color.White
+        Me.ButtonSimpan.Image = Global.PoliKlinik_Net2.My.Resources.Resources.icons8_save_24
+        Me.ButtonSimpan.Location = New System.Drawing.Point(7, 3)
+        Me.ButtonSimpan.Name = "ButtonSimpan"
+        Me.ButtonSimpan.Size = New System.Drawing.Size(120, 35)
+        Me.ButtonSimpan.TabIndex = 499
+        Me.ButtonSimpan.Text = " Simpan Data"
+        Me.ButtonSimpan.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.ButtonSimpan.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.ButtonSimpan.UseVisualStyleBackColor = False
+        '
+        'SplitContainer9
+        '
+        Me.SplitContainer9.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.SplitContainer9.FixedPanel = System.Windows.Forms.FixedPanel.Panel1
+        Me.SplitContainer9.IsSplitterFixed = True
+        Me.SplitContainer9.Location = New System.Drawing.Point(150, 40)
+        Me.SplitContainer9.Name = "SplitContainer9"
+        Me.SplitContainer9.Orientation = System.Windows.Forms.Orientation.Horizontal
+        '
+        'SplitContainer9.Panel1
+        '
+        Me.SplitContainer9.Panel1.AutoScroll = True
+        Me.SplitContainer9.Panel1.Controls.Add(Me.PanelButton)
+        '
+        'SplitContainer9.Panel2
+        '
+        Me.SplitContainer9.Panel2.AutoScroll = True
+        Me.SplitContainer9.Panel2.Controls.Add(Me.TabControlMenu)
+        Me.SplitContainer9.Size = New System.Drawing.Size(950, 644)
+        Me.SplitContainer9.SplitterDistance = 45
+        Me.SplitContainer9.SplitterWidth = 5
+        Me.SplitContainer9.TabIndex = 461
+        '
+        'PanelButton
+        '
+        Me.PanelButton.BackColor = System.Drawing.Color.FromArgb(CType(CType(240, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(240, Byte), Integer))
+        Me.PanelButton.Controls.Add(Me.ButtonCari)
+        Me.PanelButton.Controls.Add(Me.ButtonSimpan)
+        Me.PanelButton.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.PanelButton.Location = New System.Drawing.Point(0, 0)
+        Me.PanelButton.Name = "PanelButton"
+        Me.PanelButton.Size = New System.Drawing.Size(950, 45)
+        Me.PanelButton.TabIndex = 3
+        '
+        'ContextMenuStatus
+        '
+        Me.ContextMenuStatus.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CancelToolStripMenuItem, Me.RescheduleToolStripMenuItem})
+        Me.ContextMenuStatus.Name = "ContextMenuStatus"
+        Me.ContextMenuStatus.Size = New System.Drawing.Size(135, 48)
+        '
+        'CancelToolStripMenuItem
+        '
+        Me.CancelToolStripMenuItem.Name = "CancelToolStripMenuItem"
+        Me.CancelToolStripMenuItem.Size = New System.Drawing.Size(134, 22)
+        Me.CancelToolStripMenuItem.Text = "Cancel"
+        '
+        'RescheduleToolStripMenuItem
+        '
+        Me.RescheduleToolStripMenuItem.Name = "RescheduleToolStripMenuItem"
+        Me.RescheduleToolStripMenuItem.Size = New System.Drawing.Size(134, 22)
+        Me.RescheduleToolStripMenuItem.Text = "Reschedule"
+        '
         'FormReservasi
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)
@@ -610,6 +656,7 @@ Partial Class FormReservasi
         Me.SplitContainer1.Panel1.PerformLayout()
         Me.SplitContainer1.Panel2.ResumeLayout(False)
         Me.SplitContainer1.ResumeLayout(False)
+        CType(Me.DataGridViewReservasi, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage2.ResumeLayout(False)
         Me.TabPage3.ResumeLayout(False)
         Me.TabPage4.ResumeLayout(False)
@@ -617,7 +664,7 @@ Partial Class FormReservasi
         Me.SplitContainer9.Panel2.ResumeLayout(False)
         Me.SplitContainer9.ResumeLayout(False)
         Me.PanelButton.ResumeLayout(False)
-        CType(Me.DataGridViewReservasi, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ContextMenuStatus.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
@@ -657,4 +704,8 @@ Partial Class FormReservasi
     Friend WithEvents TextBoxNoHP As System.Windows.Forms.TextBox
     Friend WithEvents Label6 As System.Windows.Forms.Label
     Friend WithEvents DataGridViewReservasi As System.Windows.Forms.DataGridView
+    Friend WithEvents ContextMenuStatus As System.Windows.Forms.ContextMenuStrip
+    Friend WithEvents CancelToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents RescheduleToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents ButtonFindPasien As System.Windows.Forms.Button
 End Class

@@ -821,6 +821,12 @@
     <Compile Include="Report\ReportFeeDokterPengirim.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Reservasi\Dialog1.Designer.vb">
+      <DependentUpon>Dialog1.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reservasi\Dialog1.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Reservasi\FormReservasi.Designer.vb">
       <DependentUpon>FormReservasi.vb</DependentUpon>
     </Compile>
@@ -1614,6 +1620,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Report\ReportFeeDokterPengirim.resx">
       <DependentUpon>ReportFeeDokterPengirim.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reservasi\Dialog1.resx">
+      <DependentUpon>Dialog1.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Reservasi\FormReservasi.resx">
       <DependentUpon>FormReservasi.vb</DependentUpon>
