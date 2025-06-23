@@ -148,7 +148,7 @@ Partial Class ReportLogPaketTindakan
         Me.RadioButtonOptionPaketPerTindakan.Font = New System.Drawing.Font("Segoe UI", 9.0!)
         Me.RadioButtonOptionPaketPerTindakan.Location = New System.Drawing.Point(108, 3)
         Me.RadioButtonOptionPaketPerTindakan.Name = "RadioButtonOptionPaketPerTindakan"
-        Me.RadioButtonOptionPaketPerTindakan.Size = New System.Drawing.Size(127, 19)
+        Me.RadioButtonOptionPaketPerTindakan.Size = New System.Drawing.Size(128, 19)
         Me.RadioButtonOptionPaketPerTindakan.TabIndex = 248
         Me.RadioButtonOptionPaketPerTindakan.Text = "Paket Per-Tindakan"
         Me.RadioButtonOptionPaketPerTindakan.UseVisualStyleBackColor = True

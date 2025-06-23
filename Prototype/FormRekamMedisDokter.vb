@@ -143,7 +143,7 @@ Public Class FormRekamMedisDokter
         End Try
     End Sub
 
-    Private Sub ButtonMenu_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonMenu6.Click, ButtonMenu5.Click, ButtonMenu4.Click, ButtonMenu3.Click, ButtonMenu2.Click, ButtonMenu1.Click
+    Private Sub ButtonMenu_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonMenu7.Click, ButtonMenu6.Click, ButtonMenu5.Click, ButtonMenu4.Click, ButtonMenu3.Click, ButtonMenu2.Click, ButtonMenu1.Click
         Try
             Dim myButton = DirectCast(sender, Button)
 
@@ -154,6 +154,7 @@ Public Class FormRekamMedisDokter
             ButtonMenu4.BackColor = Color.FromArgb(0, 100, 200)
             ButtonMenu5.BackColor = Color.FromArgb(0, 100, 200)
             ButtonMenu6.BackColor = Color.FromArgb(0, 100, 200)
+            ButtonMenu7.BackColor = Color.FromArgb(0, 100, 200)
             ButtonSideMenu1.Visible = False
             ButtonSideMenu2.Visible = False
             ButtonSideMenu3.Visible = False
@@ -161,6 +162,7 @@ Public Class FormRekamMedisDokter
             ButtonSideMenu5.Visible = False
             ButtonSideMenu6.Visible = False
             ButtonSideMenu7.Visible = False
+            ButtonSideMenu8.Visible = False
 
             '# Ganti Tab Page
             Select Case myButton.Name
@@ -182,6 +184,9 @@ Public Class FormRekamMedisDokter
                 Case "ButtonMenu6"
                     TabControlMenuUtama.SelectedTab = TabPage8
                     ButtonSideMenu7.Visible = True
+                Case "ButtonMenu7"
+                    TabControlMenuUtama.SelectedTab = TabPage9
+                    ButtonSideMenu8.Visible = True
             End Select
 
             '# Ganti Warna Button
@@ -10432,6 +10437,257 @@ Public Class FormRekamMedisDokter
     Private Sub ButtonCariRiwayatSurat_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCariRiwayatSurat.Click
         Try
             GetRiwayatSurat()
+        Catch ex As Exception
+            MsgBox(ex.Message, MsgBoxStyle.Critical, "Warning!")
+        End Try
+    End Sub
+
+    Public Sub GetDataPaketHeader()
+        Dim tglAwal As String = Format(DtAwalPaket.Value, "yyyyMMdd")
+        Dim tglAkhir As String = Format(DtAkhirPaket.Value, "yyyyMMdd")
+        Dim noRM As String = idPasien
+        Dim jenisPaket As String = ""
+
+        If RadioButtonReguler.Checked Then
+            jenisPaket = "Paket Reguler"
+        ElseIf RadioButtonPerTindakan.Checked Then
+            jenisPaket = "Paket Per-Tindakan"
+        End If
+
+        Dim query As New System.Text.StringBuilder()
+
+        If jenisPaket = "Paket Reguler" Then
+            query.AppendLine("SELECT ")
+            query.AppendLine("    tblPasien.Nama, ")
+            query.AppendLine("    tblPaket.NoRekamMedis AS [No RM], ")
+            query.AppendLine("    tblPaket.NoTransaksi AS [No Transaksi], ")
+            query.AppendLine("    tblPaket.NamaPaket AS [Nama Paket], ")
+            query.AppendLine("    STUFF(( ")
+            query.AppendLine("        SELECT ', ' + tblPaketDetail.NamaTindakan ")
+            query.AppendLine("        FROM TransaksiPaketTindakanDetail tblPaketDetail ")
+            query.AppendLine("        WHERE tblPaketDetail.PaketID = tblPaket.PaketID ")
+            query.AppendLine("          AND tblPaketDetail.KodeVoucher = tblPaket.KodeVoucher ")
+            query.AppendLine("        FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)') ")
+            query.AppendLine("    , 1, 2, '') AS [Nama Tindakan], ")
+            query.AppendLine("    tblPaket.JenisPaket AS [Jenis Paket], ")
+            query.AppendLine("    tblPaket.Kuota, ")
+            query.AppendLine("    tblPaket.TanggalMulaiPaket AS [Tgl Mulai], ")
+            query.AppendLine("    tblPaket.TanggalAkhirPaket AS [Tgl Berakhir], ")
+            query.AppendLine("    tblPaket.PaketID, ")
+            query.AppendLine("    tblPaket.KodeVoucher, ")
+            query.AppendLine("    0 AS [TindakanID] ")
+            query.AppendLine("FROM TransaksiPaketTindakan tblPaket ")
+            query.AppendLine("LEFT JOIN MasterPasien tblPasien ON tblPasien.NoRekamMedis = tblPaket.NoRekamMedis ")
+            query.AppendLine("WHERE tblPaket.JenisPaket = 'Paket Reguler' ")
+
+            If noRM <> "" Then
+                query.AppendLine("AND tblPaket.NoRekamMedis = '" & noRM & "' ")
+            End If
+
+            query.AppendLine("AND CONVERT(DATE, tblPaket.TanggalMulaiPaket) BETWEEN '" & tglAwal & "' AND '" & tglAkhir & "' ")
+            query.AppendLine("AND tblPaket.DeletedDate IS NULL ")
+            query.AppendLine("ORDER BY tblPaket.PaketID")
+
+        ElseIf jenisPaket = "Paket Per-Tindakan" Then
+            query.AppendLine("SELECT ")
+            query.AppendLine("    tblPasien.Nama, ")
+            query.AppendLine("    tblPaket.NoRekamMedis AS [No RM], ")
+            query.AppendLine("    tblPaket.NamaPaket AS [Nama Paket], ")
+            query.AppendLine("    tblPaketDetail.NamaTindakan AS [Nama Tindakan], ")
+            query.AppendLine("    tblPaket.JenisPaket AS [Jenis Paket], ")
+            query.AppendLine("    tblPaketDetail.KuotaTindakan AS [Kuota], ")
+            query.AppendLine("    tblPaket.TanggalMulaiPaket AS [Tgl Mulai], ")
+            query.AppendLine("    tblPaket.TanggalAkhirPaket AS [Tgl Berakhir], ")
+            query.AppendLine("    tblPaket.PaketID, ")
+            query.AppendLine("    tblPaket.KodeVoucher, ")
+            query.AppendLine("    tblPaketDetail.TindakanID ")
+            query.AppendLine("FROM TransaksiPaketTindakanDetail tblPaketDetail ")
+            query.AppendLine("LEFT JOIN TransaksiPaketTindakan tblPaket ")
+            query.AppendLine("    ON tblPaket.PaketID = tblPaketDetail.PaketID ")
+            query.AppendLine("    AND tblPaket.KodeVoucher = tblPaketDetail.KodeVoucher ")
+            query.AppendLine("LEFT JOIN MasterPasien tblPasien ")
+            query.AppendLine("    ON tblPasien.NoRekamMedis = tblPaket.NoRekamMedis ")
+            query.AppendLine("WHERE tblPaket.JenisPaket = 'Paket Per-Tindakan' ")
+
+            If noRM <> "" Then
+                query.AppendLine("AND tblPaket.NoRekamMedis = '" & noRM & "' ")
+            End If
+
+            query.AppendLine("AND CONVERT(DATE, tblPaket.TanggalMulaiPaket) BETWEEN '" & tglAwal & "' AND '" & tglAkhir & "' ")
+            query.AppendLine("AND tblPaket.DeletedDate IS NULL ")
+            query.AppendLine("ORDER BY tblPaket.PaketID, tblPaketDetail.TindakanID")
+        End If
+
+        Dim dt As DataTable = ReadSQL(query.ToString())
+
+        If dt.Rows.Count = 0 Then
+            MessageBox.Show("Data tidak ditemukan untuk jenis paket " & jenisPaket, "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
+
+            DataGridViewPaket.DataSource = Nothing
+            DataGridViewPaket.Rows.Clear()
+            DataGridViewPaket.Columns.Clear()
+            Return ' Keluar dari Sub agar tidak lanjut styling dll
+        End If
+
+        DataGridViewPaket.DataSource = dt
+
+        ' Sembunyikan kolom asli tanggal
+        If DataGridViewPaket.Columns.Contains("Tgl Mulai") Then DataGridViewPaket.Columns("Tgl Mulai").Visible = False
+        If DataGridViewPaket.Columns.Contains("Tgl Berakhir") Then DataGridViewPaket.Columns("Tgl Berakhir").Visible = False
+        If DataGridViewPaket.Columns.Contains("PaketID") Then DataGridViewPaket.Columns("PaketID").Visible = False
+        If DataGridViewPaket.Columns.Contains("KodeVoucher") Then DataGridViewPaket.Columns("KodeVoucher").Visible = False
+        If DataGridViewPaket.Columns.Contains("TindakanID") Then DataGridViewPaket.Columns("TindakanID").Visible = False
+
+
+        ' Ganti Header kolom tampilan
+        If DataGridViewPaket.Columns.Contains("Tgl Mulai Format") Then DataGridViewPaket.Columns("Tgl Mulai Format").HeaderText = "Tgl Mulai"
+        If DataGridViewPaket.Columns.Contains("Tgl Berakhir Format") Then DataGridViewPaket.Columns("Tgl Berakhir Format").HeaderText = "Tgl Berakhir"
+
+        ' Styling Header dan Grid
+        With DataGridViewPaket
+            .ColumnHeadersDefaultCellStyle.Font = New Font("Segoe UI Semibold", 10, FontStyle.Bold)
+            .DefaultCellStyle.Font = New Font("Segoe UI", 9, FontStyle.Regular)
+            .AlternatingRowsDefaultCellStyle.BackColor = Color.AliceBlue
+            .RowsDefaultCellStyle.SelectionBackColor = Color.DodgerBlue
+            .RowsDefaultCellStyle.SelectionForeColor = Color.White
+            .EnableHeadersVisualStyles = False
+            .ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(0, 100, 200)
+            .ColumnHeadersDefaultCellStyle.ForeColor = Color.White
+            .RowHeadersVisible = False
+            .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+        End With
+
+        ' Pewarnaan baris berdasarkan Kuota
+        For Each row As DataGridViewRow In DataGridViewPaket.Rows
+            If Not row.IsNewRow Then
+                Dim kuotaVal As Integer = 0
+                If Integer.TryParse(row.Cells("Kuota").Value.ToString(), kuotaVal) Then
+                    If kuotaVal = 0 Then
+                        row.DefaultCellStyle.BackColor = Color.FromArgb(242, 222, 222)
+                        row.DefaultCellStyle.ForeColor = Color.Black
+                    ElseIf kuotaVal >= 1 Then
+                        row.DefaultCellStyle.BackColor = Color.FromArgb(195, 237, 192)
+                        row.DefaultCellStyle.ForeColor = Color.Black
+                    End If
+                End If
+            End If
+        Next
+    End Sub
+
+    Private Sub DataGridViewPaket_CellClick(ByVal sender As Object, ByVal e As DataGridViewCellEventArgs) Handles DataGridViewPaket.CellClick
+        If e.RowIndex >= 0 Then
+            Dim jenisPaket As String = ""
+            If RadioButtonReguler.Checked Then
+                jenisPaket = "Paket Reguler"
+            ElseIf RadioButtonPerTindakan.Checked Then
+                jenisPaket = "Paket Per-Tindakan"
+            End If
+
+            Dim selectedRow As DataGridViewRow = DataGridViewPaket.Rows(e.RowIndex)
+
+            Dim paketID As String = selectedRow.Cells("PaketID").Value.ToString()
+            Dim kodeVoucher As String = selectedRow.Cells("KodeVoucher").Value.ToString()
+
+            LoadDetailPaket(paketID, kodeVoucher, jenisPaket)
+        End If
+    End Sub
+
+
+    Public Sub LoadDetailPaket(ByVal paketID As String, ByVal kodeVoucher As String, ByVal jenisPaket As String)
+        Dim query As New System.Text.StringBuilder()
+
+        query.AppendLine("SELECT ")
+        query.AppendLine("    tblLog.NoTransaksi, ")
+        query.AppendLine("    tblPasien.Nama, ")
+        query.AppendLine("    tblLog.NoRekamMedis AS [No RM], ")
+        query.AppendLine("    tblLog.KodeVoucher, ")
+        query.AppendLine("    tblLog.PaketID, ")
+        query.AppendLine("    tblLog.TanggalTransaksi AS [Tgl Transaksi] ")
+        query.AppendLine("FROM LogPenggunaanPaket tblLog ")
+        query.AppendLine("INNER JOIN TransaksiPaketTindakan tblPaket ")
+        query.AppendLine("    ON tblLog.KodeVoucher = tblPaket.KodeVoucher AND tblLog.PaketID = tblPaket.PaketID ")
+        query.AppendLine("INNER JOIN MasterPasien tblPasien ON tblLog.NoRekamMedis = tblPasien.NoRekamMedis ")
+        query.AppendLine("WHERE tblPaket.JenisPaket = '" & jenisPaket & "' ")
+        query.AppendLine("AND tblLog.PaketID = '" & paketID & "' ")
+        query.AppendLine("AND tblLog.KodeVoucher = '" & kodeVoucher & "' ")
+        query.AppendLine("AND tblLog.DeletedDate IS NULL ")
+        query.AppendLine("ORDER BY tblLog.TanggalTransaksi ASC")
+
+        Dim dtDetail As DataTable = ReadSQL(query.ToString())
+
+        ' Format tanggal (jika perlu)
+        If Not dtDetail.Columns.Contains("Tgl Transaksi Format") Then
+            dtDetail.Columns.Add("Tgl Transaksi Format", GetType(String))
+        End If
+
+        For Each row As DataRow In dtDetail.Rows
+            If Not IsDBNull(row("Tgl Transaksi")) Then
+                row("Tgl Transaksi Format") = CDate(row("Tgl Transaksi")).ToString("dddd, dd MMM yyyy", New Globalization.CultureInfo("id-ID"))
+            End If
+        Next
+
+        ' Tampilkan di DataGridViewDetail
+        DataGridViewDetail.DataSource = dtDetail
+
+        If DataGridViewDetail.Columns.Contains("KodeVoucher") Then DataGridViewDetail.Columns("KodeVoucher").Visible = False
+        If DataGridViewDetail.Columns.Contains("PaketID") Then DataGridViewDetail.Columns("PaketID").Visible = False
+
+        ' Styling
+        With DataGridViewDetail
+            .ColumnHeadersDefaultCellStyle.Font = New Font("Segoe UI Semibold", 10, FontStyle.Bold)
+            .DefaultCellStyle.Font = New Font("Segoe UI", 9, FontStyle.Regular)
+            .AlternatingRowsDefaultCellStyle.BackColor = Color.AliceBlue
+            .RowsDefaultCellStyle.SelectionBackColor = Color.DodgerBlue
+            .RowsDefaultCellStyle.SelectionForeColor = Color.White
+            .EnableHeadersVisualStyles = False
+            .ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(0, 100, 200)
+            .ColumnHeadersDefaultCellStyle.ForeColor = Color.White
+            .RowHeadersVisible = False
+            .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+            .Columns("Tgl Transaksi").Visible = False
+            .Columns("Tgl Transaksi Format").HeaderText = "Tanggal Transaksi"
+        End With
+    End Sub
+
+    Private Sub ClearGrid()
+        DataGridViewPaket.DataSource = Nothing
+        DataGridViewPaket.Rows.Clear()
+        DataGridViewPaket.Columns.Clear()
+
+        DataGridViewDetail.DataSource = Nothing
+        DataGridViewDetail.Rows.Clear()
+        DataGridViewDetail.Columns.Clear()
+    End Sub
+
+    Private Sub ClearGridView()
+        DataGridViewPaket.DataSource = Nothing
+        DataGridViewPaket.Rows.Clear()
+        DataGridViewPaket.Columns.Clear()
+
+        ' Jika ada DataGridView detail
+        If DataGridViewDetail IsNot Nothing Then
+            DataGridViewDetail.DataSource = Nothing
+            DataGridViewDetail.Rows.Clear()
+            DataGridViewDetail.Columns.Clear()
+        End If
+    End Sub
+
+    Private Sub RadioButtonReguler_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles RadioButtonReguler.CheckedChanged
+        If RadioButtonReguler.Checked Then
+            ClearGridView()
+        End If
+    End Sub
+
+    Private Sub RadioButtonPerTindakan_CheckedChanged(ByVal sender As Object, ByVal e As EventArgs) Handles RadioButtonPerTindakan.CheckedChanged
+        If RadioButtonPerTindakan.Checked Then
+            ClearGridView()
+        End If
+    End Sub
+
+    Private Sub BtnCariPaket_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BtnCariPaket.Click
+        Try
+            ClearGrid()
+            GetDataPaketHeader()
         Catch ex As Exception
             MsgBox(ex.Message, MsgBoxStyle.Critical, "Warning!")
         End Try

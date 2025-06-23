@@ -438,7 +438,6 @@ Public Class FormReservasi
     End Sub
 
     Public Sub LoadPasien(ByVal Trow As DataRowView)
-        'Set Data From Pencarian
         TextBoxNamaPasien.Text = Trow("Nama").ToString
         TextBoxNoHP.Text = Trow("No. HP").ToString
     End Sub
