@@ -3252,3 +3252,4 @@ C:\Users\admin\Documents\GitHub\Poliklinik_16Juni\obj\Debug\PoliKlinik2.0.exe.li
 C:\Users\admin\Documents\GitHub\Poliklinik_16Juni\obj\Debug\PoliKlinik2.0.exe.manifest
 C:\Users\admin\Documents\GitHub\Poliklinik_16Juni\obj\Debug\PoliKlinik2.0.application
 C:\Users\admin\Documents\GitHub\Poliklinik_16Juni\obj\Debug\PoliKlinik_Net2.Dialog1.resources
+C:\Users\admin\Documents\GitHub\Poliklinik_16Juni\obj\Debug\PoliKlinik_Net2.ReportCapaianKBK.resources

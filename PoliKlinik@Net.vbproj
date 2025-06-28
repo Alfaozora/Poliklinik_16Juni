@@ -396,6 +396,12 @@
     <Compile Include="Poli\FormMasterMarketing.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Poli\Laporan\ReportCapaianKBK.Designer.vb">
+      <DependentUpon>ReportCapaianKBK.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Poli\Laporan\ReportCapaianKBK.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Poli\Laporan\ReportDiagnosa.Designer.vb">
       <DependentUpon>ReportDiagnosa.vb</DependentUpon>
     </Compile>
@@ -1392,6 +1398,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Poli\FormMasterMarketing.resx">
       <DependentUpon>FormMasterMarketing.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Poli\Laporan\ReportCapaianKBK.resx">
+      <DependentUpon>ReportCapaianKBK.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Poli\Laporan\ReportDiagnosa.resx">
       <DependentUpon>ReportDiagnosa.vb</DependentUpon>

@@ -167,7 +167,7 @@ Public Class ReportFeeDokterPengirim
               "MDK.DrNama AS 'Dokter' " & _
               "FROM MasterDokterTempatPraktek MDTP " & _
               "LEFT JOIN MasterDokterKirim MDK ON MDK.IdKirim = MDTP.IdKirim " & _
-              "LEFT JOIN TransaksiLab TL ON TL.DokterRequest = MDK.IdKirim " & _
+              "LEFT JOIN TransaksiLab TL ON TL.DokterRequest = MDTP.IdPraktek " & _
               "LEFT JOIN MasterPasien MP ON TL.IDInternet = MP.NoRekamMedis " & _
               "LEFT JOIN TransaksiLabDetail TLD ON TL.TransLabID = TLD.TransLabID " & _
               "LEFT JOIN TransaksiDetail TD ON TL.NoUrut = TD.NoUrut " & _

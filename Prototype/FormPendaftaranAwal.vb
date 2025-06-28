@@ -1789,7 +1789,12 @@ Public Class FormPendaftaranAwal
                                     rowPasien("Nomor NIK") = rowData.response.nik
                                     rowPasien("Nomor BPJS") = rowData.response.nomorkartu
                                     rowPasien("Jenis Kelamin") = rowData.response.jeniskelamin
-                                    rowPasien("Tanggal Lahir") = rowData.response.tanggallahir
+                                    'rowPasien("Tanggal Lahir") = rowData.response.tanggallahir
+                                    If rowData.response.tanggallahir IsNot Nothing AndAlso rowData.response.tanggallahir.Trim() <> "" Then
+                                        rowPasien("Tanggal Lahir") = rowData.response.tanggallahir
+                                    Else
+                                        rowPasien("Tanggal Lahir") = "01/01/1900"
+                                    End If
                                     rowPasien("Alamat") = rowData.response.alamat
                                 Else
                                     rowPasien("Nomor NIK") = nomorNIK

@@ -1,6 +1,6 @@
 <!--
 AssemblyName=DevExpress%2EXtraReports3%2C%20Version%3D1%2E12%2E3%2E0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3D79868b8147b5eae4
-AssemblyLocation=E:\MASTER\_Program Poli\Poliklinik Program\Poliklinik 2.0\PoliKlinik@Net\bin\Debug\DevExpress.XtraReports3.dll
+AssemblyLocation=C:\Windows\assembly\GAC_MSIL\DevExpress.XtraReports3\1.12.3.0__79868b8147b5eae4\DevExpress.XtraReports3.dll
 TypeName=DevExpress.XtraReports.UI.XtraReport
 Localization=en-US
 -->
@@ -695,7 +695,7 @@ Localization=en-US
 <width>500</width>
 <height>23</height>
 </Bounds>
-<Text id="ref-72">01 Jan 2025 - 20 May 2025</Text>
+<Text id="ref-72">01 Feb 2025 - 24 Jun 2025</Text>
 <NavigateUrl href="#ref-6"/>
 <Target href="#ref-6"/>
 <CanGrow>true</CanGrow>
@@ -795,7 +795,7 @@ Localization=en-US
 <width>250</width>
 <height>25</height>
 </Bounds>
-<Text id="ref-78">20-May-2025 15:04:10 By Admin</Text>
+<Text id="ref-78">24-Jun-2025 11:12:37 By Admin</Text>
 <NavigateUrl href="#ref-6"/>
 <Target href="#ref-6"/>
 <CanGrow>true</CanGrow>
@@ -1518,10 +1518,10 @@ Localization=en-US
 <ParentStyleUsing_X_UseTextAlignment>false</ParentStyleUsing_X_UseTextAlignment>
 <Dpi>100</Dpi>
 <BindingItemCount>1</BindingItemCount>
-<BindingItem0_X_PropertyName href="#ref-140"/>
-<BindingItem0_X_DataMember id="ref-162">Disc Tindakan</BindingItem0_X_DataMember>
-<BindingItem0_X_FormatString href="#ref-6"/>
-<BindingItem0_X_DataSource id="ref-163">dataSource.</BindingItem0_X_DataSource>
+<BindingItem0_X_PropertyName id="ref-162">Text</BindingItem0_X_PropertyName>
+<BindingItem0_X_DataMember id="ref-163">Disc Tindakan</BindingItem0_X_DataMember>
+<BindingItem0_X_FormatString id="ref-164">{0} %</BindingItem0_X_FormatString>
+<BindingItem0_X_DataSource id="ref-165">dataSource.</BindingItem0_X_DataSource>
 <Bounds xsi:type="a2:Rectangle" xmlns:a2="http://schemas.microsoft.com/clr/nsassem/System.Drawing/System.Drawing%2C%20Version%3D2.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Db03f5f7f11d50a3a">
 <x>671</x>
 <y>0</y>
@@ -1548,8 +1548,8 @@ Localization=en-US
 <Visible>true</Visible>
 <Tag href="#ref-6"/>
 <Dock xsi:type="a3:XRDockStyle" xmlns:a3="http://schemas.microsoft.com/clr/nsassem/DevExpress.XtraReports.UI/DevExpress.XtraReports3%2C%20Version%3D1.12.3.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3D79868b8147b5eae4">None</Dock>
-<Name id="ref-164">xrTableCell17</Name>
-<Style_X_Font id="ref-165">Trebuchet MS, 8pt</Style_X_Font>
+<Name id="ref-166">xrTableCell17</Name>
+<Style_X_Font id="ref-167">Trebuchet MS, 8pt</Style_X_Font>
 <Style_X_ForeColor href="#ref-14"/>
 <Style_X_BackColor href="#ref-15"/>
 <Style_X_BorderColor href="#ref-14"/>
@@ -1573,16 +1573,16 @@ Localization=en-US
 <Dpi>100</Dpi>
 <BindingItemCount>1</BindingItemCount>
 <BindingItem0_X_PropertyName href="#ref-154"/>
-<BindingItem0_X_DataMember id="ref-166">Nett Bayar</BindingItem0_X_DataMember>
-<BindingItem0_X_FormatString id="ref-167">Rp. {0:n0}</BindingItem0_X_FormatString>
-<BindingItem0_X_DataSource id="ref-168">dataSource.</BindingItem0_X_DataSource>
+<BindingItem0_X_DataMember id="ref-168">Nett Bayar</BindingItem0_X_DataMember>
+<BindingItem0_X_FormatString id="ref-169">Rp. {0:n0}</BindingItem0_X_FormatString>
+<BindingItem0_X_DataSource id="ref-170">dataSource.</BindingItem0_X_DataSource>
 <Bounds xsi:type="a2:Rectangle" xmlns:a2="http://schemas.microsoft.com/clr/nsassem/System.Drawing/System.Drawing%2C%20Version%3D2.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Db03f5f7f11d50a3a">
 <x>704</x>
 <y>0</y>
 <width>72</width>
 <height>30</height>
 </Bounds>
-<Text href="#ref-164"/>
+<Text href="#ref-166"/>
 <NavigateUrl href="#ref-6"/>
 <Target href="#ref-6"/>
 <CanGrow>true</CanGrow>
@@ -1602,8 +1602,8 @@ Localization=en-US
 <Visible>true</Visible>
 <Tag href="#ref-6"/>
 <Dock xsi:type="a3:XRDockStyle" xmlns:a3="http://schemas.microsoft.com/clr/nsassem/DevExpress.XtraReports.UI/DevExpress.XtraReports3%2C%20Version%3D1.12.3.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3D79868b8147b5eae4">None</Dock>
-<Name id="ref-169">xrTableCell1</Name>
-<Style_X_Font id="ref-170">Arial, 8pt, style=Bold</Style_X_Font>
+<Name id="ref-171">xrTableCell1</Name>
+<Style_X_Font id="ref-172">Arial, 8pt, style=Bold</Style_X_Font>
 <Style_X_ForeColor href="#ref-14"/>
 <Style_X_BackColor href="#ref-15"/>
 <Style_X_BorderColor href="#ref-14"/>
@@ -1632,7 +1632,7 @@ Localization=en-US
 <width>42</width>
 <height>30</height>
 </Bounds>
-<Text id="ref-171">No</Text>
+<Text id="ref-173">No</Text>
 <NavigateUrl href="#ref-6"/>
 <Target href="#ref-6"/>
 <CanGrow>true</CanGrow>
@@ -1652,8 +1652,8 @@ Localization=en-US
 <Visible>true</Visible>
 <Tag href="#ref-6"/>
 <Dock xsi:type="a3:XRDockStyle" xmlns:a3="http://schemas.microsoft.com/clr/nsassem/DevExpress.XtraReports.UI/DevExpress.XtraReports3%2C%20Version%3D1.12.3.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3D79868b8147b5eae4">None</Dock>
-<Name id="ref-172">xrTableCell2</Name>
-<Style_X_Font id="ref-173">Arial, 8pt, style=Bold</Style_X_Font>
+<Name id="ref-174">xrTableCell2</Name>
+<Style_X_Font id="ref-175">Arial, 8pt, style=Bold</Style_X_Font>
 <Style_X_ForeColor href="#ref-14"/>
 <Style_X_BackColor href="#ref-84"/>
 <Style_X_BorderColor href="#ref-14"/>
@@ -1682,7 +1682,7 @@ Localization=en-US
 <width>90</width>
 <height>30</height>
 </Bounds>
-<Text id="ref-174">NoLab</Text>
+<Text id="ref-176">NoLab</Text>
 <NavigateUrl href="#ref-6"/>
 <Target href="#ref-6"/>
 <CanGrow>true</CanGrow>
@@ -1702,8 +1702,8 @@ Localization=en-US
 <Visible>true</Visible>
 <Tag href="#ref-6"/>
 <Dock xsi:type="a3:XRDockStyle" xmlns:a3="http://schemas.microsoft.com/clr/nsassem/DevExpress.XtraReports.UI/DevExpress.XtraReports3%2C%20Version%3D1.12.3.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3D79868b8147b5eae4">None</Dock>
-<Name id="ref-175">xrTableCell3</Name>
-<Style_X_Font id="ref-176">Arial, 8pt, style=Bold</Style_X_Font>
+<Name id="ref-177">xrTableCell3</Name>
+<Style_X_Font id="ref-178">Arial, 8pt, style=Bold</Style_X_Font>
 <Style_X_ForeColor href="#ref-14"/>
 <Style_X_BackColor href="#ref-15"/>
 <Style_X_BorderColor href="#ref-14"/>
@@ -1732,7 +1732,7 @@ Localization=en-US
 <width>99</width>
 <height>30</height>
 </Bounds>
-<Text id="ref-177">TglLab</Text>
+<Text id="ref-179">TglLab</Text>
 <NavigateUrl href="#ref-6"/>
 <Target href="#ref-6"/>
 <CanGrow>true</CanGrow>
@@ -1752,8 +1752,8 @@ Localization=en-US
 <Visible>true</Visible>
 <Tag href="#ref-6"/>
 <Dock xsi:type="a3:XRDockStyle" xmlns:a3="http://schemas.microsoft.com/clr/nsassem/DevExpress.XtraReports.UI/DevExpress.XtraReports3%2C%20Version%3D1.12.3.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3D79868b8147b5eae4">None</Dock>
-<Name id="ref-178">xrTableCell9</Name>
-<Style_X_Font id="ref-179">Arial, 8pt, style=Bold</Style_X_Font>
+<Name id="ref-180">xrTableCell9</Name>
+<Style_X_Font id="ref-181">Arial, 8pt, style=Bold</Style_X_Font>
 <Style_X_ForeColor href="#ref-14"/>
 <Style_X_BackColor href="#ref-15"/>
 <Style_X_BorderColor href="#ref-14"/>
@@ -1782,7 +1782,7 @@ Localization=en-US
 <width>123</width>
 <height>30</height>
 </Bounds>
-<Text id="ref-180">Nama</Text>
+<Text id="ref-182">Nama</Text>
 <NavigateUrl href="#ref-6"/>
 <Target href="#ref-6"/>
 <CanGrow>true</CanGrow>
@@ -1802,8 +1802,8 @@ Localization=en-US
 <Visible>true</Visible>
 <Tag href="#ref-6"/>
 <Dock xsi:type="a3:XRDockStyle" xmlns:a3="http://schemas.microsoft.com/clr/nsassem/DevExpress.XtraReports.UI/DevExpress.XtraReports3%2C%20Version%3D1.12.3.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3D79868b8147b5eae4">None</Dock>
-<Name id="ref-181">xrTableCell4</Name>
-<Style_X_Font id="ref-182">Arial, 8pt, style=Bold</Style_X_Font>
+<Name id="ref-183">xrTableCell4</Name>
+<Style_X_Font id="ref-184">Arial, 8pt, style=Bold</Style_X_Font>
 <Style_X_ForeColor href="#ref-14"/>
 <Style_X_BackColor href="#ref-15"/>
 <Style_X_BorderColor href="#ref-14"/>
@@ -1832,7 +1832,7 @@ Localization=en-US
 <width>117</width>
 <height>30</height>
 </Bounds>
-<Text id="ref-183">Tindakan</Text>
+<Text id="ref-185">Tindakan</Text>
 <NavigateUrl href="#ref-6"/>
 <Target href="#ref-6"/>
 <CanGrow>true</CanGrow>
@@ -1852,8 +1852,8 @@ Localization=en-US
 <Visible>true</Visible>
 <Tag href="#ref-6"/>
 <Dock xsi:type="a3:XRDockStyle" xmlns:a3="http://schemas.microsoft.com/clr/nsassem/DevExpress.XtraReports.UI/DevExpress.XtraReports3%2C%20Version%3D1.12.3.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3D79868b8147b5eae4">None</Dock>
-<Name id="ref-184">xrTableCell13</Name>
-<Style_X_Font id="ref-185">Arial, 8pt, style=Bold</Style_X_Font>
+<Name id="ref-186">xrTableCell13</Name>
+<Style_X_Font id="ref-187">Arial, 8pt, style=Bold</Style_X_Font>
 <Style_X_ForeColor href="#ref-14"/>
 <Style_X_BackColor href="#ref-15"/>
 <Style_X_BorderColor href="#ref-14"/>
@@ -1882,7 +1882,7 @@ Localization=en-US
 <width>117</width>
 <height>30</height>
 </Bounds>
-<Text id="ref-186">Pemeriksaan</Text>
+<Text id="ref-188">Pemeriksaan</Text>
 <NavigateUrl href="#ref-6"/>
 <Target href="#ref-6"/>
 <CanGrow>true</CanGrow>
@@ -1902,8 +1902,8 @@ Localization=en-US
 <Visible>true</Visible>
 <Tag href="#ref-6"/>
 <Dock xsi:type="a3:XRDockStyle" xmlns:a3="http://schemas.microsoft.com/clr/nsassem/DevExpress.XtraReports.UI/DevExpress.XtraReports3%2C%20Version%3D1.12.3.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3D79868b8147b5eae4">None</Dock>
-<Name id="ref-187">xrTableCell6</Name>
-<Style_X_Font id="ref-188">Arial, 8pt, style=Bold</Style_X_Font>
+<Name id="ref-189">xrTableCell6</Name>
+<Style_X_Font id="ref-190">Arial, 8pt, style=Bold</Style_X_Font>
 <Style_X_ForeColor href="#ref-14"/>
 <Style_X_BackColor href="#ref-15"/>
 <Style_X_BorderColor href="#ref-14"/>
@@ -1932,7 +1932,7 @@ Localization=en-US
 <width>83</width>
 <height>30</height>
 </Bounds>
-<Text id="ref-189">Biaya Tindakan</Text>
+<Text id="ref-191">Biaya Tindakan</Text>
 <NavigateUrl href="#ref-6"/>
 <Target href="#ref-6"/>
 <CanGrow>true</CanGrow>
@@ -1952,8 +1952,8 @@ Localization=en-US
 <Visible>true</Visible>
 <Tag href="#ref-6"/>
 <Dock xsi:type="a3:XRDockStyle" xmlns:a3="http://schemas.microsoft.com/clr/nsassem/DevExpress.XtraReports.UI/DevExpress.XtraReports3%2C%20Version%3D1.12.3.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3D79868b8147b5eae4">None</Dock>
-<Name id="ref-190">xrTableCell15</Name>
-<Style_X_Font id="ref-191">Arial, 8pt, style=Bold</Style_X_Font>
+<Name id="ref-192">xrTableCell15</Name>
+<Style_X_Font id="ref-193">Arial, 8pt, style=Bold</Style_X_Font>
 <Style_X_ForeColor href="#ref-14"/>
 <Style_X_BackColor href="#ref-15"/>
 <Style_X_BorderColor href="#ref-14"/>
@@ -1982,7 +1982,7 @@ Localization=en-US
 <width>33</width>
 <height>30</height>
 </Bounds>
-<Text id="ref-192">Fee </Text>
+<Text id="ref-194">Fee </Text>
 <NavigateUrl href="#ref-6"/>
 <Target href="#ref-6"/>
 <CanGrow>true</CanGrow>
@@ -2002,8 +2002,8 @@ Localization=en-US
 <Visible>true</Visible>
 <Tag href="#ref-6"/>
 <Dock xsi:type="a3:XRDockStyle" xmlns:a3="http://schemas.microsoft.com/clr/nsassem/DevExpress.XtraReports.UI/DevExpress.XtraReports3%2C%20Version%3D1.12.3.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3D79868b8147b5eae4">None</Dock>
-<Name id="ref-193">xrTableCell16</Name>
-<Style_X_Font id="ref-194">Arial, 8pt, style=Bold</Style_X_Font>
+<Name id="ref-195">xrTableCell16</Name>
+<Style_X_Font id="ref-196">Arial, 8pt, style=Bold</Style_X_Font>
 <Style_X_ForeColor href="#ref-14"/>
 <Style_X_BackColor href="#ref-15"/>
 <Style_X_BorderColor href="#ref-14"/>
@@ -2032,7 +2032,7 @@ Localization=en-US
 <width>72</width>
 <height>30</height>
 </Bounds>
-<Text id="ref-195">Nett</Text>
+<Text id="ref-197">Nett</Text>
 <NavigateUrl href="#ref-6"/>
 <Target href="#ref-6"/>
 <CanGrow>true</CanGrow>
@@ -2052,8 +2052,8 @@ Localization=en-US
 <Visible>true</Visible>
 <Tag href="#ref-6"/>
 <Dock xsi:type="a3:XRDockStyle" xmlns:a3="http://schemas.microsoft.com/clr/nsassem/DevExpress.XtraReports.UI/DevExpress.XtraReports3%2C%20Version%3D1.12.3.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3D79868b8147b5eae4">None</Dock>
-<Name id="ref-196">xrTableCell19</Name>
-<Style_X_Font id="ref-197">Arial, 8pt, style=Bold</Style_X_Font>
+<Name id="ref-198">xrTableCell19</Name>
+<Style_X_Font id="ref-199">Arial, 8pt, style=Bold</Style_X_Font>
 <Style_X_ForeColor href="#ref-14"/>
 <Style_X_BackColor href="#ref-15"/>
 <Style_X_BorderColor href="#ref-14"/>
@@ -2082,7 +2082,7 @@ Localization=en-US
 <width>588</width>
 <height>23</height>
 </Bounds>
-<Text id="ref-198">GRAND TOTAL</Text>
+<Text id="ref-200">GRAND TOTAL</Text>
 <NavigateUrl href="#ref-6"/>
 <Target href="#ref-6"/>
 <CanGrow>true</CanGrow>
@@ -2102,8 +2102,8 @@ Localization=en-US
 <Visible>true</Visible>
 <Tag href="#ref-6"/>
 <Dock xsi:type="a3:XRDockStyle" xmlns:a3="http://schemas.microsoft.com/clr/nsassem/DevExpress.XtraReports.UI/DevExpress.XtraReports3%2C%20Version%3D1.12.3.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3D79868b8147b5eae4">None</Dock>
-<Name id="ref-199">xrTableCell21</Name>
-<Style_X_Font id="ref-200">Arial, 8.25pt, style=Bold</Style_X_Font>
+<Name id="ref-201">xrTableCell21</Name>
+<Style_X_Font id="ref-202">Arial, 8.25pt, style=Bold</Style_X_Font>
 <Style_X_ForeColor href="#ref-14"/>
 <Style_X_BackColor href="#ref-15"/>
 <Style_X_BorderColor href="#ref-14"/>
@@ -2126,17 +2126,17 @@ Localization=en-US
 <ParentStyleUsing_X_UseTextAlignment>false</ParentStyleUsing_X_UseTextAlignment>
 <Dpi>100</Dpi>
 <BindingItemCount>1</BindingItemCount>
-<BindingItem0_X_PropertyName id="ref-201">Text</BindingItem0_X_PropertyName>
-<BindingItem0_X_DataMember id="ref-202">Biaya Tindakan</BindingItem0_X_DataMember>
+<BindingItem0_X_PropertyName id="ref-203">Text</BindingItem0_X_PropertyName>
+<BindingItem0_X_DataMember id="ref-204">Biaya Tindakan</BindingItem0_X_DataMember>
 <BindingItem0_X_FormatString href="#ref-6"/>
-<BindingItem0_X_DataSource id="ref-203">dataSource.</BindingItem0_X_DataSource>
+<BindingItem0_X_DataSource id="ref-205">dataSource.</BindingItem0_X_DataSource>
 <Bounds xsi:type="a2:Rectangle" xmlns:a2="http://schemas.microsoft.com/clr/nsassem/System.Drawing/System.Drawing%2C%20Version%3D2.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Db03f5f7f11d50a3a">
 <x>588</x>
 <y>0</y>
 <width>83</width>
 <height>23</height>
 </Bounds>
-<Text href="#ref-199"/>
+<Text href="#ref-201"/>
 <NavigateUrl href="#ref-6"/>
 <Target href="#ref-6"/>
 <CanGrow>true</CanGrow>
@@ -2145,7 +2145,7 @@ Localization=en-US
 <KeepTogether>false</KeepTogether>
 <Multiline>false</Multiline>
 <Angle>0</Angle>
-<Summary_X_FormatString id="ref-204">{0:Rp #,#}</Summary_X_FormatString>
+<Summary_X_FormatString id="ref-206">{0:Rp #,#}</Summary_X_FormatString>
 <Summary_X_Func xsi:type="a3:SummaryFunc" xmlns:a3="http://schemas.microsoft.com/clr/nsassem/DevExpress.XtraReports.UI/DevExpress.XtraReports3%2C%20Version%3D1.12.3.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3D79868b8147b5eae4">Sum</Summary_X_Func>
 <Summary_X_Running xsi:type="a3:SummaryRunning" xmlns:a3="http://schemas.microsoft.com/clr/nsassem/DevExpress.XtraReports.UI/DevExpress.XtraReports3%2C%20Version%3D1.12.3.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3D79868b8147b5eae4">Report</Summary_X_Running>
 <Summary_X_IgnoreNullValues>false</Summary_X_IgnoreNullValues>
@@ -2157,8 +2157,8 @@ Localization=en-US
 <Visible>true</Visible>
 <Tag href="#ref-6"/>
 <Dock xsi:type="a3:XRDockStyle" xmlns:a3="http://schemas.microsoft.com/clr/nsassem/DevExpress.XtraReports.UI/DevExpress.XtraReports3%2C%20Version%3D1.12.3.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3D79868b8147b5eae4">None</Dock>
-<Name id="ref-205">xrTableCell22</Name>
-<Style_X_Font id="ref-206">Times New Roman, 9.75pt</Style_X_Font>
+<Name id="ref-207">xrTableCell22</Name>
+<Style_X_Font id="ref-208">Times New Roman, 9.75pt</Style_X_Font>
 <Style_X_ForeColor href="#ref-14"/>
 <Style_X_BackColor href="#ref-15"/>
 <Style_X_BorderColor href="#ref-14"/>
@@ -2207,8 +2207,8 @@ Localization=en-US
 <Visible>true</Visible>
 <Tag href="#ref-6"/>
 <Dock xsi:type="a3:XRDockStyle" xmlns:a3="http://schemas.microsoft.com/clr/nsassem/DevExpress.XtraReports.UI/DevExpress.XtraReports3%2C%20Version%3D1.12.3.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3D79868b8147b5eae4">None</Dock>
-<Name id="ref-207">xrTableCell20</Name>
-<Style_X_Font id="ref-208">Arial, 8pt, style=Bold</Style_X_Font>
+<Name id="ref-209">xrTableCell20</Name>
+<Style_X_Font id="ref-210">Arial, 8pt, style=Bold</Style_X_Font>
 <Style_X_ForeColor href="#ref-14"/>
 <Style_X_BackColor href="#ref-15"/>
 <Style_X_BorderColor href="#ref-14"/>
@@ -2231,17 +2231,17 @@ Localization=en-US
 <ParentStyleUsing_X_UseTextAlignment>false</ParentStyleUsing_X_UseTextAlignment>
 <Dpi>100</Dpi>
 <BindingItemCount>1</BindingItemCount>
-<BindingItem0_X_PropertyName id="ref-209">Text</BindingItem0_X_PropertyName>
-<BindingItem0_X_DataMember id="ref-210">Nett Bayar</BindingItem0_X_DataMember>
+<BindingItem0_X_PropertyName id="ref-211">Text</BindingItem0_X_PropertyName>
+<BindingItem0_X_DataMember id="ref-212">Nett Bayar</BindingItem0_X_DataMember>
 <BindingItem0_X_FormatString href="#ref-6"/>
-<BindingItem0_X_DataSource id="ref-211">dataSource.</BindingItem0_X_DataSource>
+<BindingItem0_X_DataSource id="ref-213">dataSource.</BindingItem0_X_DataSource>
 <Bounds xsi:type="a2:Rectangle" xmlns:a2="http://schemas.microsoft.com/clr/nsassem/System.Drawing/System.Drawing%2C%20Version%3D2.0.0.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3Db03f5f7f11d50a3a">
 <x>704</x>
 <y>0</y>
 <width>72</width>
 <height>23</height>
 </Bounds>
-<Text id="ref-212">xrTableCell3</Text>
+<Text id="ref-214">xrTableCell3</Text>
 <NavigateUrl href="#ref-6"/>
 <Target href="#ref-6"/>
 <CanGrow>true</CanGrow>
@@ -2250,7 +2250,7 @@ Localization=en-US
 <KeepTogether>false</KeepTogether>
 <Multiline>false</Multiline>
 <Angle>0</Angle>
-<Summary_X_FormatString id="ref-213">{0:Rp #,#}</Summary_X_FormatString>
+<Summary_X_FormatString id="ref-215">{0:Rp #,#}</Summary_X_FormatString>
 <Summary_X_Func xsi:type="a3:SummaryFunc" xmlns:a3="http://schemas.microsoft.com/clr/nsassem/DevExpress.XtraReports.UI/DevExpress.XtraReports3%2C%20Version%3D1.12.3.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3D79868b8147b5eae4">Sum</Summary_X_Func>
 <Summary_X_Running xsi:type="a3:SummaryRunning" xmlns:a3="http://schemas.microsoft.com/clr/nsassem/DevExpress.XtraReports.UI/DevExpress.XtraReports3%2C%20Version%3D1.12.3.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3D79868b8147b5eae4">Report</Summary_X_Running>
 <Summary_X_IgnoreNullValues>true</Summary_X_IgnoreNullValues>

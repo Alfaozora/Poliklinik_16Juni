@@ -709,8 +709,8 @@ Public Class FormCetakInvoice
             Report.Bands.Item(BandKind.ReportFooter).Controls("xrLabelKodeVoucher").Visible = True
         End If
 
-        Report.RunDesigner()
-        'Report.ShowPreview()
+        'Report.RunDesigner()
+        Report.ShowPreview()
         'Report.Print()
 
         ' ==================================================================================

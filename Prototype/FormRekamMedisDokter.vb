@@ -6052,7 +6052,7 @@ Public Class FormRekamMedisDokter
             "(" & _
             "   ISNULL(c.Tindakan, '') + " & _
             "   ISNULL(" & _
-            "       ' | ' + (" & _
+            "       '' + (" & _
             "           SELECT STUFF((" & _
             "               SELECT ' | ' + tpd.NamaTindakan " & _
             "               FROM TransaksiPoliDetail tpd " & _
@@ -6083,7 +6083,21 @@ Public Class FormRekamMedisDokter
             "UNION ALL " & _
             "SELECT a.NoUrut AS 'No Transaksi', CONVERT(VARCHAR, TglGigi, 120) AS 'Tanggal', " & _
             "c.KeluhanUtama AS 'Keluhan Utama', c.JenisPoli AS 'Layanan', c.Diagnosa AS 'Diagnosis', " & _
-            "c.Resep AS 'Resep', c.Tindakan AS 'Tindakan', c.Rujukan AS 'Rujukan', " & _
+            "c.Resep AS 'Resep', " & _
+            "(" & _
+            "   ISNULL(c.Tindakan, '') + " & _
+            "   ISNULL(" & _
+            "       '' + (" & _
+            "           SELECT STUFF((" & _
+            "               SELECT ' | ' + tgd.NamaTindakan " & _
+            "               FROM TransaksiGigiDetail tgd " & _
+            "               WHERE tgd.TransGigiID = a.TransGigiID " & _
+            "                 AND tgd.StatusPembayaran = 'PAID' " & _
+            "                 AND tgd.DeletedDate IS NULL " & _
+            "               FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 3, '')" & _
+            "       ), ''" & _
+            ")" & _
+            ") AS 'Tindakan', c.Rujukan AS 'Rujukan', " & _
             "a.DokterGigi AS 'Dokter', d.Sistole, d.Diastole, d.HeartRate, d.RespiratoryRate, d.Suhu " & _
             "FROM TransaksiGigi a " & _
             "LEFT JOIN TransaksiDetail c ON a.NoUrut=c.NoUrut " & _
@@ -6783,6 +6797,13 @@ Public Class FormRekamMedisDokter
             ketObatTindakan = "Pengobatan:" & vbCrLf & resep
         End If
 
+        'Catatan Obat
+        Dim ketCatatanObat As String = ""
+        Dim tblsCatatanObat As DataTable = ReadSQL("SELECT Catatan FROM TransaksiDetailCatatanObat WHERE NoTransaksi = '" & noUrut & "' AND DeletedDate IS NULL")
+        If tblsCatatanObat.Rows.Count > 0 Then
+            ketCatatanObat = "Catatan Obat: " & vbCrLf & tblsCatatanObat.Rows(0)("Catatan").ToString()
+        End If
+
         'Set Cek Stik
         Dim ketCekStik As String = ""
         Dim tblsCekStik As DataTable = ReadSQL("SELECT * FROM HasilCekStik WHERE NoTransaksi = '" & noUrut & "' AND Deleted IS NULL")
@@ -6794,7 +6815,7 @@ Public Class FormRekamMedisDokter
             Next
         End If
 
-                ' Set Diagnosa
+        ' Set Diagnosa
         Dim tblsDiagnosa As DataTable = ReadSQL("SELECT * FROM TransaksiDetailDiagnosa WHERE NoTransaksi = '" & noUrut & "' AND DeletedDate IS NULL")
         Dim ketDiagnosa As String = ""
 
@@ -6806,12 +6827,12 @@ Public Class FormRekamMedisDokter
                     ketDiagnosa = ketDiagnosa & vbCrLf & trowDiagnosa("KeteranganDiagnosa").ToString & " (" & trowDiagnosa("KodeDiagnosa").ToString & ")"
                 ElseIf trowDiagnosa("JenisDiagnosa") = "Diagnosa Komplikasi" Then
                     ketDiagnosa = ketDiagnosa & vbCrLf & trowDiagnosa("KeteranganDiagnosa").ToString & " (" & trowDiagnosa("KodeDiagnosa").ToString & ")"
-                        End If
-            Next
                 End If
+            Next
+        End If
 
         Dim Tnew As DataRow = tblsHasil.NewRow
-                ' DATA PASIEN
+        ' DATA PASIEN
         Tnew("Nama") = trowPasien("Nama") & " (" & trowPasien("JenisKelamin") & ")"
         Tnew("NoRekamMedis") = trowPasien("NoRekamMedis")
         Tnew("TTL") = trowPasien("TempatLahir") & ", " & Format(trowPasien("TglLahir"), "dd") & " " & BulanIndonesia(Format(trowPasien("TglLahir"), "MM")) & " " & Format(trowPasien("TglLahir"), "yyyy")
@@ -6819,7 +6840,7 @@ Public Class FormRekamMedisDokter
         Tnew("Tanggal Transaksi") = "Tanggal : " & Format(trowPasien("TanggalTransaksi"), "yyyy-MM-dd")
         Tnew("Waktu Transaksi") = "Pukul : " & Format(trowPasien("TanggalTransaksi"), "HH:mm:ss")
 
-                ' SUBJECTIVE
+        ' SUBJECTIVE
         Tnew("Keluhan Utama") = trowPasien("KeluhanUtama")
         Tnew("Keluhan Tambahan") = trowPasien("KeluhanTambahan")
         Tnew("Riwayat Penyakit Sekarang") = trowPasien("RiwayatPenyakitSekarang")
@@ -6829,25 +6850,28 @@ Public Class FormRekamMedisDokter
         Tnew("Riwayat Penyakit") = trowPasien("RiwayatPenyakitDahulu")
         Tnew("Riwayat Penyakit Keluarga") = trowPasien("RiwayatPenyakitKeluarga")
 
-                ' OBJECTIVE
+        ' OBJECTIVE
         Tnew("Keadaan umum") = ketKeadaanUmum
         Tnew("Kesadaran") = ketKesadaran
         Tnew("Tanda Vital") = ketTandaVital
         Tnew("Antropometri") = ketAntropometri
         Tnew("Status Generalis") = ketStatusGeneralis
 
-                ' ASSESMENT
+        ' ASSESMENT
         Tnew("Diagnosa") = ketDiagnosa
 
-                ' PLANNING
+        ' PLANNING
         Tnew("Rencana Tindakan / Pengobatan") = ketObatTindakan
+        If ketCatatanObat <> "" Then
+            Tnew("Rencana Tindakan / Pengobatan") &= vbCrLf & ketCatatanObat
+        End If
         If ketCekStik <> "" Then
             Tnew("Rencana Tindakan / Pengobatan") &= vbCrLf & vbCrLf & ketCekStik
         End If
         Tnew("RS Rujukan") = trowPasien("Rujukan")
         Tnew("Edukasi") = trowPasien("Edukasi")
 
-                ' FOOTER
+        ' FOOTER
         Dim namaKota As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'Kota'")
         Dim tglKunjungan As String = Format(trowPasien("TanggalTransaksi"), "dd") & " " & BulanIndonesia(Format(trowPasien("TanggalTransaksi"), "MM")) & " " & Format(trowPasien("TanggalTransaksi"), "yyyy")
         Dim nomorSIP As String = ReadSQLNIK("SELECT NoSIP FROM MasterDokter WHERE ID = '" & trowPasien("KodeDokter") & "'")

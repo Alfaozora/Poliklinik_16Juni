@@ -34,6 +34,7 @@ Public Class ReportDiagnosa
         ' Kolom data
         DataGridViewDaftarDiagnosa.Columns.Add("ColumnKodeDiagnosa", "Kode Diagnosa")
         DataGridViewDaftarDiagnosa.Columns.Add("ColumnNamaDiagnosa", "Nama Diagnosa")
+        DataGridViewDaftarDiagnosa.Columns.Add("ColumnRentangUsia", "Rentang Usia")
         DataGridViewDaftarDiagnosa.Columns.Add("ColumnJumlah", "Jumlah")
 
         ' Kolom checkbox di akhir
@@ -62,6 +63,12 @@ Public Class ReportDiagnosa
 
         With DataGridViewDaftarDiagnosa.Columns("ColumnNamaDiagnosa")
             .AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            .ReadOnly = True
+        End With
+
+        With DataGridViewDaftarDiagnosa.Columns("ColumnRentangUsia")
+            .AutoSizeMode = DataGridViewAutoSizeColumnMode.None
+            .Width = 150
             .ReadOnly = True
         End With
 
@@ -121,7 +128,7 @@ Public Class ReportDiagnosa
 
             If Tbls.Rows.Count > 0 Then
                 For Each Trow As DataRow In Tbls.Rows
-                    DataGridViewDaftarDiagnosa.Rows.Add(Trow("Kode Diagnosa").ToString(), Trow("Nama Diagnosa").ToString(), Trow("Jumlah").ToString(), False)
+                    DataGridViewDaftarDiagnosa.Rows.Add(Trow("Kode Diagnosa").ToString(), Trow("Nama Diagnosa").ToString(), Trow("Rentang Usia").ToString(), Trow("Jumlah").ToString(), False)
                 Next
 
                 DataGridViewDaftarDiagnosa.CurrentCell = Nothing
@@ -154,6 +161,7 @@ Public Class ReportDiagnosa
         selectedTable.Columns.Add("No", GetType(Integer))
         selectedTable.Columns.Add("Kode Diagnosa", GetType(String))
         selectedTable.Columns.Add("Nama Diagnosa", GetType(String))
+        selectedTable.Columns.Add("Rentang Usia", GetType(String))
         selectedTable.Columns.Add("Jumlah", GetType(Integer))
 
         Dim noUrut As Integer = 1
@@ -166,6 +174,7 @@ Public Class ReportDiagnosa
                 noUrut += 1
                 newRow("Kode Diagnosa") = row.Cells("ColumnKodeDiagnosa").Value.ToString()
                 newRow("Nama Diagnosa") = row.Cells("ColumnNamaDiagnosa").Value.ToString()
+                newRow("Rentang Usia") = row.Cells("ColumnRentangUsia").Value.ToString()
                 newRow("Jumlah") = Convert.ToInt32(row.Cells("ColumnJumlah").Value)
                 selectedTable.Rows.Add(newRow)
             End If
@@ -225,15 +234,35 @@ Public Class ReportDiagnosa
         End If
 
         ' Buat query
-        queryString = "SELECT ROW_NUMBER() OVER (ORDER BY COUNT(KodeDiagnosa) DESC) AS 'No', " & _
-                      "KodeDiagnosa AS 'Kode Diagnosa', KeteranganDiagnosa AS 'Nama Diagnosa', COUNT(KodeDiagnosa) AS 'Jumlah' " & _
-                      "FROM TransaksiDetailDiagnosa " & _
-                      "WHERE DeletedDate IS NULL AND NoTransaksi IN (" & _
-                          "SELECT NoUrut FROM TransaksiDetail " & _
-                          "WHERE CONVERT(date, TanggalTransaksi) BETWEEN '" & tanggalAwal & "' AND '" & tanggalAkhir & "'" & _
-                          tingkatPelayananSearch & indikatorSearch & jenisPoliSearch & ") " & _
-                      "GROUP BY KodeDiagnosa, KeteranganDiagnosa " & _
-                      "ORDER BY COUNT(KodeDiagnosa) DESC"
+        queryString = "SELECT ROW_NUMBER() OVER (ORDER BY COUNT(tdd.KodeDiagnosa) DESC) AS 'No', " & _
+              "tdd.KodeDiagnosa AS 'Kode Diagnosa', tdd.KeteranganDiagnosa AS 'Nama Diagnosa', " & _
+              "CASE " & _
+              "    WHEN DATEDIFF(YEAR, mp.TglLahir, GETDATE()) < 1 THEN '<1' " & _
+              "    WHEN DATEDIFF(YEAR, mp.TglLahir, GETDATE()) BETWEEN 1 AND 4 THEN '1-4' " & _
+              "    WHEN DATEDIFF(YEAR, mp.TglLahir, GETDATE()) BETWEEN 5 AND 14 THEN '5-14' " & _
+              "    WHEN DATEDIFF(YEAR, mp.TglLahir, GETDATE()) BETWEEN 15 AND 44 THEN '15-44' " & _
+              "    WHEN DATEDIFF(YEAR, mp.TglLahir, GETDATE()) BETWEEN 45 AND 55 THEN '45-55' " & _
+              "    WHEN DATEDIFF(YEAR, mp.TglLahir, GETDATE()) BETWEEN 55 AND 64 THEN '55-64' " & _
+              "    ELSE '>65' " & _
+              "END AS 'Rentang Usia', " & _
+              "COUNT(tdd.KodeDiagnosa) AS 'Jumlah' " & _
+              "FROM TransaksiDetailDiagnosa tdd " & _
+              "JOIN TransaksiDetail td ON tdd.NoTransaksi = td.NoUrut " & _
+              "JOIN MasterPasien mp ON td.IDInternet = mp.NoRekamMedis " & _
+              "WHERE tdd.DeletedDate IS NULL " & _
+              "AND CONVERT(date, td.TanggalTransaksi) BETWEEN '" & tanggalAwal & "' AND '" & tanggalAkhir & "'" & _
+              tingkatPelayananSearch & indikatorSearch & jenisPoliSearch & " " & _
+              "GROUP BY tdd.KodeDiagnosa, tdd.KeteranganDiagnosa, " & _
+              "CASE " & _
+              "    WHEN DATEDIFF(YEAR, mp.TglLahir, GETDATE()) < 1 THEN '<1' " & _
+              "    WHEN DATEDIFF(YEAR, mp.TglLahir, GETDATE()) BETWEEN 1 AND 4 THEN '1-4' " & _
+              "    WHEN DATEDIFF(YEAR, mp.TglLahir, GETDATE()) BETWEEN 5 AND 14 THEN '5-14' " & _
+              "    WHEN DATEDIFF(YEAR, mp.TglLahir, GETDATE()) BETWEEN 15 AND 44 THEN '15-44' " & _
+              "    WHEN DATEDIFF(YEAR, mp.TglLahir, GETDATE()) BETWEEN 45 AND 55 THEN '45-55' " & _
+              "    WHEN DATEDIFF(YEAR, mp.TglLahir, GETDATE()) BETWEEN 55 AND 64 THEN '55-64' " & _
+              "    ELSE '>65' " & _
+              "END " & _
+              "ORDER BY COUNT(tdd.KodeDiagnosa) DESC"
 
         ' Eksekusi query
         Dim Tbls As DataTable = ReadSQL(queryString)

@@ -1191,4 +1191,9 @@ Public Class PoliKlinik
         FormReservasi.Show()
         FormReservasi.Focus()
     End Sub
+
+    Private Sub CapaianKBKToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CapaianKBKToolStripMenuItem.Click
+        ReportCapaianKBK.Show()
+        ReportCapaianKBK.Focus()
+    End Sub
 End Class
