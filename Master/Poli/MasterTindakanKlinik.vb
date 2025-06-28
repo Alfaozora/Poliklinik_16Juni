@@ -811,7 +811,7 @@ Public Class MasterTindakanKlinik
         End If
 
         ' Validasi biaya tindakan kurang dari 0
-        If CDbl(TextBoxBiayaTindakan.Text) <= 0 Then MsgBox("Biaya harus lebih besar dari 0.", MsgBoxStyle.Exclamation, "Warning!") : Return False
+        'If CDbl(TextBoxBiayaTindakan.Text) <= 0 Then MsgBox("Biaya harus lebih besar dari 0.", MsgBoxStyle.Exclamation, "Warning!") : Return False
 
         ' Validasi informed consent
         If CheckBoxInformedConsent.Checked = True Then

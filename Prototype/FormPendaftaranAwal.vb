@@ -2250,8 +2250,14 @@ Public Class FormPendaftaranAwal
                 End If
 
                 ' Validasi diskon tindakan harus antara 0 sampai 100
-                If (discTindakan < 0 OrElse discTindakan > 100) And rowTindakan("Klasifikasi") <> "Paket" Then
-                    MsgBox("Gagal. Diskon tindakan " & rowTindakan("Tindakan") & " harus antara 0 sampai 100.", MsgBoxStyle.Exclamation, "Warning!")
+                'If (discTindakan < 0 OrElse discTindakan > 100) And rowTindakan("Klasifikasi") <> "Paket" Then
+                '    MsgBox("Gagal. Diskon tindakan " & rowTindakan("Tindakan") & " harus antara 0 sampai 100.", MsgBoxStyle.Exclamation, "Warning!")
+                '    Return False
+                'End If
+
+                ' Validasi diskon tindakan harus antara 0 sampai 50
+                If (discTindakan < 0 OrElse discTindakan > 50) And rowTindakan("Klasifikasi") <> "Paket" Then
+                    MsgBox("Gagal. Diskon tindakan " & rowTindakan("Tindakan") & " harus antara 0 sampai 50.", MsgBoxStyle.Exclamation, "Warning!")
                     Return False
                 End If
 
