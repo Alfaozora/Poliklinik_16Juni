@@ -843,6 +843,12 @@
     <Compile Include="Satu Sehat\Resource\ConditionResource.vb" />
     <Compile Include="Satu Sehat\Resource\PatientResource.vb" />
     <Compile Include="Satu Sehat\Resource\ResponseResource.vb" />
+    <Compile Include="Upload\FormSynchronizationPanBrothers.Designer.vb">
+      <DependentUpon>FormSynchronizationPanBrothers.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Upload\FormSynchronizationPanBrothers.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Upload\FormUploadJurnal.Designer.vb">
       <DependentUpon>FormUploadJurnal.vb</DependentUpon>
     </Compile>
@@ -1623,6 +1629,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Satu Sehat\FormSynchronizationSatuSehat.resx">
       <DependentUpon>FormSynchronizationSatuSehat.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Upload\FormSynchronizationPanBrothers.resx">
+      <DependentUpon>FormSynchronizationPanBrothers.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Upload\FormUploadJurnal.resx">
       <DependentUpon>FormUploadJurnal.vb</DependentUpon>
