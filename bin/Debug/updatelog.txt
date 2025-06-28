@@ -7,6 +7,8 @@ Version : 2.0.0.52 (Soon)
 # [Usability Improvement] Tidak ada Tanda Pemisah Saat Nama Tindakan Hanya 1 Pada Riwayat Kunjungan
 # [Usability Improvement] Penambahan Kolom Usia Pada Laporan Kunjungan Pasien
 # [Usability Improvement] Penambahan Kolom Rentang Usia Pada Laporan Daftar Diagnosa
+# [Usability Improvement] Diskon Maximal 50%
+# [Usability Improvement] Harga Tindakan 0
 
 Version : 2.0.0.51 (16 Juni 2025)
 # [Usability Improvement] Penambahan Nama Company pada Asuransi Lain
