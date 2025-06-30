@@ -1,4 +1,4 @@
-Version : 2.0.0.52 (Soon)
+Version : 2.0.0.52 (30 Juni 2025)
 # [Usability Improvement] Pengubahan Jenis Error Agar Mudah Terbaca pada Pencarian Diagnosa
 # [New Feature] Penambahan Menu Riwayat Penggunaan Paket Tindakan di Form Rekam Medis
 # [Bug Fix] Memperbaiki Error Tanggal lahir Saat Pengambilan data dari antrian online yang kosong
@@ -9,6 +9,8 @@ Version : 2.0.0.52 (Soon)
 # [Usability Improvement] Penambahan Kolom Rentang Usia Pada Laporan Daftar Diagnosa
 # [Usability Improvement] Diskon Maximal 50%
 # [Usability Improvement] Harga Tindakan 0
+# [Usability Improvement] Kembali ke set awal Jenis Rawat (Rawat Jalan) setelah DialogBox diclose
+# [Bug Fix] Memperbaiki error FotoPath saat Mengambil data Pasien Non-BPJS dari Antrian Online
 
 Version : 2.0.0.51 (16 Juni 2025)
 # [Usability Improvement] Penambahan Nama Company pada Asuransi Lain

@@ -1503,22 +1503,30 @@ Public Class FormPendaftaranAwal
         TextBoxStatusPeserta.Text = Trow("Status Peserta").ToString
         TextBoxPPK.Text = Trow("FKTP").ToString
 
-        Dim fotoPath As String = Trow("FotoPath").ToString()
+        ' Ambil FotoPath dari database berdasarkan NIK
+        Dim nikPasien As String = Trow("No NIK").ToString().Trim()
+        Dim fotoPath As String = ""
 
-        ' Jika menggunakan path relatif seperti "Uploads\FotoPasien\nama.jpg"
-        Dim fullPath As String = System.IO.Path.Combine(Application.StartupPath, fotoPath)
-
-        Dim defaultFotoPath As String = Application.StartupPath & "\Uploads\BlankProfile.png"
-
-        If File.Exists(fullPath) Then
-            PictureBoxFotoPasien.Image = Image.FromFile(fullPath)
-            PictureBoxFotoPasien.SizeMode = PictureBoxSizeMode.Zoom
-        Else
-            PictureBoxFotoPasien.Image = Image.FromFile(defaultFotoPath)
-            PictureBoxFotoPasien.SizeMode = PictureBoxSizeMode.Zoom
-            'MessageBox.Show("Gambar tidak ditemukan di path: " & fullPath, "Info", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        If Not String.IsNullOrEmpty(nikPasien) Then
+            fotoPath = GetFotoPathByNIK(nikPasien)
         End If
 
+        ' Path absolut ke file foto
+        Dim fullPath As String = System.IO.Path.Combine(Application.StartupPath, fotoPath)
+        Dim defaultFotoPath As String = Application.StartupPath & "\Uploads\BlankProfile.png"
+
+        Try
+            If Not String.IsNullOrEmpty(fotoPath) AndAlso fotoPath.Trim() <> "" AndAlso File.Exists(fullPath) Then
+                PictureBoxFotoPasien.Image = Image.FromFile(fullPath)
+            Else
+                PictureBoxFotoPasien.Image = Image.FromFile(defaultFotoPath)
+            End If
+        Catch ex As Exception
+            PictureBoxFotoPasien.Image = Image.FromFile(defaultFotoPath)
+            MessageBox.Show("Gagal memuat foto pasien: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        End Try
+
+        PictureBoxFotoPasien.SizeMode = PictureBoxSizeMode.Zoom
         ComboBoxPoliTujuan.Enabled = True
     End Sub
 

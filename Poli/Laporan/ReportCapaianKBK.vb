@@ -88,6 +88,17 @@ Public Class ReportCapaianKBK
             .Add("Capaian AK", "Capaian AK")
             .Add("Rujukan Non Spesialis", "Rujukan Non Spesialis")
             .Add("JumlahRujukan", "Jumlah Rujukan")
+            .Add("RRNS", "RRNS")
+            .Add("Rating RRNS", "Rating RRNS")
+            .Add("Bobot RRNS", "Bobot RRNS")
+            .Add("Capaian RRNS", "Capaian RRNS")
+            .Add("Prolanis DM Terkendali", "Prolanis DM Terkendali")
+            .Add("Peserta Diagnosa DM", "Peserta Diagnosa DM")
+            .Add("RPPT DM", "RPPT DM")
+            .Add("Prolanis HT Terkendali", "Prolanis HT Terkendali")
+            .Add("Peserta Diagnosa HT", "Peserta Diagnosa HT")
+            .Add("RPPT HT", "RPPT HT")
+            .Add("Nilai RPPT", "Nilai RPPT")
         End With
     End Sub
 
@@ -126,6 +137,9 @@ Public Class ReportCapaianKBK
     Private Sub SearchDataDaftarKunjungan()
         If ValidasiSearch() = True Then
             DataGridViewDaftarKunjungan.Rows.Clear()
+            DataGridViewDaftarKunjungan.ScrollBars = ScrollBars.Both
+            DataGridViewDaftarKunjungan.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None
+            DataGridViewDaftarKunjungan.AutoResizeColumns()
 
             Dim Tbls As DataTable = LoadDataDaftarKunjungan()
 
@@ -141,9 +155,20 @@ Public Class ReportCapaianKBK
                     Dim ratingAk As Integer = Convert.ToInt32(Trow("RatingAK"))
                     Dim bobotAk As String = Convert.ToInt32(Trow("BobotAK")).ToString() & "%"
                     Dim capaianAk As Double = If(IsDBNull(Trow("CapaianAK")), 0, Convert.ToDouble(Trow("CapaianAK")))
-                    Dim jmlRujukanNon As Integer = If(IsDBNull(Trow("RujukanNonSpesialis")), 0, Convert.ToInt32(Trow("RujukanNonSpesialis")))
+                    Dim jmlRujukanNon As Integer = If(IsDBNull(Trow("Jumlah Rujukan Kasus Non Spesialis")), 0, Convert.ToInt32(Trow("Jumlah Rujukan Kasus Non Spesialis")))
+                    Dim rrns As Double = If(IsDBNull(Trow("RRNS")), 0, Convert.ToDouble(Trow("RRNS")))
+                    Dim RatingRrns As Double = If(IsDBNull(Trow("RatingRRNS")), 0, Convert.ToDouble(Trow("RatingRRNS")))
+                    Dim bobotRrns As String = Convert.ToInt32(Trow("bobotRRNS")).ToString() & "%"
+                    Dim capaianRrns As Double = If(IsDBNull(Trow("CapaianRRNS")), 0, Convert.ToDouble(Trow("CapaianRRNS")))
+                    Dim prolanisDM As Integer = Convert.ToInt32(Trow("ProlanisDM"))
+                    Dim pesertaDiagnosaDM As Integer = Convert.ToInt32(Trow("PesertaDiagnosaDM"))
+                    Dim rpptDM As Double = If(IsDBNull(Trow("RpptDM")), 0, Convert.ToDouble(Trow("RpptDM")))
+                    Dim prolanisHT As Integer = Convert.ToInt32(Trow("ProlanisHT"))
+                    Dim pesertaDiagnosaHT As Integer = Convert.ToInt32(Trow("PesertaDiagnosaHT"))
+                    Dim rpptHT As Double = If(IsDBNull(Trow("RpptHT")), 0, Convert.ToDouble(Trow("RpptHT")))
+                    Dim nilaiRppt As Double = If(IsDBNull(Trow("NilaiRppt")), 0, Convert.ToDouble(Trow("NilaiRppt")))
 
-                    DataGridViewDaftarKunjungan.Rows.Add(tanggalProses, jumlahKontak, pesertaTerdaftar, Math.Round(angkaKontak, 2), ratingAk, bobotAk, Math.Round(capaianAk, 1), jmlRujukanNon, jumlahRujukan)
+                    DataGridViewDaftarKunjungan.Rows.Add(tanggalProses, jumlahKontak, pesertaTerdaftar, Math.Round(angkaKontak, 2), ratingAk, bobotAk, Math.Round(capaianAk, 1), jmlRujukanNon, jumlahRujukan, Math.Round(rrns, 3), RatingRrns, bobotRrns, capaianRrns, prolanisDM, pesertaDiagnosaDM, Math.Round(rpptDM, 2), prolanisHT, pesertaDiagnosaHT, Math.Round(rpptHT, 2), Math.Round(nilaiRppt, 2))
                 Next
 
                 DataGridViewDaftarKunjungan.CurrentCell = Nothing
@@ -373,18 +398,81 @@ Public Class ReportCapaianKBK
         queryBuilder.AppendLine("    WHERE TD.TanggalTransaksi >= '" & tahunTerpilih & "-01-01'")
         queryBuilder.AppendLine("      AND TD.DeletedDate IS NULL")
         queryBuilder.AppendLine("      AND MB.KdProviderPst = '" & kodePPK & "'")
-        queryBuilder.AppendLine("      AND ISNULL(TDR.JenisRujukan, '') <> 'Spesialis'")
+        queryBuilder.AppendLine("      AND ISNULL(TDR.KodeTACC, '') = '1' ")
+        queryBuilder.AppendLine("      AND TDR.DeletedBy IS NULL")
         queryBuilder.AppendLine("    GROUP BY YEAR(TD.TanggalTransaksi), MONTH(TD.TanggalTransaksi)")
         queryBuilder.AppendLine(")")
 
-        ' 6 Final Select
+        '6. Prolanis DM
+        queryBuilder.AppendLine(", ProlanisDM AS (")
+        queryBuilder.AppendLine("    SELECT ")
+        queryBuilder.AppendLine("        YEAR(TD.TanggalTransaksi) AS Tahun,")
+        queryBuilder.AppendLine("        MONTH(TD.TanggalTransaksi) AS Bulan,")
+        queryBuilder.AppendLine("        COUNT(DISTINCT TD.IDInternet) AS JumlahProlanisDM")
+        queryBuilder.AppendLine("    FROM TransaksiDetail TD")
+        queryBuilder.AppendLine("    INNER JOIN MasterPasien MP ON TD.IDInternet = MP.NoRekamMedis")
+        queryBuilder.AppendLine("    WHERE TD.TanggalTransaksi >= '" & tahunTerpilih & "-01-01'")
+        queryBuilder.AppendLine("      AND TD.DeletedDate IS NULL")
+        queryBuilder.AppendLine("      AND MP.Prolanis = 'DM'")
+        queryBuilder.AppendLine("    GROUP BY YEAR(TD.TanggalTransaksi), MONTH(TD.TanggalTransaksi)")
+        queryBuilder.AppendLine(")")
+
+        '7. Peserta DM
+        queryBuilder.AppendLine(", PesertaDiagnosaDM AS (")
+        queryBuilder.AppendLine("    SELECT ")
+        queryBuilder.AppendLine("        YEAR(TD.TanggalTransaksi) AS Tahun,")
+        queryBuilder.AppendLine("        MONTH(TD.TanggalTransaksi) AS Bulan,")
+        queryBuilder.AppendLine("        TD.IDInternet")
+        queryBuilder.AppendLine("    FROM TransaksiDetail TD")
+        queryBuilder.AppendLine("    INNER JOIN MasterPasien MP ON TD.IDInternet = MP.NoRekamMedis")
+        queryBuilder.AppendLine("    INNER JOIN MasterPasienBPJS MB ON MP.NoKartuBPJS = MB.NoKartu")
+        queryBuilder.AppendLine("    WHERE TD.TanggalTransaksi >= '2023-01-01'")
+        queryBuilder.AppendLine("      AND TD.DeletedDate IS NULL")
+        queryBuilder.AppendLine("      AND MB.KdProviderPst = '" & kodePPK & "'")
+        queryBuilder.AppendLine("      AND TD.Diagnosa LIKE '%E11%'")
+        queryBuilder.AppendLine("    GROUP BY YEAR(TD.TanggalTransaksi), MONTH(TD.TanggalTransaksi), TD.IDInternet")
+        queryBuilder.AppendLine(")")
+
+
+        '8. Prolanis HT
+        queryBuilder.AppendLine(", ProlanisHT AS (")
+        queryBuilder.AppendLine("    SELECT ")
+        queryBuilder.AppendLine("        YEAR(TD.TanggalTransaksi) AS Tahun,")
+        queryBuilder.AppendLine("        MONTH(TD.TanggalTransaksi) AS Bulan,")
+        queryBuilder.AppendLine("        COUNT(DISTINCT TD.IDInternet) AS JumlahProlanisHT")
+        queryBuilder.AppendLine("    FROM TransaksiDetail TD")
+        queryBuilder.AppendLine("    INNER JOIN MasterPasien MP ON TD.IDInternet = MP.NoRekamMedis")
+        queryBuilder.AppendLine("    WHERE TD.TanggalTransaksi >= '" & tahunTerpilih & "-01-01'")
+        queryBuilder.AppendLine("      AND TD.DeletedDate IS NULL")
+        queryBuilder.AppendLine("      AND MP.Prolanis = 'HT'")
+        queryBuilder.AppendLine("    GROUP BY YEAR(TD.TanggalTransaksi), MONTH(TD.TanggalTransaksi)")
+        queryBuilder.AppendLine(")")
+
+        '9. Peserta HT
+        queryBuilder.AppendLine(", PesertaDiagnosaHT AS (")
+        queryBuilder.AppendLine("    SELECT ")
+        queryBuilder.AppendLine("        YEAR(TD.TanggalTransaksi) AS Tahun,")
+        queryBuilder.AppendLine("        MONTH(TD.TanggalTransaksi) AS Bulan,")
+        queryBuilder.AppendLine("        TD.IDInternet")
+        queryBuilder.AppendLine("    FROM TransaksiDetail TD")
+        queryBuilder.AppendLine("    INNER JOIN MasterPasien MP ON TD.IDInternet = MP.NoRekamMedis")
+        queryBuilder.AppendLine("    INNER JOIN MasterPasienBPJS MB ON MP.NoKartuBPJS = MB.NoKartu")
+        queryBuilder.AppendLine("    WHERE TD.TanggalTransaksi >= '2023-01-01'")
+        queryBuilder.AppendLine("      AND TD.DeletedDate IS NULL")
+        queryBuilder.AppendLine("      AND MB.KdProviderPst = '" & kodePPK & "'")
+        queryBuilder.AppendLine("      AND TD.Diagnosa LIKE '%I10%'")
+        queryBuilder.AppendLine("    GROUP BY YEAR(TD.TanggalTransaksi), MONTH(TD.TanggalTransaksi), TD.IDInternet")
+        queryBuilder.AppendLine(")")
+
+
+        ' . Final Select
         queryBuilder.AppendLine("SELECT ")
         queryBuilder.AppendLine("    CONVERT(VARCHAR, CAST(CAST(B.Tahun AS VARCHAR(4)) + '-' + ")
         queryBuilder.AppendLine("    RIGHT('0' + CAST(B.Bulan AS VARCHAR(2)), 2) + '-06' AS DATETIME), 103) AS TanggalProses,")
         queryBuilder.AppendLine("    ISNULL(KC.JumlahKontak, 0) AS JumlahKontak,")
         queryBuilder.AppendLine("    ISNULL(PT.PesertaTerdaftar, 0) AS PesertaTerdaftar,")
         queryBuilder.AppendLine("    ISNULL(RV.JumlahRujukan, 0) AS JumlahRujukan,")
-        queryBuilder.AppendLine("    ISNULL(RNS.JumlahNonSpesialis, 0) AS [Jumlah Rujukan Kasus Non Spesialis],")
+        queryBuilder.AppendLine("    ISNULL(RNS.JumlahRujukanNonSpesialis, 0) AS [Jumlah Rujukan Kasus Non Spesialis],")
         queryBuilder.AppendLine("    ISNULL((CAST(ISNULL(KC.JumlahKontak, 0) AS FLOAT) / NULLIF(ISNULL(PT.PesertaTerdaftar, 0), 0)) * 1000, 0) AS AngkaKontak,")
         queryBuilder.AppendLine("    CASE ")
         queryBuilder.AppendLine("        WHEN (CAST(ISNULL(KC.JumlahKontak, 0) AS FLOAT) / NULLIF(ISNULL(PT.PesertaTerdaftar, 0), 0)) * 1000 >= 150 THEN 4")
@@ -399,8 +487,32 @@ Public Class ReportCapaianKBK
         queryBuilder.AppendLine("        WHEN (CAST(ISNULL(KC.JumlahKontak, 0) AS FLOAT) / NULLIF(ISNULL(PT.PesertaTerdaftar, 0), 0)) * 1000 > 140 THEN 2")
         queryBuilder.AppendLine("        ELSE 1")
         queryBuilder.AppendLine("    END * 0.4) AS CapaianAK")
+        queryBuilder.AppendLine("    , ISNULL(CAST(RNS.JumlahRujukanNonSpesialis AS FLOAT), 0) / NULLIF(CAST(ISNULL(RV.JumlahRujukan, 0) AS FLOAT), 0) AS RRNS")
+        queryBuilder.AppendLine("    , CASE")
+        queryBuilder.AppendLine("        WHEN ISNULL(CAST(RNS.JumlahRujukanNonSpesialis AS FLOAT), 0) / NULLIF(CAST(ISNULL(RV.JumlahRujukan, 0) AS FLOAT), 0) <= 2 THEN 4")
+        queryBuilder.AppendLine("        WHEN ISNULL(CAST(RNS.JumlahRujukanNonSpesialis AS FLOAT), 0) / NULLIF(CAST(ISNULL(RV.JumlahRujukan, 0) AS FLOAT), 0) <= 2.5 THEN 3")
+        queryBuilder.AppendLine("        WHEN ISNULL(CAST(RNS.JumlahRujukanNonSpesialis AS FLOAT), 0) / NULLIF(CAST(ISNULL(RV.JumlahRujukan, 0) AS FLOAT), 0) <= 3 THEN 2")
+        queryBuilder.AppendLine("        ELSE 1")
+        queryBuilder.AppendLine("    END AS RatingRRNS,")
+        queryBuilder.AppendLine("    50 AS BobotRRNS,")
+        queryBuilder.AppendLine("    (CASE ")
+        queryBuilder.AppendLine("        WHEN ISNULL(CAST(RNS.JumlahRujukanNonSpesialis AS FLOAT), 0) / NULLIF(CAST(ISNULL(RV.JumlahRujukan, 0) AS FLOAT), 0) <= 2 THEN 4")
+        queryBuilder.AppendLine("        WHEN ISNULL(CAST(RNS.JumlahRujukanNonSpesialis AS FLOAT), 0) / NULLIF(CAST(ISNULL(RV.JumlahRujukan, 0) AS FLOAT), 0) <= 2.5 THEN 3")
+        queryBuilder.AppendLine("        WHEN ISNULL(CAST(RNS.JumlahRujukanNonSpesialis AS FLOAT), 0) / NULLIF(CAST(ISNULL(RV.JumlahRujukan, 0) AS FLOAT), 0) <= 3 THEN 2")
+        queryBuilder.AppendLine("        ELSE 1")
+        queryBuilder.AppendLine("    END * 0.5) AS CapaianRRNS")
+        queryBuilder.AppendLine("    , ISNULL(PDM.JumlahProlanisDM, 0) AS ProlanisDM")
+        queryBuilder.AppendLine("    , ISNULL(PDDM.JumlahPesertaDM, 0) AS PesertaDiagnosaDM")
+        queryBuilder.AppendLine("    , ISNULL(CAST(PDM.JumlahProlanisDM AS FLOAT), 0) / NULLIF(CAST(PDDM.JumlahPesertaDM AS FLOAT), 0) AS RpptDM")
+
+        queryBuilder.AppendLine("    , ISNULL(PHT.JumlahProlanisHT, 0) AS ProlanisHT")
+        queryBuilder.AppendLine("    , ISNULL(PDHT.JumlahPesertaHT, 0) AS PesertaDiagnosaHT")
+        queryBuilder.AppendLine("    , ISNULL(CAST(PHT.JumlahProlanisHT AS FLOAT), 0) / NULLIF(CAST(PDHT.JumlahPesertaHT AS FLOAT), 0) AS RpptHT")
+        queryBuilder.AppendLine("    , ((ISNULL(CAST(PDM.JumlahProlanisDM AS FLOAT), 0) / NULLIF(CAST(PDDM.JumlahPesertaDM AS FLOAT), 0)) + ")
+        queryBuilder.AppendLine("       (ISNULL(CAST(PHT.JumlahProlanisHT AS FLOAT), 0) / NULLIF(CAST(PDHT.JumlahPesertaHT AS FLOAT), 0))) / 2 AS NilaiRppt")
 
         queryBuilder.AppendLine("FROM Bulan B")
+
         queryBuilder.AppendLine("LEFT JOIN (")
         queryBuilder.AppendLine("    SELECT Tahun, Bulan, COUNT(DISTINCT IDInternet) AS JumlahKontak")
         queryBuilder.AppendLine("    FROM KunjunganKontak")
@@ -413,13 +525,25 @@ Public Class ReportCapaianKBK
         queryBuilder.AppendLine("    GROUP BY Tahun, Bulan")
         queryBuilder.AppendLine(") RV ON RV.Tahun = B.Tahun AND RV.Bulan = B.Bulan")
 
-        queryBuilder.AppendLine("LEFT JOIN (")
-        queryBuilder.AppendLine("    SELECT Tahun, Bulan, COUNT(DISTINCT IDInternet) AS JumlahNonSpesialis")
-        queryBuilder.AppendLine("    FROM RujukanNonSpesialis")
-        queryBuilder.AppendLine("    GROUP BY Tahun, Bulan")
-        queryBuilder.AppendLine(") RNS ON RNS.Tahun = B.Tahun AND RNS.Bulan = B.Bulan")
-
+        queryBuilder.AppendLine("LEFT JOIN RujukanNonSpesialis RNS ON RNS.Tahun = B.Tahun AND RNS.Bulan = B.Bulan")
         queryBuilder.AppendLine("LEFT JOIN PesertaTerdaftar PT ON PT.Tahun = B.Tahun AND PT.Bulan = B.Bulan")
+        queryBuilder.AppendLine("LEFT JOIN ProlanisDM PDM ON PDM.Tahun = B.Tahun AND PDM.Bulan = B.Bulan")
+
+        queryBuilder.AppendLine("LEFT JOIN (")
+        queryBuilder.AppendLine("    SELECT Tahun, Bulan, COUNT(DISTINCT IDInternet) AS JumlahPesertaDM")
+        queryBuilder.AppendLine("    FROM PesertaDiagnosaDM")
+        queryBuilder.AppendLine("    GROUP BY Tahun, Bulan")
+        queryBuilder.AppendLine(") PDDM ON PDDM.Tahun = B.Tahun AND PDDM.Bulan = B.Bulan")
+
+        queryBuilder.AppendLine("LEFT JOIN ProlanisHT PHT ON PHT.Tahun = B.Tahun AND PHT.Bulan = B.Bulan")
+
+        queryBuilder.AppendLine("LEFT JOIN (")
+        queryBuilder.AppendLine("    SELECT Tahun, Bulan, COUNT(DISTINCT IDInternet) AS JumlahPesertaHT")
+        queryBuilder.AppendLine("    FROM PesertaDiagnosaHT")
+        queryBuilder.AppendLine("    GROUP BY Tahun, Bulan")
+        queryBuilder.AppendLine(") PDHT ON PDHT.Tahun = B.Tahun AND PDHT.Bulan = B.Bulan")
+
+
 
         queryBuilder.AppendLine("ORDER BY B.Tahun, B.Bulan")
 
