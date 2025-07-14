@@ -155,7 +155,7 @@ Public Class FormCetakInvoice
             ' Set Query Detail
             queryDetail.AppendLine("SELECT")
             queryDetail.AppendLine("  TindakanID,")
-            queryDetail.AppendLine("  NamaTindakan AS [Nama],")
+            queryDetail.AppendLine("  NamaTindakan AS [Nama Tindakan],")
             queryDetail.AppendLine("  JenisTindakan AS [Jenis],")
             queryDetail.AppendLine("  PARSENAME(CONVERT(varchar, CONVERT(money, BiayaTindakan), 1), 2) AS [Biaya Tindakan],")
             queryDetail.AppendLine("  PARSENAME(CONVERT(varchar, CONVERT(money, DiscPersenTindakan), 1), 2) AS DiscTindakan,")
@@ -607,8 +607,18 @@ Public Class FormCetakInvoice
                 NewHeader.Rows.Add(Tnew)
             ElseIf CheckBoxStatusPembelianPaket.Checked = True Then
                 Dim Tnew As DataRow = NewHeader.NewRow
-                Dim hargaAwal As Decimal = Convert.ToDecimal(rowTindakan("Harga Awal"))
-                Dim diskon As Decimal = Convert.ToDecimal(rowTindakan("Diskon"))
+                Dim hargaAwal As Decimal = 0
+                If Not IsDBNull(rowTindakan("Biaya Tindakan")) AndAlso rowTindakan("Biaya Tindakan").ToString.Trim <> "" Then
+                    hargaAwal = Convert.ToDecimal(rowTindakan("Biaya Tindakan"))
+                End If
+
+                Dim diskon As Decimal = 0
+                If Not IsDBNull(rowTindakan("DiscNilai")) AndAlso rowTindakan("DiscNilai").ToString.Trim <> "" Then
+                    diskon = Convert.ToDecimal(rowTindakan("DiscNilai"))
+                End If
+
+                'Dim hargaAwal As Decimal = Convert.ToDecimal(rowTindakan("Biaya Tindakan"))
+                'Dim diskon As Decimal = Convert.ToDecimal(rowTindakan("DiscNilai"))
 
                 ' Menghitung persentase diskon berdasarkan harga awal dan diskon
                 Dim discTindakan As Decimal
@@ -618,13 +628,13 @@ Public Class FormCetakInvoice
                     discTindakan = 0 ' Menghindari pembagian dengan nol
                 End If
 
-                Tnew("TindakanID") = rowTindakan("PaketID").ToString()
-                Tnew("Tindakan") = rowTindakan("Nama Paket")
-                Tnew("Jenis") = rowTindakan("Keterangan Paket")
-                Tnew("Biaya Tindakan") = rowTindakan("Harga Awal")
+                Tnew("TindakanID") = rowTindakan("TindakanID").ToString()
+                Tnew("Tindakan") = rowTindakan("Tindakan")
+                Tnew("Jenis") = rowTindakan("Jenis")
+                Tnew("Biaya Tindakan") = rowTindakan("Biaya Tindakan")
                 Tnew("DiscTindakan") = discTindakan
-                Tnew("DiscNilai") = rowTindakan("Diskon")
-                Tnew("NettBayar") = rowTindakan("Harga Nett")
+                Tnew("DiscNilai") = rowTindakan("DiscNilai")
+                Tnew("NettBayar") = rowTindakan("NettBayar")
 
                 Tnew("Registrasi") = TrowPasien("NoRekamMedis")
                 Tnew("Nama") = TrowPasien("Nama")

@@ -542,8 +542,13 @@ Public Class Find
                     LabAdminOnline.LoadAdminLab(Grdrow("idlabinternet").ToString, Grdrow("nourut").ToString)
                 Case "FindCOAadd"
                     FormVerifikasiOmsetTagihan.LoadCOAdetail(Grdrow)
+                Case "FindMasterTindakanKlinikReservasi"
+                    FormReservasi.LoadTindakanPoli(Grdrow(0).ToString)
+                Case "FindMasterDokterReservasi"
+                    FormReservasi.LoadDokter(Grdrow("ID").ToString)
+                Case "FindMasterSesi"
+                    FormReservasi.LoadReservasi(Grdrow("RuanganID").ToString)
                 Case Else : MsgBox("Error...")
-
             End Select
             Me.Close()
         End If

@@ -21,6 +21,90 @@ Imports System.Text
 Imports System.Globalization
 
 Public Class FormRekamMedisDokter
+
+    Public Class TindakanDetail
+        Private _TindakanID As String
+        Private _NamaTindakan As String
+        Private _JenisTindakan As String
+        Private _BiayaTindakan As Decimal
+        Private _DiskonTindakan As Decimal
+        Private _NettBayar As Decimal
+        Private _Jumlah As Integer
+        Private _GrandTotal As Decimal
+
+        Public Property TindakanID() As String
+            Get
+                Return _TindakanID
+            End Get
+            Set(ByVal value As String)
+                _TindakanID = value
+            End Set
+        End Property
+
+        Public Property NamaTindakan() As String
+            Get
+                Return _NamaTindakan
+            End Get
+            Set(ByVal value As String)
+                _NamaTindakan = value
+            End Set
+        End Property
+
+        Public Property JenisTindakan() As String
+            Get
+                Return _JenisTindakan
+            End Get
+            Set(ByVal value As String)
+                _JenisTindakan = value
+            End Set
+        End Property
+
+        Public Property BiayaTindakan() As Decimal
+            Get
+                Return _BiayaTindakan
+            End Get
+            Set(ByVal value As Decimal)
+                _BiayaTindakan = value
+            End Set
+        End Property
+
+        Public Property DiskonTindakan() As Decimal
+            Get
+                Return _DiskonTindakan
+            End Get
+            Set(ByVal value As Decimal)
+                _DiskonTindakan = value
+            End Set
+        End Property
+
+        Public Property NettBayar() As Decimal
+            Get
+                Return _NettBayar
+            End Get
+            Set(ByVal value As Decimal)
+                _NettBayar = value
+            End Set
+        End Property
+
+        Public Property Jumlah() As Integer
+            Get
+                Return _Jumlah
+            End Get
+            Set(ByVal value As Integer)
+                _Jumlah = value
+            End Set
+        End Property
+
+        Public Property GrandTotal() As Decimal
+            Get
+                Return _GrandTotal
+            End Get
+            Set(ByVal value As Decimal)
+                _GrandTotal = value
+            End Set
+        End Property
+    End Class
+
     ' Connection
     Dim dbApotek As New TLcon
 
@@ -1947,10 +2031,52 @@ Public Class FormRekamMedisDokter
                 penjaminTindakan = LabelPenjaminAsuransiLain.Text
             End If
 
+            Dim dtPasien As DataTable = ReadSQL("SELECT MR.Nama, MR.NoHandphone, MR.JenisKelamin " & _
+                                    "FROM TransaksiDetail TD " & _
+                                    "INNER JOIN MasterPasien MR ON TD.IDInternet = MR.NoRekamMedis " & _
+                                    "WHERE TD.NoUrut = '" & idTransaksi & "'")
+
+            Dim namaPasien As String = ""
+            Dim NoHp As String = ""
+            Dim jenisKelamin As String = ""
+
+            If dtPasien.Rows.Count > 0 Then
+                namaPasien = dtPasien.Rows(0)("Nama").ToString()
+                NoHp = dtPasien.Rows(0)("NoHandphone").ToString()
+                jenisKelamin = dtPasien.Rows(0)("JenisKelamin").ToString()
+            End If
+
             If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
                 ' Insert ke tabel TransaksiPoliDetail
                 WriteSQL("INSERT INTO TransaksiPoliDetail(TransPoliID,TindakanID,NamaTindakan,JenisTindakan,BiayaTindakan,DiscTindakan,NettBayar,Penjamin,GroupBayar,StatusPembayaran,CreatedBy,CreatedDate) " & _
                          "VALUES('" & trowPoli("TransPoliID") & "','" & TextBoxTindakanID.Text & "','" & TextBoxNamaTindakan.Text & "','" & TextBoxJenisTindakan.Text & "'," & CDbl(TextBoxBiayaTindakan.Text) & ", 0," & CDbl(TextBoxBiayaTindakan.Text) & ", '" & penjaminTindakan & "', '', 'PENDING', '" & userInput & "', GETDATE())", 4)
+
+                Dim dtReminder As DataTable = ReadSQL("SELECT Reminder, Bulan FROM MasterTindakan WHERE TindakanID = '" & TextBoxTindakanID.Text & "'")
+
+                If dtReminder.Rows.Count > 0 AndAlso CBool(dtReminder.Rows(0)("Reminder")) = True Then
+                    Dim bulanStr As String = dtReminder.Rows(0)("Bulan").ToString().Trim()
+                    Dim jumlahBulan As Integer = 1 ' default jika kosong
+                    If IsNumeric(bulanStr) Then
+                        jumlahBulan = CInt(bulanStr)
+                    End If
+
+                    ' Hitung tanggal reminder = hari ini + jumlah bulan
+                    Dim tglReminder As Date = Date.Today.AddMonths(jumlahBulan)
+
+                    ' Simpan ke LogReminderPasien
+                    WriteSQL("INSERT INTO LogReminderPasien (NamaPasien, NoHP, Keperluan, Tanggal, Status, CreatedBy, CreatedDate, JenisKelamin) " & _
+                             "VALUES ('" & namaPasien.Replace("'", "''") & "', " & _
+                             "'" & NoHp.Replace("'", "''") & "', " & _
+                             "'" & TextBoxNamaTindakan.Text & "', " & _
+                             "'" & tglReminder.ToString("yyyy-MM-dd 09:00") & "', " & _
+                             "'TERJADWAL', " & _
+                             "'" & userInput.Replace("'", "''") & "', " & _
+                             "GETDATE(), " & _
+                             "'" & jenisKelamin & "')", 4)
+
+                    MsgBox("INSERT Reminder sukses untuk: " & namaPasien & vbCrLf & "Tanggal: " & tglReminder.ToString("yyyy-MM-dd"), MsgBoxStyle.Information)
+                End If
+
             ElseIf jenisTransaksi = "GIGI" Then
                 ' Insert ke tabel TransaksiGigiDetail
                 WriteSQL("INSERT INTO TransaksiGigiDetail(TransGigiID,TindakanID,NamaTindakan,JenisTindakan,BiayaTindakan,DiscTindakan,NettBayar,Penjamin,GroupBayar,StatusPembayaran,CreatedBy,CreatedDate) " & _
@@ -6727,6 +6853,7 @@ Public Class FormRekamMedisDokter
         insertRowToTbls(tblsHasil, "typstring", "Rencana Tindakan / Pengobatan")
         insertRowToTbls(tblsHasil, "typstring", "RS Rujukan")
         insertRowToTbls(tblsHasil, "typstring", "Edukasi")
+        insertRowToTbls(tblsHasil, "typstring", "TanggalKontrol")
 
                 ' Set Alergi
         Dim alergiList As New List(Of String)
@@ -6856,6 +6983,17 @@ Public Class FormRekamMedisDokter
         Tnew("Tanda Vital") = ketTandaVital
         Tnew("Antropometri") = ketAntropometri
         Tnew("Status Generalis") = ketStatusGeneralis
+
+        'Kontrol Kembali
+        Dim tblsKontrol As DataTable = ReadSQL("SELECT * FROM SuratKeteranganKontrol WHERE NoTransaksi = '" & noUrut & "'")
+        Dim ketKontrol As String = ""
+
+        If tblsKontrol.Rows.Count > 0 Then
+            Dim tanggalKontrol As Date = CDate(tblsKontrol.Rows(0)("Tanggal"))
+            Dim culture As New CultureInfo("id-ID")
+            ketKontrol = tanggalKontrol.ToString("dd MMMM yyyy", culture)
+        End If
+        Tnew("TanggalKontrol") = ketKontrol
 
         ' ASSESMENT
         Tnew("Diagnosa") = ketDiagnosa
@@ -7503,39 +7641,163 @@ Public Class FormRekamMedisDokter
         End Try
     End Sub
 
-    Private Sub GetRiwayatLaboratorium()
-        'If DataGridViewRiwayatLaboratorium.Rows.Count > 0 Then
-        '    DataGridViewRiwayatLaboratorium.Rows.Clear()
-        'End If
+    'Private Sub GetRiwayatLaboratorium()
+    '    'If DataGridViewRiwayatLaboratorium.Rows.Count > 0 Then
+    '    '    DataGridViewRiwayatLaboratorium.Rows.Clear()
+    '    'End If
 
+    '    DataGridViewRiwayatLaboratorium.DataSource = Nothing
+
+    '    Dim Tawal As Date = TglAwalRiwayatLaboratorium.Value
+    '    Dim Takhir As Date = TglAkhirRiwayatLaboratorium.Value
+    '    Dim queryString As String = ""
+    '    Dim queryOrderString As String = ""
+    '    Dim queryTindakanString As String = ""
+
+    '    Dim tblTemp As DataTable = CreateTableRiwayatLaboratorium()
+
+    '    If RadioButtonRiwayatTindakan1.Checked = True Then
+    '        queryTindakanString = "AND a.TindakanID = '" & TextBoxKodeTindakanRiwayatLaboratorium.Text & "'"
+    '    ElseIf RadioButtonRiwayatTindakan2.Checked = True Then
+    '        queryTindakanString = ""
+    '    ElseIf RadioButtonCekStik.Checked = True Then
+    '        Dim queryCekStik As String = "SELECT CreatedDate, Kategori, Kondisi, Hasil, Satuan, Keterangan " & _
+    '                               "FROM HasilCekstik " & _
+    '                               "WHERE NoRM = '" & idPasien & "' " & _
+    '                               "AND CONVERT(date, CreatedDate) BETWEEN '" & Format(Tawal, "yyyy-MM-dd") & "' AND '" & Format(Takhir, "yyyy-MM-dd") & "'"
+
+    '        'MsgBox("Query CekStik: " & queryCekStik)
+
+    '        Dim TblCekStik As DataTable = ReadSQL(queryCekStik)
+
+
+    '        If TblCekStik.Rows.Count > 0 Then
+    '            For Each rowCekStik As DataRow In TblCekStik.Rows
+    '                Dim newRow As DataRow = tblTemp.NewRow()
+    '                newRow("Tgl Pemeriksaan") = Format(rowCekStik("CreatedDate"), "yyyy-MM-dd HH:mm:ss")
+    '                newRow("Nama Pemeriksaan") = rowCekStik("Kategori").ToString()
+    '                newRow("Jenis Pemeriksaan") = "Cek Stik"
+    '                newRow("Detail Keterangan") = rowCekStik("Kondisi").ToString()
+    '                newRow("Hasil") = rowCekStik("Hasil").ToString()
+    '                newRow("Satuan") = rowCekStik("Satuan").ToString()
+    '                newRow("Nilai Rujukan") = ""
+    '                newRow("Keterangan") = rowCekStik("Keterangan").ToString()
+
+    '                tblTemp.Rows.Add(newRow)
+    '            Next
+    '        End If
+
+    '    End If
+
+    '    queryString = "SELECT a.CreatedDate, a.NamaTindakan, a.JenisTindakan, b.DetailKet, b.Result, b.Satuan, b.Pria, b.Wanita, b.Keterangan, b.saran AS 'Saran' " & _
+    '                  "FROM TransaksiLabDetail a " & _
+    '                  "LEFT JOIN TransaksiLabResult b ON a.TransLabIDDetail = b.TransLabIDDetail AND a.TindakanID = b.TindakanID " & _
+    '                  "LEFT JOIN MasterJenisTindakan m ON m.JenisTindakan=a.JenisTindakan " & _
+    '                  "WHERE a.StatusPembayaran = 'PAID' " & queryTindakanString & " AND a.TransLabID IN (SELECT TransLabID FROM TransaksiLab WHERE IDInternet = '" & idPasien & "' AND Status IN ('CETAK', 'TAKEIT')  AND CONVERT(date, Tgllab) BETWEEN '" & Format(Tawal.Date, "yyyy-MM-dd") & "' AND '" & Format(Takhir.Date, "yyyy-MM-dd") & "' AND deleted <> 1 AND LabStartTime IS NOT NULL)"
+    '    queryOrderString = " ORDER BY a.TransLabID DESC, m.UrutanJenisID, a.Urutan, b.TindakanID, b.NoUrut, a.TransLabIDDetail, a.TindakanID, b.GroupID, b.DetailKet"
+
+
+    '    Dim Tbls As DataTable = ReadSQL(queryString & queryOrderString)
+    '    If Tbls.Rows.Count > 0 Then
+    '        For Each Trow As DataRow In Tbls.Rows
+    '            Dim nilaiRujukan As String = ""
+
+    '            Dim newRow As DataRow = tblTemp.NewRow()
+    '            newRow("Tgl Pemeriksaan") = Format(Trow("CreatedDate"), "yyyy-MM-dd HH:mm:ss")
+    '            newRow("Nama Pemeriksaan") = Trow("NamaTindakan")
+    '            newRow("Jenis Pemeriksaan") = Trow("JenisTindakan")
+    '            newRow("Detail Keterangan") = Trow("DetailKet")
+    '            newRow("Hasil") = Trow("Result")
+    '            newRow("Satuan") = Trow("Satuan")
+    '            newRow("Nilai Rujukan") = Trow("Pria")
+    '            newRow("Keterangan") = Trow("Keterangan")
+
+    '            tblTemp.Rows.Add(newRow)
+    '        Next
+
+    '        ' Tambahkan kolom checkbox
+    '        'Dim checkColumn As New DataGridViewCheckBoxColumn()
+    '        'checkColumn.Name = "CheckColumn" ' Nama kolom
+    '        'checkColumn.HeaderText = "Pilih" ' Header kolom
+    '        'DataGridViewRiwayatLaboratorium.Columns.Add(checkColumn)
+    '        'DataGridViewRiwayatLaboratorium.Columns("CheckColumn").ReadOnly = False
+
+    '        DataGridViewRiwayatLaboratorium.DataSource = tblTemp
+    '        DataGridViewRiwayatLaboratorium.CurrentCell = Nothing
+    '        DataGridViewRiwayatLaboratorium.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+
+    '        'For Each row As DataGridViewRow In DataGridViewRiwayatLaboratorium.Rows
+    '        '    Dim cell As DataGridViewCell = row.Cells("CheckColumn")
+
+    '        '    If row.Cells("Nama Pemeriksaan").ToString.Contains("ECG") = True Then
+    '        '        cell.Value = True ' Ubah menjadi True (checked) untuk setiap baris.
+    '        '    End If
+    '        'Next
+    '    Else
+    '        MsgBox("Data tidak ditemukan.", MsgBoxStyle.Exclamation, "Warning!")
+    '    End If
+    'End Sub
+
+    Private Sub GetRiwayatLaboratorium()
         DataGridViewRiwayatLaboratorium.DataSource = Nothing
 
         Dim Tawal As Date = TglAwalRiwayatLaboratorium.Value
         Dim Takhir As Date = TglAkhirRiwayatLaboratorium.Value
-        Dim queryString As String = ""
-        Dim queryOrderString As String = ""
-        Dim queryTindakanString As String = ""
+        Dim tblTemp As DataTable = CreateTableRiwayatLaboratorium()
 
-        If RadioButtonRiwayatTindakan1.Checked = True Then
-            queryTindakanString = "AND a.TindakanID = '" & TextBoxKodeTindakanRiwayatLaboratorium.Text & "'"
-        ElseIf RadioButtonRiwayatTindakan2.Checked = True Then
-            queryTindakanString = ""
+        If RadioButtonCekStik.Checked = True Then
+            ' Ambil hanya data dari HasilCekstik
+            Dim queryCekStik As String = "SELECT CreatedDate, Kategori, Kondisi, Hasil, Satuan, Keterangan " & _
+                                         "FROM HasilCekstik " & _
+                                         "WHERE NoRM = '" & idPasien & "' " & _
+                                         "AND CONVERT(date, CreatedDate) BETWEEN '" & Format(Tawal, "yyyy-MM-dd") & "' AND '" & Format(Takhir, "yyyy-MM-dd") & "'"
+
+            Dim TblCekStik As DataTable = ReadSQL(queryCekStik)
+
+            If TblCekStik.Rows.Count > 0 Then
+                For Each rowCekStik As DataRow In TblCekStik.Rows
+                    Dim newRow As DataRow = tblTemp.NewRow()
+                    newRow("Tgl Pemeriksaan") = Format(rowCekStik("CreatedDate"), "yyyy-MM-dd HH:mm:ss")
+                    newRow("Nama Pemeriksaan") = rowCekStik("Kategori").ToString()
+                    newRow("Jenis Pemeriksaan") = "Cek Stik"
+                    newRow("Detail Keterangan") = rowCekStik("Kondisi").ToString()
+                    newRow("Hasil") = rowCekStik("Hasil").ToString()
+                    newRow("Satuan") = rowCekStik("Satuan").ToString()
+                    newRow("Nilai Rujukan") = ""
+                    newRow("Keterangan") = rowCekStik("Keterangan").ToString()
+
+                    tblTemp.Rows.Add(newRow)
+                Next
+            End If
+
+            ' Tampilkan hasil cek stik
+            If tblTemp.Rows.Count > 0 Then
+                DataGridViewRiwayatLaboratorium.DataSource = tblTemp
+                DataGridViewRiwayatLaboratorium.CurrentCell = Nothing
+                DataGridViewRiwayatLaboratorium.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+            Else
+                MsgBox("Data tidak ditemukan.", MsgBoxStyle.Exclamation, "Warning!")
+            End If
+
+            Exit Sub
         End If
 
-        queryString = "SELECT a.CreatedDate, a.NamaTindakan, a.JenisTindakan, b.DetailKet, b.Result, b.Satuan, b.Pria, b.Wanita, b.Keterangan, b.saran AS 'Saran' " & _
-                      "FROM TransaksiLabDetail a " & _
-                      "LEFT JOIN TransaksiLabResult b ON a.TransLabIDDetail = b.TransLabIDDetail AND a.TindakanID = b.TindakanID " & _
-                      "LEFT JOIN MasterJenisTindakan m ON m.JenisTindakan=a.JenisTindakan " & _
-                      "WHERE a.StatusPembayaran = 'PAID' " & queryTindakanString & " AND a.TransLabID IN (SELECT TransLabID FROM TransaksiLab WHERE IDInternet = '" & idPasien & "' AND Status IN ('CETAK', 'TAKEIT')  AND CONVERT(date, Tgllab) BETWEEN '" & Format(Tawal.Date, "yyyy-MM-dd") & "' AND '" & Format(Takhir.Date, "yyyy-MM-dd") & "' AND deleted <> 1 AND LabStartTime IS NOT NULL)"
-        queryOrderString = " ORDER BY a.TransLabID DESC, m.UrutanJenisID, a.Urutan, b.TindakanID, b.NoUrut, a.TransLabIDDetail, a.TindakanID, b.GroupID, b.DetailKet"
+        ' Jika bukan Cek Stik, ambil dari TransaksiLabDetail
+        Dim queryTindakanString As String = ""
+        If RadioButtonRiwayatTindakan1.Checked = True Then
+            queryTindakanString = "AND a.TindakanID = '" & TextBoxKodeTindakanRiwayatLaboratorium.Text & "'"
+        End If
 
-        Dim tblTemp As DataTable = CreateTableRiwayatLaboratorium()
+        Dim queryString As String = "SELECT a.CreatedDate, a.NamaTindakan, a.JenisTindakan, b.DetailKet, b.Result, b.Satuan, b.Pria, b.Wanita, b.Keterangan, b.saran AS 'Saran' " & _
+                                    "FROM TransaksiLabDetail a " & _
+                                    "LEFT JOIN TransaksiLabResult b ON a.TransLabIDDetail = b.TransLabIDDetail AND a.TindakanID = b.TindakanID " & _
+                                    "LEFT JOIN MasterJenisTindakan m ON m.JenisTindakan=a.JenisTindakan " & _
+                                    "WHERE a.StatusPembayaran = 'PAID' " & queryTindakanString & " AND a.TransLabID IN (SELECT TransLabID FROM TransaksiLab WHERE IDInternet = '" & idPasien & "' AND Status IN ('CETAK', 'TAKEIT')  AND CONVERT(date, Tgllab) BETWEEN '" & Format(Tawal, "yyyy-MM-dd") & "' AND '" & Format(Takhir, "yyyy-MM-dd") & "' AND deleted <> 1 AND LabStartTime IS NOT NULL)"
+        Dim queryOrderString As String = " ORDER BY a.TransLabID DESC, m.UrutanJenisID, a.Urutan, b.TindakanID, b.NoUrut, a.TransLabIDDetail, a.TindakanID, b.GroupID, b.DetailKet"
 
         Dim Tbls As DataTable = ReadSQL(queryString & queryOrderString)
         If Tbls.Rows.Count > 0 Then
             For Each Trow As DataRow In Tbls.Rows
-                Dim nilaiRujukan As String = ""
-
                 Dim newRow As DataRow = tblTemp.NewRow()
                 newRow("Tgl Pemeriksaan") = Format(Trow("CreatedDate"), "yyyy-MM-dd HH:mm:ss")
                 newRow("Nama Pemeriksaan") = Trow("NamaTindakan")
@@ -7548,29 +7810,18 @@ Public Class FormRekamMedisDokter
 
                 tblTemp.Rows.Add(newRow)
             Next
+        End If
 
-            ' Tambahkan kolom checkbox
-            'Dim checkColumn As New DataGridViewCheckBoxColumn()
-            'checkColumn.Name = "CheckColumn" ' Nama kolom
-            'checkColumn.HeaderText = "Pilih" ' Header kolom
-            'DataGridViewRiwayatLaboratorium.Columns.Add(checkColumn)
-            'DataGridViewRiwayatLaboratorium.Columns("CheckColumn").ReadOnly = False
-
+        ' Tampilkan data lab
+        If tblTemp.Rows.Count > 0 Then
             DataGridViewRiwayatLaboratorium.DataSource = tblTemp
             DataGridViewRiwayatLaboratorium.CurrentCell = Nothing
             DataGridViewRiwayatLaboratorium.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
-
-            'For Each row As DataGridViewRow In DataGridViewRiwayatLaboratorium.Rows
-            '    Dim cell As DataGridViewCell = row.Cells("CheckColumn")
-
-            '    If row.Cells("Nama Pemeriksaan").ToString.Contains("ECG") = True Then
-            '        cell.Value = True ' Ubah menjadi True (checked) untuk setiap baris.
-            '    End If
-            'Next
         Else
             MsgBox("Data tidak ditemukan.", MsgBoxStyle.Exclamation, "Warning!")
         End If
     End Sub
+
 
     Function CreateTableRiwayatLaboratorium() As DataTable
         Dim Thasil As New DataTable
@@ -8211,10 +8462,17 @@ Public Class FormRekamMedisDokter
                                 WriteSQL("UPDATE LogPenggunaanPaket SET DeletedBy = 'Admin', DeletedDate = GETDATE() WHERE ID IN (" & _
                                         "SELECT TOP 1 ID FROM LogPenggunaanPaket WHERE KodeVoucher = '" & kodeVoucher & "' AND NoTransaksi = '" & idTransaksi & "' AND DeletedDate IS NULL ORDER BY CreatedDate DESC)", 4)
                                 WriteSQL("UPDATE TransaksiPaketTindakan SET Kuota = ISNULL(Kuota, 0) + 1 WHERE KodeVoucher = '" & kodeVoucher & "'", 4)
+
+                                WriteSQL("UPDATE TransaksiPoliDetail " & _
+                                      "SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
+                                      "WHERE TransPoliID IN (SELECT TransPoliID FROM TransaksiPoli WHERE NoUrut = '" & idTransaksi & "') " & _
+                                      "AND KodeVoucher = '" & kodeVoucher & "' " & _
+                                      "AND CONVERT(DATE, transaksitime) = CONVERT(DATE, GETDATE()) " & _
+                                      "AND DeletedDate IS NULL", 4)
                             End If
 
-                            MsgBox("Tindakan : " & namaTindakan & " berhasil dihapus.", MsgBoxStyle.Information, "Success!")
-                        End If
+                        MsgBox("Tindakan : " & namaTindakan & " berhasil dihapus.", MsgBoxStyle.Information, "Success!")
+                    End If
 
                         SaveDetailTindakan()
                     End If
@@ -9383,6 +9641,20 @@ Public Class FormRekamMedisDokter
                 ' Ambil nilai tanggal dari DateTimePicker
                 Dim tgl As DateTime = DateTimePickerTanggalKontrol.Value.Date ' Normalisasi ke tengah malam
                 Dim diagnosa = TextBoxDiagnosaSuratKontrol.Text.Replace("'", "''")
+                Dim dtPasien As DataTable = ReadSQL("SELECT MR.Nama, MR.NoHandphone, MR.JenisKelamin " & _
+                                    "FROM TransaksiDetail TD " & _
+                                    "INNER JOIN MasterPasien MR ON TD.IDInternet = MR.NoRekamMedis " & _
+                                    "WHERE TD.NoUrut = '" & idTransaksi & "'")
+
+                Dim namaPasien As String = ""
+                Dim NoHp As String = ""
+                Dim jenisKelamin As String = ""
+
+                If dtPasien.Rows.Count > 0 Then
+                    namaPasien = dtPasien.Rows(0)("Nama").ToString()
+                    NoHp = dtPasien.Rows(0)("NoHandphone").ToString()
+                    jenisKelamin = dtPasien.Rows(0)("JenisKelamin").ToString()
+                End If
 
                 If TextBoxNoSuratKeteranganKontrol.Text = "" Then
                     ' Insert Data SuratKeteranganKontrol
@@ -9397,6 +9669,16 @@ Public Class FormRekamMedisDokter
                         ' Insert data ke SuratKeteranganKontrol
                         WriteSQL("INSERT INTO SuratKeteranganKontrol (NoTransaksi, NoRekamMedis, NoSurat, TanggalSurat, DokterID, DokterNama, Diagnosa, Tanggal, CreatedBy, CreatedDate) " & _
                                 "VALUES ('" & idTransaksi & "', '" & idPasien & "', '" & nomorSurat & "', GETDATE(), '" & rowData("KodeDokter") & "', '" & rowData("NamaDokter") & "', '" & diagnosa & "', '" & Format(tgl, "yyyy-MM-dd") & "', '" & userInput & "', GETDATE())", 4)
+
+                        WriteSQL("INSERT INTO LogReminderPasien (NamaPasien, NoHP, Keperluan, Tanggal, Status, CreatedBy, CreatedDate, JenisKelamin) " & _
+                           "VALUES ('" & namaPasien & "', " & _
+                                  "'" & NoHp & "', " & _
+                                  "'Kontrol Kembali Ke Faskes', " & _
+                                  "'" & tgl.ToString("yyyy-MM-dd 09:00") & "', " & _
+                                  "'TERJADWAL', " & _
+                                  "'" & userInput & "', " & _
+                                  "GETDATE(), " & _
+                                  "'" & jenisKelamin & "')", 4)
 
                         ' Set Nomor Surat
                         TextBoxNoSuratKeteranganKontrol.Text = nomorSurat
@@ -11290,9 +11572,13 @@ Public Class FormRekamMedisDokter
 
             ' Ambil data HargaNett dan Kuota dari MasterPaketTindakan
             Dim tblPaket As DataTable = ReadSQL("SELECT * FROM MasterPaketTindakan WHERE PaketID = '" & identitasPaket & "'")
+            'Parsing JSON DetailTindakan
+            Dim jsonText As String = tblPaket.Rows(0)("DetailTindakan").ToString()
+            Dim listTindakan As List(Of TindakanDetail) = JsonConvert.DeserializeObject(Of List(Of TindakanDetail))(jsonText)
+
             Dim hargaNettPaket As Decimal = 0
             Dim kuotaPaket As Integer = 1
-
+           
             If tblPaket IsNot Nothing AndAlso tblPaket.Rows.Count > 0 Then
                 Dim paket As DataRow = tblPaket.Rows(0)
                 If Not IsDBNull(paket("HargaNett")) Then
@@ -11328,6 +11614,39 @@ Public Class FormRekamMedisDokter
                     WriteSQL("UPDATE TransaksiPaketTindakanDetail SET KuotaTindakan = KuotaTindakan - 1 WHERE PaketID = '" & rowTindakan("PaketID") & "' AND TindakanID = '" & rowTindakan("TindakanID") & "' AND KodeVoucher = '" & rowTindakan("KodeVoucher") & "'", 4)
                 End If
             Next
+
+            ' Loop data JSON dan simpan ke TransaksiPoliDetail
+            For Each tindakan As TindakanDetail In listTindakan
+                Dim sqlFee As String = "SELECT FeeDokter, FeePerawat FROM MasterTindakan WHERE TindakanID = '" & tindakan.TindakanID & "'"
+                Dim tblFee As DataTable = ReadSQL(sqlFee)
+
+                Dim feeDokter As Decimal = 0D
+                Dim feePerawat As Decimal = 0D
+
+                If tblFee IsNot Nothing AndAlso tblFee.Rows.Count > 0 Then
+                    If Not IsDBNull(tblFee.Rows(0)("FeeDokter")) Then
+                        feeDokter = CDec(tblFee.Rows(0)("FeeDokter"))
+                    End If
+                    If Not IsDBNull(tblFee.Rows(0)("FeePerawat")) Then
+                        feePerawat = CDec(tblFee.Rows(0)("FeePerawat"))
+                    End If
+                End If
+
+                WriteSQL("INSERT INTO TransaksiPoliDetail(Awal, TransPoliID, TindakanID, PaketID, NamaTindakan, JenisTindakan, BiayaTindakan, DiscTindakan, NettBayar, admin, transaksitime, DiscPersenTindakan, StatusPembayaran, KodeVoucher, Penjamin, FeeDokter, FeePerawat) " & _
+                     "VALUES('1', '" & transPoliId & "', " & _
+                     "'" & tindakan.TindakanID & "', " & _
+                     "'" & identitasPaket & "', " & _
+                     "'" & tindakan.NamaTindakan.Replace("'", "''") & "', " & _
+                     "'" & tindakan.JenisTindakan.Replace("'", "''") & "', " & _
+                     CDec(tindakan.BiayaTindakan) & ", " & _
+                     CDec(tindakan.DiskonTindakan) & ", " & _
+                     CDec(tindakan.NettBayar) & ", " & _
+                     "'" & userInput & "', GETDATE(), 0, 'PAID', " & _
+                     "'" & rowPaket(0)("KodeVoucher").ToString & "', " & _
+                     "'" & rowPaket(0)("Penjamin").ToString & "', " & _
+                     feeDokter & ", " & feePerawat & ")", 4)
+            Next
+
 
             MsgBox("Data berhasil disimpan.", MsgBoxStyle.Information, "Sukses")
             'Return tblTindakan

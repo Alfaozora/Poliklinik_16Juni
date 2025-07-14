@@ -319,23 +319,48 @@ Public Class ReportCapaianKBK
         Dim tahunTerpilih As String = ComboBoxTahun.SelectedItem.ToString()
         Dim queryBuilder As New StringBuilder()
 
-        ' 1. WITH Bulan
         Dim tahunSekarang As Integer = DateTime.Now.Year
+        Dim bulanSekarang As Integer = DateTime.Now.Month
+        Dim tanggalSekarang As Integer = DateTime.Now.Day
+
         Dim bulanMaksimal As Integer = 12
 
         If Val(tahunTerpilih) = tahunSekarang Then
-            bulanMaksimal = DateTime.Now.Month
+            If DateTime.Now.Day >= 6 Then
+                ' Boleh munculkan data sampai bulan sebelumnya
+                bulanMaksimal = DateTime.Now.Month - 1
+            Else
+                bulanMaksimal = DateTime.Now.Month - 2
+            End If
+            ' Pastikan tidak lebih kecil dari 1
+            If bulanMaksimal < 1 Then bulanMaksimal = 1
         End If
+
+        'queryBuilder.AppendLine("WITH Bulan AS (")
+        'For bulan As Integer = 1 To bulanMaksimal
+        '    Dim barisUnion As String = "    SELECT " & tahunTerpilih & " AS Tahun, " & bulan & " AS Bulan"
+        '    If bulan < bulanMaksimal Then
+        '        barisUnion &= " UNION ALL"
+        '    End If
+        '    queryBuilder.AppendLine(barisUnion)
+        'Next
+        'queryBuilder.AppendLine(")")
 
         queryBuilder.AppendLine("WITH Bulan AS (")
         For bulan As Integer = 1 To bulanMaksimal
             Dim barisUnion As String = "    SELECT " & tahunTerpilih & " AS Tahun, " & bulan & " AS Bulan"
-            If bulan < bulanMaksimal Then
-                barisUnion &= " UNION ALL"
-            End If
+            If bulan < bulanMaksimal Then barisUnion &= " UNION ALL"
             queryBuilder.AppendLine(barisUnion)
         Next
+        queryBuilder.AppendLine(")")
 
+        queryBuilder.AppendLine(", RentangTanggal AS (")
+        queryBuilder.AppendLine("    SELECT Tahun, Bulan,")
+        queryBuilder.AppendLine("        CASE WHEN Bulan = 1 THEN CAST(CAST(Tahun - 1 AS VARCHAR) + '-12-06' AS DATE)")
+        queryBuilder.AppendLine("             ELSE CAST(CAST(Tahun AS VARCHAR) + '-' + RIGHT('0' + CAST(Bulan - 1 AS VARCHAR), 2) + '-06' AS DATE) END AS StartDate,")
+        queryBuilder.AppendLine("        CASE WHEN Bulan = 1 THEN CAST(CAST(Tahun AS VARCHAR) + '-01-05' AS DATE)")
+        queryBuilder.AppendLine("             ELSE CAST(CAST(Tahun AS VARCHAR) + '-' + RIGHT('0' + CAST(Bulan AS VARCHAR), 2) + '-05' AS DATE) END AS EndDate")
+        queryBuilder.AppendLine("    FROM Bulan")
         queryBuilder.AppendLine(")")
 
         ' 2. PesertaTerdaftar
@@ -343,7 +368,8 @@ Public Class ReportCapaianKBK
         queryBuilder.AppendLine("    SELECT ")
         queryBuilder.AppendLine("        B.Tahun,")
         queryBuilder.AppendLine("        B.Bulan,")
-        queryBuilder.AppendLine("        COUNT(DISTINCT MPB.NoKartu) AS PesertaTerdaftar")
+        queryBuilder.AppendLine("        COUNT(MPB.NoKartu) AS PesertaTerdaftar")
+        'queryBuilder.AppendLine("        COUNT(DISTINCT MPB.NoKartu) AS PesertaTerdaftar")
         queryBuilder.AppendLine("    FROM Bulan B")
         queryBuilder.AppendLine("    LEFT JOIN MasterPasienBPJS MPB ON MPB.KdProviderPst = '" & kodePPK & "'")
         queryBuilder.AppendLine("    LEFT JOIN MasterPasien MP ON MPB.NoKartu = MP.NoKartuBPJS")
@@ -354,20 +380,52 @@ Public Class ReportCapaianKBK
         queryBuilder.AppendLine(")")
 
         ' 3. KunjunganKontak
+        'queryBuilder.AppendLine(", KunjunganKontak AS (")
+        'queryBuilder.AppendLine("    SELECT ")
+        'queryBuilder.AppendLine("        YEAR(TD.TanggalTransaksi) AS Tahun,")
+        'queryBuilder.AppendLine("        MONTH(TD.TanggalTransaksi) AS Bulan,")
+        'queryBuilder.AppendLine("        TD.IDInternet")
+        'queryBuilder.AppendLine("    FROM TransaksiDetail TD")
+        'queryBuilder.AppendLine("    INNER JOIN MasterPasien MP ON TD.IDInternet = MP.NoRekamMedis")
+        'queryBuilder.AppendLine("    INNER JOIN MasterPasienBPJS MB ON MP.NoKartuBPJS = MB.NoKartu")
+        'queryBuilder.AppendLine("    WHERE TD.JenisKunjungan IN ('Kunjungan Sakit', 'Kunjungan Sehat')")
+        'queryBuilder.AppendLine("      AND TD.TanggalTransaksi >= '" & tahunTerpilih & "-01-01'")
+        'queryBuilder.AppendLine("      AND TD.DeletedDate IS NULL")
+        'queryBuilder.AppendLine("      AND MB.KdProviderPst = '" & kodePPK & "'")
+        'queryBuilder.AppendLine("    GROUP BY YEAR(TD.TanggalTransaksi), MONTH(TD.TanggalTransaksi), TD.IDInternet")
+        'queryBuilder.AppendLine(")")
+
+        'queryBuilder.AppendLine(", KunjunganKontak AS (")
+        'queryBuilder.AppendLine("    SELECT ")
+        'queryBuilder.AppendLine("        YEAR(TD.TanggalTransaksi) AS Tahun,")
+        'queryBuilder.AppendLine("        MONTH(TD.TanggalTransaksi) AS Bulan")
+        'queryBuilder.AppendLine("    FROM TransaksiDetail TD")
+        'queryBuilder.AppendLine("    INNER JOIN MasterPasien MP ON TD.IDInternet = MP.NoRekamMedis")
+        'queryBuilder.AppendLine("    INNER JOIN MasterPasienBPJS MB ON MP.NoKartuBPJS = MB.NoKartu")
+        'queryBuilder.AppendLine("    WHERE TD.JenisKunjungan IN ('Kunjungan Sakit', 'Kunjungan Sehat')")
+        'queryBuilder.AppendLine("      AND TD.TanggalTransaksi >= '" & tahunTerpilih & "-01-01'")
+        'queryBuilder.AppendLine("      AND TD.DeletedDate IS NULL")
+        'queryBuilder.AppendLine("      AND MB.Aktif = 'True'")
+        'queryBuilder.AppendLine("      AND MB.KdProviderPst = '" & kodePPK & "'")
+        'queryBuilder.AppendLine(")")
+
         queryBuilder.AppendLine(", KunjunganKontak AS (")
         queryBuilder.AppendLine("    SELECT ")
-        queryBuilder.AppendLine("        YEAR(TD.TanggalTransaksi) AS Tahun,")
-        queryBuilder.AppendLine("        MONTH(TD.TanggalTransaksi) AS Bulan,")
-        queryBuilder.AppendLine("        TD.IDInternet")
+        queryBuilder.AppendLine("        RT.Tahun, ")
+        queryBuilder.AppendLine("        RT.Bulan, ")
+        queryBuilder.AppendLine("        COUNT(TD.IDInternet) AS JumlahKontak")
         queryBuilder.AppendLine("    FROM TransaksiDetail TD")
         queryBuilder.AppendLine("    INNER JOIN MasterPasien MP ON TD.IDInternet = MP.NoRekamMedis")
         queryBuilder.AppendLine("    INNER JOIN MasterPasienBPJS MB ON MP.NoKartuBPJS = MB.NoKartu")
+        queryBuilder.AppendLine("    INNER JOIN RentangTanggal RT ON TD.TanggalTransaksi BETWEEN RT.StartDate AND RT.EndDate")
         queryBuilder.AppendLine("    WHERE TD.JenisKunjungan IN ('Kunjungan Sakit', 'Kunjungan Sehat')")
-        queryBuilder.AppendLine("      AND TD.TanggalTransaksi >= '" & tahunTerpilih & "-01-01'")
         queryBuilder.AppendLine("      AND TD.DeletedDate IS NULL")
+        queryBuilder.AppendLine("      AND MB.Aktif = 'True'")
+        queryBuilder.AppendLine("      AND MP.DeletedBy IS NULL")
         queryBuilder.AppendLine("      AND MB.KdProviderPst = '" & kodePPK & "'")
-        queryBuilder.AppendLine("    GROUP BY YEAR(TD.TanggalTransaksi), MONTH(TD.TanggalTransaksi), TD.IDInternet")
+        queryBuilder.AppendLine("    GROUP BY RT.Tahun, RT.Bulan")
         queryBuilder.AppendLine(")")
+
 
         ' 4. RujukanVertikal
         queryBuilder.AppendLine(", RujukanVertikal AS (")
@@ -381,9 +439,28 @@ Public Class ReportCapaianKBK
         queryBuilder.AppendLine("    WHERE TD.StatusPulang = 'Rujuk Vertikal'")
         queryBuilder.AppendLine("      AND TD.TanggalTransaksi >= '" & tahunTerpilih & "-01-01'")
         queryBuilder.AppendLine("      AND TD.DeletedDate IS NULL")
+        queryBuilder.AppendLine("      AND MB.Aktif = 'True'")
+        queryBuilder.AppendLine("      AND MP.DeletedBy IS NULL")
         queryBuilder.AppendLine("      AND MB.KdProviderPst = '" & kodePPK & "'")
         queryBuilder.AppendLine("    GROUP BY YEAR(TD.TanggalTransaksi), MONTH(TD.TanggalTransaksi), TD.IDInternet")
         queryBuilder.AppendLine(")")
+
+        'queryBuilder.AppendLine(", RujukanVertikal AS (")
+        'queryBuilder.AppendLine("    SELECT ")
+        'queryBuilder.AppendLine("        RT.Tahun, ")
+        'queryBuilder.AppendLine("        RT.Bulan, ")
+        'queryBuilder.AppendLine("        COUNT(TD.IDInternet) AS JumlahRujukan")
+        'queryBuilder.AppendLine("    FROM TransaksiDetail TD")
+        'queryBuilder.AppendLine("    INNER JOIN MasterPasien MP ON TD.IDInternet = MP.NoRekamMedis")
+        'queryBuilder.AppendLine("    INNER JOIN MasterPasienBPJS MB ON MP.NoKartuBPJS = MB.NoKartu")
+        'queryBuilder.AppendLine("    INNER JOIN RentangTanggal RT ON TD.TanggalTransaksi BETWEEN RT.StartDate AND RT.EndDate")
+        'queryBuilder.AppendLine("    WHERE TD.StatusPulang = 'Rujuk Vertikal'")
+        'queryBuilder.AppendLine("      AND TD.DeletedDate IS NULL")
+        'queryBuilder.AppendLine("      AND MB.Aktif = 'True'")
+        'queryBuilder.AppendLine("      AND MP.DeletedBy IS NULL")
+        'queryBuilder.AppendLine("      AND MB.KdProviderPst = '" & kodePPK & "'")
+        'queryBuilder.AppendLine("    GROUP BY RT.Tahun, RT.Bulan")
+        'queryBuilder.AppendLine(")")
 
         ' 5. RujukanNonSpesialis
         queryBuilder.AppendLine(", RujukanNonSpesialis AS (")
@@ -404,6 +481,22 @@ Public Class ReportCapaianKBK
         queryBuilder.AppendLine(")")
 
         '6. Prolanis DM
+        'queryBuilder.AppendLine(", ProlanisDM AS (")
+        'queryBuilder.AppendLine("    SELECT ")
+        'queryBuilder.AppendLine("        YEAR(TD.TanggalTransaksi) AS Tahun,")
+        'queryBuilder.AppendLine("        MONTH(TD.TanggalTransaksi) AS Bulan,")
+        'queryBuilder.AppendLine("        COUNT(DISTINCT TD.IDInternet) AS JumlahProlanisDM")
+        'queryBuilder.AppendLine("    FROM TransaksiDetail TD")
+        'queryBuilder.AppendLine("    INNER JOIN MasterPasien MP ON TD.IDInternet = MP.NoRekamMedis")
+        'queryBuilder.AppendLine("    INNER JOIN MasterPasienBPJS MB ON MP.NoKartuBPJS = MB.NoKartu")
+        'queryBuilder.AppendLine("    WHERE TD.TanggalTransaksi >= '" & tahunTerpilih & "-01-01'")
+        'queryBuilder.AppendLine("      AND TD.DeletedDate IS NULL")
+        'queryBuilder.AppendLine("      AND MB.KdProviderPst = '" & kodePPK & "'")
+        'queryBuilder.AppendLine("      AND MB.PesertaProl LIKE '%DM%'")
+        'queryBuilder.AppendLine("      AND MB.Aktif = 'True'")
+        'queryBuilder.AppendLine("    GROUP BY YEAR(TD.TanggalTransaksi), MONTH(TD.TanggalTransaksi)")
+        'queryBuilder.AppendLine(")")
+
         queryBuilder.AppendLine(", ProlanisDM AS (")
         queryBuilder.AppendLine("    SELECT ")
         queryBuilder.AppendLine("        YEAR(TD.TanggalTransaksi) AS Tahun,")
@@ -411,11 +504,20 @@ Public Class ReportCapaianKBK
         queryBuilder.AppendLine("        COUNT(DISTINCT TD.IDInternet) AS JumlahProlanisDM")
         queryBuilder.AppendLine("    FROM TransaksiDetail TD")
         queryBuilder.AppendLine("    INNER JOIN MasterPasien MP ON TD.IDInternet = MP.NoRekamMedis")
+        queryBuilder.AppendLine("    INNER JOIN MasterPasienBPJS MB ON MP.NoKartuBPJS = MB.NoKartu")
+        queryBuilder.AppendLine("    INNER JOIN TransaksiLab TL ON TD.NoUrut = TL.NoUrut")
+        queryBuilder.AppendLine("    INNER JOIN TransaksiLabDetail TLD ON TL.TransLabID = TLD.TransLabID")
+        queryBuilder.AppendLine("    INNER JOIN TransaksiLabResult TLR ON TLD.TransLabIDDetail = TLR.TransLabIDDetail")
         queryBuilder.AppendLine("    WHERE TD.TanggalTransaksi >= '" & tahunTerpilih & "-01-01'")
         queryBuilder.AppendLine("      AND TD.DeletedDate IS NULL")
-        queryBuilder.AppendLine("      AND MP.Prolanis = 'DM'")
+        queryBuilder.AppendLine("      AND MB.KdProviderPst = '" & kodePPK & "'")
+        'queryBuilder.AppendLine("      AND MB.PesertaProl LIKE '%DM%'")
+        queryBuilder.AppendLine("      AND MB.Aktif = 'True'")
+        queryBuilder.AppendLine("      AND TD.JenisTransaksi = 'LAB'")
+        queryBuilder.AppendLine("      AND TLD.TindakanID = '101'")
         queryBuilder.AppendLine("    GROUP BY YEAR(TD.TanggalTransaksi), MONTH(TD.TanggalTransaksi)")
         queryBuilder.AppendLine(")")
+
 
         '7. Peserta DM
         queryBuilder.AppendLine(", PesertaDiagnosaDM AS (")
@@ -467,8 +569,12 @@ Public Class ReportCapaianKBK
 
         ' . Final Select
         queryBuilder.AppendLine("SELECT ")
-        queryBuilder.AppendLine("    CONVERT(VARCHAR, CAST(CAST(B.Tahun AS VARCHAR(4)) + '-' + ")
-        queryBuilder.AppendLine("    RIGHT('0' + CAST(B.Bulan AS VARCHAR(2)), 2) + '-06' AS DATETIME), 103) AS TanggalProses,")
+        'queryBuilder.AppendLine("    CONVERT(VARCHAR, CAST(CAST(B.Tahun AS VARCHAR(4)) + '-' + ")
+        'queryBuilder.AppendLine("    RIGHT('0' + CAST(B.Bulan AS VARCHAR(2)), 2) + '-06' AS DATETIME), 103) AS TanggalProses,")
+        queryBuilder.AppendLine("    CONVERT(VARCHAR, CAST(CASE")
+        queryBuilder.AppendLine("        WHEN B.Bulan = 12 THEN CAST((B.Tahun + 1) AS VARCHAR) + '-01-06'")
+        queryBuilder.AppendLine("        ELSE CAST(B.Tahun AS VARCHAR) + '-' + RIGHT('0' + CAST(B.Bulan + 1 AS VARCHAR), 2) + '-06'")
+        queryBuilder.AppendLine("    END AS DATETIME), 103) AS TanggalProses,")
         queryBuilder.AppendLine("    ISNULL(KC.JumlahKontak, 0) AS JumlahKontak,")
         queryBuilder.AppendLine("    ISNULL(PT.PesertaTerdaftar, 0) AS PesertaTerdaftar,")
         queryBuilder.AppendLine("    ISNULL(RV.JumlahRujukan, 0) AS JumlahRujukan,")
@@ -513,17 +619,27 @@ Public Class ReportCapaianKBK
 
         queryBuilder.AppendLine("FROM Bulan B")
 
-        queryBuilder.AppendLine("LEFT JOIN (")
-        queryBuilder.AppendLine("    SELECT Tahun, Bulan, COUNT(DISTINCT IDInternet) AS JumlahKontak")
-        queryBuilder.AppendLine("    FROM KunjunganKontak")
-        queryBuilder.AppendLine("    GROUP BY Tahun, Bulan")
-        queryBuilder.AppendLine(") KC ON KC.Tahun = B.Tahun AND KC.Bulan = B.Bulan")
+        'queryBuilder.AppendLine("LEFT JOIN (")
+        'queryBuilder.AppendLine("    SELECT Tahun, Bulan, COUNT(DISTINCT IDInternet) AS JumlahKontak")
+        'queryBuilder.AppendLine("    FROM KunjunganKontak")
+        'queryBuilder.AppendLine("    GROUP BY Tahun, Bulan")
+        'queryBuilder.AppendLine(") KC ON KC.Tahun = B.Tahun AND KC.Bulan = B.Bulan")
+
+        'queryBuilder.AppendLine("LEFT JOIN (")
+        'queryBuilder.AppendLine("    SELECT Tahun, Bulan, COUNT(*) AS JumlahKontak")
+        'queryBuilder.AppendLine("    FROM KunjunganKontak")
+        'queryBuilder.AppendLine("    GROUP BY Tahun, Bulan")
+        'queryBuilder.AppendLine(") KC ON KC.Tahun = B.Tahun AND KC.Bulan = B.Bulan")
+
+        queryBuilder.AppendLine("LEFT JOIN KunjunganKontak KC ON KC.Tahun = B.Tahun AND KC.Bulan = B.Bulan")
 
         queryBuilder.AppendLine("LEFT JOIN (")
         queryBuilder.AppendLine("    SELECT Tahun, Bulan, COUNT(DISTINCT IDInternet) AS JumlahRujukan")
         queryBuilder.AppendLine("    FROM RujukanVertikal")
         queryBuilder.AppendLine("    GROUP BY Tahun, Bulan")
         queryBuilder.AppendLine(") RV ON RV.Tahun = B.Tahun AND RV.Bulan = B.Bulan")
+
+        'queryBuilder.AppendLine("LEFT JOIN RujukanVertikal RV ON RV.Tahun = B.Tahun AND RV.Bulan = B.Bulan")
 
         queryBuilder.AppendLine("LEFT JOIN RujukanNonSpesialis RNS ON RNS.Tahun = B.Tahun AND RNS.Bulan = B.Bulan")
         queryBuilder.AppendLine("LEFT JOIN PesertaTerdaftar PT ON PT.Tahun = B.Tahun AND PT.Bulan = B.Bulan")

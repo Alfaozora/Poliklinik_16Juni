@@ -41,6 +41,10 @@ Partial Class MasterTindakanKlinik
         Me.ButtonExportMasterTindakan = New System.Windows.Forms.Button
         Me.SplitContainer3 = New System.Windows.Forms.SplitContainer
         Me.PanelMasterTindakan = New System.Windows.Forms.Panel
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox
+        Me.Label33 = New System.Windows.Forms.Label
+        Me.TextBoxBulanReminder = New System.Windows.Forms.TextBox
+        Me.CheckBoxReminder = New System.Windows.Forms.CheckBox
         Me.Panel5 = New System.Windows.Forms.Panel
         Me.RadioButtonPelaksanaDokter = New System.Windows.Forms.RadioButton
         Me.RadioButtonPelaksanaPerawat = New System.Windows.Forms.RadioButton
@@ -171,6 +175,7 @@ Partial Class MasterTindakanKlinik
         Me.SplitContainer3.Panel1.SuspendLayout()
         Me.SplitContainer3.SuspendLayout()
         Me.PanelMasterTindakan.SuspendLayout()
+        Me.GroupBox1.SuspendLayout()
         Me.Panel5.SuspendLayout()
         Me.SplitContainerFeeTindakan.Panel1.SuspendLayout()
         Me.SplitContainerFeeTindakan.Panel2.SuspendLayout()
@@ -459,6 +464,7 @@ Partial Class MasterTindakanKlinik
         'PanelMasterTindakan
         '
         Me.PanelMasterTindakan.AutoScroll = True
+        Me.PanelMasterTindakan.Controls.Add(Me.GroupBox1)
         Me.PanelMasterTindakan.Controls.Add(Me.Panel5)
         Me.PanelMasterTindakan.Controls.Add(Me.CheckBoxStatusAktifTindakan)
         Me.PanelMasterTindakan.Controls.Add(Me.SplitContainerFeeTindakan)
@@ -488,6 +494,50 @@ Partial Class MasterTindakanKlinik
         Me.PanelMasterTindakan.Name = "PanelMasterTindakan"
         Me.PanelMasterTindakan.Size = New System.Drawing.Size(757, 500)
         Me.PanelMasterTindakan.TabIndex = 563
+        '
+        'GroupBox1
+        '
+        Me.GroupBox1.Controls.Add(Me.Label33)
+        Me.GroupBox1.Controls.Add(Me.TextBoxBulanReminder)
+        Me.GroupBox1.Controls.Add(Me.CheckBoxReminder)
+        Me.GroupBox1.Location = New System.Drawing.Point(537, 17)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(247, 116)
+        Me.GroupBox1.TabIndex = 573
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "Reminder Pasien ?"
+        '
+        'Label33
+        '
+        Me.Label33.AutoSize = True
+        Me.Label33.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label33.Location = New System.Drawing.Point(15, 51)
+        Me.Label33.Name = "Label33"
+        Me.Label33.Size = New System.Drawing.Size(94, 17)
+        Me.Label33.TabIndex = 574
+        Me.Label33.Text = "Berapa Bulan?"
+        '
+        'TextBoxBulanReminder
+        '
+        Me.TextBoxBulanReminder.BackColor = System.Drawing.Color.White
+        Me.TextBoxBulanReminder.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxBulanReminder.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
+        Me.TextBoxBulanReminder.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxBulanReminder.Location = New System.Drawing.Point(18, 71)
+        Me.TextBoxBulanReminder.Name = "TextBoxBulanReminder"
+        Me.TextBoxBulanReminder.Size = New System.Drawing.Size(109, 23)
+        Me.TextBoxBulanReminder.TabIndex = 573
+        '
+        'CheckBoxReminder
+        '
+        Me.CheckBoxReminder.AutoSize = True
+        Me.CheckBoxReminder.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.CheckBoxReminder.Location = New System.Drawing.Point(18, 22)
+        Me.CheckBoxReminder.Name = "CheckBoxReminder"
+        Me.CheckBoxReminder.Size = New System.Drawing.Size(42, 19)
+        Me.CheckBoxReminder.TabIndex = 572
+        Me.CheckBoxReminder.Text = "Iya"
+        Me.CheckBoxReminder.UseVisualStyleBackColor = True
         '
         'Panel5
         '
@@ -604,7 +654,7 @@ Partial Class MasterTindakanKlinik
         Me.RadioButtonNonAktifFee.Font = New System.Drawing.Font("Segoe UI", 9.0!)
         Me.RadioButtonNonAktifFee.Location = New System.Drawing.Point(48, 3)
         Me.RadioButtonNonAktifFee.Name = "RadioButtonNonAktifFee"
-        Me.RadioButtonNonAktifFee.Size = New System.Drawing.Size(53, 19)
+        Me.RadioButtonNonAktifFee.Size = New System.Drawing.Size(54, 19)
         Me.RadioButtonNonAktifFee.TabIndex = 246
         Me.RadioButtonNonAktifFee.Text = "Tidak"
         Me.RadioButtonNonAktifFee.UseVisualStyleBackColor = True
@@ -1552,7 +1602,7 @@ Partial Class MasterTindakanKlinik
         Me.RadioButtonPaketPerTindakan.Font = New System.Drawing.Font("Segoe UI", 9.0!)
         Me.RadioButtonPaketPerTindakan.Location = New System.Drawing.Point(108, 3)
         Me.RadioButtonPaketPerTindakan.Name = "RadioButtonPaketPerTindakan"
-        Me.RadioButtonPaketPerTindakan.Size = New System.Drawing.Size(127, 19)
+        Me.RadioButtonPaketPerTindakan.Size = New System.Drawing.Size(128, 19)
         Me.RadioButtonPaketPerTindakan.TabIndex = 246
         Me.RadioButtonPaketPerTindakan.Text = "Paket Per-Tindakan"
         Me.RadioButtonPaketPerTindakan.UseVisualStyleBackColor = True
@@ -1939,6 +1989,8 @@ Partial Class MasterTindakanKlinik
         Me.SplitContainer3.ResumeLayout(False)
         Me.PanelMasterTindakan.ResumeLayout(False)
         Me.PanelMasterTindakan.PerformLayout()
+        Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox1.PerformLayout()
         Me.Panel5.ResumeLayout(False)
         Me.Panel5.PerformLayout()
         Me.SplitContainerFeeTindakan.Panel1.ResumeLayout(False)
@@ -2109,4 +2161,8 @@ Partial Class MasterTindakanKlinik
     Friend WithEvents ButtonSimpanMasterPaket As System.Windows.Forms.Button
     Friend WithEvents ButtonClearMasterPaket As System.Windows.Forms.Button
     Friend WithEvents ButtonExportMasterPaket As System.Windows.Forms.Button
+    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    Friend WithEvents Label33 As System.Windows.Forms.Label
+    Friend WithEvents TextBoxBulanReminder As System.Windows.Forms.TextBox
+    Friend WithEvents CheckBoxReminder As System.Windows.Forms.CheckBox
 End Class

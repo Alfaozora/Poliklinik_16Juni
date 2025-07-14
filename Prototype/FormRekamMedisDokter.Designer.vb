@@ -1189,6 +1189,7 @@ Me.Label13 = New System.Windows.Forms.Label
 Me.DataGridViewRiwayatKunjungan = New System.Windows.Forms.DataGridView
 Me.TabPage4 = New System.Windows.Forms.TabPage
 Me.SplitContainerRiwayatLaboratorium = New System.Windows.Forms.SplitContainer
+Me.RadioButtonCekStik = New System.Windows.Forms.RadioButton
 Me.TextBoxKodeTindakanRiwayatLaboratorium = New System.Windows.Forms.TextBox
 Me.TextBoxNamaTindakanRiwayatLaboratorium = New System.Windows.Forms.TextBox
 Me.ButtonCariTindakanRiwayatLaboratorium = New System.Windows.Forms.Button
@@ -16119,6 +16120,7 @@ Me.SplitContainerRiwayatLaboratorium.Orientation = System.Windows.Forms.Orientat
 'SplitContainerRiwayatLaboratorium.Panel1
 '
 Me.SplitContainerRiwayatLaboratorium.Panel1.AutoScroll = true
+Me.SplitContainerRiwayatLaboratorium.Panel1.Controls.Add(Me.RadioButtonCekStik)
 Me.SplitContainerRiwayatLaboratorium.Panel1.Controls.Add(Me.TextBoxKodeTindakanRiwayatLaboratorium)
 Me.SplitContainerRiwayatLaboratorium.Panel1.Controls.Add(Me.TextBoxNamaTindakanRiwayatLaboratorium)
 Me.SplitContainerRiwayatLaboratorium.Panel1.Controls.Add(Me.ButtonCariTindakanRiwayatLaboratorium)
@@ -16141,6 +16143,18 @@ Me.SplitContainerRiwayatLaboratorium.Size = New System.Drawing.Size(886, 562)
 Me.SplitContainerRiwayatLaboratorium.SplitterDistance = 185
 Me.SplitContainerRiwayatLaboratorium.SplitterWidth = 5
 Me.SplitContainerRiwayatLaboratorium.TabIndex = 462
+'
+'RadioButtonCekStik
+'
+Me.RadioButtonCekStik.AutoSize = true
+Me.RadioButtonCekStik.Font = New System.Drawing.Font("Segoe UI", 9.75!)
+Me.RadioButtonCekStik.Location = New System.Drawing.Point(442, 76)
+Me.RadioButtonCekStik.Name = "RadioButtonCekStik"
+Me.RadioButtonCekStik.Size = New System.Drawing.Size(71, 21)
+Me.RadioButtonCekStik.TabIndex = 535
+Me.RadioButtonCekStik.Tag = "10"
+Me.RadioButtonCekStik.Text = "Cek Stik"
+Me.RadioButtonCekStik.UseVisualStyleBackColor = true
 '
 'TextBoxKodeTindakanRiwayatLaboratorium
 '
@@ -18687,4 +18701,5 @@ End Sub
     Friend WithEvents DataGridViewDetail As System.Windows.Forms.DataGridView
     Friend WithEvents RadioButtonPerTindakan As System.Windows.Forms.RadioButton
     Friend WithEvents RadioButtonReguler As System.Windows.Forms.RadioButton
+    Friend WithEvents RadioButtonCekStik As System.Windows.Forms.RadioButton
 End Class

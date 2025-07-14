@@ -209,7 +209,6 @@ Partial Class PoliKlinik
         Me.RekapPendapatanKlinikToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
         Me.Form1gptToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.DashboardToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
-        Me.ReservasiToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.KYCToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MasterToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.DokterToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -268,6 +267,8 @@ Partial Class PoliKlinik
         Me.txmcu = New System.Windows.Forms.TextBox
         Me.TimerUpdateProgram = New System.Windows.Forms.Timer(Me.components)
         Me.TimerShutdown = New System.Windows.Forms.Timer(Me.components)
+        Me.TimerKirimReminderWA = New System.Windows.Forms.Timer(Me.components)
+        Me.ReservasiDanReminderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip.SuspendLayout()
         Me.StatusStrip.SuspendLayout()
         Me.SuspendLayout()
@@ -454,7 +455,7 @@ Partial Class PoliKlinik
         '
         'PoliToolStripMenuItem1
         '
-        Me.PoliToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PembayaranPoliToolStripMenuItem, Me.PendapatanKlinikToolStripMenuItem1, Me.KapitasiKlinikToolStripMenuItem, Me.LaporanKlinikToolStripMenuItem, Me.LaporanToolStripMenuItem, Me.RekapPendapatanToolStripMenuItem})
+        Me.PoliToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PembayaranPoliToolStripMenuItem, Me.PendapatanKlinikToolStripMenuItem1, Me.KapitasiKlinikToolStripMenuItem, Me.LaporanKlinikToolStripMenuItem, Me.LaporanToolStripMenuItem, Me.RekapPendapatanToolStripMenuItem, Me.ReservasiDanReminderToolStripMenuItem})
         Me.PoliToolStripMenuItem1.Font = New System.Drawing.Font("Arial", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.PoliToolStripMenuItem1.Name = "PoliToolStripMenuItem1"
         Me.PoliToolStripMenuItem1.Size = New System.Drawing.Size(52, 20)
@@ -464,7 +465,7 @@ Partial Class PoliKlinik
         'PembayaranPoliToolStripMenuItem
         '
         Me.PembayaranPoliToolStripMenuItem.Name = "PembayaranPoliToolStripMenuItem"
-        Me.PembayaranPoliToolStripMenuItem.Size = New System.Drawing.Size(209, 22)
+        Me.PembayaranPoliToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
         Me.PembayaranPoliToolStripMenuItem.Tag = "0302"
         Me.PembayaranPoliToolStripMenuItem.Text = "Kasir Poli"
         '
@@ -472,7 +473,7 @@ Partial Class PoliKlinik
         '
         Me.PendapatanKlinikToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.RekapPendapatanKlinikToolStripMenuItem, Me.ReportClosingTagihanKlinikToolStripMenuItem})
         Me.PendapatanKlinikToolStripMenuItem1.Name = "PendapatanKlinikToolStripMenuItem1"
-        Me.PendapatanKlinikToolStripMenuItem1.Size = New System.Drawing.Size(209, 22)
+        Me.PendapatanKlinikToolStripMenuItem1.Size = New System.Drawing.Size(216, 22)
         Me.PendapatanKlinikToolStripMenuItem1.Tag = "0305"
         Me.PendapatanKlinikToolStripMenuItem1.Text = "Pendapatan Klinik"
         '
@@ -494,7 +495,7 @@ Partial Class PoliKlinik
         '
         Me.KapitasiKlinikToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MasterHargaKapitasiToolStripMenuItem, Me.KapitasiBPJSToolStripMenuItem})
         Me.KapitasiKlinikToolStripMenuItem.Name = "KapitasiKlinikToolStripMenuItem"
-        Me.KapitasiKlinikToolStripMenuItem.Size = New System.Drawing.Size(209, 22)
+        Me.KapitasiKlinikToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
         Me.KapitasiKlinikToolStripMenuItem.Tag = "0307"
         Me.KapitasiKlinikToolStripMenuItem.Text = "Kapitasi Klinik"
         '
@@ -516,7 +517,7 @@ Partial Class PoliKlinik
         '
         Me.LaporanKlinikToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.Daftar10DiagnosaTerbanyakToolStripMenuItem, Me.LaporanDaftarDiagnosaToolStripMenuItem, Me.DaftarKunjunganPasienToolStripMenuItem, Me.LaporanRiwayatPaketTindakanToolStripMenuItem})
         Me.LaporanKlinikToolStripMenuItem.Name = "LaporanKlinikToolStripMenuItem"
-        Me.LaporanKlinikToolStripMenuItem.Size = New System.Drawing.Size(209, 22)
+        Me.LaporanKlinikToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
         Me.LaporanKlinikToolStripMenuItem.Tag = "0309"
         Me.LaporanKlinikToolStripMenuItem.Text = "Laporan Klinik"
         '
@@ -551,14 +552,14 @@ Partial Class PoliKlinik
         'LaporanToolStripMenuItem
         '
         Me.LaporanToolStripMenuItem.Name = "LaporanToolStripMenuItem"
-        Me.LaporanToolStripMenuItem.Size = New System.Drawing.Size(209, 22)
+        Me.LaporanToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
         Me.LaporanToolStripMenuItem.Tag = "0308"
         Me.LaporanToolStripMenuItem.Text = "Rekap Fee Practitioner"
         '
         'RekapPendapatanToolStripMenuItem
         '
         Me.RekapPendapatanToolStripMenuItem.Name = "RekapPendapatanToolStripMenuItem"
-        Me.RekapPendapatanToolStripMenuItem.Size = New System.Drawing.Size(209, 22)
+        Me.RekapPendapatanToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
         Me.RekapPendapatanToolStripMenuItem.Text = "Rekap Pendapatan"
         '
         'LabToolStripMenuItem
@@ -999,14 +1000,14 @@ Partial Class PoliKlinik
         'HargaToolStripMenuItem
         '
         Me.HargaToolStripMenuItem.Name = "HargaToolStripMenuItem"
-        Me.HargaToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.HargaToolStripMenuItem.Size = New System.Drawing.Size(116, 22)
         Me.HargaToolStripMenuItem.Tag = "050601"
         Me.HargaToolStripMenuItem.Text = "Harga"
         '
         'PasienToolStripMenuItem2
         '
         Me.PasienToolStripMenuItem2.Name = "PasienToolStripMenuItem2"
-        Me.PasienToolStripMenuItem2.Size = New System.Drawing.Size(152, 22)
+        Me.PasienToolStripMenuItem2.Size = New System.Drawing.Size(116, 22)
         Me.PasienToolStripMenuItem2.Tag = "050602"
         Me.PasienToolStripMenuItem2.Text = "Pasien"
         '
@@ -1355,7 +1356,7 @@ Partial Class PoliKlinik
         '
         'ITToolStripMenuItem1
         '
-        Me.ITToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ImplementasiBPJSToolStripMenuItem1, Me.FormPendaftaranPasienToolStripMenuItem, Me.EmailToolStripMenuItem, Me.CetakAlamatToolStripMenuItem, Me.JPKToolStripMenuItem1, Me.FormTrialToolStripMenuItem, Me.FormTrial2ToolStripMenuItem, Me.FormTrial3ToolStripMenuItem, Me.PrototypeToolStripMenuItem, Me.Prototype2ToolStripMenuItem, Me.FormTrial5ToolStripMenuItem, Me.Form3ToolStripMenuItem, Me.SatuSehatResourceToolStripMenuItem, Me.SatuSehatSynchronizationToolStripMenuItem, Me.ValidasiFaskesPasienToolStripMenuItem, Me.RecycleToolStripMenuItem, Me.Form1gptToolStripMenuItem, Me.DashboardToolStripMenuItem, Me.ReservasiToolStripMenuItem})
+        Me.ITToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ImplementasiBPJSToolStripMenuItem1, Me.FormPendaftaranPasienToolStripMenuItem, Me.EmailToolStripMenuItem, Me.CetakAlamatToolStripMenuItem, Me.JPKToolStripMenuItem1, Me.FormTrialToolStripMenuItem, Me.FormTrial2ToolStripMenuItem, Me.FormTrial3ToolStripMenuItem, Me.PrototypeToolStripMenuItem, Me.Prototype2ToolStripMenuItem, Me.FormTrial5ToolStripMenuItem, Me.Form3ToolStripMenuItem, Me.SatuSehatResourceToolStripMenuItem, Me.SatuSehatSynchronizationToolStripMenuItem, Me.ValidasiFaskesPasienToolStripMenuItem, Me.RecycleToolStripMenuItem, Me.Form1gptToolStripMenuItem, Me.DashboardToolStripMenuItem})
         Me.ITToolStripMenuItem1.Font = New System.Drawing.Font("Arial", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ITToolStripMenuItem1.Name = "ITToolStripMenuItem1"
         Me.ITToolStripMenuItem1.Size = New System.Drawing.Size(30, 20)
@@ -1563,12 +1564,6 @@ Partial Class PoliKlinik
         Me.DashboardToolStripMenuItem.Name = "DashboardToolStripMenuItem"
         Me.DashboardToolStripMenuItem.Size = New System.Drawing.Size(238, 22)
         Me.DashboardToolStripMenuItem.Text = "Dashboard"
-        '
-        'ReservasiToolStripMenuItem
-        '
-        Me.ReservasiToolStripMenuItem.Name = "ReservasiToolStripMenuItem"
-        Me.ReservasiToolStripMenuItem.Size = New System.Drawing.Size(238, 22)
-        Me.ReservasiToolStripMenuItem.Text = "Reservasi"
         '
         'KYCToolStripMenuItem
         '
@@ -1963,6 +1958,18 @@ Partial Class PoliKlinik
         '
         Me.TimerShutdown.Interval = 300000
         '
+        'TimerKirimReminderWA
+        '
+        Me.TimerKirimReminderWA.Enabled = True
+        Me.TimerKirimReminderWA.Interval = 60000
+        '
+        'ReservasiDanReminderToolStripMenuItem
+        '
+        Me.ReservasiDanReminderToolStripMenuItem.Name = "ReservasiDanReminderToolStripMenuItem"
+        Me.ReservasiDanReminderToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
+        Me.ReservasiDanReminderToolStripMenuItem.Tag = "0311"
+        Me.ReservasiDanReminderToolStripMenuItem.Text = "Reservasi dan Reminder"
+        '
         'PoliKlinik
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -2230,6 +2237,7 @@ Partial Class PoliKlinik
     Friend WithEvents KYCToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents DashboardToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents MasterMarketingToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents ReservasiToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents CapaianKBKToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents TimerKirimReminderWA As System.Windows.Forms.Timer
+    Friend WithEvents ReservasiDanReminderToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 End Class

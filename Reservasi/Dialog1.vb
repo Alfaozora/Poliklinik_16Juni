@@ -43,5 +43,4 @@ Public Class Dialog1
         dtReservasiUlang.Value = DateTime.Now
         dtSelesaiUlang.Value = DateTime.Now.AddMinutes(30)
     End Sub
-
 End Class

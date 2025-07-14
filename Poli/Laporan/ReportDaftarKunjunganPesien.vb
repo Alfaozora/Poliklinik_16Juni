@@ -35,7 +35,6 @@ Public Class ReportDaftarKunjunganPesien
         DataGridViewDaftarKunjungan.Columns.Add("ColumnPasienID", "ID Pasien")
         DataGridViewDaftarKunjungan.Columns.Add("ColumnNamaPasien", "Nama Pasien")
         DataGridViewDaftarKunjungan.Columns.Add("ColumnJenisKelamin", "Jenis Kelamin")
-        DataGridViewDaftarKunjungan.Columns.Add("ColumnUsia", "Usia")
         DataGridViewDaftarKunjungan.Columns.Add("ColumnDiagnosa", "Diagnosa")
         DataGridViewDaftarKunjungan.Columns.Add("ColumnLayanan", "Layanan")
         DataGridViewDaftarKunjungan.Columns.Add("ColumnNamaDokter", "Dokter")
@@ -48,7 +47,7 @@ Public Class ReportDaftarKunjunganPesien
 
         ' Mengatur lebar maksimum untuk kolom kode diagnosa
         Dim increamentDataColumn As DataGridViewColumn = DataGridViewDaftarKunjungan.Columns("ColumnNo")
-        increamentDataColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill ' Menonaktifkan penyesuaian otomatis
+        increamentDataColumn.AutoSizeMode = DataGridViewAutoSizeColumnMode.None ' Menonaktifkan penyesuaian otomatis
         increamentDataColumn.Width = 50 ' Mengatur lebar maksimums
     End Sub
 
@@ -131,7 +130,7 @@ Public Class ReportDaftarKunjunganPesien
                         jenisPenagihan = GetJenisPembayaran(Trow("JenisTransaksi"), Trow("NoUrut"))
                     End If
 
-                    DataGridViewDaftarKunjungan.Rows.Add(New String() {"-", "" & Trow("NoUrut") & "", "" & Format(Trow("TglTransaksi"), "yyyy-MM-dd HH:mm:ss") & "", "" & Trow("NoRekamMedis") & "", "" & Trow("Nama") & "", "" & Trow("JenisKelamin") & "", "" & Trow("Usia") & "", "" & Trow("Diagnosa") & "", "" & Trow("JenisPoli") & "", "" & Trow("NamaDokter") & "", "" & jenisPenagihan & ""})
+                    DataGridViewDaftarKunjungan.Rows.Add(New String() {"-", "" & Trow("NoUrut") & "", "" & Format(Trow("TglTransaksi"), "yyyy-MM-dd HH:mm:ss") & "", "" & Trow("NoRekamMedis") & "", "" & Trow("Nama") & "", "" & Trow("JenisKelamin") & "", "" & Trow("Diagnosa") & "", "" & Trow("JenisPoli") & "", "" & Trow("NamaDokter") & "", "" & jenisPenagihan & ""})
                 Next
 
                 DataGridViewDaftarKunjungan.CurrentCell = Nothing
@@ -305,46 +304,19 @@ Public Class ReportDaftarKunjunganPesien
 
         Dim queryBuilder As New StringBuilder()
         queryBuilder.AppendLine("SELECT * FROM (")
-        queryBuilder.AppendLine("    SELECT")
-        queryBuilder.AppendLine("        TransaksiDetail.StatusPulang,")
-        queryBuilder.AppendLine("        TransaksiDetail.Diagnosa,")
-        queryBuilder.AppendLine("        MasterPasien.JenisKelamin,")
-        queryBuilder.AppendLine("        DATEDIFF(YEAR, MasterPasien.TglLahir, GETDATE()) AS Usia,")
-        queryBuilder.AppendLine("        TransaksiDetail.JenisPenagihan,")
-        queryBuilder.AppendLine("        TransaksiDetail.JenisTransaksi,")
-        queryBuilder.AppendLine("        TransaksiDetail.JenisPoli,")
-        queryBuilder.AppendLine("        TransaksiPoli.NoUrut,")
-        queryBuilder.AppendLine("        MasterPasien.NoRekamMedis,")
-        queryBuilder.AppendLine("        TransaksiPoli.TglPoli AS 'TglTransaksi',")
-        queryBuilder.AppendLine("        MasterPasien.Nama,")
-        queryBuilder.AppendLine("        TransaksiPoli.DokterPoli AS 'NamaDokter',")
-        queryBuilder.AppendLine("        TransaksiPoli.StatusKeterangan AS 'Status'")
+        queryBuilder.AppendLine("    SELECT TransaksiDetail.StatusPulang, TransaksiDetail.Diagnosa, MasterPasien.JenisKelamin, TransaksiDetail.JenisPenagihan, TransaksiDetail.JenisTransaksi, TransaksiDetail.JenisPoli, TransaksiPoli.NoUrut, MasterPasien.NoRekamMedis, TransaksiPoli.TglPoli AS 'TglTransaksi', MasterPasien.Nama, TransaksiPoli.DokterPoli AS 'NamaDokter', TransaksiPoli.StatusKeterangan AS 'Status'")
         queryBuilder.AppendLine("    FROM TransaksiPoli")
         queryBuilder.AppendLine("    LEFT JOIN TransaksiDetail ON TransaksiPoli.NoUrut = TransaksiDetail.NoUrut")
         queryBuilder.AppendLine("    LEFT JOIN MasterPasien ON TransaksiPoli.IDInternet = MasterPasien.NoRekamMedis")
         queryBuilder.AppendLine("    WHERE TransaksiPoli.deleted = 0" & queryStringCondition & queryStringJenisKunjungan)
         queryBuilder.AppendLine("    UNION")
-        queryBuilder.AppendLine("    SELECT")
-        queryBuilder.AppendLine("        TransaksiDetail.StatusPulang,")
-        queryBuilder.AppendLine("        TransaksiDetail.Diagnosa,")
-        queryBuilder.AppendLine("        MasterPasien.JenisKelamin,")
-        queryBuilder.AppendLine("        DATEDIFF(YEAR, MasterPasien.TglLahir, GETDATE()) AS Usia,")
-        queryBuilder.AppendLine("        TransaksiDetail.JenisPenagihan,")
-        queryBuilder.AppendLine("        TransaksiDetail.JenisTransaksi,")
-        queryBuilder.AppendLine("        TransaksiDetail.JenisPoli,")
-        queryBuilder.AppendLine("        TransaksiGigi.NoUrut,")
-        queryBuilder.AppendLine("        MasterPasien.NoRekamMedis,")
-        queryBuilder.AppendLine("        TransaksiGigi.TglGigi AS 'TglTransaksi',")
-        queryBuilder.AppendLine("        MasterPasien.Nama,")
-        queryBuilder.AppendLine("        TransaksiGigi.DokterGigi AS 'NamaDokter',")
-        queryBuilder.AppendLine("        TransaksiGigi.StatusKeterangan AS 'Status'")
+        queryBuilder.AppendLine("    SELECT TransaksiDetail.StatusPulang, TransaksiDetail.Diagnosa, MasterPasien.JenisKelamin, TransaksiDetail.JenisPenagihan, TransaksiDetail.JenisTransaksi, TransaksiDetail.JenisPoli, TransaksiGigi.NoUrut, MasterPasien.NoRekamMedis, TransaksiGigi.TglGigi AS 'TglTransaksi', MasterPasien.Nama, TransaksiGigi.DokterGigi AS 'NamaDokter', TransaksiGigi.StatusKeterangan AS 'Status'")
         queryBuilder.AppendLine("    FROM TransaksiGigi")
         queryBuilder.AppendLine("    LEFT JOIN TransaksiDetail ON TransaksiGigi.NoUrut = TransaksiDetail.NoUrut")
         queryBuilder.AppendLine("    LEFT JOIN MasterPasien ON TransaksiGigi.IDInternet = MasterPasien.NoRekamMedis")
         queryBuilder.AppendLine("    WHERE TransaksiGigi.deleted = 0" & queryStringCondition & queryStringJenisKunjungan)
         queryBuilder.AppendLine(") AS CombinedResults")
         queryBuilder.AppendLine("ORDER BY TglTransaksi, NoUrut")
-
 
         Dim Tbls As DataTable = ReadSQL(queryBuilder.ToString())
 
