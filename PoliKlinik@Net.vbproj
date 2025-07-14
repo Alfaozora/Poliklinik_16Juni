@@ -396,6 +396,12 @@
     <Compile Include="Poli\FormMasterMarketing.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Poli\Laporan\ReportCapaianKBK.Designer.vb">
+      <DependentUpon>ReportCapaianKBK.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Poli\Laporan\ReportCapaianKBK.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Poli\Laporan\ReportDiagnosa.Designer.vb">
       <DependentUpon>ReportDiagnosa.vb</DependentUpon>
     </Compile>
@@ -819,6 +825,12 @@
       <DependentUpon>ReportFeeDokterPengirim.vb</DependentUpon>
     </Compile>
     <Compile Include="Report\ReportFeeDokterPengirim.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reservasi\Dialog1.Designer.vb">
+      <DependentUpon>Dialog1.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reservasi\Dialog1.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Reservasi\FormReservasi.Designer.vb">
@@ -1387,6 +1399,9 @@
     <EmbeddedResource Include="Poli\FormMasterMarketing.resx">
       <DependentUpon>FormMasterMarketing.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Poli\Laporan\ReportCapaianKBK.resx">
+      <DependentUpon>ReportCapaianKBK.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Poli\Laporan\ReportDiagnosa.resx">
       <DependentUpon>ReportDiagnosa.vb</DependentUpon>
     </EmbeddedResource>
@@ -1614,6 +1629,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Report\ReportFeeDokterPengirim.resx">
       <DependentUpon>ReportFeeDokterPengirim.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reservasi\Dialog1.resx">
+      <DependentUpon>Dialog1.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Reservasi\FormReservasi.resx">
       <DependentUpon>FormReservasi.vb</DependentUpon>

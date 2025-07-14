@@ -8,15 +8,120 @@ Imports Newtonsoft
 Imports System.Security.Cryptography
 Imports System.Collections.Generic
 Imports Newtonsoft.Json.Linq
-
 Public Class FindDiagnosa
     Private formName As String = "PENCARIAN DIAGNOSA"
     Private TForm As String
 
+    'Private Class varJson
+    '    Public metaData As MetaData
+    '    Public response As v4_BPJS
+    'End Class
+
     Private Class varJson
-        Public metaData As MetaData
-        Public response As v4_BPJS
+        Private _metaData As MetaData
+        Private _response As v4_BPJS
+
+        Public Property metaData() As MetaData
+            Get
+                Return _metaData
+            End Get
+            Set(ByVal value As MetaData)
+                _metaData = value
+            End Set
+        End Property
+
+        Public Property response() As v4_BPJS
+            Get
+                Return _response
+            End Get
+            Set(ByVal value As v4_BPJS)
+                _response = value
+            End Set
+        End Property
     End Class
+
+    Private Class MetaData
+        Private _message As String
+        Private _code As Integer
+
+        Public Property message() As String
+            Get
+                Return _message
+            End Get
+            Set(ByVal value As String)
+                _message = value
+            End Set
+        End Property
+
+        Public Property code() As Integer
+            Get
+                Return _code
+            End Get
+            Set(ByVal value As Integer)
+                _code = value
+            End Set
+        End Property
+    End Class
+
+    Private Class v4_BPJS
+        Private _list As Diagnosa()
+
+        Public Property list() As Diagnosa()
+            Get
+                Return _list
+            End Get
+            Set(ByVal value As Diagnosa())
+                _list = value
+            End Set
+        End Property
+    End Class
+
+    Private Class Diagnosa
+        Private _kdDiag As String
+        Private _nmDiag As String
+        Private _nonSpesialis As Boolean
+
+        Public Property kdDiag() As String
+            Get
+                Return _kdDiag
+            End Get
+            Set(ByVal value As String)
+                _kdDiag = value
+            End Set
+        End Property
+
+        Public Property nmDiag() As String
+            Get
+                Return _nmDiag
+            End Get
+            Set(ByVal value As String)
+                _nmDiag = value
+            End Set
+        End Property
+
+        Public Property nonSpesialis() As Boolean
+            Get
+                Return _nonSpesialis
+            End Get
+            Set(ByVal value As Boolean)
+                _nonSpesialis = value
+            End Set
+        End Property
+    End Class
+
+    Private Class ErrorMeta
+        Private _metaData As MetaData
+
+        Public Property metaData() As MetaData
+            Get
+                Return _metaData
+            End Get
+            Set(ByVal value As MetaData)
+                _metaData = value
+            End Set
+        End Property
+    End Class
+
 
     Function CreateTableICD() As DataTable
         Dim Thasil As New DataTable
@@ -55,9 +160,10 @@ Public Class FindDiagnosa
         Try
             If Checking() = True Then
                 Dim kriteria As String = TextBoxKriteria.Text
-                Dim Tdata As DataTable = New DataTable
+                'Dim Tdata As DataTable = New DataTable
+                Dim Tdata As DataTable = CreateTableICD()
 
-                Tdata = CreateTableICD()
+                'Tdata = CreateTableICD()
                 Tdata.Rows.Clear()
 
                 Dim getResponse As String = ""
@@ -66,33 +172,67 @@ Public Class FindDiagnosa
 
                 getResponse = getDataFromPcare(uri)
 
-                If getResponse <> "Nothing" Then
-                    Dim varsespoli() = Newtonsoft.Json.JsonConvert.DeserializeObject(Of varJson())(getResponse)
+                If getResponse = "Nothing" OrElse getResponse Is Nothing OrElse getResponse.Trim() = "" Then
+                    MsgBox("Tidak ada respon dari server.", MsgBoxStyle.Critical, "Warning!")
+                    Exit Sub
+                End If
+
+                Dim isArray As Boolean = getResponse.Trim().StartsWith("[")
+                Dim isObject As Boolean = getResponse.Trim().StartsWith("{")
+
+                If isArray Then
+                    Dim varsespoli() As varJson = JsonConvert.DeserializeObject(Of varJson())(getResponse)
 
                     For Each oneVar As varJson In varsespoli
-                        ' Tambah eror pas isian kosong
                         If oneVar.metaData.message = "OK" Then
-                            For index As Integer = 0 To oneVar.response.list.Length - 1
-                                Dim Tlastnew As DataRow = Tdata.NewRow
-                                Tlastnew("Kode Diagnosa") = oneVar.response.list(index).kdDiag
-                                Tlastnew("Nama Diagnosa") = oneVar.response.list(index).nmDiag
-                                Tlastnew("Non Spesialis") = oneVar.response.list(index).nonSpesialis
-                                Tdata.Rows.Add(Tlastnew)
-                            Next
+                            If oneVar.response IsNot Nothing AndAlso oneVar.response.list IsNot Nothing Then
+                                For Each diag In oneVar.response.list
+                                    Dim Tlastnew As DataRow = Tdata.NewRow
+                                    Tlastnew("Kode Diagnosa") = diag.kdDiag
+                                    Tlastnew("Nama Diagnosa") = diag.nmDiag
+                                    Tlastnew("Non Spesialis") = diag.nonSpesialis
+                                    Tdata.Rows.Add(Tlastnew)
+                                Next
+                            End If
                         Else
-                            MsgBox("Data tidak ditemukan.", MsgBoxStyle.Critical, "Warning!")
+                            MsgBox("BPJS: " & oneVar.metaData.message, MsgBoxStyle.Critical, "Peringatan!")
                         End If
                     Next
+
+                ElseIf isObject Then
+                    Dim errResponse As ErrorMeta = JsonConvert.DeserializeObject(Of ErrorMeta)(getResponse)
+                    MsgBox("BPJS Error: " & errResponse.metaData.message, MsgBoxStyle.Exclamation, "Peringatan!")
                 Else
-                    MsgBox("Data tidak ditemukan.", MsgBoxStyle.Critical, "Warning!")
+                    MsgBox("Format respon tidak dikenali!", MsgBoxStyle.Critical, "Kesalahan Format")
                 End If
+
+                'If getResponse <> "Nothing" Then
+                '    'Dim varsespoli() = Newtonsoft.Json.JsonConvert.DeserializeObject(Of varJson())(getResponse)
+                '    Dim varsespoli() As varJson = JsonConvert.DeserializeObject(Of varJson())(getResponse)
+
+                '    For Each oneVar As varJson In varsespoli
+                '        If oneVar.metaData.message = "OK" Then
+                '            For index As Integer = 0 To oneVar.response.list.Length - 1
+                '                Dim Tlastnew As DataRow = Tdata.NewRow
+                '                Tlastnew("Kode Diagnosa") = oneVar.response.list(index).kdDiag
+                '                Tlastnew("Nama Diagnosa") = oneVar.response.list(index).nmDiag
+                '                Tlastnew("Non Spesialis") = oneVar.response.list(index).nonSpesialis
+                '                Tdata.Rows.Add(Tlastnew)
+                '            Next
+                '        Else
+                '            MsgBox("Data tidak ditemukan.", MsgBoxStyle.Critical, "Warning!")
+                '        End If
+                '    Next
+                'Else
+                '    MsgBox("Data tidak ditemukan.", MsgBoxStyle.Critical, "Warning!")
+                'End If
 
                 GridControlPencarian.DataSource = Tdata
                 GridViewPencarian.BestFitColumns()
                 'GridViewPencarian.Columns("NonSpesialis ").Visible = False
             End If
         Catch ex As Exception
-            MsgBox("Eror : " & ex.Message, MsgBoxStyle.Exclamation, "Error!")
+            MsgBox("Eror saat memproses data: " & ex.Message, MsgBoxStyle.Exclamation, "Error!")
         End Try
     End Sub
 

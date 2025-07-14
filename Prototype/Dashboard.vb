@@ -275,6 +275,8 @@ Public Class Dashboard
             If tbl.Rows.Count > 0 Then
                 Dim jumlah As Integer = Convert.ToInt32(tbl.Rows(0)("JumlahPasienBaru"))
                 LabelPasien.Text = jumlah
+                LabelPasien.ForeColor = Color.Coral
+                LabelPasien.TextAlign = ContentAlignment.MiddleCenter
             End If
         Catch ex As Exception
             MessageBox.Show("Gagal menampilkan data: " & ex.Message)
@@ -322,6 +324,7 @@ Public Class Dashboard
                 LabelPoliUmum.ForeColor = Color.Coral
                 LabelPoliUmum.TextAlign = ContentAlignment.MiddleCenter
                 Label3.Visible = True
+                Panel8.BackgroundImage = Image.FromFile(Application.StartupPath + "\Image\icon\Hair.png")
 
                 Dim jumlahGigiMulut As Integer = ReadSQLNIK("SELECT COUNT(*) FROM TransaksiDetail WHERE JenisPoli = 'POLI HBOT' AND DeletedBy IS NULL AND CONVERT(DATE, CreatedDate) = CONVERT(DATE, GETDATE())")
                 LabelPoliGigi.Text = jumlahGigiMulut.ToString()
@@ -329,15 +332,19 @@ Public Class Dashboard
                 LabelPoliUmum.TextAlign = ContentAlignment.MiddleCenter
                 Label7.Visible = True
                 Label4.Visible = False
+                Panel10.BackgroundImage = Image.FromFile(Application.StartupPath + "\Image\icon\oxygen.png")
 
                 Dim jumlahKia As Integer = ReadSQLNIK("SELECT COUNT(*) FROM TransaksiDetail WHERE JenisPoli = 'POLI FISIOTERAPI' AND DeletedBy IS NULL AND CONVERT(DATE, CreatedDate) = CONVERT(DATE, GETDATE())")
                 LabelPoliKia.Text = jumlahKia.ToString()
                 LabelPoliKia.ForeColor = Color.Coral
                 LabelPoliKia.TextAlign = ContentAlignment.MiddleCenter
                 Label8.Visible = True
-
+                Label5.Visible = False
                 Panel5.Visible = False
                 Panel4.Visible = False
+                Panel12.Visible = False
+                Panel9.BackgroundImage = Image.FromFile(Application.StartupPath + "\Image\icon\Bone.png")
+                Panel6.Location = New Point(959, 212)
             Else
                 Dim jumlahUmum As Integer = ReadSQLNIK("SELECT COUNT(*) FROM TransaksiDetail WHERE JenisPoli = 'POLI UMUM' AND DeletedBy IS NULL AND CONVERT(DATE, CreatedDate) = CONVERT(DATE, GETDATE())")
                 LabelPoliUmum.Text = jumlahUmum.ToString()
@@ -377,7 +384,8 @@ Public Class Dashboard
         RoundPanel(Panel5, 20)
         RoundPanel(Panel3, 20)
         RoundPanel(Panel2, 20)
-        RoundPanel(Panel1, 20) 'round 20
+        RoundPanel(Panel1, 20)
+        RoundPanel(Panel12, 20)
         Panel1.BackColor = Color.WhiteSmoke
     End Sub
 

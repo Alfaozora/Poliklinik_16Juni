@@ -112,6 +112,11 @@ Public Class DialogBoxKonfirmasiPendaftaran
         'InsertNewItemComboSQL("SELECT Nama FROM MasterDokter WHERE Jenis like '%Perawat%' AND NoNIP IS NOT NULL AND StatusAktif = 1", ComboBoxPilihanPerawat)
         'ComboBoxPilihanPerawat.SelectedIndex = -1
 
+        ' Set jenis rawat
+        RadioButtonStatusRawatJalan.Checked = True
+        RadioButtonPromotifPreventif.Checked = False
+        RadioButtonStatusRawatInap.Checked = False
+
         Me.BringToFront()
         Me.CenterToScreen()
     End Sub

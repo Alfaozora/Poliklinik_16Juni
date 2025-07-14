@@ -1,3 +1,22 @@
+
+Version : 2.0.0.53 (soon)
+# [New Feature] Penambahan Menu Reminder Pasien Untuk Mengingatkan Pasien Untuk Berkunjung ke Faskes
+# [New Feature] Penambahan Menu Riwayat Cek Stik pada Riwayat Laboratiorium
+
+Version : 2.0.0.52 (30 Juni 2025)
+# [Usability Improvement] Pengubahan Jenis Error Agar Mudah Terbaca pada Pencarian Diagnosa
+# [New Feature] Penambahan Menu Riwayat Penggunaan Paket Tindakan di Form Rekam Medis
+# [Bug Fix] Memperbaiki Error Tanggal lahir Saat Pengambilan data dari antrian online yang kosong
+# [Usability Improvement] Menambahkan Catatan Obat pada ERM
+# [Bug Fix] Memperbaiki Querry dalam Pengambilan Data Fee/Omset Dokter Kirim
+# [Usability Improvement] Tidak ada Tanda Pemisah Saat Nama Tindakan Hanya 1 Pada Riwayat Kunjungan
+# [Usability Improvement] Penambahan Kolom Usia Pada Laporan Kunjungan Pasien
+# [Usability Improvement] Penambahan Kolom Rentang Usia Pada Laporan Daftar Diagnosa
+# [Usability Improvement] Diskon Maximal 50%
+# [Usability Improvement] Harga Tindakan 0
+# [Usability Improvement] Kembali ke set awal Jenis Rawat (Rawat Jalan) setelah DialogBox diclose
+# [Bug Fix] Memperbaiki error FotoPath saat Mengambil data Pasien Non-BPJS dari Antrian Online
+
 Version : 2.0.0.51 (16 Juni 2025)
 # [Usability Improvement] Penambahan Nama Company pada Asuransi Lain
 # [New Feature] Penambahan Surat Keterangan Penolakan/Persetujuan Rujukan

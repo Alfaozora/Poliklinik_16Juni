@@ -250,6 +250,10 @@ Public Class FindPasien
                     ReportDaftarKunjunganPesien.LoadPasien(Grdrow)
                 Case "ReportLogPaketTindakan"
                     ReportLogPaketTindakan.LoadPasien(Grdrow)
+                Case "FormReservasi"
+                    FormReservasi.LoadPasien(Grdrow)
+                Case "FormReminder"
+                    FormReservasi.LoadPasien(Grdrow)
             End Select
 
             Me.Close()

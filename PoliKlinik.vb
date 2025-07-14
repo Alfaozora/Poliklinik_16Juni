@@ -119,6 +119,132 @@ Public Class PoliKlinik
         End If
     End Sub
 
+    '----------Reminder WA------------------'
+    Private Function GetNamaKlinik() As String
+        Try
+            Dim lokasiPoli As String = "SELECT StrValue FROM MsConfig WHERE ConfigName = 'NoPoli'"
+            Dim lokasi As DataTable = ReadSQL(lokasiPoli)
+
+            If lokasi IsNot Nothing AndAlso lokasi.Rows.Count > 0 Then
+                Dim row As DataRow = lokasi.Rows(0)
+                Dim strValue As String = row("StrValue").ToString()
+
+                Select Case strValue
+                    Case "W001" : Return "KLINIK MITRA MEDICARE SUCI"
+                    Case "W002" : Return "KLINIK MITRA MEDICARE MANYAR"
+                    Case "W003" : Return "KLINIK MITRA MEDICARE DRIYOREJO"
+                    Case "L001" : Return "KLINIK MITRA MEDICARE DHARMAHUSADA"
+                    Case "L002" : Return "KLINIK MITRA MEDICARE DIPONEGORO"
+                    Case "L003" : Return "KLINIK LUMIERA LUZELLA"
+                    Case "L005" : Return "INHOUSE WINGS SURYA"
+                    Case "A002" : Return "KLINIK MITRA MEDICARE JATIUWUH"
+                    Case "AD01" : Return "KLINIK MITRA MEDICARE BOYOLALI"
+                    Case "D002" : Return "KLINIK MITRA MEDICARE RANCAEKEK"
+                    Case "T001" : Return "KLINIK CITRA MEDICARE KARAWANG"
+                End Select
+            End If
+
+        Catch ex As Exception
+            ' Optional: log error atau berikan default
+            Return "KLINIK MITRA MEDICARE/INHOUSE"
+        End Try
+
+        Return "KLINIK MITRA MEDICARE/INHOUSE"
+    End Function
+
+    Private isTestingMode As Boolean = False
+
+    Private Sub KirimReminderOtomatis()
+        Dim query As String = "SELECT ReminderID, NamaPasien, NoHP, Keperluan, Tanggal, TanggalKirim, JenisKelamin " & _
+                              "FROM LogReminderPasien " & _
+                              "WHERE Status = 'TERJADWAL' AND DATEDIFF(DAY, GETDATE(), Tanggal) = 1"
+
+        Dim dt As DataTable = ReadSQL(query)
+        Dim now As DateTime = DateTime.Now
+        Dim batasKirim As TimeSpan = New TimeSpan(9, 0, 0) ' 09:00 WIB
+
+        For Each row As DataRow In dt.Rows
+            Dim waktuReminder As DateTime = CDate(row("Tanggal"))
+            Dim sudahDikirim As Boolean = Not IsDBNull(row("TanggalKirim"))
+
+            ' Kirim H-1 setelah jam 9 pagi dan belum dikirim sebelumnya
+            If DateDiff(DateInterval.Day, now.Date, waktuReminder.Date) = 1 AndAlso now.TimeOfDay >= batasKirim AndAlso Not sudahDikirim Then
+
+                Dim namaPasien As String = row("NamaPasien").ToString()
+                Dim noHP As String = row("NoHP").ToString()
+                Dim keperluan As String = row("Keperluan").ToString()
+
+                Dim jenisKelamin As String = ""
+                If row("JenisKelamin").ToString.Trim.ToUpper() = "L" Then
+                    jenisKelamin = "Bapak"
+                ElseIf row("JenisKelamin").ToString.Trim.ToUpper() = "P" Then
+                    jenisKelamin = "Ibu"
+                End If
+
+                Dim id As Integer = CInt(row("ReminderID"))
+
+                If isTestingMode Then
+                    KirimReminderWhatsAppOtomatis("[TEST]" & namaPasien, noHP, waktuReminder, keperluan, jenisKelamin)
+                    My.Computer.FileSystem.WriteAllText("log_reminder_test.txt", now & " >> TESTING MODE >> " & noHP & vbCrLf, True)
+                Else
+                    KirimReminderWhatsAppOtomatis(namaPasien, noHP, waktuReminder, keperluan, jenisKelamin)
+                    WriteSQL("UPDATE LogReminderPasien SET Status = 'TERKIRIM', TanggalKirim = GETDATE() WHERE ReminderID = " & id, 4)
+                End If
+            End If
+        Next
+    End Sub
+
+    Private Sub TimerKirimReminderWA_Tick(ByVal sender As Object, ByVal e As EventArgs) Handles Timer1.Tick
+        KirimReminderOtomatis()
+    End Sub
+
+    Public Function SetParameterWhatsappText(ByVal nomor As String, ByVal pesan As String) As String
+        Dim cleanPesan As String = pesan.Replace(vbCrLf, "\n").Replace("""", "\""")
+
+        ' Buat JSON manual
+        Dim json As String = "{" & _
+            """number"": """ & nomor & """," & _
+            """message"": """ & cleanPesan & """" & _
+        "}"
+
+        Return json
+    End Function
+
+    Private Sub KirimReminderWhatsAppOtomatis(ByVal namaPasien As String, ByVal noHP As String, ByVal tanggal As DateTime, ByVal keperluan As String, ByVal jenisKelamin As String)
+        Try
+            If noHP.StartsWith("08") Then
+                noHP = "62" & noHP.Substring(1)
+            End If
+
+            Dim namaKlinik As String = GetNamaKlinik()
+            Dim waStatus As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_klinik_status'")
+            Dim waIP As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_klinik_ip'")
+            Dim lokasiKlinik As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'AlamatCompany'")
+
+            If waStatus <> "Yes" Then Exit Sub
+
+            Dim tanggalIndo As String = tanggal.ToString("dddd, dd MMMM yyyy", New Globalization.CultureInfo("id-ID"))
+            Dim pesan As String = "Salam sehat, " & jenisKelamin & " *" & namaPasien & "*." & vbCrLf & vbCrLf & _
+                                  "Kami dari " & namaKlinik & " mengingatkan bahwa jadwal kunjungan kesehatan rutin Anda telah tiba." & vbCrLf & vbCrLf & _
+                                  "Mohon hadir ke fasilitas kami untuk *" & keperluan & "* sesuai program yang telah disepakati." & vbCrLf & vbCrLf & _
+                                  "Tanggal Kunjungan: " & tanggalIndo & vbCrLf & _
+                                  "Jam: " & tanggal.ToString("HH:mm") & " WIB" & vbCrLf & _
+                                  "Alamat: " & lokasiKlinik & vbCrLf & vbCrLf & _
+                                  "Mohon hadir tepat waktu. Untuk informasi lebih lanjut, silakan hubungi kami di Nomor ini." & vbCrLf & _
+                                  "Terima kasih." & vbCrLf & vbCrLf & _
+                                  "" & namaKlinik & vbCrLf & vbCrLf & _
+                                  "----- Sehat Itu Hak Anda -----"
+
+            Dim parameter As String = SetParameterWhatsappText(noHP, pesan)
+            Dim urlSend As String = "http://" & waIP & ":4444/send"
+            SendDataWhatsapp(parameter, urlSend)
+
+        Catch ex As Exception
+            ' Optional: log ke file jika error
+        End Try
+        My.Computer.FileSystem.WriteAllText("log_reminder.txt", DateTime.Now & " - Dikirim ke: " & noHP & vbCrLf, True)
+    End Sub
+    '---------------------END Reminder WA-------------------------'
 
     Private Sub ExitToolsStripMenuItem_Click(ByVal sender As Object, ByVal e As EventArgs)
         Me.Close()
@@ -177,7 +303,8 @@ Public Class PoliKlinik
     End Sub
 
     Private Sub PoliKlinik_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-
+        TimerKirimReminderWA.Interval = 60000
+        TimerKirimReminderWA.Start()
 
         Me.BackgroundImage = Image.FromFile(Application.StartupPath + "\Image\wallpaper.jpg")
 
@@ -1187,7 +1314,13 @@ Public Class PoliKlinik
         FormMasterMarketing.Focus()
     End Sub
 
-    Private Sub ReservasiToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ReservasiToolStripMenuItem.Click
+
+    Private Sub CapaianKBKToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CapaianKBKToolStripMenuItem.Click
+        ReportCapaianKBK.Show()
+        ReportCapaianKBK.Focus()
+    End Sub
+
+    Private Sub ReservasiDanReminderToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ReservasiDanReminderToolStripMenuItem.Click
         FormReservasi.Show()
         FormReservasi.Focus()
     End Sub

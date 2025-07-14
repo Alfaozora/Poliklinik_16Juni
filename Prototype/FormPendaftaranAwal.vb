@@ -1503,23 +1503,30 @@ Public Class FormPendaftaranAwal
         TextBoxStatusPeserta.Text = Trow("Status Peserta").ToString
         TextBoxPPK.Text = Trow("FKTP").ToString
 
-        Dim fotoPath As String = Trow("FotoPath").ToString()
+        ' Ambil FotoPath dari database berdasarkan NIK
+        Dim nikPasien As String = Trow("No NIK").ToString().Trim()
+        Dim fotoPath As String = ""
 
-        ' Jika menggunakan path relatif seperti "Uploads\FotoPasien\nama.jpg"
-        Dim fullPath As String = System.IO.Path.Combine(Application.StartupPath, fotoPath)
-
-        Dim defaultFotoPath As String = Application.StartupPath & "\Uploads\BlankProfile.png"
-
-        If File.Exists(fullPath) Then
-            PictureBoxFotoPasien.Image = Image.FromFile(fullPath)
-            PictureBoxFotoPasien.SizeMode = PictureBoxSizeMode.Zoom
-        Else
-            PictureBoxFotoPasien.Image = Image.FromFile(defaultFotoPath)
-            PictureBoxFotoPasien.SizeMode = PictureBoxSizeMode.Zoom
-            'MessageBox.Show("Gambar tidak ditemukan di path: " & fullPath, "Info", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        If Not String.IsNullOrEmpty(nikPasien) Then
+            fotoPath = GetFotoPathByNIK(nikPasien)
         End If
 
+        ' Path absolut ke file foto
+        Dim fullPath As String = System.IO.Path.Combine(Application.StartupPath, fotoPath)
+        Dim defaultFotoPath As String = Application.StartupPath & "\Uploads\BlankProfile.png"
 
+        Try
+            If Not String.IsNullOrEmpty(fotoPath) AndAlso fotoPath.Trim() <> "" AndAlso File.Exists(fullPath) Then
+                PictureBoxFotoPasien.Image = Image.FromFile(fullPath)
+            Else
+                PictureBoxFotoPasien.Image = Image.FromFile(defaultFotoPath)
+            End If
+        Catch ex As Exception
+            PictureBoxFotoPasien.Image = Image.FromFile(defaultFotoPath)
+            MessageBox.Show("Gagal memuat foto pasien: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        End Try
+
+        PictureBoxFotoPasien.SizeMode = PictureBoxSizeMode.Zoom
         ComboBoxPoliTujuan.Enabled = True
     End Sub
 
@@ -1790,7 +1797,12 @@ Public Class FormPendaftaranAwal
                                     rowPasien("Nomor NIK") = rowData.response.nik
                                     rowPasien("Nomor BPJS") = rowData.response.nomorkartu
                                     rowPasien("Jenis Kelamin") = rowData.response.jeniskelamin
-                                    rowPasien("Tanggal Lahir") = rowData.response.tanggallahir
+                                    'rowPasien("Tanggal Lahir") = rowData.response.tanggallahir
+                                    If rowData.response.tanggallahir IsNot Nothing AndAlso rowData.response.tanggallahir.Trim() <> "" Then
+                                        rowPasien("Tanggal Lahir") = rowData.response.tanggallahir
+                                    Else
+                                        rowPasien("Tanggal Lahir") = "01/01/1900"
+                                    End If
                                     rowPasien("Alamat") = rowData.response.alamat
                                 Else
                                     rowPasien("Nomor NIK") = nomorNIK
@@ -2246,8 +2258,14 @@ Public Class FormPendaftaranAwal
                 End If
 
                 ' Validasi diskon tindakan harus antara 0 sampai 100
-                If (discTindakan < 0 OrElse discTindakan > 100) And rowTindakan("Klasifikasi") <> "Paket" Then
-                    MsgBox("Gagal. Diskon tindakan " & rowTindakan("Tindakan") & " harus antara 0 sampai 100.", MsgBoxStyle.Exclamation, "Warning!")
+                'If (discTindakan < 0 OrElse discTindakan > 100) And rowTindakan("Klasifikasi") <> "Paket" Then
+                '    MsgBox("Gagal. Diskon tindakan " & rowTindakan("Tindakan") & " harus antara 0 sampai 100.", MsgBoxStyle.Exclamation, "Warning!")
+                '    Return False
+                'End If
+
+                ' Validasi diskon tindakan harus antara 0 sampai 50
+                If (discTindakan < 0 OrElse discTindakan > 50) And rowTindakan("Klasifikasi") <> "Paket" Then
+                    MsgBox("Gagal. Diskon tindakan " & rowTindakan("Tindakan") & " harus antara 0 sampai 50.", MsgBoxStyle.Exclamation, "Warning!")
                     Return False
                 End If
 
