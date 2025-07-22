@@ -889,10 +889,10 @@ Partial Class FormReservasi
         'TabPage3
         '
         Me.TabPage3.Controls.Add(Me.PanelLayoutMenu3TopMain)
-        Me.TabPage3.Location = New System.Drawing.Point(4, 27)
+        Me.TabPage3.Location = New System.Drawing.Point(4, 25)
         Me.TabPage3.Name = "TabPage3"
         Me.TabPage3.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage3.Size = New System.Drawing.Size(942, 563)
+        Me.TabPage3.Size = New System.Drawing.Size(942, 565)
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "Tab Menu 3"
         Me.TabPage3.UseVisualStyleBackColor = True
@@ -905,7 +905,7 @@ Partial Class FormReservasi
         Me.PanelLayoutMenu3TopMain.Dock = System.Windows.Forms.DockStyle.Fill
         Me.PanelLayoutMenu3TopMain.Location = New System.Drawing.Point(3, 3)
         Me.PanelLayoutMenu3TopMain.Name = "PanelLayoutMenu3TopMain"
-        Me.PanelLayoutMenu3TopMain.Size = New System.Drawing.Size(936, 557)
+        Me.PanelLayoutMenu3TopMain.Size = New System.Drawing.Size(936, 559)
         Me.PanelLayoutMenu3TopMain.TabIndex = 5
         '
         'SplitContainer3
@@ -939,7 +939,7 @@ Partial Class FormReservasi
         'SplitContainer3.Panel2
         '
         Me.SplitContainer3.Panel2.Controls.Add(Me.DataGridViewSesi)
-        Me.SplitContainer3.Size = New System.Drawing.Size(936, 557)
+        Me.SplitContainer3.Size = New System.Drawing.Size(936, 559)
         Me.SplitContainer3.SplitterDistance = 178
         Me.SplitContainer3.TabIndex = 0
         '
@@ -1162,17 +1162,17 @@ Partial Class FormReservasi
         Me.DataGridViewSesi.RowHeadersVisible = False
         Me.DataGridViewSesi.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders
         Me.DataGridViewSesi.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.DataGridViewSesi.Size = New System.Drawing.Size(936, 375)
+        Me.DataGridViewSesi.Size = New System.Drawing.Size(936, 377)
         Me.DataGridViewSesi.StandardTab = True
         Me.DataGridViewSesi.TabIndex = 522
         '
         'TabPage4
         '
         Me.TabPage4.Controls.Add(Me.PanelLayoutMenu4TopMain)
-        Me.TabPage4.Location = New System.Drawing.Point(4, 27)
+        Me.TabPage4.Location = New System.Drawing.Point(4, 25)
         Me.TabPage4.Name = "TabPage4"
         Me.TabPage4.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage4.Size = New System.Drawing.Size(942, 563)
+        Me.TabPage4.Size = New System.Drawing.Size(942, 565)
         Me.TabPage4.TabIndex = 3
         Me.TabPage4.Text = "Tab Menu 4"
         Me.TabPage4.UseVisualStyleBackColor = True
@@ -1184,7 +1184,7 @@ Partial Class FormReservasi
         Me.PanelLayoutMenu4TopMain.Dock = System.Windows.Forms.DockStyle.Fill
         Me.PanelLayoutMenu4TopMain.Location = New System.Drawing.Point(3, 3)
         Me.PanelLayoutMenu4TopMain.Name = "PanelLayoutMenu4TopMain"
-        Me.PanelLayoutMenu4TopMain.Size = New System.Drawing.Size(936, 557)
+        Me.PanelLayoutMenu4TopMain.Size = New System.Drawing.Size(936, 559)
         Me.PanelLayoutMenu4TopMain.TabIndex = 7
         '
         'ButtonCari

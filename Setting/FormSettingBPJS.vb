@@ -140,6 +140,27 @@ Public Class FormSettingBPJS
 
         ' Post Data
         Dim jsonString As String = InsertDataAPI(parameterPendaftaran, uriUpdate)
+
+        ' Parsing respon dan tampilkan status
+        Try
+            If Not String.IsNullOrEmpty(jsonString) Then
+                Dim jArray As JArray = jArray.Parse(jsonString)
+                If jArray.Count > 0 Then
+                    Dim firstItem As JObject = jArray(0)
+
+                    Dim status As String = firstItem("status").ToString()
+                    Dim message As String = firstItem("message").ToString()
+
+                    MessageBox.Show("Status Kirim: " & status & vbCrLf & "Pesan: " & message, "Info", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Else
+                    MessageBox.Show("Respon kosong dari server.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                End If
+            Else
+                MessageBox.Show("Tidak ada respon dari server.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End If
+        Catch ex As Exception
+            MessageBox.Show("Gagal parsing respon: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
     End Sub
 
     Private Sub butGetData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles butGetData.Click

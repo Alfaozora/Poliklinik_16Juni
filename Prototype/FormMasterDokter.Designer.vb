@@ -37,6 +37,7 @@ Partial Class FormMasterDokter
         Me.TabControlMenu = New System.Windows.Forms.TabControl
         Me.TabPage1 = New System.Windows.Forms.TabPage
         Me.PanelLayoutMenu1TopMain = New System.Windows.Forms.Panel
+        Me.CheckedListBoxPoli = New System.Windows.Forms.CheckedListBox
         Me.Label4 = New System.Windows.Forms.Label
         Me.TextBoxNomorSIP = New System.Windows.Forms.TextBox
         Me.Label3 = New System.Windows.Forms.Label
@@ -99,7 +100,7 @@ Partial Class FormMasterDokter
         Me.ButtonClearMenu1 = New System.Windows.Forms.Button
         Me.ButtonSimpanMenu1 = New System.Windows.Forms.Button
         Me.SplitContainer9 = New System.Windows.Forms.SplitContainer
-        Me.CheckedListBoxPoli = New System.Windows.Forms.CheckedListBox
+        Me.RadioButtonJenisMarketing = New System.Windows.Forms.RadioButton
         Me.PanelTop.SuspendLayout()
         Me.PanelSide.SuspendLayout()
         Me.TabControlMenu.SuspendLayout()
@@ -366,6 +367,15 @@ Partial Class FormMasterDokter
         Me.PanelLayoutMenu1TopMain.Size = New System.Drawing.Size(936, 557)
         Me.PanelLayoutMenu1TopMain.TabIndex = 6
         '
+        'CheckedListBoxPoli
+        '
+        Me.CheckedListBoxPoli.FormattingEnabled = True
+        Me.CheckedListBoxPoli.Location = New System.Drawing.Point(566, 62)
+        Me.CheckedListBoxPoli.Name = "CheckedListBoxPoli"
+        Me.CheckedListBoxPoli.ScrollAlwaysVisible = True
+        Me.CheckedListBoxPoli.Size = New System.Drawing.Size(174, 94)
+        Me.CheckedListBoxPoli.TabIndex = 560
+        '
         'Label4
         '
         Me.Label4.AutoSize = True
@@ -507,13 +517,14 @@ Partial Class FormMasterDokter
         'Panel1
         '
         Me.Panel1.BackColor = System.Drawing.Color.Transparent
+        Me.Panel1.Controls.Add(Me.RadioButtonJenisMarketing)
         Me.Panel1.Controls.Add(Me.RadioButtonJenisPerawat)
         Me.Panel1.Controls.Add(Me.RadioButtonJenisDokter)
         Me.Panel1.Controls.Add(Me.RadioButtonJenisBidan)
         Me.Panel1.Font = New System.Drawing.Font("Segoe UI", 9.75!)
         Me.Panel1.Location = New System.Drawing.Point(205, 58)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(300, 25)
+        Me.Panel1.Size = New System.Drawing.Size(309, 25)
         Me.Panel1.TabIndex = 524
         '
         'RadioButtonJenisPerawat
@@ -1051,14 +1062,16 @@ Partial Class FormMasterDokter
         Me.SplitContainer9.SplitterWidth = 5
         Me.SplitContainer9.TabIndex = 461
         '
-        'CheckedListBoxPoli
+        'RadioButtonJenisMarketing
         '
-        Me.CheckedListBoxPoli.FormattingEnabled = True
-        Me.CheckedListBoxPoli.Location = New System.Drawing.Point(566, 62)
-        Me.CheckedListBoxPoli.Name = "CheckedListBoxPoli"
-        Me.CheckedListBoxPoli.ScrollAlwaysVisible = True
-        Me.CheckedListBoxPoli.Size = New System.Drawing.Size(174, 94)
-        Me.CheckedListBoxPoli.TabIndex = 560
+        Me.RadioButtonJenisMarketing.AutoSize = True
+        Me.RadioButtonJenisMarketing.Font = New System.Drawing.Font("Segoe UI", 9.75!)
+        Me.RadioButtonJenisMarketing.Location = New System.Drawing.Point(217, 2)
+        Me.RadioButtonJenisMarketing.Name = "RadioButtonJenisMarketing"
+        Me.RadioButtonJenisMarketing.Size = New System.Drawing.Size(85, 21)
+        Me.RadioButtonJenisMarketing.TabIndex = 533
+        Me.RadioButtonJenisMarketing.Text = "Marketing"
+        Me.RadioButtonJenisMarketing.UseVisualStyleBackColor = True
         '
         'FormMasterDokter
         '
@@ -1175,4 +1188,5 @@ Partial Class FormMasterDokter
     Friend WithEvents RadioButtonJenisBidan As System.Windows.Forms.RadioButton
     Friend WithEvents Label4 As System.Windows.Forms.Label
     Friend WithEvents CheckedListBoxPoli As System.Windows.Forms.CheckedListBox
+    Friend WithEvents RadioButtonJenisMarketing As System.Windows.Forms.RadioButton
 End Class

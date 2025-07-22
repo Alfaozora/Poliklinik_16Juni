@@ -270,7 +270,7 @@ Public Class FormMasterDokter
         Return True
     End Function
 
-    Function ValidasiInputData() As Boolean
+    Function ValidasiInputData(Optional ByVal jenisDokter As String = "") As Boolean
         ' Validasi Nama Poli
         If RadioButtonJenisDokter.Checked = True AndAlso CheckedListBoxPoli.CheckedItems.Count = 0 Then
             MsgBox("Silakan pilih minimal satu poli untuk dokter.", MsgBoxStyle.Exclamation, "Validasi Gagal")
@@ -295,23 +295,38 @@ Public Class FormMasterDokter
             Return False
         End If
 
+
         ' Validasi Nomor IHS Kosong
-        If RadioButtonJenisDokter.Checked = True And TextBoxNomorIHS.Text = "" Then
+        'If RadioButtonJenisDokter.Checked = True And TextBoxNomorIHS.Text = "" Then
+        '    MessageBox.Show("Nomor IHS tidak boleh kosong.", "Validasi", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+        '    Return False
+        'End If
+        If jenisDokter = "Dokter" AndAlso TextBoxNomorIHS.Text = "" Then
             MessageBox.Show("Nomor IHS tidak boleh kosong.", "Validasi", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
             Return False
         End If
 
         ' Validasi Bridging PCare
-        If RadioButtonJenisDokter.Checked = True And CheckBridgingPcareActive() = True AndAlso ComboBoxBridgingPCare.SelectedIndex = -1 Then
+        'If RadioButtonJenisDokter.Checked = True And CheckBridgingPcareActive() = True AndAlso ComboBoxBridgingPCare.SelectedIndex = -1 Then
+        '    MessageBox.Show("Bridging PCare tidak boleh kosong.", "Validasi", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+        '    Return False
+        'End If
+        If jenisDokter = "Dokter" AndAlso CheckBridgingPcareActive() AndAlso ComboBoxBridgingPCare.SelectedIndex = -1 Then
             MessageBox.Show("Bridging PCare tidak boleh kosong.", "Validasi", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
             Return False
         End If
+
 
         ' Validasi SIP Dokter
         If RadioButtonJenisDokter.Checked = True And TextBoxNomorSIP.Text.Trim = "" Then
             MessageBox.Show("No SIP Dokter tidak boleh kosong.", "Validasi", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
             Return False
         End If
+        'If jenisDokter <> "Marketing" AndAlso TextBoxNomorSIP.Text.Trim = "" Then
+        '    MessageBox.Show("No SIP tidak boleh kosong.", "Validasi", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+        '    Return False
+        'End If
+
 
         ' Validasi Nama Lengkap Kosong
         If TextBoxNamaLengkapIdentitas.Text = "" Then
@@ -375,19 +390,21 @@ Public Class FormMasterDokter
     End Sub
 
     Private Sub SaveData(ByRef jenisProses As String)
-        If ValidasiInputData() = True Then
-            ' Inisialisasi semua variabel
-            Dim idDokter As String = ""
-            Dim jenisDokter As String = ""
+        ' Inisialisasi semua variabel
+        Dim idDokter As String = ""
+        Dim jenisDokter As String = ""
 
-            If RadioButtonJenisDokter.Checked = True Then
-                jenisDokter = "Dokter"
-            ElseIf RadioButtonJenisBidan.Checked = True Then
-                jenisDokter = "Bidan"
-            ElseIf RadioButtonJenisPerawat.Checked = True Then
-                jenisDokter = "Perawat"
-            End If
+        If RadioButtonJenisDokter.Checked = True Then
+            jenisDokter = "Dokter"
+        ElseIf RadioButtonJenisBidan.Checked = True Then
+            jenisDokter = "Bidan"
+        ElseIf RadioButtonJenisPerawat.Checked = True Then
+            jenisDokter = "Perawat"
+        ElseIf RadioButtonJenisMarketing.Checked = True Then
+            jenisDokter = "Marketing"
+        End If
 
+        If ValidasiInputData(jenisDokter) = True Then
             Dim noNIK As String = TextBoxNomorNIK.Text.Trim()
             Dim noNIP As String = TextBoxNomorNIP.Text.Trim()
             Dim noSIP As String = TextBoxNomorSIP.Text.Trim()
@@ -560,6 +577,8 @@ Public Class FormMasterDokter
             RadioButtonJenisPerawat.Checked = True
         ElseIf Trow("Jenis") = "Bidan" Then
             RadioButtonJenisBidan.Checked = True
+        ElseIf Trow("Jenis") = "Marketing" Then
+            RadioButtonJenisMarketing.Checked = True
         End If
 
         If IsDBNull(Trow("NoNIK")) = False Then TextBoxNomorNIK.Text = Trow("NoNIK")
