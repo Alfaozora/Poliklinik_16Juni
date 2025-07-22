@@ -102,30 +102,44 @@ Public Class DialogBoxRiwayatPerawatanICare
 
                 Dim jsonString As String = ""
                 jsonString = GenerateICareUrl(payloadBridging, endpointBridging, "POST")
+                MsgBox(jsonString)
 
                 ' Parsing JSON response
                 Dim jsonObj As JObject = JObject.Parse(jsonString)
 
                 ' Mengambil nilai metaData.code
-                Dim code As Integer = CInt(jsonObj("metaData")("code"))
+                Dim codeStr As Integer = CInt(jsonObj("metaData")("code"))
+
+                If IsNumeric(codeStr) Then
+                    Dim code As Integer = CInt(codeStr)
+
+                    If code = 200 Then
+                        ' Lanjut: valid dan buka link
+                    Else
+                        Dim message As String = jsonObj("metaData")("message").ToString()
+                        MsgBox("Error: " & message, MsgBoxStyle.Critical, "API Error")
+                    End If
+                Else
+                    MsgBox("Error: Kode response tidak valid: " & codeStr, MsgBoxStyle.Critical, "API Error")
+                End If
 
                 ' Jika kode 200, sukses
-                If code = 200 Then
-                    ' Menampilkan alert sukses
-                    MsgBox("User Valid. Klik OK untuk menampilkan informasi pencarian riwayat pelayanan kesehatan." & vbCrLf & "Tutup aplikasi `Google Chrome` terlebih dahulu jika redirect gagal.", MsgBoxStyle.OkOnly Or MsgBoxStyle.Information, "Validasi User")
+                'If code = 200 Then
+                '    ' Menampilkan alert sukses
+                '    MsgBox("User Valid. Klik OK untuk menampilkan informasi pencarian riwayat pelayanan kesehatan." & vbCrLf & "Tutup aplikasi `Google Chrome` terlebih dahulu jika redirect gagal.", MsgBoxStyle.OkOnly Or MsgBoxStyle.Information, "Validasi User")
 
-                    ' Mengambil nilai dari response.url
-                    Dim url As String = jsonObj("response")("url").ToString()
+                '    ' Mengambil nilai dari response.url
+                '    Dim url As String = jsonObj("response")("url").ToString()
 
-                    ' Membuka di chrome
-                    OpenInNewChromeWindow(url)
-                Else
-                    ' Mengambil pesan error
-                    Dim message As String = jsonObj("metaData")("message").ToString()
+                '    ' Membuka di chrome
+                '    OpenInNewChromeWindow(url)
+                'Else
+                '    ' Mengambil pesan error
+                '    Dim message As String = jsonObj("metaData")("message").ToString()
 
-                    ' Menampilkan alert jika terjadi error
-                    MsgBox("Error: " & message, MsgBoxStyle.Critical, "API Error")
-                End If
+                '    ' Menampilkan alert jika terjadi error
+                '    MsgBox("Error: " & message, MsgBoxStyle.Critical, "API Error")
+                'End If
 
                 Me.Close()
             End If

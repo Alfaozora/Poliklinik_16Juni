@@ -38,6 +38,10 @@ Partial Class FormPendaftaranAwal
         Me.ButtonFindPasien = New System.Windows.Forms.Button
         Me.ButtonClearData = New System.Windows.Forms.Button
         Me.PanelPasienInfo = New System.Windows.Forms.Panel
+        Me.ComboBoxPenjamin = New System.Windows.Forms.ComboBox
+        Me.Label19 = New System.Windows.Forms.Label
+        Me.ComboBoxMarketing = New System.Windows.Forms.ComboBox
+        Me.Label17 = New System.Windows.Forms.Label
         Me.GroupBoxFotoPasien = New System.Windows.Forms.GroupBox
         Me.PictureBoxFotoPasien = New System.Windows.Forms.PictureBox
         Me.CheckBoxPaket = New System.Windows.Forms.CheckBox
@@ -376,6 +380,10 @@ Partial Class FormPendaftaranAwal
         '
         Me.PanelPasienInfo.AutoScroll = True
         Me.PanelPasienInfo.BackColor = System.Drawing.Color.White
+        Me.PanelPasienInfo.Controls.Add(Me.ComboBoxPenjamin)
+        Me.PanelPasienInfo.Controls.Add(Me.Label19)
+        Me.PanelPasienInfo.Controls.Add(Me.ComboBoxMarketing)
+        Me.PanelPasienInfo.Controls.Add(Me.Label17)
         Me.PanelPasienInfo.Controls.Add(Me.GroupBoxFotoPasien)
         Me.PanelPasienInfo.Controls.Add(Me.CheckBoxPaket)
         Me.PanelPasienInfo.Controls.Add(Me.LabelNotifikasiIHS)
@@ -444,6 +452,46 @@ Partial Class FormPendaftaranAwal
         Me.PanelPasienInfo.Name = "PanelPasienInfo"
         Me.PanelPasienInfo.Size = New System.Drawing.Size(1111, 560)
         Me.PanelPasienInfo.TabIndex = 6
+        '
+        'ComboBoxPenjamin
+        '
+        Me.ComboBoxPenjamin.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBoxPenjamin.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ComboBoxPenjamin.FormattingEnabled = True
+        Me.ComboBoxPenjamin.Location = New System.Drawing.Point(889, 129)
+        Me.ComboBoxPenjamin.Name = "ComboBoxPenjamin"
+        Me.ComboBoxPenjamin.Size = New System.Drawing.Size(270, 25)
+        Me.ComboBoxPenjamin.TabIndex = 539
+        '
+        'Label19
+        '
+        Me.Label19.AutoSize = True
+        Me.Label19.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label19.Location = New System.Drawing.Point(887, 109)
+        Me.Label19.Name = "Label19"
+        Me.Label19.Size = New System.Drawing.Size(66, 17)
+        Me.Label19.TabIndex = 538
+        Me.Label19.Text = "Penjamin"
+        '
+        'ComboBoxMarketing
+        '
+        Me.ComboBoxMarketing.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBoxMarketing.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ComboBoxMarketing.FormattingEnabled = True
+        Me.ComboBoxMarketing.Location = New System.Drawing.Point(609, 129)
+        Me.ComboBoxMarketing.Name = "ComboBoxMarketing"
+        Me.ComboBoxMarketing.Size = New System.Drawing.Size(270, 25)
+        Me.ComboBoxMarketing.TabIndex = 537
+        '
+        'Label17
+        '
+        Me.Label17.AutoSize = True
+        Me.Label17.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label17.Location = New System.Drawing.Point(607, 109)
+        Me.Label17.Name = "Label17"
+        Me.Label17.Size = New System.Drawing.Size(71, 17)
+        Me.Label17.TabIndex = 536
+        Me.Label17.Text = "Marketing"
         '
         'GroupBoxFotoPasien
         '
@@ -528,7 +576,7 @@ Partial Class FormPendaftaranAwal
         Me.ButtonSimpan.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
         Me.ButtonSimpan.ForeColor = System.Drawing.Color.White
         Me.ButtonSimpan.Image = Global.PoliKlinik_Net2.My.Resources.Resources.icons8_save_24
-        Me.ButtonSimpan.Location = New System.Drawing.Point(1057, 524)
+        Me.ButtonSimpan.Location = New System.Drawing.Point(1057, 580)
         Me.ButtonSimpan.Name = "ButtonSimpan"
         Me.ButtonSimpan.Size = New System.Drawing.Size(100, 35)
         Me.ButtonSimpan.TabIndex = 243
@@ -542,7 +590,7 @@ Partial Class FormPendaftaranAwal
         Me.TabControlMenu1.Controls.Add(Me.TabPageTindakan)
         Me.TabControlMenu1.Controls.Add(Me.TabPagePemeriksaanFisik)
         Me.TabControlMenu1.ItemSize = New System.Drawing.Size(200, 25)
-        Me.TabControlMenu1.Location = New System.Drawing.Point(606, 177)
+        Me.TabControlMenu1.Location = New System.Drawing.Point(606, 233)
         Me.TabControlMenu1.Name = "TabControlMenu1"
         Me.TabControlMenu1.SelectedIndex = 0
         Me.TabControlMenu1.Size = New System.Drawing.Size(555, 287)
@@ -1111,7 +1159,7 @@ Partial Class FormPendaftaranAwal
         Me.ButtonKalkulasi.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
         Me.ButtonKalkulasi.ForeColor = System.Drawing.Color.White
         Me.ButtonKalkulasi.Image = Global.PoliKlinik_Net2.My.Resources.Resources.icons8_calculator_24
-        Me.ButtonKalkulasi.Location = New System.Drawing.Point(949, 524)
+        Me.ButtonKalkulasi.Location = New System.Drawing.Point(949, 580)
         Me.ButtonKalkulasi.Name = "ButtonKalkulasi"
         Me.ButtonKalkulasi.Size = New System.Drawing.Size(100, 35)
         Me.ButtonKalkulasi.TabIndex = 242
@@ -1135,7 +1183,7 @@ Partial Class FormPendaftaranAwal
         '
         Me.Label23.AutoSize = True
         Me.Label23.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label23.Location = New System.Drawing.Point(1054, 469)
+        Me.Label23.Location = New System.Drawing.Point(1054, 525)
         Me.Label23.Name = "Label23"
         Me.Label23.Size = New System.Drawing.Size(75, 17)
         Me.Label23.TabIndex = 241
@@ -1155,7 +1203,7 @@ Partial Class FormPendaftaranAwal
         '
         Me.Label16.AutoSize = True
         Me.Label16.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label16.Location = New System.Drawing.Point(948, 469)
+        Me.Label16.Location = New System.Drawing.Point(948, 525)
         Me.Label16.Name = "Label16"
         Me.Label16.Size = New System.Drawing.Size(76, 17)
         Me.Label16.TabIndex = 240
@@ -1174,7 +1222,7 @@ Partial Class FormPendaftaranAwal
         'TextBoxTotalBayar
         '
         Me.TextBoxTotalBayar.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextBoxTotalBayar.Location = New System.Drawing.Point(1057, 489)
+        Me.TextBoxTotalBayar.Location = New System.Drawing.Point(1057, 545)
         Me.TextBoxTotalBayar.Maximum = New Decimal(New Integer() {99999999, 0, 0, 0})
         Me.TextBoxTotalBayar.Name = "TextBoxTotalBayar"
         Me.TextBoxTotalBayar.Size = New System.Drawing.Size(100, 29)
@@ -1195,7 +1243,7 @@ Partial Class FormPendaftaranAwal
         'TextBoxTotalPembulatan
         '
         Me.TextBoxTotalPembulatan.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextBoxTotalPembulatan.Location = New System.Drawing.Point(951, 489)
+        Me.TextBoxTotalPembulatan.Location = New System.Drawing.Point(951, 545)
         Me.TextBoxTotalPembulatan.Maximum = New Decimal(New Integer() {99999999, 0, 0, 0})
         Me.TextBoxTotalPembulatan.Name = "TextBoxTotalPembulatan"
         Me.TextBoxTotalPembulatan.Size = New System.Drawing.Size(100, 29)
@@ -1216,7 +1264,7 @@ Partial Class FormPendaftaranAwal
         '
         Me.Label15.AutoSize = True
         Me.Label15.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label15.Location = New System.Drawing.Point(842, 469)
+        Me.Label15.Location = New System.Drawing.Point(842, 525)
         Me.Label15.Name = "Label15"
         Me.Label15.Size = New System.Drawing.Size(65, 17)
         Me.Label15.TabIndex = 237
@@ -1236,7 +1284,7 @@ Partial Class FormPendaftaranAwal
         '
         Me.Label3.AutoSize = True
         Me.Label3.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label3.Location = New System.Drawing.Point(736, 469)
+        Me.Label3.Location = New System.Drawing.Point(736, 525)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(79, 17)
         Me.Label3.TabIndex = 236
@@ -1257,7 +1305,7 @@ Partial Class FormPendaftaranAwal
         '
         Me.Label7.AutoSize = True
         Me.Label7.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label7.Location = New System.Drawing.Point(630, 469)
+        Me.Label7.Location = New System.Drawing.Point(630, 525)
         Me.Label7.Name = "Label7"
         Me.Label7.Size = New System.Drawing.Size(70, 17)
         Me.Label7.TabIndex = 235
@@ -1266,7 +1314,7 @@ Partial Class FormPendaftaranAwal
         'TextBoxTotalBruto
         '
         Me.TextBoxTotalBruto.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextBoxTotalBruto.Location = New System.Drawing.Point(633, 489)
+        Me.TextBoxTotalBruto.Location = New System.Drawing.Point(633, 545)
         Me.TextBoxTotalBruto.Maximum = New Decimal(New Integer() {99999999, 0, 0, 0})
         Me.TextBoxTotalBruto.Name = "TextBoxTotalBruto"
         Me.TextBoxTotalBruto.Size = New System.Drawing.Size(100, 29)
@@ -1275,7 +1323,7 @@ Partial Class FormPendaftaranAwal
         '
         'TextBoxPoliKeluhanTambahan
         '
-        Me.TextBoxPoliKeluhanTambahan.Location = New System.Drawing.Point(890, 131)
+        Me.TextBoxPoliKeluhanTambahan.Location = New System.Drawing.Point(890, 187)
         Me.TextBoxPoliKeluhanTambahan.Multiline = True
         Me.TextBoxPoliKeluhanTambahan.Name = "TextBoxPoliKeluhanTambahan"
         Me.TextBoxPoliKeluhanTambahan.Size = New System.Drawing.Size(271, 40)
@@ -1284,7 +1332,7 @@ Partial Class FormPendaftaranAwal
         'TextBoxTotalDiskon
         '
         Me.TextBoxTotalDiskon.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextBoxTotalDiskon.Location = New System.Drawing.Point(739, 489)
+        Me.TextBoxTotalDiskon.Location = New System.Drawing.Point(739, 545)
         Me.TextBoxTotalDiskon.Maximum = New Decimal(New Integer() {99999999, 0, 0, 0})
         Me.TextBoxTotalDiskon.Name = "TextBoxTotalDiskon"
         Me.TextBoxTotalDiskon.Size = New System.Drawing.Size(100, 29)
@@ -1305,7 +1353,7 @@ Partial Class FormPendaftaranAwal
         'TextBoxTotalNett
         '
         Me.TextBoxTotalNett.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextBoxTotalNett.Location = New System.Drawing.Point(845, 489)
+        Me.TextBoxTotalNett.Location = New System.Drawing.Point(845, 545)
         Me.TextBoxTotalNett.Maximum = New Decimal(New Integer() {99999999, 0, 0, 0})
         Me.TextBoxTotalNett.Name = "TextBoxTotalNett"
         Me.TextBoxTotalNett.Size = New System.Drawing.Size(100, 29)
@@ -1316,7 +1364,7 @@ Partial Class FormPendaftaranAwal
         '
         Me.Label26.AutoSize = True
         Me.Label26.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label26.Location = New System.Drawing.Point(887, 111)
+        Me.Label26.Location = New System.Drawing.Point(887, 167)
         Me.Label26.Name = "Label26"
         Me.Label26.Size = New System.Drawing.Size(126, 17)
         Me.Label26.TabIndex = 174
@@ -1359,7 +1407,7 @@ Partial Class FormPendaftaranAwal
         '
         Me.Label27.AutoSize = True
         Me.Label27.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label27.Location = New System.Drawing.Point(606, 111)
+        Me.Label27.Location = New System.Drawing.Point(606, 167)
         Me.Label27.Name = "Label27"
         Me.Label27.Size = New System.Drawing.Size(102, 17)
         Me.Label27.TabIndex = 172
@@ -1402,7 +1450,7 @@ Partial Class FormPendaftaranAwal
         '
         'TextBoxPoliKeluhanUtama
         '
-        Me.TextBoxPoliKeluhanUtama.Location = New System.Drawing.Point(609, 131)
+        Me.TextBoxPoliKeluhanUtama.Location = New System.Drawing.Point(609, 187)
         Me.TextBoxPoliKeluhanUtama.Multiline = True
         Me.TextBoxPoliKeluhanUtama.Name = "TextBoxPoliKeluhanUtama"
         Me.TextBoxPoliKeluhanUtama.Size = New System.Drawing.Size(270, 40)
@@ -2311,4 +2359,8 @@ Partial Class FormPendaftaranAwal
     Friend WithEvents CheckBoxPaket As System.Windows.Forms.CheckBox
     Friend WithEvents GroupBoxFotoPasien As System.Windows.Forms.GroupBox
     Friend WithEvents PictureBoxFotoPasien As System.Windows.Forms.PictureBox
+    Friend WithEvents ComboBoxPenjamin As System.Windows.Forms.ComboBox
+    Friend WithEvents Label19 As System.Windows.Forms.Label
+    Friend WithEvents ComboBoxMarketing As System.Windows.Forms.ComboBox
+    Friend WithEvents Label17 As System.Windows.Forms.Label
 End Class

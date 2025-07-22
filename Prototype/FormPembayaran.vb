@@ -56,6 +56,7 @@ Public Class FormPembayaran
     Private _namaPasien As String = ""
     Private _namaDokter As String = ""
     Private _namaPerawat As String = ""
+    Private _namaMarketing As String = ""
     Private _keluhanUtama As String = ""
     Private _keluhanTambahan As String = ""
     Private _jenisKunjungan As String = ""
@@ -83,6 +84,7 @@ Public Class FormPembayaran
             _namaPasien = GetValueFromDictionary("Nama Pasien", "")
             _namaDokter = GetValueFromDictionary("Nama Dokter", "")
             _namaPerawat = GetValueFromDictionary("Nama Perawat", "")
+            _namaMarketing = GetValueFromDictionary("Nama Marketing", "")
             _keluhanUtama = GetValueFromDictionary("Keluhan Utama", "")
             _keluhanTambahan = GetValueFromDictionary("Keluhan Tambahan", "")
             _jenisKunjungan = GetValueFromDictionary("Jenis Kunjungan", "")
@@ -872,6 +874,7 @@ Public Class FormPembayaran
         Dim statusPaket As Boolean = False
         Dim penjaminTindakan As String = ""
 
+
         ' Generate Kode Voucher (Jika Pembelian Baru)
         Dim voucherID As String = GetUUID()
 
@@ -903,8 +906,8 @@ Public Class FormPembayaran
 
             If _jenisTransaksi = "AWAL" Then
                 ' Insert TransaksiPoli
-                WriteSQL("INSERT INTO TransaksiPoli (IDInternet, DokterPoli, PerawatPoli, TglPoli, CreatedDate, CreatedBy, ClosedBayar, KodeDokter, NoUrut, StatusKeterangan, StatusTransaksi, ArrivedDate) " & _
-                     "VALUES('" & _noRekamMedis & "','" & _namaDokter & "', '" & _namaPerawat & "', GETDATE(), GETDATE(),'" & userInput & "', '12/31/9998', '" & kodeDokter & "', '" & _nomorUrutTransaksi & "', 'Belum Diperiksa', 'arrived', GETDATE())", 4)
+                WriteSQL("INSERT INTO TransaksiPoli (IDInternet, DokterPoli, PerawatPoli, TglPoli, CreatedDate, CreatedBy, ClosedBayar, KodeDokter, NoUrut, StatusKeterangan, StatusTransaksi, ArrivedDate, MarketingPoli) " & _
+                     "VALUES('" & _noRekamMedis & "','" & _namaDokter & "', '" & _namaPerawat & "', GETDATE(), GETDATE(),'" & userInput & "', '12/31/9998', '" & kodeDokter & "', '" & _nomorUrutTransaksi & "', 'Belum Diperiksa', 'arrived', GETDATE(), '" & _namaMarketing & "')", 4)
 
                 ' Set ID Poli
                 _idTransaksi = ReadSQLNIK("SELECT TransPoliID FROM TransaksiPoli WHERE NoUrut = '" & _nomorUrutTransaksi & "'")

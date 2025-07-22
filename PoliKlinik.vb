@@ -1309,7 +1309,7 @@ Public Class PoliKlinik
         Dashboard.Focus()
     End Sub
 
-    Private Sub MasterMarketingToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MasterMarketingToolStripMenuItem.Click
+    Private Sub MasterMarketingToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         FormMasterMarketing.Show()
         FormMasterMarketing.Focus()
     End Sub

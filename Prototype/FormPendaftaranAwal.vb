@@ -485,6 +485,11 @@ Public Class FormPendaftaranAwal
         ComboBoxPilihanPerawat.SelectedIndex = -1
         ComboBoxPilihanPerawat.Enabled = False
 
+        'Set ComboBox Marketing Poli
+        InsertNewItemComboSQL("SELECT Nama FROM MasterDokter WHERE (Jenis like '%Marketing%') AND StatusAktif = 1", ComboBoxMarketing)
+        ComboBoxMarketing.SelectedIndex = -1
+        ComboBoxMarketing.Enabled = False
+
         CheckBoxPaket.Checked = False
         CheckBoxPaket.Visible = False
 
@@ -951,6 +956,14 @@ Public Class FormPendaftaranAwal
             Dim kodeDokter As String = ""
             Dim JenisKunjungan As String = ""
             Dim jenisRawat As String = ""
+            Dim marketingPoliValue As String
+
+            'Marketing Default NULL 
+            If ComboBoxMarketing.SelectedIndex = -1 Then
+                marketingPoliValue = "NULL"
+            Else
+                marketingPoliValue = ComboBoxMarketing.Text
+            End If
 
             '# Get Data Master Poli
             Dim tblPoli As DataTable = ReadSQL("SELECT * FROM MasterPoliTujuan WHERE NamaPoli = '" & ComboBoxPoliTujuan.Text & "'")
@@ -1019,6 +1032,7 @@ Public Class FormPendaftaranAwal
                         dataDictionary.Add("Nama Pasien", TextBoxNama.Text)
                         dataDictionary.Add("Nama Dokter", ComboBoxPilihanDokter.Text)
                         dataDictionary.Add("Nama Perawat", ComboBoxPilihanPerawat.Text)
+                        dataDictionary.Add("Nama Marketing", marketingPoliValue)
                         dataDictionary.Add("Keluhan Utama", TextBoxPoliKeluhanUtama.Text)
                         dataDictionary.Add("Keluhan Tambahan", TextBoxPoliKeluhanTambahan.Text)
                         dataDictionary.Add("Jenis Kunjungan", JenisKunjungan)
@@ -1118,8 +1132,8 @@ Public Class FormPendaftaranAwal
                         Next
 
                         ' Insert TransaksiPoli
-                        WriteSQL("INSERT INTO TransaksiPoli (IDInternet, DokterPoli, PerawatPoli, TglPoli, CreatedDate, CreatedBy, ClosedBayar, KodeDokter, NoUrut) " & _
-                             "VALUES('" & TextBoxRM.Text & "','" & ComboBoxPilihanDokter.Text & "', '" & ComboBoxPilihanPerawat.Text & "', GETDATE(), GETDATE(),'" & userInput & "', '12/31/9998', '" & kodeDokter & "', '" & nomorUrutTransaksi & "')", 4)
+                        WriteSQL("INSERT INTO TransaksiPoli (IDInternet, DokterPoli, PerawatPoli, TglPoli, CreatedDate, CreatedBy, ClosedBayar, KodeDokter, NoUrut, MarketingPoli) " & _
+                             "VALUES('" & TextBoxRM.Text & "','" & ComboBoxPilihanDokter.Text & "', '" & ComboBoxPilihanPerawat.Text & "', GETDATE(), GETDATE(),'" & userInput & "', '12/31/9998', '" & kodeDokter & "', '" & nomorUrutTransaksi & "', '" & marketingPoliValue & "')", 4)
 
                         ' Set ID Poli
                         idTransaksi = ReadSQLNIK("SELECT TransPoliID FROM TransaksiPoli WHERE NoUrut = '" & nomorUrutTransaksi & "'")
@@ -1359,6 +1373,7 @@ Public Class FormPendaftaranAwal
             ' Disable Button & ComboBox
             ComboBoxPilihanDokter.Enabled = False
             ComboBoxPilihanPerawat.Enabled = False
+            ComboBoxMarketing.Enabled = False
 
             TextBoxPoliKeluhanUtama.Enabled = False
             TextBoxPoliKeluhanTambahan.Enabled = False
@@ -1370,6 +1385,7 @@ Public Class FormPendaftaranAwal
             DisablePemeriksaanFisik()
             ComboBoxPilihanDokter.SelectedIndex = -1
             ComboBoxPilihanPerawat.SelectedIndex = -1
+            ComboBoxMarketing.SelectedIndex = -1
             TextBoxPoliKeluhanUtama.ResetText()
             TextBoxPoliKeluhanTambahan.ResetText()
 
@@ -1384,6 +1400,7 @@ Public Class FormPendaftaranAwal
                 If TrowPoli("DokterAwal") = True Then
                     ComboBoxPilihanDokter.Enabled = True
                     ComboBoxPilihanPerawat.Enabled = True
+                    ComboBoxMarketing.Enabled = True
 
                     TextBoxPoliKeluhanUtama.Enabled = True
                     TextBoxPoliKeluhanTambahan.Enabled = True
@@ -2263,9 +2280,9 @@ Public Class FormPendaftaranAwal
                 '    Return False
                 'End If
 
-                ' Validasi diskon tindakan harus antara 0 sampai 50
-                If (discTindakan < 0 OrElse discTindakan > 50) And rowTindakan("Klasifikasi") <> "Paket" Then
-                    MsgBox("Gagal. Diskon tindakan " & rowTindakan("Tindakan") & " harus antara 0 sampai 50.", MsgBoxStyle.Exclamation, "Warning!")
+                ' Validasi diskon tindakan harus antara 0 sampai 25
+                If (discTindakan < 0 OrElse discTindakan > 25) And rowTindakan("Klasifikasi") <> "Paket" Then
+                    MsgBox("Gagal. Diskon tindakan " & rowTindakan("Tindakan") & " harus antara 0 sampai 25.", MsgBoxStyle.Exclamation, "Warning!")
                     Return False
                 End If
 
@@ -2386,6 +2403,7 @@ Public Class FormPendaftaranAwal
             ' Disable Button & ComboBox
             ComboBoxPilihanDokter.Enabled = False
             ComboBoxPilihanPerawat.Enabled = False
+            ComboBoxMarketing.Enabled = False
 
             TextBoxPoliKeluhanUtama.Enabled = False
             TextBoxPoliKeluhanTambahan.Enabled = False
@@ -2393,6 +2411,7 @@ Public Class FormPendaftaranAwal
             DisablePemeriksaanFisik()
             ComboBoxPilihanDokter.SelectedIndex = -1
             ComboBoxPilihanPerawat.SelectedIndex = -1
+            ComboBoxMarketing.SelectedIndex = -1
             TextBoxPoliKeluhanUtama.ResetText()
             TextBoxPoliKeluhanTambahan.ResetText()
 
@@ -2413,6 +2432,7 @@ Public Class FormPendaftaranAwal
                 If TrowPoli("DokterAwal") = True Then
                     ComboBoxPilihanDokter.Enabled = True
                     ComboBoxPilihanPerawat.Enabled = True
+                    ComboBoxMarketing.Enabled = True
 
                     TextBoxPoliKeluhanUtama.Enabled = True
                     TextBoxPoliKeluhanTambahan.Enabled = True
