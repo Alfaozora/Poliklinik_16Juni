@@ -41,6 +41,7 @@ Partial Class MasterTindakanKlinik
         Me.ButtonExportMasterTindakan = New System.Windows.Forms.Button
         Me.SplitContainer3 = New System.Windows.Forms.SplitContainer
         Me.PanelMasterTindakan = New System.Windows.Forms.Panel
+        Me.CheckedListBoxPoli = New System.Windows.Forms.CheckedListBox
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.Label33 = New System.Windows.Forms.Label
         Me.TextBoxBulanReminder = New System.Windows.Forms.TextBox
@@ -160,6 +161,7 @@ Partial Class MasterTindakanKlinik
         Me.TextBoxReffID = New System.Windows.Forms.TextBox
         Me.GridControlTindakan = New DevExpress.XtraGrid.GridControl
         Me.GridViewTindakan = New DevExpress.XtraGrid.Views.Grid.GridView
+        Me.CheckedListBoxPoli2 = New System.Windows.Forms.CheckedListBox
         Me.PanelTop.SuspendLayout()
         Me.PanelMasterTindakanKlinik.SuspendLayout()
         Me.SplitContainer1.Panel1.SuspendLayout()
@@ -464,6 +466,7 @@ Partial Class MasterTindakanKlinik
         'PanelMasterTindakan
         '
         Me.PanelMasterTindakan.AutoScroll = True
+        Me.PanelMasterTindakan.Controls.Add(Me.CheckedListBoxPoli)
         Me.PanelMasterTindakan.Controls.Add(Me.GroupBox1)
         Me.PanelMasterTindakan.Controls.Add(Me.Panel5)
         Me.PanelMasterTindakan.Controls.Add(Me.CheckBoxStatusAktifTindakan)
@@ -495,6 +498,15 @@ Partial Class MasterTindakanKlinik
         Me.PanelMasterTindakan.Size = New System.Drawing.Size(757, 500)
         Me.PanelMasterTindakan.TabIndex = 563
         '
+        'CheckedListBoxPoli
+        '
+        Me.CheckedListBoxPoli.FormattingEnabled = True
+        Me.CheckedListBoxPoli.Location = New System.Drawing.Point(537, 139)
+        Me.CheckedListBoxPoli.Name = "CheckedListBoxPoli"
+        Me.CheckedListBoxPoli.ScrollAlwaysVisible = True
+        Me.CheckedListBoxPoli.Size = New System.Drawing.Size(174, 94)
+        Me.CheckedListBoxPoli.TabIndex = 574
+        '
         'GroupBox1
         '
         Me.GroupBox1.Controls.Add(Me.Label33)
@@ -502,7 +514,7 @@ Partial Class MasterTindakanKlinik
         Me.GroupBox1.Controls.Add(Me.CheckBoxReminder)
         Me.GroupBox1.Location = New System.Drawing.Point(537, 17)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(247, 116)
+        Me.GroupBox1.Size = New System.Drawing.Size(174, 116)
         Me.GroupBox1.TabIndex = 573
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Reminder Pasien ?"
@@ -1488,6 +1500,7 @@ Partial Class MasterTindakanKlinik
         'SplitContainerMasterPaket.Panel1
         '
         Me.SplitContainerMasterPaket.Panel1.BackColor = System.Drawing.Color.White
+        Me.SplitContainerMasterPaket.Panel1.Controls.Add(Me.CheckedListBoxPoli2)
         Me.SplitContainerMasterPaket.Panel1.Controls.Add(Me.TextBox15)
         Me.SplitContainerMasterPaket.Panel1.Controls.Add(Me.Label2)
         Me.SplitContainerMasterPaket.Panel1.Controls.Add(Me.TextBoxMaksimalBHP_Paket)
@@ -1959,6 +1972,15 @@ Partial Class MasterTindakanKlinik
         Me.GridViewTindakan.OptionsView.ShowIndicator = False
         Me.GridViewTindakan.PaintStyleName = "Skin"
         '
+        'CheckedListBoxPoli2
+        '
+        Me.CheckedListBoxPoli2.FormattingEnabled = True
+        Me.CheckedListBoxPoli2.Location = New System.Drawing.Point(496, 20)
+        Me.CheckedListBoxPoli2.Name = "CheckedListBoxPoli2"
+        Me.CheckedListBoxPoli2.ScrollAlwaysVisible = True
+        Me.CheckedListBoxPoli2.Size = New System.Drawing.Size(174, 94)
+        Me.CheckedListBoxPoli2.TabIndex = 577
+        '
         'MasterTindakanKlinik
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -2165,4 +2187,6 @@ Partial Class MasterTindakanKlinik
     Friend WithEvents Label33 As System.Windows.Forms.Label
     Friend WithEvents TextBoxBulanReminder As System.Windows.Forms.TextBox
     Friend WithEvents CheckBoxReminder As System.Windows.Forms.CheckBox
+    Friend WithEvents CheckedListBoxPoli As System.Windows.Forms.CheckedListBox
+    Friend WithEvents CheckedListBoxPoli2 As System.Windows.Forms.CheckedListBox
 End Class

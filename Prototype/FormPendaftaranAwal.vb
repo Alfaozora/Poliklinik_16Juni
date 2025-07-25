@@ -2112,10 +2112,28 @@ Public Class FormPendaftaranAwal
     End Function
 
     Private Sub ButtonTambahPaket_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonTambahPaket.Click
-        If GridControlTindakanPoli.MainView IsNot GridViewPaketPoli Then ClearGridDataPaket()
+        If GridControlTindakanPoli.MainView IsNot GridViewPaketPoli Then
+            ClearGridDataPaket()
+        End If
+
+        ' Ambil PoliTujuan dari ComboBox
+        Dim poliTujuanFilter As String = ComboBoxPoliTujuan.Text.Trim()
+
+        ' Validasi input
+        If poliTujuanFilter = "" Then
+            MessageBox.Show("Silakan pilih Poli Tujuan terlebih dahulu.", "Validasi", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Exit Sub
+        End If
+
+        ' Query dengan filter PoliTujuan
+        Dim queryString As String = "SELECT NamaPaket, KeteranganPaket, " & _
+                                "PARSENAME(CONVERT(VARCHAR,CONVERT(MONEY,HargaNett),1),2) AS PaketNilaiTotal, PaketID " & _
+                                "FROM MasterPaketTindakan " & _
+                                "WHERE CONVERT(DATE, GETDATE()) BETWEEN TanggalMulai AND TanggalBerakhir " & _
+                                "AND PoliTujuan LIKE '%" & poliTujuanFilter.Replace("'", "''") & "%'"
 
         FindMultiple.Show()
-        FindMultiple.Query("SELECT NamaPaket, KeteranganPaket, PARSENAME(CONVERT(VARCHAR,CONVERT(MONEY,HargaNett),1),2) AS PaketNilaiTotal, PaketID FROM MasterPaketTindakan WHERE CONVERT(DATE, GETDATE()) between TanggalMulai AND TanggalBerakhir ", " ORDER BY NamaPaket", "FindPemeriksaanPendaftaranPaket", 0)
+        FindMultiple.Query(queryString, " ORDER BY NamaPaket", "FindPemeriksaanPendaftaranPaket", 0)
     End Sub
 
     Public Sub LoadTindakanPaket(ByRef rowPaket() As DataRow)

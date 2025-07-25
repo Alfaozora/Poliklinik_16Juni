@@ -19,7 +19,7 @@ Imports DevExpress.XtraPrinting
 Public Class FormPembayaran
     Private formName As String = "FORM PEMBAYARAN"
     Dim thread As System.Threading.Thread
-    Dim tblTindakan As DataTable
+    Dim tblTindakan As New DataTable
     Dim txtotalbruto, txtotaldisc, txtotalpembulatan, txtotalrow As Double
     'Dim Takhir As Double
     'Dim txkembali As Double
@@ -873,7 +873,6 @@ Public Class FormPembayaran
         Dim kodeDokter As String = ""
         Dim statusPaket As Boolean = False
         Dim penjaminTindakan As String = ""
-
 
         ' Generate Kode Voucher (Jika Pembelian Baru)
         Dim voucherID As String = GetUUID()
