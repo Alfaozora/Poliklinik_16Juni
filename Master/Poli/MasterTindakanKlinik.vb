@@ -193,7 +193,7 @@ Public Class MasterTindakanKlinik
 
         ' Hide tab header button TabControl
         TabControlMenu.ItemSize = New Size(0, 1)
-        TextBoxBulanReminder.ReadOnly = True
+        TextBoxHariReminder.ReadOnly = True
 
         ClearDataMenuPaket()
         ClearDataMenuTindakan()
@@ -712,7 +712,7 @@ Public Class MasterTindakanKlinik
         'Set Reminder
         If Convert.ToInt32(rowTindakan("Reminder")) = 1 Then CheckBoxReminder.Checked = True
         If Convert.ToInt32(rowTindakan("Reminder")) = 0 Then CheckBoxReminder.Checked = False
-        If IsDBNull(rowTindakan("Bulan")) = False Then TextBoxBulanReminder.Text = rowTindakan("Bulan")
+        If IsDBNull(rowTindakan("Hari")) = False Then TextBoxHariReminder.Text = rowTindakan("Hari")
 
         ' Set Informed Consent
         If Convert.ToInt32(rowTindakan("StatusInformedConsent")) = 1 Then CheckBoxInformedConsent.Checked = True
@@ -768,8 +768,8 @@ Public Class MasterTindakanKlinik
         CheckedListBoxPoli.Enabled = True
 
         CheckBoxReminder.Checked = False
-        TextBoxBulanReminder.ResetText()
-        TextBoxBulanReminder.ReadOnly = True
+        TextBoxHariReminder.ResetText()
+        TextBoxHariReminder.ReadOnly = True
 
         If RadioButtonPoliUmum.Checked = True Then
             InsertNewItemComboSQL("SELECT DISTINCT JenisTindakan FROM MasterTindakan", ComboBoxGroupJenisTindakan)
@@ -822,12 +822,12 @@ Public Class MasterTindakanKlinik
 
         'Reminder
         Dim statusReminder As Integer = If(CheckBoxReminder.Checked, 1, 0)
-        Dim bulan As String
+        Dim hari As String
 
-        If TextBoxBulanReminder.Text.Trim() = "" Then
-            bulan = "NULL"
+        If TextBoxHariReminder.Text.Trim() = "" Then
+            hari = "NULL"
         Else
-            bulan = "'" & TextBoxBulanReminder.Text.Trim().Replace("'", "''") & "'"
+            hari = "'" & TextBoxHariReminder.Text.Trim().Replace("'", "''") & "'"
         End If
 
         'Filter Poli
@@ -868,13 +868,13 @@ Public Class MasterTindakanKlinik
         If TextBoxTindakanID.Text = "" Then
             ' Insert Data Baru 
             If RadioButtonPoliUmum.Checked = True Then
-                WriteSQL("INSERT INTO MasterTindakan ([NamaTindakan], [JenisTindakan], [BiayaTindakan], [JenisDokter], [CreatedDate], [CreatedBy], [StatusFeeTindakan], [StatusBHP], [StatusPersentaseFee], [StatusNominalFee], [PersentaseFeePerusahaan], [PersentaseFeeKaryawan], [FeePerTindakan], [FeeDokter], [FeePerawat], [StatusFeeKonsultasi], [MaksimalBHP], [StatusInformedConsent], [TindakanInformedConsent], [Bulan], [Reminder], [PoliTujuan]) " & _
-                     "VALUES('" & TextBoxNamaTindakan.Text & "','" & ComboBoxGroupJenisTindakan.Text & "'," & CInt(TextBoxBiayaTindakan.Text) & ", '" & jenisPelaksana & "', GETDATE(), '" & userInput & "', '" & statusFee & "', '" & statusBHP & "', '" & statusPersentase & "', " & _
-                     "'" & statusNominal & "', '" & CDbl(TextBoxPersentaseFeePerusahaan.Text) & "', '" & CDbl(TextBoxPersentaseFeeKaryawan.Text) & "', '" & CDbl(TextBoxNominalFee.Text) & "', '" & CDbl(TextBoxFeeDokterTambahan.Text) & "', '" & CDbl(TextBoxFeePerawatTambahan.Text) & "', '" & statusFeeKonsultasi & "', '" & CDbl(TextBoxMaksimalBHP_Tindakan.Text) & "', '" & statusInformedConsent & "', '" & ComboBoxInformedConsent.Text & "', '" & bulan & "', " & statusReminder & ", " & poliGabung & ")", 4)
+                WriteSQL("INSERT INTO MasterTindakan ([NamaTindakan], [JenisTindakan], [BiayaTindakan], [JenisDokter], [CreatedDate], [CreatedBy], [StatusFeeTindakan], [StatusBHP], [StatusPersentaseFee], [StatusNominalFee], [PersentaseFeePerusahaan], [PersentaseFeeKaryawan], [FeePerTindakan], [FeeDokter], [FeePerawat], [StatusFeeKonsultasi], [MaksimalBHP], [StatusInformedConsent], [TindakanInformedConsent], [Hari], [Reminder], [PoliTujuan]) " & _
+                         "VALUES('" & TextBoxNamaTindakan.Text & "','" & ComboBoxGroupJenisTindakan.Text & "'," & CInt(TextBoxBiayaTindakan.Text) & ", '" & jenisPelaksana & "', GETDATE(), '" & userInput & "', '" & statusFee & "', '" & statusBHP & "', '" & statusPersentase & "', " & _
+                         "'" & statusNominal & "', '" & CDbl(TextBoxPersentaseFeePerusahaan.Text) & "', '" & CDbl(TextBoxPersentaseFeeKaryawan.Text) & "', '" & CDbl(TextBoxNominalFee.Text) & "', '" & CDbl(TextBoxFeeDokterTambahan.Text) & "', '" & CDbl(TextBoxFeePerawatTambahan.Text) & "', '" & statusFeeKonsultasi & "', '" & CDbl(TextBoxMaksimalBHP_Tindakan.Text) & "', '" & statusInformedConsent & "', '" & ComboBoxInformedConsent.Text & "', '" & hari & "', " & statusReminder & ", '" & poliGabung & "')", 4)
             ElseIf RadioButtonPoliGigi.Checked = True Then
-                WriteSQL("INSERT INTO MasterTindakanGigi ([NamaTindakan], [JenisTindakan], [BiayaTindakan], [JenisDokter], [CreatedDate], [CreatedBy], [StatusFeeTindakan], [StatusBHP], [StatusPersentaseFee], [StatusNominalFee], [PersentaseFeePerusahaan], [PersentaseFeeKaryawan], [FeePerTindakan], [FeeDokter], [FeePerawat], [StatusFeeKonsultasi], [MaksimalBHP], [StatusInformedConsent], [TindakanInformedConsent], [Bulan], [Reminder], [PoliTujuan]) " & _
+                WriteSQL("INSERT INTO MasterTindakanGigi ([NamaTindakan], [JenisTindakan], [BiayaTindakan], [JenisDokter], [CreatedDate], [CreatedBy], [StatusFeeTindakan], [StatusBHP], [StatusPersentaseFee], [StatusNominalFee], [PersentaseFeePerusahaan], [PersentaseFeeKaryawan], [FeePerTindakan], [FeeDokter], [FeePerawat], [StatusFeeKonsultasi], [MaksimalBHP], [StatusInformedConsent], [TindakanInformedConsent], [Hari], [Reminder], [PoliTujuan]) " & _
                      "VALUES('" & TextBoxNamaTindakan.Text & "', '" & ComboBoxGroupJenisTindakan.Text & "', " & CInt(TextBoxBiayaTindakan.Text) & ", '" & jenisPelaksana & "', GETDATE(), '" & userInput & "', '" & statusFee & "', '" & statusBHP & "', '" & statusPersentase & "', " & _
-                     "'" & statusNominal & "', '" & CDbl(TextBoxPersentaseFeePerusahaan.Text) & "', '" & CDbl(TextBoxPersentaseFeeKaryawan.Text) & "', '" & CDbl(TextBoxNominalFee.Text) & "', '" & CDbl(TextBoxFeeDokterTambahan.Text) & "', '" & CDbl(TextBoxFeePerawatTambahan.Text) & "', '" & statusFeeKonsultasi & "', '" & CDbl(TextBoxMaksimalBHP_Tindakan.Text) & "', '" & statusInformedConsent & "', '" & ComboBoxInformedConsent.Text & "', '" & bulan & "', " & statusReminder & ", " & poliGabung & ")", 4)
+                     "'" & statusNominal & "', '" & CDbl(TextBoxPersentaseFeePerusahaan.Text) & "', '" & CDbl(TextBoxPersentaseFeeKaryawan.Text) & "', '" & CDbl(TextBoxNominalFee.Text) & "', '" & CDbl(TextBoxFeeDokterTambahan.Text) & "', '" & CDbl(TextBoxFeePerawatTambahan.Text) & "', '" & statusFeeKonsultasi & "', '" & CDbl(TextBoxMaksimalBHP_Tindakan.Text) & "', '" & statusInformedConsent & "', '" & ComboBoxInformedConsent.Text & "', '" & hari & "', " & statusReminder & ", '" & poliGabung & "')", 4)
             End If
 
             ClearDataMenuTindakan()
@@ -898,7 +898,7 @@ Public Class MasterTindakanKlinik
                               "FeePerawat = '" & CDbl(TextBoxFeePerawatTambahan.Text) & "'," & _
                               "StatusFeeKonsultasi = '" & statusFeeKonsultasi & "'," & _
                               "MaksimalBHP = '" & CDbl(TextBoxMaksimalBHP_Tindakan.Text) & "'," & _
-                              "Bulan = " & bulan & "," & _
+                              "Hari = " & hari & "," & _
                               "Reminder = '" & statusReminder & "'," & _
                               "PoliTujuan = '" & poliGabung & "'," & _
                               "UpdatedBy = '" & userInput & "'," & _
@@ -1106,9 +1106,9 @@ Public Class MasterTindakanKlinik
         Dim queryStringTindakan As String = ""
 
         If RadioButtonPoliUmum.Checked = True Then
-            queryStringTindakan = "SELECT TindakanID, NamaTindakan, JenisTindakan, BiayaTindakan, JenisDokter AS 'Pelaksana', StatusFeeTindakan, FeeDokter, FeePerawat, StatusBHP, MaksimalBHP, PersentaseFeePerusahaan, PersentaseFeeKaryawan, StatusPersentaseFee, StatusNominalFee, FeePerTindakan, StatusFeeKonsultasi, TindakanInformedConsent FROM MasterTindakan WHERE Closed = 0"
+            queryStringTindakan = "SELECT TindakanID, NamaTindakan, JenisTindakan, BiayaTindakan, JenisDokter AS 'Pelaksana', StatusFeeTindakan, FeeDokter, FeePerawat, StatusBHP, MaksimalBHP, PersentaseFeePerusahaan, PersentaseFeeKaryawan, StatusPersentaseFee, StatusNominalFee, FeePerTindakan, StatusFeeKonsultasi, TindakanInformedConsent, Hari, Reminder, PoliTujuan FROM MasterTindakan WHERE Closed = 0"
         ElseIf RadioButtonPoliGigi.Checked = True Then
-            queryStringTindakan = "SELECT TindakanID, NamaTindakan, JenisTindakan, BiayaTindakan, JenisDokter AS 'Pelaksana', StatusFeeTindakan, FeeDokter, FeePerawat, StatusBHP, MaksimalBHP, PersentaseFeePerusahaan, PersentaseFeeKaryawan, StatusPersentaseFee, StatusNominalFee, FeePerTindakan, StatusFeeKonsultasi, TindakanInformedConsent FROM MasterTindakanGigi WHERE Closed = 0"
+            queryStringTindakan = "SELECT TindakanID, NamaTindakan, JenisTindakan, BiayaTindakan, JenisDokter AS 'Pelaksana', StatusFeeTindakan, FeeDokter, FeePerawat, StatusBHP, MaksimalBHP, PersentaseFeePerusahaan, PersentaseFeeKaryawan, StatusPersentaseFee, StatusNominalFee, FeePerTindakan, StatusFeeKonsultasi, TindakanInformedConsent, Hari, Reminder, PoliTujuan FROM MasterTindakanGigi WHERE Closed = 0"
         End If
 
         Dim tblTindakan As DataTable = ReadSQL(queryStringTindakan)
@@ -1179,7 +1179,7 @@ Public Class MasterTindakanKlinik
     Private Sub ButtonExportMasterPaket_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonExportMasterPaket.Click
         Dim queryStringPaket As String = ""
 
-        queryStringPaket = "SELECT PaketID, NamaPaket, KeteranganPaket, JenisPaket, HargaNett, Kuota, TanggalMulai, TanggalBerakhir FROM MasterPaketTindakan WHERE DeletedDate IS NULL"
+        queryStringPaket = "SELECT PaketID, NamaPaket, KeteranganPaket, JenisPaket, HargaNett, Kuota, TanggalMulai, TanggalBerakhir, PoliTujuan FROM MasterPaketTindakan WHERE DeletedDate IS NULL"
 
         Dim tblPaket As DataTable = ReadSQL(queryStringPaket)
 
@@ -1216,7 +1216,7 @@ Public Class MasterTindakanKlinik
         End If
     End Sub
 
-    Private Sub TextBoxBulanReminder_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles TextBoxBulanReminder.KeyPress
+    Private Sub TextBoxHariReminder_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles TextBoxHariReminder.KeyPress
         If Not Char.IsControl(e.KeyChar) AndAlso Not Char.IsDigit(e.KeyChar) Then
             e.Handled = True
         End If
@@ -1225,10 +1225,10 @@ Public Class MasterTindakanKlinik
     Private Sub CheckBoxReminder_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckBoxReminder.CheckedChanged
         ' Jika dicentang, TextBoxBulan bisa diisi
         If CheckBoxReminder.Checked Then
-            TextBoxBulanReminder.ReadOnly = False
+            TextBoxHariReminder.ReadOnly = False
         Else
-            TextBoxBulanReminder.ReadOnly = True
-            TextBoxBulanReminder.Text = ""
+            TextBoxHariReminder.ReadOnly = True
+            TextBoxHariReminder.Text = ""
         End If
     End Sub
 

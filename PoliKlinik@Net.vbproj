@@ -498,6 +498,12 @@
     <Compile Include="Prototype\FormInputInformedConsent.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Prototype\FormKodeVoucher.Designer.vb">
+      <DependentUpon>FormKodeVoucher.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormKodeVoucher.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Prototype\FormMasterDokter.Designer.vb">
       <DependentUpon>FormMasterDokter.vb</DependentUpon>
     </Compile>
@@ -813,6 +819,12 @@
       <DependentUpon>KYC.vb</DependentUpon>
     </Compile>
     <Compile Include="Prototype\KYC.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Prototype\PopUpVoucher.Designer.vb">
+      <DependentUpon>PopUpVoucher.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\PopUpVoucher.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Prototype\UploadTindakan.Designer.vb">
@@ -1450,6 +1462,9 @@
     <EmbeddedResource Include="Prototype\FormInputInformedConsent.resx">
       <DependentUpon>FormInputInformedConsent.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormKodeVoucher.resx">
+      <DependentUpon>FormKodeVoucher.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormMasterDokter.resx">
       <DependentUpon>FormMasterDokter.vb</DependentUpon>
     </EmbeddedResource>
@@ -1623,6 +1638,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\KYC.resx">
       <DependentUpon>KYC.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\PopUpVoucher.resx">
+      <DependentUpon>PopUpVoucher.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\UploadTindakan.resx">
       <DependentUpon>UploadTindakan.vb</DependentUpon>

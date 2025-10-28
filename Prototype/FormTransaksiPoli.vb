@@ -399,4 +399,34 @@ Public Class FormTransaksiPoli
             End If
         End If
     End Sub
+
+    ' Informasi voucher aktif
+    Private voucherAktifKode As String = ""
+    Private voucherTipe As String = ""
+    Private voucherNilai As Decimal = 0
+    Private voucherTindakanID As String = ""
+    Private voucherIsTindakan As Boolean = False
+
+    Private Sub ButtonVoucher_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonVoucher.Click
+        'PopUpVoucher.Show()
+        'PopUpVoucher.Focus()
+        Dim f As New PopUpVoucher()
+        AddHandler f.VoucherDipilih, AddressOf ProsesVoucher
+        f.ShowDialog()
+    End Sub
+
+    Private Sub ProsesVoucher(ByVal kode As String, ByVal jenis As String, ByVal nilai As Decimal)
+        Dim Tbls As DataTable = CType(gridtindakan.DataSource, DataTable)
+
+        For Each row As DataRow In Tbls.Rows
+            If jenis.ToUpper() = "NOMINAL" Then
+                row("DiscNilai") = nilai
+            ElseIf jenis.ToUpper() = "PERCENT" Then
+                row("DiscTindakan") = nilai
+            End If
+        Next
+
+        ' Jalankan ulang kalkulasi
+        Kalkulasi()
+    End Sub
 End Class

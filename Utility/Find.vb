@@ -548,6 +548,10 @@ Public Class Find
                     FormReservasi.LoadDokter(Grdrow("ID").ToString)
                 Case "FindMasterSesi"
                     FormReservasi.LoadReservasi(Grdrow("RuanganID").ToString)
+                Case "FindMasterTindakanVoc"
+                    Dim tindakanID As String = Grdrow("TindakanID").ToString()
+                    Dim namaTindakan As String = Grdrow("NamaTindakan").ToString()
+                    FormKodeVoucher.TextBoxTindakan.Text = tindakanID & " - " & namaTindakan
                 Case Else : MsgBox("Error...")
             End Select
             Me.Close()

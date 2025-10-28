@@ -120,6 +120,18 @@
   <metadata name="MenuStrip5.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>383, 5</value>
   </metadata>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="ButtonVoucher.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAA
+        dgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAD2SURBVDhPzdLL
+        KoZhFAXgJ8mpKBMDE7eAuakIE4ccZq7CRBJJItfgAjA1dchAmZm6GK2//evrqz/9Jqzatff7vWt/a+39
+        8h8wilVs9RkrxXWPSxxUfOC8UfeKcO7S4L2laAnDrbNe6HDfulIK8xis/AIPmKp6DYuVhxOuTbxgrD5E
+        1gwG8IkbrJfnV0xipDjhdnCI3coXMFT5Dk6wjSdM1Pkejivv4KguB80GwQYeazbXmG43yEqeG4PrWggi
+        MeT8OX5PcVZ2Y6djoT3EucYQc3m88v1qNlv19xDba1zud42R/JuHdIXbNIiUrKj9VH+KcLLOP8YXEfE5
+        XWAQBQYAAAAASUVORK5CYII=
+</value>
+  </data>
   <metadata name="MenuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>498, 5</value>
   </metadata>
@@ -129,7 +141,6 @@
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>25</value>
   </metadata>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAABAAMAEBAAAAEAIABoBAAANgAAACAgAAABACAAqBAAAJ4EAAAwMAAAAQAgAKglAABGFQAAKAAAABAA

@@ -47,9 +47,6 @@ Partial Class ReportMasterHarga
         'GridControl1
         '
         Me.GridControl1.Dock = System.Windows.Forms.DockStyle.Fill
-        '
-        '
-        '
         Me.GridControl1.EmbeddedNavigator.Name = ""
         Me.GridControl1.Location = New System.Drawing.Point(0, 121)
         Me.GridControl1.MainView = Me.GridView1
@@ -104,7 +101,7 @@ Partial Class ReportMasterHarga
         'cmbtindakan
         '
         Me.cmbtindakan.FormattingEnabled = True
-        Me.cmbtindakan.Items.AddRange(New Object() {"Master Tindakan", "Master Lab", "Master Gigi"})
+        Me.cmbtindakan.Items.AddRange(New Object() {"Master Tindakan", "Master Paket Tindakan"})
         Me.cmbtindakan.Location = New System.Drawing.Point(97, 19)
         Me.cmbtindakan.Name = "cmbtindakan"
         Me.cmbtindakan.Size = New System.Drawing.Size(247, 21)
