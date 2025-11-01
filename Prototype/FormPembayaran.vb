@@ -68,6 +68,11 @@ Public Class FormPembayaran
     Private _statusLansia As String = ""
     Private _statusGawatDarurat As String = ""
 
+    ' Variabel Voucher
+    Private _kodeVoucher As String = ""
+    Private _jenisVoucher As String = ""
+    Private _nilaiVoucher As Decimal = 0
+
     Public Property DataDictionary() As Dictionary(Of String, Object)
         Get
             Return _dataDictionary
@@ -97,6 +102,10 @@ Public Class FormPembayaran
             _statusGawatDarurat = GetValueFromDictionary("Status Gawat Darurat", "")
 
             _namaPoli = GetValueFromDictionary("Poli Tujuan", "")
+
+            _kodeVoucher = GetValueFromDictionary("Kode Voucher", "")
+            _jenisVoucher = GetValueFromDictionary("Jenis Voucher", "")
+            _nilaiVoucher = GetValueFromDictionary("Nilai Voucher", 0)
         End Set
     End Property
 
@@ -1178,8 +1187,43 @@ Public Class FormPembayaran
                         WriteSQL("INSERT INTO TransaksiPoliDetail(TransPoliID,TindakanID,NamaTindakan,JenisTindakan,BiayaTindakan,DiscTindakan,NettBayar,admin,transaksitime,DiscPersenTindakan,GroupBayar,StatusPembayaran,CreatedBy, CreatedDate) " & _
                                  "VALUES('" & _idTransaksi & "','" & Trow("TindakanID") & "','" & Trow("Tindakan") & "','" & Trow("Jenis") & "'," & CDbl(Trow("Biaya Tindakan")) & "," & CDbl(Trow("DiscNilai")) & "," & CDbl(Trow("NettBayar")) & ",'" & userInput & "',GETDATE()," & CDbl(Trow("DiscTindakan")) & ",'" & NoPembayaran & "', 'PAID', '" & userInput & "', GETDATE())", 4)
                     Else
-                        WriteSQL("UPDATE TransaksiPoliDetail SET  BiayaTindakan = " & CDbl(Trow("Biaya Tindakan")) & ", DiscTindakan = " & CDbl(Trow("DiscNilai")) & ", NettBayar = " & CDbl(Trow("NettBayar")) & ", admin = '" & userInput & "', transaksitime = GETDATE(), DiscPersenTindakan = " & CDbl(Trow("DiscTindakan")) & ", GroupBayar = '" & NoPembayaran & "', StatusPembayaran = 'PAID' " & _
-                                 "WHERE TransPoliIDDetail = '" & Trow("TransPoliIDDetail") & "' AND TransPoliID = '" & _idTransaksi & "' AND TindakanID = '" & Trow("TindakanID") & "' AND NamaTindakan = '" & Trow("Tindakan") & "' AND JenisTindakan = '" & Trow("Jenis") & "'", 4)
+                        'WriteSQL("UPDATE TransaksiPoliDetail SET  BiayaTindakan = " & CDbl(Trow("Biaya Tindakan")) & ", DiscTindakan = " & CDbl(Trow("DiscNilai")) & ", NettBayar = " & CDbl(Trow("NettBayar")) & ", admin = '" & userInput & "', transaksitime = GETDATE(), DiscPersenTindakan = " & CDbl(Trow("DiscTindakan")) & ", GroupBayar = '" & NoPembayaran & "', StatusPembayaran = 'PAID' " & _
+                        '         "WHERE TransPoliIDDetail = '" & Trow("TransPoliIDDetail") & "' AND TransPoliID = '" & _idTransaksi & "' AND TindakanID = '" & Trow("TindakanID") & "' AND NamaTindakan = '" & Trow("Tindakan") & "' AND JenisTindakan = '" & Trow("Jenis") & "'", 4)
+
+                        WriteSQL("UPDATE TransaksiPoliDetail SET " & _
+                              "BiayaTindakan = " & CDbl(Trow("Biaya Tindakan")) & ", " & _
+                              "DiscTindakan = " & CDbl(Trow("DiscNilai")) & ", " & _
+                              "NettBayar = " & CDbl(Trow("NettBayar")) & ", " & _
+                              "DiscPersenTindakan = " & CDbl(Trow("DiscTindakan")) & ", " & _
+                              "GroupBayar = '" & NoPembayaran.Replace("'", "''") & "', " & _
+                              "StatusPembayaran = 'PAID', " & _
+                              "KodeVoucher = '" & _kodeVoucher.Replace("'", "''") & "', " & _
+                              "admin = '" & userInput.Replace("'", "''") & "', " & _
+                              "transaksitime = GETDATE() " & _
+                              "WHERE TransPoliIDDetail = '" & Trow("TransPoliIDDetail").ToString().Replace("'", "''") & "' " & _
+                              "AND TransPoliID = '" & _idTransaksi.Replace("'", "''") & "' " & _
+                              "AND TindakanID = '" & Trow("TindakanID").ToString().Replace("'", "''") & "' " & _
+                              "AND NamaTindakan = '" & Trow("Tindakan").ToString().Replace("'", "''") & "' " & _
+                              "AND JenisTindakan = '" & Trow("Jenis").ToString().Replace("'", "''") & "'", 4)
+
+                        ' === Setelah semua transaksi tersimpan ===
+                        If _kodeVoucher <> "" Then
+                            Try
+                                ' Update jumlah terpakai voucher
+                                Dim sqlUpdateVoucher As String = _
+                                    "UPDATE MasterVoucher " & _
+                                    "SET JumlahTerpakai = ISNULL(JumlahTerpakai, 0) + 1 " & _
+                                    "WHERE KodeVoucher = '" & _kodeVoucher.Replace("'", "''") & "'"
+
+                                WriteSQL(sqlUpdateVoucher, 4)
+
+                                ' Opsional: tampilkan notifikasi sukses
+                                MessageBox.Show("Voucher berhasil digunakan dan jumlah pemakaian diperbarui.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                            Catch ex As Exception
+                                MessageBox.Show("Gagal memperbarui jumlah pemakaian voucher: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                            End Try
+                        End If
+
                     End If
 
                     'NewHeader.Rows.Clear()

@@ -25,7 +25,8 @@
         'Dim kodeVoucher As String = Guid.NewGuid().ToString().ToUpper()
 
         ' (Opsional) Kalau mau kode lebih pendek, ambil sebagian
-        Dim kodeVoucher As String = Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper()
+        Dim UUID As String = Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper()
+        Dim kodeVoucher As String = "LMRLZL" & UUID
 
         ' Tampilkan hasil ke TextBox
         TextBoxKodeVoc.Text = kodeVoucher
@@ -78,7 +79,7 @@
         Dim tglAkhir As DateTime = dtAkhir.Value
         Dim maks As Integer = If(TextBoxKuotaVoc.Text = "", 0, CInt(TextBoxKuotaVoc.Text))
         Dim jenis As Integer
-        If ComboBoxJenisVoc.Text.Trim().ToLower() = "Voucher Tindakan" Then
+        If ComboBoxJenisVoc.Text.Trim().ToLower() = "voucher tindakan" Then
             jenis = 1
         Else
             jenis = 0
@@ -101,6 +102,14 @@
             Exit Sub
         End If
 
+        ' ✅ Validasi kode voucher tidak boleh sama
+        Dim cekSql As String = "SELECT COUNT(*) FROM MasterVoucher WHERE KodeVoucher = '" & kode.Replace("'", "''") & "'"
+        Dim dtCek As DataTable = ReadSQL(cekSql)
+        If dtCek.Rows.Count > 0 AndAlso CInt(dtCek.Rows(0)(0)) > 0 Then
+            MsgBox("Kode voucher sudah digunakan. Gunakan kode lain.", MsgBoxStyle.Exclamation)
+            Exit Sub
+        End If
+
         If tglAkhir < tglMulai Then
             MsgBox("Tanggal akhir tidak boleh lebih kecil dari tanggal mulai.", MsgBoxStyle.Exclamation)
             Exit Sub
@@ -111,24 +120,30 @@
             Exit Sub
         End If
 
-        Dim sql As String = "INSERT INTO MasterVoucher " & _
-         "(NamaVoucher, KodeVoucher, Tipe, Nilai, MinTransaksi, TanggalMulai, TanggalAkhir, JumlahMaks, JumlahTerpakai, Status, Tindakan, KodeTindakan, CreatedDate, CreatedBy) VALUES (" & _
-         "'" & nama.Replace("'", "''") & "', " & _
-         "'" & kode.Replace("'", "''") & "', " & _
-         "'" & tipe.Replace("'", "''") & "', " & _
-         nilai & ", " & _
-         minTransaksi & ", " & _
-         "'" & tglMulai.ToString("yyyy-MM-dd HH:mm:ss") & "', " & _
-         "'" & tglAkhir.ToString("yyyy-MM-dd HH:mm:ss") & "', " & _
-         maks & ", " & _
-         "0, " & _
-         status & ", " & _
-         jenis & ", " & _
-         "'" & tindakanID.Replace("'", "''") & "', " & _
-         "GETDATE(), " & _
-         "'" & createdBy.Replace("'", "''") & "'" & _
-         ")"
+        ' ✅ Validasi minimal pembelian harus diisi (>0)
+        If minTransaksi <= 0 Then
+            MsgBox("Minimal pembelian harus diisi dan lebih dari 0.", MsgBoxStyle.Exclamation)
+            Exit Sub
+        End If
 
+        ' --- Simpan ke database ---
+        Dim sql As String = "INSERT INTO MasterVoucher " & _
+            "(NamaVoucher, KodeVoucher, Tipe, Nilai, MinTransaksi, TanggalMulai, TanggalAkhir, JumlahMaks, JumlahTerpakai, Status, Tindakan, KodeTindakan, CreatedDate, CreatedBy) VALUES (" & _
+            "'" & nama.Replace("'", "''") & "', " & _
+            "'" & kode.Replace("'", "''") & "', " & _
+            "'" & tipe.Replace("'", "''") & "', " & _
+            nilai & ", " & _
+            minTransaksi & ", " & _
+            "'" & tglMulai.ToString("yyyy-MM-dd HH:mm:ss") & "', " & _
+            "'" & tglAkhir.ToString("yyyy-MM-dd HH:mm:ss") & "', " & _
+            maks & ", " & _
+            "0, " & _
+            status & ", " & _
+            jenis & ", " & _
+            "'" & tindakanID.Replace("'", "''") & "', " & _
+            "GETDATE(), " & _
+            "'" & createdBy.Replace("'", "''") & "'" & _
+            ")"
 
         WriteSQL(sql, 4)
 
@@ -268,7 +283,7 @@
     Private Sub DataGridView1_CellContentClick(ByVal sender As Object, ByVal e As DataGridViewCellEventArgs) Handles DataGridView1.CellContentClick
         ' Pastikan kolom yang diklik adalah tombol "Hapus"
         If e.RowIndex >= 0 AndAlso DataGridView1.Columns(e.ColumnIndex).Name = "Hapus" Then
-            Dim idVoucher As String = DataGridView1.Rows(e.RowIndex).Cells("ID").Value.ToString()
+            Dim kodeVoucher As String = DataGridView1.Rows(e.RowIndex).Cells("Kode Voucher").Value.ToString()
             Dim namaVoucher As String = DataGridView1.Rows(e.RowIndex).Cells("Nama Voucher").Value.ToString()
 
             Dim konfirmasi As DialogResult = MessageBox.Show("Apakah Anda yakin ingin menghapus voucher: " & namaVoucher & "?", "Konfirmasi Hapus", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
@@ -278,7 +293,7 @@
                     ' Soft delete (update DeletedBy dan DeletedDate)
                     Dim deletedBy As String = userInput
                     Dim sql As String = "UPDATE MasterVoucher SET DeletedBy='" & deletedBy.Replace("'", "''") & "', " & _
-                                    "DeletedDate=GETDATE() WHERE ID=" & idVoucher
+                                    "DeletedDate=GETDATE() WHERE KodeVoucher='" & kodeVoucher.Replace("'", "''") & "'"
 
                     WriteSQL(sql, 4)
 
@@ -290,6 +305,83 @@
                     MessageBox.Show("Terjadi kesalahan saat menghapus data: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
                 End Try
             End If
+        End If
+    End Sub
+
+    Private Sub ButtonGenerateVoc_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonGenerateVoc.Click
+        Dim dlg As New DialogGenerateVoucher()
+        If dlg.ShowDialog() = DialogResult.OK Then
+            Dim jumlahGenerate As Integer
+            If Integer.TryParse(dlg.TextBoxCopy.Text.Trim(), jumlahGenerate) = False OrElse jumlahGenerate <= 0 Then
+                MsgBox("Masukkan jumlah voucher yang valid.", MsgBoxStyle.Exclamation)
+                Exit Sub
+            End If
+
+            ' --- Ambil data dari form utama (seperti ButtonSimpanVoc_Click) ---
+            Dim nama As String = TextBoxNamaVoc.Text.Trim()
+            Dim tipe As String = ComboBoxNominalVoc.Text.Trim()
+            Dim nilai As Integer = If(TextBoxNominalVoc.Text = "", 0, CInt(TextBoxNominalVoc.Text))
+            Dim minTransaksi As Integer = If(TextBoxMinVoc.Text = "", 0, CInt(TextBoxMinVoc.Text))
+            Dim tglMulai As DateTime = dtAwal.Value
+            Dim tglAkhir As DateTime = dtAkhir.Value
+            Dim maks As Integer = If(TextBoxKuotaVoc.Text = "", 0, CInt(TextBoxKuotaVoc.Text))
+            Dim jenis As Integer = If(ComboBoxJenisVoc.Text.Trim().ToLower() = "voucher tindakan", 1, 0)
+            Dim status As Integer = 1
+            Dim createdBy As String = userInput
+
+            Dim tindakanID As String = ""
+            If TextBoxTindakan.Text.Contains("-") Then
+                Dim split() As String = TextBoxTindakan.Text.Split("-"c)
+                tindakanID = split(0).Trim()
+            Else
+                tindakanID = TextBoxTindakan.Text.Trim()
+            End If
+
+            ' --- Validasi umum ---
+            If nama = "" Or tipe = "" Then
+                MsgBox("Nama dan tipe voucher harus diisi.", MsgBoxStyle.Exclamation)
+                Exit Sub
+            End If
+
+            If nilai <= 0 Then
+                MsgBox("Nilai voucher tidak boleh 0.", MsgBoxStyle.Exclamation)
+                Exit Sub
+            End If
+
+            ' --- Generate beberapa voucher ---
+            'Dim tahun As String = DateTime.Now.Year.ToString()
+            Dim count As Integer = 0
+
+            For i As Integer = 1 To jumlahGenerate
+                ' Buat UUID unik
+                Dim uuid As String = Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper()
+
+                ' Format kode voucher
+                Dim kodeVoucher As String = "LMRLZL" & uuid
+
+                ' Query insert voucher
+                Dim sql As String = "INSERT INTO MasterVoucher " & _
+                    "(NamaVoucher, KodeVoucher, Tipe, Nilai, MinTransaksi, TanggalMulai, TanggalAkhir, JumlahMaks, JumlahTerpakai, Status, Tindakan, KodeTindakan, CreatedDate, CreatedBy) VALUES (" & _
+                    "'" & nama.Replace("'", "''") & "', " & _
+                    "'" & kodeVoucher.Replace("'", "''") & "', " & _
+                    "'" & tipe.Replace("'", "''") & "', " & _
+                    nilai & ", " & _
+                    minTransaksi & ", " & _
+                    "'" & tglMulai.ToString("yyyy-MM-dd HH:mm:ss") & "', " & _
+                    "'" & tglAkhir.ToString("yyyy-MM-dd HH:mm:ss") & "', " & _
+                    maks & ", 0, " & _
+                    status & ", " & _
+                    jenis & ", " & _
+                    "'" & tindakanID.Replace("'", "''") & "', " & _
+                    "GETDATE(), '" & createdBy.Replace("'", "''") & "')"
+
+                WriteSQL(sql, 4)
+                count += 1
+            Next
+
+            MsgBox(count & " voucher berhasil digenerate.", MsgBoxStyle.Information)
+            ResetForm()
+            LoadVoucher()
         End If
     End Sub
 End Class

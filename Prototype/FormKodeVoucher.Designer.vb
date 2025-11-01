@@ -25,6 +25,7 @@ Partial Class FormKodeVoucher
         Me.components = New System.ComponentModel.Container
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(FormKodeVoucher))
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer
+        Me.ButtonGenerateVoc = New System.Windows.Forms.Button
         Me.ButtonFind = New System.Windows.Forms.Button
         Me.Label10 = New System.Windows.Forms.Label
         Me.TextBoxTindakan = New System.Windows.Forms.TextBox
@@ -34,6 +35,7 @@ Partial Class FormKodeVoucher
         Me.Label8 = New System.Windows.Forms.Label
         Me.ComboBoxNominalVoc = New System.Windows.Forms.ComboBox
         Me.Label7 = New System.Windows.Forms.Label
+        Me.ButtonGenerate = New System.Windows.Forms.Button
         Me.ComboBoxJenisVoc = New System.Windows.Forms.ComboBox
         Me.TextBoxKuotaVoc = New System.Windows.Forms.TextBox
         Me.Label6 = New System.Windows.Forms.Label
@@ -49,7 +51,6 @@ Partial Class FormKodeVoucher
         Me.Label1 = New System.Windows.Forms.Label
         Me.DataGridView1 = New System.Windows.Forms.DataGridView
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.ButtonGenerate = New System.Windows.Forms.Button
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
@@ -66,6 +67,7 @@ Partial Class FormKodeVoucher
         '
         'SplitContainer1.Panel1
         '
+        Me.SplitContainer1.Panel1.Controls.Add(Me.ButtonGenerateVoc)
         Me.SplitContainer1.Panel1.Controls.Add(Me.ButtonFind)
         Me.SplitContainer1.Panel1.Controls.Add(Me.Label10)
         Me.SplitContainer1.Panel1.Controls.Add(Me.TextBoxTindakan)
@@ -98,6 +100,21 @@ Partial Class FormKodeVoucher
         Me.SplitContainer1.SplitterDistance = 180
         Me.SplitContainer1.SplitterWidth = 5
         Me.SplitContainer1.TabIndex = 0
+        '
+        'ButtonGenerateVoc
+        '
+        Me.ButtonGenerateVoc.BackColor = System.Drawing.Color.White
+        Me.ButtonGenerateVoc.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonGenerateVoc.FlatAppearance.BorderSize = 2
+        Me.ButtonGenerateVoc.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(180, Byte), Integer))
+        Me.ButtonGenerateVoc.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonGenerateVoc.ForeColor = System.Drawing.Color.Black
+        Me.ButtonGenerateVoc.Location = New System.Drawing.Point(129, 136)
+        Me.ButtonGenerateVoc.Name = "ButtonGenerateVoc"
+        Me.ButtonGenerateVoc.Size = New System.Drawing.Size(107, 35)
+        Me.ButtonGenerateVoc.TabIndex = 520
+        Me.ButtonGenerateVoc.Text = "GENERATE"
+        Me.ButtonGenerateVoc.UseVisualStyleBackColor = False
         '
         'ButtonFind
         '
@@ -197,6 +214,21 @@ Partial Class FormKodeVoucher
         Me.Label7.Size = New System.Drawing.Size(84, 17)
         Me.Label7.TabIndex = 510
         Me.Label7.Text = "Tipe Voucher"
+        '
+        'ButtonGenerate
+        '
+        Me.ButtonGenerate.BackColor = System.Drawing.Color.WhiteSmoke
+        Me.ButtonGenerate.BackgroundImage = CType(resources.GetObject("ButtonGenerate.BackgroundImage"), System.Drawing.Image)
+        Me.ButtonGenerate.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
+        Me.ButtonGenerate.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonGenerate.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonGenerate.Location = New System.Drawing.Point(392, 32)
+        Me.ButtonGenerate.Name = "ButtonGenerate"
+        Me.ButtonGenerate.Size = New System.Drawing.Size(32, 25)
+        Me.ButtonGenerate.TabIndex = 509
+        Me.ButtonGenerate.Tag = ""
+        Me.ToolTip1.SetToolTip(Me.ButtonGenerate, "Generate Kode Voucher")
+        Me.ButtonGenerate.UseVisualStyleBackColor = False
         '
         'ComboBoxJenisVoc
         '
@@ -341,21 +373,6 @@ Partial Class FormKodeVoucher
         Me.DataGridView1.Size = New System.Drawing.Size(950, 270)
         Me.DataGridView1.TabIndex = 0
         '
-        'ButtonGenerate
-        '
-        Me.ButtonGenerate.BackColor = System.Drawing.Color.WhiteSmoke
-        Me.ButtonGenerate.BackgroundImage = CType(resources.GetObject("ButtonGenerate.BackgroundImage"), System.Drawing.Image)
-        Me.ButtonGenerate.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
-        Me.ButtonGenerate.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.ButtonGenerate.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.ButtonGenerate.Location = New System.Drawing.Point(392, 32)
-        Me.ButtonGenerate.Name = "ButtonGenerate"
-        Me.ButtonGenerate.Size = New System.Drawing.Size(32, 25)
-        Me.ButtonGenerate.TabIndex = 509
-        Me.ButtonGenerate.Tag = ""
-        Me.ToolTip1.SetToolTip(Me.ButtonGenerate, "Generate Kode Voucher")
-        Me.ButtonGenerate.UseVisualStyleBackColor = False
-        '
         'FormKodeVoucher
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -398,4 +415,5 @@ Partial Class FormKodeVoucher
     Friend WithEvents TextBoxTindakan As System.Windows.Forms.TextBox
     Friend WithEvents ButtonFind As System.Windows.Forms.Button
     Friend WithEvents DataGridView1 As System.Windows.Forms.DataGridView
+    Friend WithEvents ButtonGenerateVoc As System.Windows.Forms.Button
 End Class

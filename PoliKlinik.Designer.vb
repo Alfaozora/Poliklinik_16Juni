@@ -42,6 +42,7 @@ Partial Class PoliKlinik
         Me.LaboratoriumRujukanToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MasterHargaTindakanRujukanToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
         Me.MasterHargaToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.MasterVoucherToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MasterPaketToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
         Me.DownloadKPAToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.PendaftaranToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -269,7 +270,6 @@ Partial Class PoliKlinik
         Me.TimerUpdateProgram = New System.Windows.Forms.Timer(Me.components)
         Me.TimerShutdown = New System.Windows.Forms.Timer(Me.components)
         Me.TimerKirimReminderWA = New System.Windows.Forms.Timer(Me.components)
-        Me.MasterVoucherToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip.SuspendLayout()
         Me.StatusStrip.SuspendLayout()
         Me.SuspendLayout()
@@ -398,6 +398,13 @@ Partial Class PoliKlinik
         Me.MasterHargaToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
         Me.MasterHargaToolStripMenuItem.Tag = "0112"
         Me.MasterHargaToolStripMenuItem.Text = "Master Harga"
+        '
+        'MasterVoucherToolStripMenuItem
+        '
+        Me.MasterVoucherToolStripMenuItem.Name = "MasterVoucherToolStripMenuItem"
+        Me.MasterVoucherToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
+        Me.MasterVoucherToolStripMenuItem.Tag = "0113"
+        Me.MasterVoucherToolStripMenuItem.Text = "Master Voucher"
         '
         'MasterPaketToolStripMenuItem1
         '
@@ -1971,12 +1978,6 @@ Partial Class PoliKlinik
         '
         Me.TimerKirimReminderWA.Enabled = True
         Me.TimerKirimReminderWA.Interval = 60000
-        '
-        'MasterVoucherToolStripMenuItem
-        '
-        Me.MasterVoucherToolStripMenuItem.Name = "MasterVoucherToolStripMenuItem"
-        Me.MasterVoucherToolStripMenuItem.Size = New System.Drawing.Size(216, 22)
-        Me.MasterVoucherToolStripMenuItem.Text = "Master Voucher"
         '
         'PoliKlinik
         '

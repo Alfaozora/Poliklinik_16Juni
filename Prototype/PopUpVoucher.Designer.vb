@@ -23,24 +23,24 @@ Partial Class PopUpVoucher
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer
-        Me.Panel2 = New System.Windows.Forms.Panel
         Me.SplitContainer2 = New System.Windows.Forms.SplitContainer
-        Me.DataGridVoucher = New System.Windows.Forms.DataGridView
         Me.DataGridRiwayat = New System.Windows.Forms.DataGridView
-        Me.TextBoxKodeVoc = New System.Windows.Forms.TextBox
-        Me.ButtonCariVoc = New System.Windows.Forms.Button
+        Me.DataGridVoucher = New System.Windows.Forms.DataGridView
         Me.Panel1 = New System.Windows.Forms.Panel
+        Me.ButtonCariVoc = New System.Windows.Forms.Button
+        Me.TextBoxKodeVoc = New System.Windows.Forms.TextBox
+        Me.Panel2 = New System.Windows.Forms.Panel
         Me.ButtonSubmit = New System.Windows.Forms.Button
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
-        Me.Panel2.SuspendLayout()
         Me.SplitContainer2.Panel1.SuspendLayout()
         Me.SplitContainer2.Panel2.SuspendLayout()
         Me.SplitContainer2.SuspendLayout()
-        CType(Me.DataGridVoucher, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DataGridRiwayat, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.DataGridVoucher, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.Panel1.SuspendLayout()
+        Me.Panel2.SuspendLayout()
         Me.SuspendLayout()
         '
         'SplitContainer1
@@ -63,16 +63,6 @@ Partial Class PopUpVoucher
         Me.SplitContainer1.SplitterDistance = 380
         Me.SplitContainer1.TabIndex = 0
         '
-        'Panel2
-        '
-        Me.Panel2.BackColor = System.Drawing.Color.WhiteSmoke
-        Me.Panel2.Controls.Add(Me.ButtonSubmit)
-        Me.Panel2.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.Panel2.Location = New System.Drawing.Point(0, 0)
-        Me.Panel2.Name = "Panel2"
-        Me.Panel2.Size = New System.Drawing.Size(801, 51)
-        Me.Panel2.TabIndex = 1
-        '
         'SplitContainer2
         '
         Me.SplitContainer2.Dock = System.Windows.Forms.DockStyle.Fill
@@ -90,18 +80,6 @@ Partial Class PopUpVoucher
         Me.SplitContainer2.SplitterDistance = 267
         Me.SplitContainer2.TabIndex = 1
         '
-        'DataGridVoucher
-        '
-        Me.DataGridVoucher.AllowUserToAddRows = False
-        Me.DataGridVoucher.AllowUserToDeleteRows = False
-        Me.DataGridVoucher.BackgroundColor = System.Drawing.SystemColors.ControlLightLight
-        Me.DataGridVoucher.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DataGridVoucher.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.DataGridVoucher.Location = New System.Drawing.Point(0, 0)
-        Me.DataGridVoucher.Name = "DataGridVoucher"
-        Me.DataGridVoucher.Size = New System.Drawing.Size(530, 320)
-        Me.DataGridVoucher.TabIndex = 0
-        '
         'DataGridRiwayat
         '
         Me.DataGridRiwayat.AllowUserToAddRows = False
@@ -115,17 +93,32 @@ Partial Class PopUpVoucher
         Me.DataGridRiwayat.Size = New System.Drawing.Size(267, 320)
         Me.DataGridRiwayat.TabIndex = 0
         '
-        'TextBoxKodeVoc
+        'DataGridVoucher
         '
-        Me.TextBoxKodeVoc.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextBoxKodeVoc.Location = New System.Drawing.Point(271, 18)
-        Me.TextBoxKodeVoc.Multiline = True
-        Me.TextBoxKodeVoc.Name = "TextBoxKodeVoc"
-        Me.TextBoxKodeVoc.Size = New System.Drawing.Size(405, 25)
-        Me.TextBoxKodeVoc.TabIndex = 2
+        Me.DataGridVoucher.AllowUserToAddRows = False
+        Me.DataGridVoucher.AllowUserToDeleteRows = False
+        Me.DataGridVoucher.BackgroundColor = System.Drawing.SystemColors.ControlLightLight
+        Me.DataGridVoucher.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.DataGridVoucher.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.DataGridVoucher.Location = New System.Drawing.Point(0, 0)
+        Me.DataGridVoucher.Name = "DataGridVoucher"
+        Me.DataGridVoucher.Size = New System.Drawing.Size(530, 320)
+        Me.DataGridVoucher.TabIndex = 0
+        '
+        'Panel1
+        '
+        Me.Panel1.BackColor = System.Drawing.Color.WhiteSmoke
+        Me.Panel1.Controls.Add(Me.ButtonCariVoc)
+        Me.Panel1.Controls.Add(Me.TextBoxKodeVoc)
+        Me.Panel1.Dock = System.Windows.Forms.DockStyle.Top
+        Me.Panel1.Location = New System.Drawing.Point(0, 0)
+        Me.Panel1.Name = "Panel1"
+        Me.Panel1.Size = New System.Drawing.Size(801, 60)
+        Me.Panel1.TabIndex = 0
         '
         'ButtonCariVoc
         '
+        Me.ButtonCariVoc.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.ButtonCariVoc.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
         Me.ButtonCariVoc.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
         Me.ButtonCariVoc.FlatAppearance.BorderSize = 2
@@ -140,19 +133,29 @@ Partial Class PopUpVoucher
         Me.ButtonCariVoc.Text = "CARI"
         Me.ButtonCariVoc.UseVisualStyleBackColor = False
         '
-        'Panel1
+        'TextBoxKodeVoc
         '
-        Me.Panel1.BackColor = System.Drawing.Color.WhiteSmoke
-        Me.Panel1.Controls.Add(Me.ButtonCariVoc)
-        Me.Panel1.Controls.Add(Me.TextBoxKodeVoc)
-        Me.Panel1.Dock = System.Windows.Forms.DockStyle.Top
-        Me.Panel1.Location = New System.Drawing.Point(0, 0)
-        Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(801, 60)
-        Me.Panel1.TabIndex = 0
+        Me.TextBoxKodeVoc.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.TextBoxKodeVoc.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.TextBoxKodeVoc.Location = New System.Drawing.Point(271, 18)
+        Me.TextBoxKodeVoc.Multiline = True
+        Me.TextBoxKodeVoc.Name = "TextBoxKodeVoc"
+        Me.TextBoxKodeVoc.Size = New System.Drawing.Size(405, 25)
+        Me.TextBoxKodeVoc.TabIndex = 2
+        '
+        'Panel2
+        '
+        Me.Panel2.BackColor = System.Drawing.Color.WhiteSmoke
+        Me.Panel2.Controls.Add(Me.ButtonSubmit)
+        Me.Panel2.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.Panel2.Location = New System.Drawing.Point(0, 0)
+        Me.Panel2.Name = "Panel2"
+        Me.Panel2.Size = New System.Drawing.Size(801, 51)
+        Me.Panel2.TabIndex = 1
         '
         'ButtonSubmit
         '
+        Me.ButtonSubmit.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.ButtonSubmit.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
         Me.ButtonSubmit.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
         Me.ButtonSubmit.FlatAppearance.BorderSize = 2
@@ -178,14 +181,14 @@ Partial Class PopUpVoucher
         Me.SplitContainer1.Panel1.ResumeLayout(False)
         Me.SplitContainer1.Panel2.ResumeLayout(False)
         Me.SplitContainer1.ResumeLayout(False)
-        Me.Panel2.ResumeLayout(False)
         Me.SplitContainer2.Panel1.ResumeLayout(False)
         Me.SplitContainer2.Panel2.ResumeLayout(False)
         Me.SplitContainer2.ResumeLayout(False)
-        CType(Me.DataGridVoucher, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DataGridRiwayat, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.DataGridVoucher, System.ComponentModel.ISupportInitialize).EndInit()
         Me.Panel1.ResumeLayout(False)
         Me.Panel1.PerformLayout()
+        Me.Panel2.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub

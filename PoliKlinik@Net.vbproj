@@ -474,6 +474,12 @@
     <Compile Include="Prototype\DialogBoxTambahTindakan.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Prototype\DialogGenerateVoucher.Designer.vb">
+      <DependentUpon>DialogGenerateVoucher.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\DialogGenerateVoucher.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Prototype\ExportReportLaboratorium.Designer.vb">
       <DependentUpon>ExportReportLaboratorium.vb</DependentUpon>
     </Compile>
@@ -1449,6 +1455,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\DialogBoxTambahTindakan.resx">
       <DependentUpon>DialogBoxTambahTindakan.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\DialogGenerateVoucher.resx">
+      <DependentUpon>DialogGenerateVoucher.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\ExportReportLaboratorium.resx">
       <DependentUpon>ExportReportLaboratorium.vb</DependentUpon>
