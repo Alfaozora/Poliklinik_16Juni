@@ -622,7 +622,7 @@ Public Class FormCetakInvoice
                            "FROM TransaksiPoliDetail " & _
                            "WHERE TransPoliID = '" & transPoliID & "' " & _
                            "AND DeletedBy IS NULL AND Awal = '0' " & _
-                           "GROUP BY TindakanID"
+                           "GROUP BY TindakanID, NamaTindakan, JenisTindakan"
 
             Case "AWALPOLI"
                 queryQty = "SELECT " & _
@@ -638,7 +638,7 @@ Public Class FormCetakInvoice
                            "FROM TransaksiPoliDetail " & _
                            "WHERE TransPoliID = '" & transPoliID & "' " & _
                            "AND DeletedBy IS NULL AND Awal = '1' " & _
-                           "GROUP BY TindakanID"
+                           "GROUP BY TindakanID, NamaTindakan, JenisTindakan"
 
             Case "GIGI"
                 queryQty = "SELECT " & _
@@ -654,7 +654,7 @@ Public Class FormCetakInvoice
                            "FROM TransaksiGigiDetail " & _
                            "WHERE TransGigiID = '" & transPoliID & "' " & _
                            "AND DeletedBy IS NULL AND Awal = '0' " & _
-                           "GROUP BY TindakanID"
+                           "GROUP BY TindakanID, NamaTindakan, JenisTindakan"
 
             Case "AWALGIGI"
                 queryQty = "SELECT " & _
@@ -670,7 +670,7 @@ Public Class FormCetakInvoice
                            "FROM TransaksiGigiDetail " & _
                            "WHERE TransGigiID = '" & transPoliID & "' " & _
                            "AND DeletedBy IS NULL AND Awal = '1' " & _
-                           "GROUP BY TindakanID"
+                           "GROUP BY TindakanID, NamaTindakan, JenisTindakan"
 
             Case Else
                 MsgBox("Jenis transaksi tidak dikenali.", MsgBoxStyle.Critical)

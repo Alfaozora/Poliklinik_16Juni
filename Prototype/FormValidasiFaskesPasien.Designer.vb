@@ -31,6 +31,8 @@ Partial Class FormValidasiFaskesPasien
         Me.GridView1 = New DevExpress.XtraGrid.Views.Grid.GridView
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
         Me.Panel1 = New System.Windows.Forms.Panel
+        Me.Label2 = New System.Windows.Forms.Label
+        Me.ComboBoxServer = New System.Windows.Forms.ComboBox
         Me.CheckBoxPasarKemis = New System.Windows.Forms.CheckBox
         Me.CheckBoxJatiuwung = New System.Windows.Forms.CheckBox
         Me.Label1 = New System.Windows.Forms.Label
@@ -153,6 +155,8 @@ Partial Class FormValidasiFaskesPasien
         'Panel1
         '
         Me.Panel1.BackColor = System.Drawing.Color.White
+        Me.Panel1.Controls.Add(Me.Label2)
+        Me.Panel1.Controls.Add(Me.ComboBoxServer)
         Me.Panel1.Controls.Add(Me.CheckBoxPasarKemis)
         Me.Panel1.Controls.Add(Me.CheckBoxJatiuwung)
         Me.Panel1.Controls.Add(Me.Label1)
@@ -179,6 +183,25 @@ Partial Class FormValidasiFaskesPasien
         Me.Panel1.Name = "Panel1"
         Me.Panel1.Size = New System.Drawing.Size(1095, 198)
         Me.Panel1.TabIndex = 236
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Font = New System.Drawing.Font("Segoe UI", 9.75!)
+        Me.Label2.Location = New System.Drawing.Point(8, 15)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(90, 17)
+        Me.Label2.TabIndex = 536
+        Me.Label2.Text = "Server PCare :"
+        '
+        'ComboBoxServer
+        '
+        Me.ComboBoxServer.FormattingEnabled = True
+        Me.ComboBoxServer.Items.AddRange(New Object() {"Jatiuwung", "Pasar Kemis", "Suci", "Driyorejo", "Manyar", "Dharmahusada"})
+        Me.ComboBoxServer.Location = New System.Drawing.Point(101, 15)
+        Me.ComboBoxServer.Name = "ComboBoxServer"
+        Me.ComboBoxServer.Size = New System.Drawing.Size(188, 21)
+        Me.ComboBoxServer.TabIndex = 535
         '
         'CheckBoxPasarKemis
         '
@@ -574,4 +597,6 @@ Partial Class FormValidasiFaskesPasien
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents CheckBoxPasarKemis As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBoxJatiuwung As System.Windows.Forms.CheckBox
+    Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents ComboBoxServer As System.Windows.Forms.ComboBox
 End Class

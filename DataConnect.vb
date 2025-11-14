@@ -67,6 +67,69 @@ Module Test
 
     Private DB_Poliklinik As TLcon
 
+    Public Class PCareConfig
+        Private _consID As String
+        Public Property consID() As String
+            Get
+                Return _consID
+            End Get
+            Set(ByVal value As String)
+                _consID = value
+            End Set
+        End Property
+
+        Private _secretKey As String
+        Public Property secretKey() As String
+            Get
+                Return _secretKey
+            End Get
+            Set(ByVal value As String)
+                _secretKey = value
+            End Set
+        End Property
+
+        Private _username As String
+        Public Property username() As String
+            Get
+                Return _username
+            End Get
+            Set(ByVal value As String)
+                _username = value
+            End Set
+        End Property
+
+        Private _password As String
+        Public Property password() As String
+            Get
+                Return _password
+            End Get
+            Set(ByVal value As String)
+                _password = value
+            End Set
+        End Property
+
+        Private _kdAplikasi As String
+        Public Property kdAplikasi() As String
+            Get
+                Return _kdAplikasi
+            End Get
+            Set(ByVal value As String)
+                _kdAplikasi = value
+            End Set
+        End Property
+
+        Private _userKey As String
+        Public Property userKey() As String
+            Get
+                Return _userKey
+            End Get
+            Set(ByVal value As String)
+                _userKey = value
+            End Set
+        End Property
+
+    End Class
+
     Function CekKoneksi(ByVal txt As String, ByVal Tconn As TLcon) As Boolean
         Dim Dttable As New DataTable
         Dim Tbool As Boolean = False
@@ -2792,6 +2855,63 @@ Module Test
         Next
 
         Return jenisBayar
+    End Function
+
+    Public Function getDataFromPcareMulti(ByVal apiEndpoint As String) As String
+        Try
+            ' --- WAJIB: cek apakah server sudah dipilih ---
+            If currentConfig Is Nothing Then
+                Throw New Exception("Konfigurasi PCare belum dipilih. Silakan pilih server pada ComboBoxServer.")
+            End If
+
+            Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'web_service_klinik'")
+            Dim urlWebService As String = baseURL & "api/get-data-resource-pcare"
+
+            ' --- Ambil data PCare dari currentConfig ---
+            Dim consID As String = currentConfig.consID
+            Dim secretKey As String = currentConfig.secretKey
+            Dim pcareUname As String = currentConfig.username
+            Dim pcarePWD As String = currentConfig.password
+            Dim kdAplikasi As String = currentConfig.kdAplikasi
+            Dim userKey As String = currentConfig.userKey
+
+            'REQUEST GET METHOD
+            Dim webreq As HttpWebRequest = WebRequest.Create(urlWebService)
+
+            webreq.Accept = "application/json"
+
+            webreq.Headers("cons-id") = consID
+            webreq.Headers("secret-key") = secretKey
+            webreq.Headers("username-pcare") = pcareUname
+            webreq.Headers("password-pcare") = pcarePWD
+            webreq.Headers("kd-aplikasi") = kdAplikasi
+            webreq.Headers("user-key") = userKey
+            webreq.Headers("API-Endpoint") = apiEndpoint
+
+            webreq.Method = "GET"
+
+            Dim res As WebResponse = webreq.GetResponse()
+            Dim stream As Stream = res.GetResponseStream()
+            Dim streamReader As New StreamReader(stream)
+
+            Dim responseSuccess As String = streamReader.ReadToEnd()
+            streamReader.Close()
+
+            responseSuccess = "[" & responseSuccess & "]"
+
+            Return responseSuccess
+
+        Catch ex As WebException
+            Dim responseStream As Stream = ex.Response.GetResponseStream()
+            Dim reader As New StreamReader(responseStream)
+            Dim responseError As String = reader.ReadToEnd()
+
+            reader.Close()
+            responseStream.Close()
+
+            Return responseError
+
+        End Try
     End Function
 
     Public Function getDataFromPcare(ByVal apiEndpoint As String) As String

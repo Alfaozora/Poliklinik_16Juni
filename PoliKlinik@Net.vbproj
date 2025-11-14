@@ -827,6 +827,7 @@
     <Compile Include="Prototype\KYC.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Prototype\PCareModule.vb" />
     <Compile Include="Prototype\PopUpVoucher.Designer.vb">
       <DependentUpon>PopUpVoucher.vb</DependentUpon>
     </Compile>

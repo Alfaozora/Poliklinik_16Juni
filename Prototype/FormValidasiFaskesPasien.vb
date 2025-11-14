@@ -847,43 +847,76 @@ Public Class FormValidasiFaskesPasien
         thread.Start()
     End Sub
 
+    Private Function SafeFieldString(ByVal row As DataRow, ByVal fieldName As String) As String
+        If row.IsNull(fieldName) Then
+            Return String.Empty
+        Else
+            Return Convert.ToString(row(fieldName)).Trim()
+        End If
+    End Function
+
     Private Sub ValidasiFaskesPasien()
         Try
+            If currentConfig Is Nothing Then
+                MessageBox.Show("Silakan pilih server PCare terlebih dahulu.", _
+                                "Validasi", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                Exit Sub
+            End If
+
             Dim Tbls As DataTable = gridlab.DataSource
-            Dim procent As Integer = 0
-            Dim persen As Integer = 0
-            Dim counter As Integer = 0
+            Dim total As Integer = Tbls.Rows.Count
+            Dim current As Integer = 0
 
-
-            ' Set Status Proses
             statusProses = "Running"
 
-            ' Set kdProviderLokal
+            ' Kumpulkan provider lokal
+            kdProviderLokal.Clear()
             If CheckBoxJatiuwung.Checked Then kdProviderLokal.Add(CheckBoxJatiuwung.Tag)
             If CheckBoxPasarKemis.Checked Then kdProviderLokal.Add(CheckBoxPasarKemis.Tag)
 
+            Dim rnd As New Random()
+            Dim batchCounter As Integer = 0
+            Dim batchLimit As Integer = rnd.Next(40, 60) ' Random antara 40–60
+
             For Each rowData As DataRow In Tbls.Rows
-                ' Jika status proses stop
+
                 If statusProses = "Stop" Then Exit For
 
-                ' Validasi Faskes
-                GetDataPesertaBPJS(rowData("NIK"), "NoKartuNIK")
+                Dim nik As String = SafeFieldString(rowData, "NIK")
+                Dim noBPJS As String = SafeFieldString(rowData, "NoBPJS") ' atau nama kolom yang benar
 
-                persen = persen + 1
-                counter += 1
-                procent = persen * 100 / Tbls.Rows.Count
-                ProgressBar1.Value = procent
-                TextBoxCount.Text = Tbls.Rows.Count & " / " & persen
+                If nik <> "" Then
+                    ' Pakai NIK jika ada
+                    GetDataPesertaBPJS(nik, "NoKartuNIK")
+                ElseIf noBPJS <> "" Then
+                    ' Kalau NIK kosong, pakai NoBPJS
+                    GetDataPesertaBPJS(noBPJS, "NoKartuNO") ' tipe selain "NoKartuNIK" -> akan dipakai sebagai noka
+                Else
+                    ' Keduanya kosong: tulis log / skip
+                    TextBoxResponseGagal.Text = "Baris tanpa NIK/NoBPJS. (RowIndex:{Tbls.Rows.IndexOf(rowData)})" & vbCrLf & TextBoxResponseGagal.Text
+                End If
 
-                ' Jeda antar request agar tidak terlalu cepat (misal 300 ms)
-                'System.Threading.Thread.Sleep(300)
+                ' update progress UI
+                current += 1
+                ProgressBar1.Value = CInt((current / total) * 100)
+                TextBoxCount.Text = "" & current & " / " & total & ""
 
-                ' Jika sudah 50 request, istirahat 5 detik
-                If counter Mod 50 = 0 Then
-                    'MsgBox("Menunggu 5 detik sebelum lanjut batch berikutnya...", MsgBoxStyle.Information, "Batch Pause")
-                    System.Threading.Thread.Sleep(5000)
+                ' Jeda random antara 4–7 detik
+                Dim delay As Integer = rnd.Next(4000, 7000)
+                Threading.Thread.Sleep(delay)
+
+                ' Random pause setiap 40–60 request
+                batchCounter += 1
+                If batchCounter >= batchLimit Then
+                    Dim pause As Integer = rnd.Next(8000, 15000) ' 8–15 detik
+                    Threading.Thread.Sleep(pause)
+
+                    ' Reset ulang batch
+                    batchCounter = 0
+                    batchLimit = rnd.Next(40, 60)
                 End If
             Next
+
         Catch ex As Exception
             MsgBox("Error: " & ex.Message, MsgBoxStyle.Critical, "Error")
         End Try
@@ -948,7 +981,12 @@ Public Class FormValidasiFaskesPasien
         End If
     End Sub
 
-    Private Sub GetDataPesertaBPJS(ByRef noKartu As String, ByRef jenisKartu As String)
+    Private Sub GetDataPesertaBPJS(ByVal noKartu As String, ByVal jenisKartu As String)
+        If String.IsNullOrEmpty(noKartu) Then
+            ' Tidak ada yang dicek
+            Return
+        End If
+
         Dim maxRetry As Integer = 3
         Dim attempt As Integer = 0
         Dim success As Boolean = False
@@ -957,53 +995,45 @@ Public Class FormValidasiFaskesPasien
             Try
                 attempt += 1
 
-                If Trim(noKartu) <> "" Then
-                    Dim kdProvider As String = ""
-                    Dim nmProvider As String = ""
-                    Dim urlPcare As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName='pcare_base_url'")
-                    Dim uri As String = If(jenisKartu = "NoKartuNIK", urlPcare & "peserta/nik/" & noKartu, urlPcare & "peserta/noka/" & noKartu)
+                Dim urlPcare As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName='pcare_base_url'")
+                Dim uri As String = If(jenisKartu = "NoKartuNIK", urlPcare & "peserta/nik/" & noKartu, urlPcare & "peserta/noka/" & noKartu)
 
-                    Dim getResponse As String = getDataFromPcare(uri)
+                Dim getResponse As String = getDataFromPcareMulti(uri)
 
-                    If getResponse Is Nothing OrElse Trim(getResponse) = "" Then
-                        Throw New Exception("Response kosong.")
-                    End If
-
-                    Dim jsonToken As JToken
-                    If getResponse.TrimStart().StartsWith("[") Then
-                        jsonToken = JArray.Parse(getResponse)
-                    Else
-                        jsonToken = New JArray(JObject.Parse(getResponse))
-                    End If
-
-                    For Each item As JObject In jsonToken
-                        Dim meta = item("metaData")
-                        Dim resp = item("response")
-
-                        If meta IsNot Nothing AndAlso meta("message").ToString() = "OK" AndAlso resp IsNot Nothing Then
-                            kdProvider = resp("kdProviderPst")("kdProvider").ToString()
-                            nmProvider = resp("kdProviderPst")("nmProvider").ToString()
-
-                            If Not kdProviderLokal.Contains(kdProvider) Then
-                                TextBoxResponseGagal.Text = "Peserta (" & noKartu & ") tidak terdaftar sebagai Peserta Faskes. (" & _
-                                                        kdProvider & " - " & nmProvider & ")" & vbCrLf & TextBoxResponseGagal.Text
-                            Else
-                                TextBoxResponseSukses.Text = "Peserta (" & noKartu & ") terdaftar sebagai Peserta Faskes." & vbCrLf & _
-                                TextBoxResponseSukses.Text()
-                            End If
-                            success = True
-                        End If
-                    Next
+                If String.IsNullOrEmpty(getResponse) Then
+                    Throw New Exception("Response kosong.")
                 End If
 
-            Catch ex As Exception
-                ' Kalau gagal, tunggu sebentar sebelum coba lagi
-                If attempt < maxRetry Then
-                    System.Threading.Thread.Sleep(1000) ' tunggu 1 detik sebelum retry
+                ' parsing seperti kode Anda (jaga try/catch)
+                Dim jsonToken As JToken
+                If getResponse.TrimStart().StartsWith("[") Then
+                    jsonToken = JArray.Parse(getResponse)
                 Else
-                    ' Gagal setelah 3 kali, tandai sebagai gagal
-                    TextBoxResponseGagal.Text = "Gagal mengambil data (" & noKartu & ") setelah 3x percobaan. " & _
-                                            "Error: " & ex.Message & vbCrLf & TextBoxResponseGagal.Text
+                    jsonToken = New JArray(JObject.Parse(getResponse))
+                End If
+
+                For Each item As JObject In jsonToken
+                    Dim meta = item("metaData")
+                    Dim resp = item("response")
+
+                    If meta IsNot Nothing AndAlso meta("message").ToString() = "OK" AndAlso resp IsNot Nothing Then
+                        Dim kdProvider = resp("kdProviderPst")("kdProvider").ToString()
+                        Dim nmProvider = resp("kdProviderPst")("nmProvider").ToString()
+
+                        If Not kdProviderLokal.Contains(kdProvider) Then
+                            TextBoxResponseGagal.Text = "Peserta (" & noKartu & ") tidak terdaftar sebagai Peserta Faskes. (" & kdProvider & " - " & nmProvider & ")" & vbCrLf & TextBoxResponseGagal.Text
+                        Else
+                            TextBoxResponseSukses.Text = "Peserta (" & noKartu & ") terdaftar sebagai Peserta Faskes. (" & kdProvider & " - " & nmProvider & ")" & vbCrLf & TextBoxResponseSukses.Text
+                        End If
+                        success = True
+                    End If
+                Next
+
+            Catch ex As Exception
+                If attempt < maxRetry Then
+                    System.Threading.Thread.Sleep(1000)
+                Else
+                    TextBoxResponseGagal.Text = "Gagal mengambil data (" & noKartu & ") setelah " & maxRetry & "x percobaan. Error: " & ex.Message & "" & vbCrLf & TextBoxResponseGagal.Text
                 End If
             End Try
         End While
@@ -1047,5 +1077,73 @@ Public Class FormValidasiFaskesPasien
 
     Private Sub ButtonStopProses_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonStopProses.Click
         statusProses = "Stop"
+    End Sub
+
+    Private Sub ComboBoxServer_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBoxServer.SelectedIndexChanged
+        If ComboBoxServer.SelectedItem Is Nothing Then
+            MessageBox.Show("Silakan pilih server terlebih dahulu.", "Validasi", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Exit Sub
+        End If
+
+        Dim cfg As New PCareConfig()
+
+        Select Case ComboBoxServer.SelectedItem.ToString()
+
+            Case "Jatiuwung"
+                cfg.consID = "31685"
+                cfg.secretKey = "4vE34E4608"
+                cfg.username = "KLINIKMITRAMEDICARE"
+                cfg.password = "Mmc_Jtu*1125"
+                cfg.kdAplikasi = "095"
+                cfg.userKey = "7c888cc0c3806575da3e1d861bd97267"
+
+            Case "Pasar Kemis"
+                cfg.consID = "17719"
+                cfg.secretKey = "3jE82218EF"
+                cfg.username = "KLINIK-MITRAMEDICARE"
+                cfg.password = "Mmc_PK*1125"
+                cfg.kdAplikasi = "095"
+                cfg.userKey = "bade5cc308b0b68c14c348a8fe9e74ca"
+
+            Case "Suci"
+                cfg.consID = "1893"
+                cfg.secretKey = "9gUDA107B5"
+                cfg.username = "0205B053"
+                cfg.password = "Mmc_Suci*1125"
+                cfg.kdAplikasi = "095"
+                cfg.userKey = "8ac7e1cd95a4f696434c621d34732e4f"
+
+            Case "Driyorejo"
+                cfg.consID = "31602"
+                cfg.secretKey = "7uD61F885D"
+                cfg.username = "0205B055"
+                cfg.password = "Mmc_Dri*1125"
+                cfg.kdAplikasi = "095"
+                cfg.userKey = "4ad30d9cfa32050503eca8979e3327fa"
+
+            Case "Manyar"
+                cfg.consID = "16271"
+                cfg.secretKey = "4kD6778982"
+                cfg.username = "0205b057"
+                cfg.password = "Mmc_Myr*1125"
+                cfg.kdAplikasi = "095"
+                cfg.userKey = "3481c67560b34b1ccdf4c955b18e6242"
+
+            Case "Dharmahusada"
+                cfg.consID = "20839"
+                cfg.secretKey = "2pH6146451"
+                cfg.username = "0217b098eza"
+                cfg.password = "Mmc_Dhu*1125"
+                cfg.kdAplikasi = "095"
+                cfg.userKey = "aef76fe76adf8e0598181aeaa3b7585a"
+
+            Case Else
+                MessageBox.Show("Konfigurasi server tidak ditemukan.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Exit Sub
+        End Select
+        currentConfig = cfg
+
+        MessageBox.Show("Konfigurasi server berhasil diterapkan.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
+
     End Sub
 End Class
