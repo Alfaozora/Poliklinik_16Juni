@@ -3253,3 +3253,6 @@ C:\Users\admin\Documents\GitHub\Poliklinik_16Juni\obj\Debug\PoliKlinik2.0.applic
 C:\Users\admin\Documents\GitHub\Poliklinik_16Juni\obj\Debug\PoliKlinik_Net2.Dialog1.resources
 C:\Users\admin\Documents\GitHub\Poliklinik_16Juni\obj\Debug\PoliKlinik_Net2.ReportCapaianKBK.resources
 C:\Users\admin\Documents\GitHub\Poliklinik_16Juni\obj\Debug\PoliKlinik_Net2.FormRekamMedisDokter.resources
+C:\Users\admin\Documents\GitHub\Poliklinik_16Juni\obj\Debug\PoliKlinik_Net2.FormKodeVoucher.resources
+C:\Users\admin\Documents\GitHub\Poliklinik_16Juni\obj\Debug\PoliKlinik_Net2.PopUpVoucher.resources
+C:\Users\admin\Documents\GitHub\Poliklinik_16Juni\obj\Debug\PoliKlinik_Net2.DialogGenerateVoucher.resources

@@ -120,11 +120,11 @@
   <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="ButtonStopProses.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
-        iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAMdJREFUSEvl
-        lM0NAiEUhF+HWoIHsB3twO0GPK0daCfKsJCYMPIWXA7GL5lkQ2aG8LfyB1h3EOsvYvwc9Eya09guuTo4
-        Xveh5P5WygUPvE1Yf6ZldZ1SWqGvfBGyVbBUFmxRdbuMe9BQi3AmFNwWFtBgGboK4yZq1mAZdBVYf6Nm
-        DZbBOyngxt4JSI6ZIA2WgQq23CJ0FYw/5NHXFGzx0NDxkeG/CjD0Z5fpmWR1eSZu15ozCR51W2osE03x
-        bufS+B3Gvir+DUReO04xo7oWs6oAAAAASUVORK5CYII=
+        iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABGdBTUEAALGPC/xhBQAAAMdJREFUSEvd
+        lNkNAjEMRN0hlMBHQjvQAekm5mu3A7YT0OwhgZ2bzQc8aaTVajxWnIPo/7H+RJZvZHggw89Vw/rvIO3l
+        nO9Hsvx4Cw0LHnirsHxVQXldZEyYtvBFqE2CpcqiWiXHZfykCmqFPQmC0yLNUA7ph4KrMN4pY2sDZCks
+        j9rY2oAHaYsZWxsE6qQhahRIf7RuzxEhS9F/k3sfU7DHRUNGlO5PBej62G20NCkO35jHVbInfsqPJcXS
+        yH3ck/nbu++Cf4UXO04xo4ZTqOYAAAAASUVORK5CYII=
 </value>
   </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">

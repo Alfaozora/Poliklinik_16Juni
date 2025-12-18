@@ -31,6 +31,11 @@ Partial Class FormValidasiFaskesPasien
         Me.GridView1 = New DevExpress.XtraGrid.Views.Grid.GridView
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
         Me.Panel1 = New System.Windows.Forms.Panel
+        Me.Label2 = New System.Windows.Forms.Label
+        Me.ComboBoxServer = New System.Windows.Forms.ComboBox
+        Me.CheckBoxPasarKemis = New System.Windows.Forms.CheckBox
+        Me.CheckBoxJatiuwung = New System.Windows.Forms.CheckBox
+        Me.Label1 = New System.Windows.Forms.Label
         Me.Label6 = New System.Windows.Forms.Label
         Me.TextBoxCount = New System.Windows.Forms.TextBox
         Me.ButtonUploadData = New System.Windows.Forms.Button
@@ -54,9 +59,6 @@ Partial Class FormValidasiFaskesPasien
         Me.ProgressBar1 = New System.Windows.Forms.ProgressBar
         Me.butsavemultiple = New System.Windows.Forms.Button
         Me.butsavelab = New System.Windows.Forms.Button
-        Me.Label1 = New System.Windows.Forms.Label
-        Me.CheckBoxJatiuwung = New System.Windows.Forms.CheckBox
-        Me.CheckBoxPasarKemis = New System.Windows.Forms.CheckBox
         Me.GroupBox1.SuspendLayout()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -153,6 +155,8 @@ Partial Class FormValidasiFaskesPasien
         'Panel1
         '
         Me.Panel1.BackColor = System.Drawing.Color.White
+        Me.Panel1.Controls.Add(Me.Label2)
+        Me.Panel1.Controls.Add(Me.ComboBoxServer)
         Me.Panel1.Controls.Add(Me.CheckBoxPasarKemis)
         Me.Panel1.Controls.Add(Me.CheckBoxJatiuwung)
         Me.Panel1.Controls.Add(Me.Label1)
@@ -179,6 +183,63 @@ Partial Class FormValidasiFaskesPasien
         Me.Panel1.Name = "Panel1"
         Me.Panel1.Size = New System.Drawing.Size(1095, 198)
         Me.Panel1.TabIndex = 236
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Font = New System.Drawing.Font("Segoe UI", 9.75!)
+        Me.Label2.Location = New System.Drawing.Point(8, 15)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(90, 17)
+        Me.Label2.TabIndex = 536
+        Me.Label2.Text = "Server PCare :"
+        '
+        'ComboBoxServer
+        '
+        Me.ComboBoxServer.FormattingEnabled = True
+        Me.ComboBoxServer.Items.AddRange(New Object() {"Jatiuwung", "Pasar Kemis", "Suci", "Driyorejo", "Manyar", "Dharmahusada"})
+        Me.ComboBoxServer.Location = New System.Drawing.Point(101, 15)
+        Me.ComboBoxServer.Name = "ComboBoxServer"
+        Me.ComboBoxServer.Size = New System.Drawing.Size(188, 21)
+        Me.ComboBoxServer.TabIndex = 535
+        '
+        'CheckBoxPasarKemis
+        '
+        Me.CheckBoxPasarKemis.AutoSize = True
+        Me.CheckBoxPasarKemis.Checked = True
+        Me.CheckBoxPasarKemis.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.CheckBoxPasarKemis.Font = New System.Drawing.Font("Segoe UI", 9.75!)
+        Me.CheckBoxPasarKemis.Location = New System.Drawing.Point(155, 77)
+        Me.CheckBoxPasarKemis.Name = "CheckBoxPasarKemis"
+        Me.CheckBoxPasarKemis.Size = New System.Drawing.Size(98, 21)
+        Me.CheckBoxPasarKemis.TabIndex = 534
+        Me.CheckBoxPasarKemis.Tag = "0221B186"
+        Me.CheckBoxPasarKemis.Text = "Pasar Kemis"
+        Me.CheckBoxPasarKemis.UseVisualStyleBackColor = True
+        '
+        'CheckBoxJatiuwung
+        '
+        Me.CheckBoxJatiuwung.AutoSize = True
+        Me.CheckBoxJatiuwung.Checked = True
+        Me.CheckBoxJatiuwung.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.CheckBoxJatiuwung.Font = New System.Drawing.Font("Segoe UI", 9.75!)
+        Me.CheckBoxJatiuwung.Location = New System.Drawing.Point(65, 77)
+        Me.CheckBoxJatiuwung.Name = "CheckBoxJatiuwung"
+        Me.CheckBoxJatiuwung.Size = New System.Drawing.Size(84, 21)
+        Me.CheckBoxJatiuwung.TabIndex = 533
+        Me.CheckBoxJatiuwung.Tag = "0223B069"
+        Me.CheckBoxJatiuwung.Text = "Jatiuwung"
+        Me.CheckBoxJatiuwung.UseVisualStyleBackColor = True
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Font = New System.Drawing.Font("Segoe UI", 9.75!)
+        Me.Label1.Location = New System.Drawing.Point(8, 78)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(51, 17)
+        Me.Label1.TabIndex = 532
+        Me.Label1.Text = "Lokasi :"
         '
         'Label6
         '
@@ -467,44 +528,6 @@ Partial Class FormValidasiFaskesPasien
         Me.butsavelab.UseVisualStyleBackColor = True
         Me.butsavelab.Visible = False
         '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Font = New System.Drawing.Font("Segoe UI", 9.75!)
-        Me.Label1.Location = New System.Drawing.Point(8, 78)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(51, 17)
-        Me.Label1.TabIndex = 532
-        Me.Label1.Text = "Lokasi :"
-        '
-        'CheckBoxJatiuwung
-        '
-        Me.CheckBoxJatiuwung.AutoSize = True
-        Me.CheckBoxJatiuwung.Checked = True
-        Me.CheckBoxJatiuwung.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBoxJatiuwung.Font = New System.Drawing.Font("Segoe UI", 9.75!)
-        Me.CheckBoxJatiuwung.Location = New System.Drawing.Point(65, 77)
-        Me.CheckBoxJatiuwung.Name = "CheckBoxJatiuwung"
-        Me.CheckBoxJatiuwung.Size = New System.Drawing.Size(84, 21)
-        Me.CheckBoxJatiuwung.TabIndex = 533
-        Me.CheckBoxJatiuwung.Tag = "0223B069"
-        Me.CheckBoxJatiuwung.Text = "Jatiuwung"
-        Me.CheckBoxJatiuwung.UseVisualStyleBackColor = True
-        '
-        'CheckBoxPasarKemis
-        '
-        Me.CheckBoxPasarKemis.AutoSize = True
-        Me.CheckBoxPasarKemis.Checked = True
-        Me.CheckBoxPasarKemis.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.CheckBoxPasarKemis.Font = New System.Drawing.Font("Segoe UI", 9.75!)
-        Me.CheckBoxPasarKemis.Location = New System.Drawing.Point(155, 77)
-        Me.CheckBoxPasarKemis.Name = "CheckBoxPasarKemis"
-        Me.CheckBoxPasarKemis.Size = New System.Drawing.Size(98, 21)
-        Me.CheckBoxPasarKemis.TabIndex = 534
-        Me.CheckBoxPasarKemis.Tag = "0221B186"
-        Me.CheckBoxPasarKemis.Text = "Pasar Kemis"
-        Me.CheckBoxPasarKemis.UseVisualStyleBackColor = True
-        '
         'FormValidasiFaskesPasien
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -518,7 +541,7 @@ Partial Class FormValidasiFaskesPasien
         Me.MinimumSize = New System.Drawing.Size(1098, 558)
         Me.Name = "FormValidasiFaskesPasien"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
-        Me.Text = "Upload Tindakan Laboratorium"
+        Me.Text = "Validasi Faskes Pasien"
         Me.GroupBox1.ResumeLayout(False)
         Me.SplitContainer1.Panel1.ResumeLayout(False)
         Me.SplitContainer1.Panel1.PerformLayout()
@@ -574,4 +597,6 @@ Partial Class FormValidasiFaskesPasien
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents CheckBoxPasarKemis As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBoxJatiuwung As System.Windows.Forms.CheckBox
+    Friend WithEvents Label2 As System.Windows.Forms.Label
+    Friend WithEvents ComboBoxServer As System.Windows.Forms.ComboBox
 End Class

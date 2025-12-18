@@ -67,6 +67,69 @@ Module Test
 
     Private DB_Poliklinik As TLcon
 
+    Public Class PCareConfig
+        Private _consID As String
+        Public Property consID() As String
+            Get
+                Return _consID
+            End Get
+            Set(ByVal value As String)
+                _consID = value
+            End Set
+        End Property
+
+        Private _secretKey As String
+        Public Property secretKey() As String
+            Get
+                Return _secretKey
+            End Get
+            Set(ByVal value As String)
+                _secretKey = value
+            End Set
+        End Property
+
+        Private _username As String
+        Public Property username() As String
+            Get
+                Return _username
+            End Get
+            Set(ByVal value As String)
+                _username = value
+            End Set
+        End Property
+
+        Private _password As String
+        Public Property password() As String
+            Get
+                Return _password
+            End Get
+            Set(ByVal value As String)
+                _password = value
+            End Set
+        End Property
+
+        Private _kdAplikasi As String
+        Public Property kdAplikasi() As String
+            Get
+                Return _kdAplikasi
+            End Get
+            Set(ByVal value As String)
+                _kdAplikasi = value
+            End Set
+        End Property
+
+        Private _userKey As String
+        Public Property userKey() As String
+            Get
+                Return _userKey
+            End Get
+            Set(ByVal value As String)
+                _userKey = value
+            End Set
+        End Property
+
+    End Class
+
     Function CekKoneksi(ByVal txt As String, ByVal Tconn As TLcon) As Boolean
         Dim Dttable As New DataTable
         Dim Tbool As Boolean = False
@@ -1235,44 +1298,79 @@ Module Test
         Return True
     End Function
 
+    'Function validateNoWhatsapp(ByVal NoWhatsapp As String) As Boolean
+    '    Dim Twhatsapp() As String = NoWhatsapp.Split(",")
+
+    '    If NoWhatsapp.Contains(",") = True Then
+    '        For i As Integer = 0 To Twhatsapp.Count - 1
+    '            If Twhatsapp(i).ToString.Trim.Length < 9 Then
+    '                MsgBox("No Whatsapp yang dimasukkan tidak valid, pastikan jumlah digit no whatsapp yang dimasukkan.", MsgBoxStyle.Critical, "Warning")
+    '                Return False
+    '            ElseIf Twhatsapp(i).ToString.Trim.Length > 13 Then
+    '                MsgBox("No Whatsapp yang dimasukkan tidak valid, pastikan jumlah digit no whatsapp yang dimasukkan.", MsgBoxStyle.Critical, "Warning")
+    '                Return False
+    '            End If
+
+    '            'Cek Awalan Format No Whatsapp
+    '            If Strings.Left(Twhatsapp(i).ToString.Trim, 2) = "08" Or Strings.Left(Twhatsapp(i).ToString.Trim, 3) = "628" Then
+    '                Return True
+    '            Else
+    '                MsgBox("No Whatsapp yang dimasukkan tidak valid, pastikan no whatsapp bukan telepon rumah atau kantor.", MsgBoxStyle.Critical, "Warning")
+    '                Return False
+    '            End If
+    '        Next
+    '    Else
+    '        If NoWhatsapp.Length < 9 Then
+    '            MsgBox("No Whatsapp yang dimasukkan tidak valid, pastikan jumlah digit no whatsapp yang dimasukkan.", MsgBoxStyle.Critical, "Warning")
+    '            Return False
+    '        ElseIf NoWhatsapp.Length > 13 Then
+    '            MsgBox("No Whatsapp yang dimasukkan tidak valid, pastikan jumlah digit no whatsapp yang dimasukkan.", MsgBoxStyle.Critical, "Warning")
+    '            Return False
+    '        End If
+
+    '        'Cek Awalan Format No Whatsapp
+    '        If Strings.Left(NoWhatsapp, 2) = "08" Or Strings.Left(NoWhatsapp, 3) = "628" Then
+    '            Return True
+    '        Else
+    '            MsgBox("No Whatsapp yang dimasukkan tidak valid, pastikan no whatsapp bukan telepon rumah atau kantor.", MsgBoxStyle.Critical, "Warning")
+    '            Return False
+    '        End If
+    '    End If
+
+    '    Return True
+    'End Function
+
     Function validateNoWhatsapp(ByVal NoWhatsapp As String) As Boolean
         Dim Twhatsapp() As String = NoWhatsapp.Split(",")
 
-        If NoWhatsapp.Contains(",") = True Then
-            For i As Integer = 0 To Twhatsapp.Count - 1
-                If Twhatsapp(i).ToString.Trim.Length < 9 Then
-                    MsgBox("No Whatsapp yang dimasukkan tidak valid, pastikan jumlah digit no whatsapp yang dimasukkan.", MsgBoxStyle.Critical, "Warning")
-                    Return False
-                ElseIf Twhatsapp(i).ToString.Trim.Length > 13 Then
-                    MsgBox("No Whatsapp yang dimasukkan tidak valid, pastikan jumlah digit no whatsapp yang dimasukkan.", MsgBoxStyle.Critical, "Warning")
-                    Return False
-                End If
+        For i As Integer = 0 To Twhatsapp.Length - 1
+            Dim nomor = Twhatsapp(i).Trim()
 
-                'Cek Awalan Format No Whatsapp
-                If Strings.Left(Twhatsapp(i).ToString.Trim, 2) = "08" Or Strings.Left(Twhatsapp(i).ToString.Trim, 3) = "628" Then
-                    Return True
-                Else
-                    MsgBox("No Whatsapp yang dimasukkan tidak valid, pastikan no whatsapp bukan telepon rumah atau kantor.", MsgBoxStyle.Critical, "Warning")
-                    Return False
-                End If
-            Next
-        Else
-            If NoWhatsapp.Length < 9 Then
-                MsgBox("No Whatsapp yang dimasukkan tidak valid, pastikan jumlah digit no whatsapp yang dimasukkan.", MsgBoxStyle.Critical, "Warning")
-                Return False
-            ElseIf NoWhatsapp.Length > 13 Then
-                MsgBox("No Whatsapp yang dimasukkan tidak valid, pastikan jumlah digit no whatsapp yang dimasukkan.", MsgBoxStyle.Critical, "Warning")
+            ' Buang semua karakter selain angka dan +
+            nomor = System.Text.RegularExpressions.Regex.Replace(nomor, "[^0-9+]", "")
+
+            ' Jika diawali +, hilangkan + untuk validasi digit
+            If nomor.StartsWith("+") Then
+                nomor = nomor.Substring(1)
+            End If
+
+            ' Jika diawali dengan 0 → ubah ke 62 untuk validasi panjang dan format
+            If nomor.StartsWith("0") Then
+                nomor = "62" & nomor.Substring(1)
+            End If
+
+            ' Validasi panjang antara 9 dan 15 digit
+            If nomor.Length < 9 OrElse nomor.Length > 15 Then
+                MsgBox("No WhatsApp tidak valid. Jumlah digit harus antara 9 sampai 15.", MsgBoxStyle.Critical, "Warning")
                 Return False
             End If
 
-            'Cek Awalan Format No Whatsapp
-            If Strings.Left(NoWhatsapp, 2) = "08" Or Strings.Left(NoWhatsapp, 3) = "628" Then
-                Return True
-            Else
-                MsgBox("No Whatsapp yang dimasukkan tidak valid, pastikan no whatsapp bukan telepon rumah atau kantor.", MsgBoxStyle.Critical, "Warning")
+            ' Validasi angka semua
+            If Not IsNumeric(nomor) Then
+                MsgBox("No WhatsApp tidak valid. Harus berisi angka saja.", MsgBoxStyle.Critical, "Warning")
                 Return False
             End If
-        End If
+        Next
 
         Return True
     End Function
@@ -2757,6 +2855,63 @@ Module Test
         Next
 
         Return jenisBayar
+    End Function
+
+    Public Function getDataFromPcareMulti(ByVal apiEndpoint As String) As String
+        Try
+            ' --- WAJIB: cek apakah server sudah dipilih ---
+            If currentConfig Is Nothing Then
+                Throw New Exception("Konfigurasi PCare belum dipilih. Silakan pilih server pada ComboBoxServer.")
+            End If
+
+            Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'web_service_klinik'")
+            Dim urlWebService As String = baseURL & "api/get-data-resource-pcare"
+
+            ' --- Ambil data PCare dari currentConfig ---
+            Dim consID As String = currentConfig.consID
+            Dim secretKey As String = currentConfig.secretKey
+            Dim pcareUname As String = currentConfig.username
+            Dim pcarePWD As String = currentConfig.password
+            Dim kdAplikasi As String = currentConfig.kdAplikasi
+            Dim userKey As String = currentConfig.userKey
+
+            'REQUEST GET METHOD
+            Dim webreq As HttpWebRequest = WebRequest.Create(urlWebService)
+
+            webreq.Accept = "application/json"
+
+            webreq.Headers("cons-id") = consID
+            webreq.Headers("secret-key") = secretKey
+            webreq.Headers("username-pcare") = pcareUname
+            webreq.Headers("password-pcare") = pcarePWD
+            webreq.Headers("kd-aplikasi") = kdAplikasi
+            webreq.Headers("user-key") = userKey
+            webreq.Headers("API-Endpoint") = apiEndpoint
+
+            webreq.Method = "GET"
+
+            Dim res As WebResponse = webreq.GetResponse()
+            Dim stream As Stream = res.GetResponseStream()
+            Dim streamReader As New StreamReader(stream)
+
+            Dim responseSuccess As String = streamReader.ReadToEnd()
+            streamReader.Close()
+
+            responseSuccess = "[" & responseSuccess & "]"
+
+            Return responseSuccess
+
+        Catch ex As WebException
+            Dim responseStream As Stream = ex.Response.GetResponseStream()
+            Dim reader As New StreamReader(responseStream)
+            Dim responseError As String = reader.ReadToEnd()
+
+            reader.Close()
+            responseStream.Close()
+
+            Return responseError
+
+        End Try
     End Function
 
     Public Function getDataFromPcare(ByVal apiEndpoint As String) As String

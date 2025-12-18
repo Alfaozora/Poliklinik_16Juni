@@ -19,7 +19,7 @@ Imports DevExpress.XtraPrinting
 Public Class FormPembayaran
     Private formName As String = "FORM PEMBAYARAN"
     Dim thread As System.Threading.Thread
-    Dim tblTindakan As DataTable
+    Dim tblTindakan As New DataTable
     Dim txtotalbruto, txtotaldisc, txtotalpembulatan, txtotalrow As Double
     'Dim Takhir As Double
     'Dim txkembali As Double
@@ -68,6 +68,11 @@ Public Class FormPembayaran
     Private _statusLansia As String = ""
     Private _statusGawatDarurat As String = ""
 
+    ' Variabel Voucher
+    Private _kodeVoucher As String = ""
+    Private _jenisVoucher As String = ""
+    Private _nilaiVoucher As Decimal = 0
+
     Public Property DataDictionary() As Dictionary(Of String, Object)
         Get
             Return _dataDictionary
@@ -97,6 +102,10 @@ Public Class FormPembayaran
             _statusGawatDarurat = GetValueFromDictionary("Status Gawat Darurat", "")
 
             _namaPoli = GetValueFromDictionary("Poli Tujuan", "")
+
+            _kodeVoucher = GetValueFromDictionary("Kode Voucher", "")
+            _jenisVoucher = GetValueFromDictionary("Jenis Voucher", "")
+            _nilaiVoucher = GetValueFromDictionary("Nilai Voucher", 0)
         End Set
     End Property
 
@@ -335,8 +344,10 @@ Public Class FormPembayaran
         insertRowToTbls(Thasil, "Typstring", "Tindakan")
         insertRowToTbls(Thasil, "Typstring", "Jenis")
         insertRowToTbls(Thasil, "typefloat", "Biaya Tindakan")
-        insertRowToTbls(Thasil, "typefloat", "DiscTindakan")
+        insertRowToTbls(Thasil, "typeString", "DiscTindakan")
         insertRowToTbls(Thasil, "typefloat", "DiscNilai")
+        insertRowToTbls(Thasil, "typeint", "Qty")
+        insertRowToTbls(Thasil, "typefloat", "SubTotal")
         insertRowToTbls(Thasil, "typefloat", "NettBayar")
         insertRowToTbls(Thasil, "typstring", "Registrasi")
         insertRowToTbls(Thasil, "typstring", "Nama")
@@ -874,7 +885,6 @@ Public Class FormPembayaran
         Dim statusPaket As Boolean = False
         Dim penjaminTindakan As String = ""
 
-
         ' Generate Kode Voucher (Jika Pembelian Baru)
         Dim voucherID As String = GetUUID()
 
@@ -1177,8 +1187,43 @@ Public Class FormPembayaran
                         WriteSQL("INSERT INTO TransaksiPoliDetail(TransPoliID,TindakanID,NamaTindakan,JenisTindakan,BiayaTindakan,DiscTindakan,NettBayar,admin,transaksitime,DiscPersenTindakan,GroupBayar,StatusPembayaran,CreatedBy, CreatedDate) " & _
                                  "VALUES('" & _idTransaksi & "','" & Trow("TindakanID") & "','" & Trow("Tindakan") & "','" & Trow("Jenis") & "'," & CDbl(Trow("Biaya Tindakan")) & "," & CDbl(Trow("DiscNilai")) & "," & CDbl(Trow("NettBayar")) & ",'" & userInput & "',GETDATE()," & CDbl(Trow("DiscTindakan")) & ",'" & NoPembayaran & "', 'PAID', '" & userInput & "', GETDATE())", 4)
                     Else
-                        WriteSQL("UPDATE TransaksiPoliDetail SET  BiayaTindakan = " & CDbl(Trow("Biaya Tindakan")) & ", DiscTindakan = " & CDbl(Trow("DiscNilai")) & ", NettBayar = " & CDbl(Trow("NettBayar")) & ", admin = '" & userInput & "', transaksitime = GETDATE(), DiscPersenTindakan = " & CDbl(Trow("DiscTindakan")) & ", GroupBayar = '" & NoPembayaran & "', StatusPembayaran = 'PAID' " & _
-                                 "WHERE TransPoliIDDetail = '" & Trow("TransPoliIDDetail") & "' AND TransPoliID = '" & _idTransaksi & "' AND TindakanID = '" & Trow("TindakanID") & "' AND NamaTindakan = '" & Trow("Tindakan") & "' AND JenisTindakan = '" & Trow("Jenis") & "'", 4)
+                        'WriteSQL("UPDATE TransaksiPoliDetail SET  BiayaTindakan = " & CDbl(Trow("Biaya Tindakan")) & ", DiscTindakan = " & CDbl(Trow("DiscNilai")) & ", NettBayar = " & CDbl(Trow("NettBayar")) & ", admin = '" & userInput & "', transaksitime = GETDATE(), DiscPersenTindakan = " & CDbl(Trow("DiscTindakan")) & ", GroupBayar = '" & NoPembayaran & "', StatusPembayaran = 'PAID' " & _
+                        '         "WHERE TransPoliIDDetail = '" & Trow("TransPoliIDDetail") & "' AND TransPoliID = '" & _idTransaksi & "' AND TindakanID = '" & Trow("TindakanID") & "' AND NamaTindakan = '" & Trow("Tindakan") & "' AND JenisTindakan = '" & Trow("Jenis") & "'", 4)
+
+                        WriteSQL("UPDATE TransaksiPoliDetail SET " & _
+                              "BiayaTindakan = " & CDbl(Trow("Biaya Tindakan")) & ", " & _
+                              "DiscTindakan = " & CDbl(Trow("DiscNilai")) & ", " & _
+                              "NettBayar = " & CDbl(Trow("NettBayar")) & ", " & _
+                              "DiscPersenTindakan = " & CDbl(Trow("DiscTindakan")) & ", " & _
+                              "GroupBayar = '" & NoPembayaran.Replace("'", "''") & "', " & _
+                              "StatusPembayaran = 'PAID', " & _
+                              "KodeVoucher = '" & _kodeVoucher.Replace("'", "''") & "', " & _
+                              "admin = '" & userInput.Replace("'", "''") & "', " & _
+                              "transaksitime = GETDATE() " & _
+                              "WHERE TransPoliIDDetail = '" & Trow("TransPoliIDDetail").ToString().Replace("'", "''") & "' " & _
+                              "AND TransPoliID = '" & _idTransaksi.Replace("'", "''") & "' " & _
+                              "AND TindakanID = '" & Trow("TindakanID").ToString().Replace("'", "''") & "' " & _
+                              "AND NamaTindakan = '" & Trow("Tindakan").ToString().Replace("'", "''") & "' " & _
+                              "AND JenisTindakan = '" & Trow("Jenis").ToString().Replace("'", "''") & "'", 4)
+
+                        ' === Setelah semua transaksi tersimpan ===
+                        If _kodeVoucher <> "" Then
+                            Try
+                                ' Update jumlah terpakai voucher
+                                Dim sqlUpdateVoucher As String = _
+                                    "UPDATE MasterVoucher " & _
+                                    "SET JumlahTerpakai = ISNULL(JumlahTerpakai, 0) + 1 " & _
+                                    "WHERE KodeVoucher = '" & _kodeVoucher.Replace("'", "''") & "'"
+
+                                WriteSQL(sqlUpdateVoucher, 4)
+
+                                ' Opsional: tampilkan notifikasi sukses
+                                MessageBox.Show("Voucher berhasil digunakan dan jumlah pemakaian diperbarui.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                            Catch ex As Exception
+                                MessageBox.Show("Gagal memperbarui jumlah pemakaian voucher: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                            End Try
+                        End If
+
                     End If
 
                     'NewHeader.Rows.Clear()
@@ -1636,7 +1681,7 @@ Public Class FormPembayaran
                 If Jeniscetak = "Struk" Then
                     Report = XtraReport.FromFile(Application.StartupPath + "\reports\PrintTindakanStruk.repx", True)
                 Else
-                    Report = XtraReport.FromFile(Application.StartupPath + "\reports\Resource\PrintInvoiceTransaksi.repx", True)
+                    Report = XtraReport.FromFile(Application.StartupPath + "\reports\Resource\PrintInvoiceTransaksiKop.repx", True)
                 End If
 
                 Report.DataSource = NewHeader
@@ -1714,7 +1759,7 @@ Public Class FormPembayaran
     Function SendPCareDataV2() As Boolean
         '# Variabel BPJS
         Dim tglDaftarBPJS As String = Format(DateAndTime.Now, "dd-MM-yyyy")
-        Dim uriBPJS As String = "http://sina.mitramedicare.com/v3/controller/ws_pcare_add_pendaftaran.php"
+        Dim uriBPJS As String = "https://sina.mitramedicare.com/v3/controller/ws_pcare_add_pendaftaran.php"
         Dim kdPoli As String = ""
         Dim kdTkp As String = ""
         Dim kunjSakit As String = ""
@@ -1820,7 +1865,7 @@ Public Class FormPembayaran
     Function SetStatusHadir() As Boolean
         '# Variabel BPJS
         Dim tglDaftar As String = Format(DateAndTime.Now, "dd-MM-yyyy")
-        Dim uriSINA As String = "http://sina.mitramedicare.com/v3/controller/ws_pcare_add_pendaftaran.php"
+        Dim uriSINA As String = "https://sina.mitramedicare.com/v3/controller/ws_pcare_add_pendaftaran.php"
 
         '# Variabel SINA
         Dim _loc As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'NoPoli'")
@@ -1960,8 +2005,15 @@ Public Class FormPembayaran
             ' Simpan Pembayaran
             SaveDataPembayaran()
         Catch ex As Exception
-            ' Tangani pengecualian di sini
-            MessageBox.Show("Terjadi kesalahan: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            '' Tangani pengecualian di sini
+            'MessageBox.Show("Terjadi kesalahan: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+
+            Dim detail As String = ex.Message
+            If ex.InnerException IsNot Nothing Then
+                detail &= vbCrLf & "Inner: " & ex.InnerException.Message
+            End If
+
+            MessageBox.Show("Terjadi kesalahan: " & detail & vbCrLf & ex.StackTrace, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
 
@@ -1971,6 +2023,62 @@ Public Class FormPembayaran
             MessageBox.Show("Gagal!. Transaksi belum dilakukan pembayaran.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
             Exit Sub
         End If
+
+        'TransPoliID
+        Dim transPoliIDDT As DataTable = ReadSQL("SELECT TransPoliID FROM TransaksiPoli WHERE NoUrut ='" & NomorTransaksi & "'")
+        Dim transPoliID As String = ""
+        If transPoliIDDT.Rows.Count > 0 Then
+            transPoliID = transPoliIDDT.Rows(0)("TransPoliID").ToString()
+        Else
+            ' Handle jika tidak ditemukan
+            MsgBox("TransPoliID tidak ditemukan!")
+            Exit Sub
+        End If
+
+        'Filter Transaksi
+        Dim filterAwal As String = ""
+
+        If JenisTransaksi = "AWAL" Then
+            filterAwal = "AND Awal = '1'"
+        ElseIf JenisTransaksi = "UMUM" Then
+            filterAwal = "AND Awal = '0'"
+        End If
+
+        'Dim queryAwal As String = "" & _
+        '     "SELECT " & _
+        '         "TindakanID, " & _
+        '         "MAX(NamaTindakan) AS Tindakan, " & _
+        '         "MAX(JenisTindakan) AS Jenis, " & _
+        '         "MAX(BiayaTindakan) AS [Biaya Tindakan], " & _
+        '         "COUNT(*) AS Qty, " & _
+        '         "SUM(BiayaTindakan) AS SubTotal, " & _
+        '         "MAX(DiscTindakan) AS Diskon, " & _
+        '         "SUM(BiayaTindakan - ISNULL(DiscTindakan, 0)) AS NettBayar " & _
+        '     "FROM TransaksiPoliDetail " & _
+        '     "WHERE TransPoliID = '" & transPoliID & "' " & _
+        '         "AND DeletedBy IS NULL " & _
+        '         filterAwal & " " & _
+        '     "GROUP BY TindakanID"
+
+        Dim queryAwal As String = "" & _
+            "SELECT " & _
+            "TindakanID, " & _
+            "NamaTindakan AS Tindakan, " & _
+            "JenisTindakan AS Jenis, " & _
+            "BiayaTindakan AS [Biaya Tindakan], " & _
+            "DiscTindakan AS Diskon, " & _
+            "1 AS Qty, " & _
+            "(BiayaTindakan - ISNULL(DiscTindakan, 0)) AS NettBayar, " & _
+            "(BiayaTindakan - ISNULL(DiscTindakan, 0)) AS SubTotal " & _
+            "FROM TransaksiPoliDetail " & _
+            "WHERE TransPoliID = '" & transPoliID & "' " & _
+            "AND DeletedBy IS NULL " & _
+            filterAwal
+
+        ' Eksekusi query ke DataTable
+        Dim tblTindakan As DataTable = ReadSQL(queryAwal)
+
+
 
         ' Set Data Pasien
         Dim tblsPasien As DataTable = ReadSQL("SELECT NoHandphone, Email, NoRekamMedis, Nama + ' / (' + JenisKelamin + ')' AS 'Nama', YEAR(TglLahir) AS 'TahunLahir', MONTH(TglLahir) AS 'BulanLahir', DAY(TglLahir) AS 'TanggalLahir', " & _
@@ -2023,33 +2131,57 @@ Public Class FormPembayaran
             '           "biaya:" & rowTindakan("Biaya Tindakan"))
 
             If statusQR = True Then
-                Dim hargaAwal As Decimal = Convert.ToDecimal(rowTindakan("Harga Awal"))
-                Dim diskon As Decimal = Convert.ToDecimal(rowTindakan("Diskon"))
-
-                ' Menghitung persentase diskon berdasarkan harga awal dan diskon
-                Dim discTindakan As Decimal
-                If hargaAwal > 0 Then
-                    discTindakan = (diskon / hargaAwal) * 100
-                Else
-                    discTindakan = 0 ' Menghindari pembagian dengan nol
+                ' Gunakan kolom "DiscNilai" dari hasil query, bukan "Diskon"
+                Dim diskon As Decimal = 0
+                If rowTindakan.Table.Columns.Contains("Diskon") AndAlso Not IsDBNull(rowTindakan("Diskon")) Then
+                    diskon = Convert.ToDecimal(rowTindakan("Diskon"))
                 End If
 
-                Tnew("TindakanID") = rowTindakan("PaketID").ToString()
-                Tnew("Tindakan") = rowTindakan("Nama Paket")
-                Tnew("Jenis") = rowTindakan("Keterangan Paket")
-                Tnew("Biaya Tindakan") = rowTindakan("Harga Awal")
-                Tnew("DiscTindakan") = discTindakan
-                Tnew("DiscNilai") = rowTindakan("Diskon")
-                Tnew("NettBayar") = rowTindakan("Harga Nett")
+                ' Hitung persentase diskon
+                Dim hargaAwal As Decimal = Convert.ToDecimal(rowTindakan("Biaya Tindakan"))
+                Dim discTindakan As Decimal = 0
+                If hargaAwal > 0 Then
+                    discTindakan = (diskon / hargaAwal) * 100
+                End If
+
+                'Debug.WriteLine("Biaya: " & hargaAwal)
+                'Debug.WriteLine("Diskon: " & diskon)
+                'Debug.WriteLine("Diskon Persen: " & discTindakan)
+
+                ' Assign data ke row baru
+                Tnew("TindakanID") = rowTindakan("TindakanID").ToString()
+                Tnew("Tindakan") = rowTindakan("Tindakan")
+                Tnew("Jenis") = rowTindakan("Jenis")
+                Tnew("Biaya Tindakan") = hargaAwal
+                Tnew("DiscTindakan") = discTindakan.ToString("0.##") & "%"
+                Tnew("DiscNilai") = diskon
+                Tnew("NettBayar") = rowTindakan("NettBayar")
+                Tnew("Qty") = rowTindakan("Qty")
+                Tnew("SubTotal") = Convert.ToDecimal(Tnew("NettBayar")) * Convert.ToInt32(Tnew("Qty"))
+
             Else
+                Dim diskon As Decimal = 0
+                If rowTindakan.Table.Columns.Contains("Diskon") AndAlso Not IsDBNull(rowTindakan("Diskon")) Then
+                    diskon = Convert.ToDecimal(rowTindakan("Diskon"))
+                End If
+
+                Dim hargaAwal As Decimal = Convert.ToDecimal(rowTindakan("Biaya Tindakan"))
+                Dim discTindakan As Decimal = 0
+                If hargaAwal > 0 Then
+                    discTindakan = (diskon / hargaAwal) * 100
+                End If
+
                 Tnew("TindakanID") = rowTindakan("TindakanID")
                 Tnew("Tindakan") = rowTindakan("Tindakan")
                 Tnew("Jenis") = rowTindakan("Jenis")
-                Tnew("Biaya Tindakan") = rowTindakan("Biaya Tindakan")
-                Tnew("DiscTindakan") = rowTindakan("DiscTindakan")
-                Tnew("DiscNilai") = rowTindakan("DiscNilai")
+                Tnew("Biaya Tindakan") = hargaAwal
+                Tnew("DiscTindakan") = discTindakan.ToString("0.##") & "%"
+                Tnew("DiscNilai") = diskon
                 Tnew("NettBayar") = rowTindakan("NettBayar")
+                Tnew("Qty") = rowTindakan("Qty")
+                Tnew("SubTotal") = Convert.ToDecimal(Tnew("NettBayar")) * Convert.ToInt32(Tnew("Qty"))
             End If
+
 
             NewHeader.Rows.Add(Tnew)
         Next
@@ -2061,7 +2193,7 @@ Public Class FormPembayaran
             Case "Preview"
                 Report = XtraReport.FromFile(Application.StartupPath + "\reports\Resource\PrintInvoiceTransaksiKop.repx", True)
             Case "Cetak"
-                Report = XtraReport.FromFile(Application.StartupPath + "\reports\Resource\PrintInvoiceTransaksi.repx", True)
+                Report = XtraReport.FromFile(Application.StartupPath + "\reports\Resource\PrintInvoiceTransaksiKop.repx", True)
             Case "Export PDF"
                 Report = XtraReport.FromFile(Application.StartupPath + "\reports\Resource\PrintInvoiceTransaksiKop.repx", True)
             Case "WhatsApp"
@@ -2071,6 +2203,7 @@ Public Class FormPembayaran
         End Select
 
         Report.DataSource = NewHeader
+        'Report.RunDesigner()
 
         Dim tblPembayaran As New DataTable
         Dim nominalTotalInvoice As Double
@@ -2090,18 +2223,40 @@ Public Class FormPembayaran
                 tblPembayaran = ReadSQL("SELECT * FROM TransaksiGigiBayarAwal WHERE TransGigiID IN (SELECT TransGigiID FROM TransaksiGigi WHERE NoUrut = '" & NomorTransaksi & "')")
         End Select
 
+        'For i As Integer = 1 To tblPembayaran.Rows.Count
+        '    Dim rowPembayaran As DataRow = tblPembayaran.Rows(i - 1)
+        '    Dim Tket As String = "bayar" & i
+        '    Report.Bands.Item(BandKind.ReportFooter).Controls(Tket).Visible = True
+        '    If rowPembayaran("JenisBayar") = "TAGIHAN" Or rowPembayaran("JenisBayar") = "TUNAI" Then
+        '        Report.Bands.Item(BandKind.ReportFooter).Controls(Tket).Text = rowPembayaran("JenisBayar") & " - Jumlah : " & Splitmoney(rowPembayaran("JumlahBayar")) & " (" & rowPembayaran("NoJenisBayar").ToString & ")"
+        '    Else
+        '        Report.Bands.Item(BandKind.ReportFooter).Controls(Tket).Text = rowPembayaran("JenisBayar") & " - No Kartu : " & "*".PadRight(Len(rowPembayaran("NoJenisBayar")) - 3) & Strings.Right(rowPembayaran("NoJenisBayar"), 3) & rowPembayaran("kartu") & " - Jumlah : " & Splitmoney(rowPembayaran("JumlahBayar"))
+        '    End If
+
+        '    nominalTotalInvoice = nominalTotalInvoice + rowPembayaran("JumlahBayar")
+        '    nominalKembaliInvoice = nominalKembaliInvoice + rowPembayaran("Kembali")
+        'Next
+
         For i As Integer = 1 To tblPembayaran.Rows.Count
             Dim rowPembayaran As DataRow = tblPembayaran.Rows(i - 1)
             Dim Tket As String = "bayar" & i
             Report.Bands.Item(BandKind.ReportFooter).Controls(Tket).Visible = True
-            If rowPembayaran("JenisBayar") = "TAGIHAN" Or rowPembayaran("JenisBayar") = "TUNAI" Then
-                Report.Bands.Item(BandKind.ReportFooter).Controls(Tket).Text = rowPembayaran("JenisBayar") & " - Jumlah : " & Splitmoney(rowPembayaran("JumlahBayar")) & " (" & rowPembayaran("NoJenisBayar").ToString & ")"
+
+            Dim jenisBayar As String = rowPembayaran("JenisBayar").ToString()
+            Dim noJenis As String = If(rowPembayaran("NoJenisBayar"), "").ToString()
+            Dim kartuExtra As String = If(rowPembayaran("kartu"), "").ToString()
+            Dim jumlahBayar As Decimal = If(rowPembayaran("JumlahBayar"), 0)
+            Dim kembaliBayar As Decimal = If(rowPembayaran("Kembali"), 0)
+
+            If jenisBayar = "TAGIHAN" Or jenisBayar = "TUNAI" Then
+                Report.Bands.Item(BandKind.ReportFooter).Controls(Tket).Text = jenisBayar & " - Jumlah : " & Splitmoney(jumlahBayar) & " (" & noJenis & ")"
             Else
-                Report.Bands.Item(BandKind.ReportFooter).Controls(Tket).Text = rowPembayaran("JenisBayar") & " - No Kartu : " & "*".PadRight(Len(rowPembayaran("NoJenisBayar")) - 3) & Strings.Right(rowPembayaran("NoJenisBayar"), 3) & rowPembayaran("kartu") & " - Jumlah : " & Splitmoney(rowPembayaran("JumlahBayar"))
+                Dim maskCount As Integer = Math.Max(0, noJenis.Length - 3)
+                Report.Bands.Item(BandKind.ReportFooter).Controls(Tket).Text = jenisBayar & " - No Kartu : " & "*".PadRight(maskCount) & noJenis.Substring(Math.Max(0, noJenis.Length - 3)) & kartuExtra & " - Jumlah : " & Splitmoney(jumlahBayar)
             End If
 
-            nominalTotalInvoice = nominalTotalInvoice + rowPembayaran("JumlahBayar")
-            nominalKembaliInvoice = nominalKembaliInvoice + rowPembayaran("Kembali")
+            nominalTotalInvoice += jumlahBayar
+            nominalKembaliInvoice += kembaliBayar
         Next
 
         Report.Bands.Item(BandKind.ReportFooter).Controls("lblBayar").Text = Splitmoney(nominalTotalInvoice)
@@ -2185,7 +2340,13 @@ Public Class FormPembayaran
             Dim NoWhatsappCustomer As String = ReadSQLNIK("SELECT NoHandphone FROM MasterPasien WHERE NoRekamMedis = '" & _noRekamMedis & "'")
 
             ' Ganti format nomor WhatsApp
-            If Strings.Left(NoWhatsappCustomer, 2) = "08" Then NoWhatsappCustomer = "62" & NoWhatsappCustomer.Substring(1, NoWhatsappCustomer.Length - 1)
+            If NoWhatsappCustomer.StartsWith("08") Then
+                ' Format lokal Indonesia, ubah ke format internasional
+                NoWhatsappCustomer = "62" & NoWhatsappCustomer.Substring(1)
+            ElseIf NoWhatsappCustomer.StartsWith("+") Then
+                ' Sudah format internasional dengan tanda +, hapus + saja
+                NoWhatsappCustomer = NoWhatsappCustomer.Substring(1)
+            End If
 
             ' Set Variabel WhatsApp
             Dim whatsAppStatus As String = ""

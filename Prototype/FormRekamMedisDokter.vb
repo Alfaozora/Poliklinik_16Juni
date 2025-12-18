@@ -21,7 +21,6 @@ Imports System.Text
 Imports System.Globalization
 
 Public Class FormRekamMedisDokter
-
     Public Class TindakanDetail
         Private _TindakanID As String
         Private _NamaTindakan As String
@@ -29,6 +28,7 @@ Public Class FormRekamMedisDokter
         Private _BiayaTindakan As Decimal
         Private _DiskonTindakan As Decimal
         Private _NettBayar As Decimal
+        Private _KuotaTindakan As Decimal
         Private _Jumlah As Integer
         Private _GrandTotal As Decimal
 
@@ -101,6 +101,15 @@ Public Class FormRekamMedisDokter
             End Get
             Set(ByVal value As Decimal)
                 _GrandTotal = value
+            End Set
+        End Property
+
+        Public Property KuotaTindakan() As Decimal
+            Get
+                Return _KuotaTindakan
+            End Get
+            Set(ByVal value As Decimal)
+                _KuotaTindakan = value
             End Set
         End Property
     End Class
@@ -2051,17 +2060,17 @@ Public Class FormRekamMedisDokter
                 WriteSQL("INSERT INTO TransaksiPoliDetail(TransPoliID,TindakanID,NamaTindakan,JenisTindakan,BiayaTindakan,DiscTindakan,NettBayar,Penjamin,GroupBayar,StatusPembayaran,CreatedBy,CreatedDate) " & _
                          "VALUES('" & trowPoli("TransPoliID") & "','" & TextBoxTindakanID.Text & "','" & TextBoxNamaTindakan.Text & "','" & TextBoxJenisTindakan.Text & "'," & CDbl(TextBoxBiayaTindakan.Text) & ", 0," & CDbl(TextBoxBiayaTindakan.Text) & ", '" & penjaminTindakan & "', '', 'PENDING', '" & userInput & "', GETDATE())", 4)
 
-                Dim dtReminder As DataTable = ReadSQL("SELECT Reminder, Bulan FROM MasterTindakan WHERE TindakanID = '" & TextBoxTindakanID.Text & "'")
+                Dim dtReminder As DataTable = ReadSQL("SELECT Reminder, Hari FROM MasterTindakan WHERE TindakanID = '" & TextBoxTindakanID.Text & "'")
 
                 If dtReminder.Rows.Count > 0 AndAlso CBool(dtReminder.Rows(0)("Reminder")) = True Then
-                    Dim bulanStr As String = dtReminder.Rows(0)("Bulan").ToString().Trim()
-                    Dim jumlahBulan As Integer = 1 ' default jika kosong
-                    If IsNumeric(bulanStr) Then
-                        jumlahBulan = CInt(bulanStr)
+                    Dim hariStr As String = dtReminder.Rows(0)("Hari").ToString().Trim()
+                    Dim jumlahHari As Integer = 1 ' default jika kosong
+                    If IsNumeric(hariStr) Then
+                        jumlahHari = CInt(hariStr)
                     End If
 
                     ' Hitung tanggal reminder = hari ini + jumlah bulan
-                    Dim tglReminder As Date = Date.Today.AddMonths(jumlahBulan)
+                    Dim tglReminder As Date = Date.Today.AddDays(jumlahHari)
 
                     ' Simpan ke LogReminderPasien
                     WriteSQL("INSERT INTO LogReminderPasien (NamaPasien, NoHP, Keperluan, Tanggal, Status, CreatedBy, CreatedDate, JenisKelamin) " & _
@@ -3969,87 +3978,86 @@ Public Class FormRekamMedisDokter
         '       "LEFT JOIN TransaksiPaketTindakan TPT ON LPP.KodeVoucher = TPT.KodeVoucher " & _
         '       "WHERE LPP.NoTransaksi = '" & idTransaksi & "' AND LPP.DeletedDate IS NULL")
         If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
-            Tbls = ReadSQL("SELECT " & _
-                "TPD.TransPoliIDDetail AS ID, " & _
-                "TPD.TindakanID, " & _
+            Dim filterPaketPerTindakan As Boolean = True
+            Dim filterPaketReguler As Boolean = True
+
+            Dim queryUnion1 As String = ""
+            Dim queryUnion2 As String = ""
+            Dim queryUnion3 As String = ""
+
+            ' Paket Per-Tindakan dari Log
+            If filterPaketPerTindakan Then
+                queryUnion1 = "SELECT DISTINCT " & _
+                    "NULL AS ID, " & _
+                    "LPP.TindakanID, " & _
+                    "TPTD.NamaTindakan, " & _
+                    "TPT.JenisPaket AS JenisTindakan, " & _
+                    "TPBA.admin AS CreatedBy, " & _
+                    "TPBA.transaksitime AS CreatedDate, " & _
+                    "'PAID' AS StatusPembayaran, '-' AS Penjamin, " & _
+                    "LPP.KodeVoucher, TPTD.KuotaTindakan AS Kuota " & _
+                    "FROM LogPenggunaanPaket LPP " & _
+                    "LEFT JOIN TransaksiPoli TP ON LPP.NoTransaksi = TP.NoUrut " & _
+                    "OUTER APPLY (SELECT TOP 1 admin, transaksitime FROM TransaksiPoliBayarAwal " & _
+                    "WHERE TransPoliID = TP.TransPoliID ORDER BY transaksitime DESC) TPBA " & _
+                    "INNER JOIN TransaksiPaketTindakan TPT ON LPP.KodeVoucher = TPT.KodeVoucher " & _
+                    "INNER JOIN TransaksiPaketTindakanDetail TPTD " & _
+                    "ON TPT.KodeVoucher = TPTD.KodeVoucher AND TPT.PaketID = TPTD.PaketID " & _
+                    "AND TPTD.TindakanID = LPP.TindakanID " & _
+                    "WHERE LPP.NoTransaksi = '" & idTransaksi & "' AND LPP.DeletedDate IS NULL " & _
+                    "AND TPT.JenisPaket = 'Paket Per-Tindakan' AND TPT.PaketID = LPP.PaketID"
+            End If
+
+            ' Paket Reguler
+            If filterPaketReguler Then
+                queryUnion2 = "SELECT DISTINCT " & _
+                    "TPD.TransPoliIDDetail AS ID, " & _
+                    "TPD.TindakanID, " & _
+                    "TPTD.NamaTindakan, " & _
+                    "TPT.JenisPaket AS JenisTindakan, " & _
+                    "TPBA.admin AS CreatedBy, " & _
+                    "TPBA.transaksitime AS CreatedDate, " & _
+                    "'PAID' AS StatusPembayaran, '-' AS Penjamin, " & _
+                    "TPT.KodeVoucher, " & _
+                    "TPT.Kuota AS Kuota " & _
+                    "FROM TransaksiPoliDetail TPD " & _
+                    "INNER JOIN TransaksiPoli TP ON TP.TransPoliID = TPD.TransPoliID " & _
+                    "INNER JOIN TransaksiPaketTindakan TPT ON TPT.PaketID = TPD.PaketID AND TPT.KodeVoucher = TPD.KodeVoucher " & _
+                    "LEFT JOIN TransaksiPaketTindakanDetail TPTD ON TPTD.PaketID = TPD.PaketID AND TPTD.KodeVoucher = TPD.KodeVoucher " & _
+                    "OUTER APPLY (SELECT TOP 1 admin, transaksitime FROM TransaksiPoliBayarAwal " & _
+                    "WHERE TransPoliID = TPD.TransPoliID ORDER BY transaksitime DESC) TPBA " & _
+                    "WHERE TPT.JenisPaket = 'Paket Reguler' " & _
+                    "AND TP.NoUrut = '" & idTransaksi & "' " & _
+                    "AND TPD.DeletedDate IS NULL"
+            End If
+
+            ' Tindakan langsung dari TransaksiPoliDetail
+            queryUnion3 = "SELECT DISTINCT " & _
+                "TPD.TransPoliIDDetail AS ID, TPD.TindakanID, " & _
                 "ISNULL(TPTD.NamaTindakan, TPD.NamaTindakan) AS NamaTindakan, " & _
-                "TPD.JenisTindakan, " & _
-                "TPD.CreatedBy, " & _
-                "TPD.CreatedDate, " & _
-                "TPD.StatusPembayaran, " & _
-                "TPD.Penjamin, " & _
-                "LPP.KodeVoucher, " & _
-                "NULL AS Kuota " & _
+                "TPD.JenisTindakan, TPD.CreatedBy, TPD.CreatedDate, " & _
+                "TPD.StatusPembayaran, TPD.Penjamin, LPP.KodeVoucher, NULL AS Kuota " & _
                 "FROM TransaksiPoliDetail TPD " & _
                 "INNER JOIN TransaksiPoli TP ON TPD.TransPoliID = TP.TransPoliID " & _
-                "OUTER APPLY ( " & _
-                "    SELECT TOP 1 * FROM LogPenggunaanPaket " & _
-                "    WHERE NoTransaksi = TP.NoUrut AND DeletedDate IS NULL " & _
-                "    ORDER BY CreatedDate DESC " & _
-                ") LPP " & _
+                "OUTER APPLY (SELECT TOP 1 * FROM LogPenggunaanPaket " & _
+                "WHERE NoTransaksi = TP.NoUrut AND DeletedDate IS NULL ORDER BY CreatedDate DESC) LPP " & _
                 "LEFT JOIN TransaksiPaketTindakan TPT ON LPP.KodeVoucher = TPT.KodeVoucher " & _
-                "LEFT JOIN TransaksiPaketTindakanDetail TPTD " & _
-                "    ON TPT.KodeVoucher = TPTD.KodeVoucher " & _
-                "    AND TPT.PaketID = TPTD.PaketID " & _
-                "    AND TPTD.TindakanID = TPD.TindakanID " & _
-                "WHERE TPD.DeletedDate IS NULL AND TPD.Awal <> 1 AND TP.NoUrut = '" & idTransaksi & "' " & _
-                "UNION ALL " & _
-                "SELECT " & _
-                "NULL AS ID, " & _
-                "LPP.TindakanID, " & _
-                "TPTD.NamaTindakan, " & _
-                "TPT.JenisPaket AS JenisTindakan, " & _
-                "TPBA.admin AS CreatedBy, " & _
-                "TPBA.transaksitime AS CreatedDate, " & _
-                "'PAID' AS StatusPembayaran, " & _
-                "'-' AS Penjamin, " & _
-                "LPP.KodeVoucher, " & _
-                "TPTD.KuotaTindakan AS Kuota " & _
-                "FROM LogPenggunaanPaket LPP " & _
-                "LEFT JOIN TransaksiPoli TP ON LPP.NoTransaksi = TP.NoUrut " & _
-                "OUTER APPLY ( " & _
-                "    SELECT TOP 1 admin, transaksitime FROM TransaksiPoliBayarAwal " & _
-                "    WHERE TransPoliID = TP.TransPoliID ORDER BY transaksitime DESC " & _
-                ") TPBA " & _
-                "INNER JOIN TransaksiPaketTindakan TPT ON LPP.KodeVoucher = TPT.KodeVoucher " & _
-                "INNER JOIN TransaksiPaketTindakanDetail TPTD " & _
-                "    ON TPT.KodeVoucher = TPTD.KodeVoucher " & _
-                "    AND TPT.PaketID = TPTD.PaketID " & _
-                "    AND TPTD.TindakanID = LPP.TindakanID " & _
-                "WHERE LPP.NoTransaksi = '" & idTransaksi & "' " & _
-                "AND LPP.DeletedDate IS NULL " & _
-                "AND TPT.JenisPaket = 'Paket Per-Tindakan' " & _
-                "UNION ALL " & _
-                "SELECT " & _
-                "NULL AS ID, " & _
-                "TPTD.TindakanID, " & _
-                "TPTD.NamaTindakan, " & _
-                "TPT.JenisPaket AS JenisTindakan, " & _
-                "TPBA.admin AS CreatedBy, " & _
-                "TPBA.transaksitime AS CreatedDate, " & _
-                "'PAID' AS StatusPembayaran, " & _
-                "'-' AS Penjamin, " & _
-                "TPT.KodeVoucher, " & _
-                "TPT.Kuota AS Kuota " & _
-                "FROM TransaksiPaketTindakan TPT " & _
-                "INNER JOIN TransaksiPaketTindakanDetail TPTD " & _
-                "    ON TPT.KodeVoucher = TPTD.KodeVoucher " & _
-                "    AND TPT.PaketID = TPTD.PaketID " & _
-                "LEFT JOIN LogPenggunaanPaket LPP " & _
-                "    ON LPP.KodeVoucher = TPT.KodeVoucher " & _
-                "    AND LPP.NoTransaksi = '" & idTransaksi & "' " & _
-                "    AND LPP.DeletedDate IS NULL " & _
-                "LEFT JOIN TransaksiPoli TP ON LPP.NoTransaksi = TP.NoUrut " & _
-                "OUTER APPLY ( " & _
-                "    SELECT TOP 1 admin, transaksitime " & _
-                "    FROM TransaksiPoliBayarAwal " & _
-                "    WHERE TransPoliID = TP.TransPoliID " & _
-                "    ORDER BY transaksitime DESC " & _
-                ") TPBA " & _
-                "WHERE TPT.JenisPaket = 'Paket Reguler' " & _
-                "AND TPT.KodeVoucher IN ( " & _
-                "    SELECT KodeVoucher FROM LogPenggunaanPaket " & _
-                "    WHERE NoTransaksi = '" & idTransaksi & "' AND DeletedDate IS NULL)")
+                "LEFT JOIN TransaksiPaketTindakanDetail TPTD ON TPT.KodeVoucher = TPTD.KodeVoucher " & _
+                "AND TPT.PaketID = TPTD.PaketID AND TPTD.TindakanID = TPD.TindakanID " & _
+                "WHERE TPD.DeletedDate IS NULL AND TPD.Awal <> 1 AND TP.NoUrut = '" & idTransaksi & "'"
+
+            ' Gabung semua bagian query sesuai filter
+            Dim finalQuery As String = queryUnion3
+
+            If filterPaketPerTindakan Then
+                finalQuery &= " UNION ALL " & queryUnion1
+            End If
+            If filterPaketReguler Then
+                finalQuery &= " UNION ALL " & queryUnion2
+            End If
+
+            ' Eksekusi
+            Tbls = ReadSQL(finalQuery)
         ElseIf jenisTransaksi = "GIGI" Then
         'Tbls = ReadSQL("SELECT TransGigiIDDetail AS 'ID', TindakanID, NamaTindakan, JenisTindakan, CreatedBy, CreatedDate, StatusPembayaran, Penjamin " & _
         '               "FROM TransaksiGigiDetail " & _
@@ -6258,19 +6266,16 @@ Public Class FormRekamMedisDokter
             "c.KeluhanUtama AS 'Keluhan Utama', c.JenisPoli AS 'Layanan', c.Diagnosa AS 'Diagnosis', " & _
             "c.Resep AS 'Resep', " & _
             "(" & _
-            "   ISNULL(c.Tindakan, '') + " & _
-            "   ISNULL(" & _
-            "       '' + (" & _
-            "           SELECT STUFF((" & _
-            "               SELECT ' | ' + tpd.NamaTindakan " & _
-            "               FROM TransaksiPoliDetail tpd " & _
-            "               WHERE tpd.TransPoliID = a.TransPoliID " & _
-            "                 AND tpd.StatusPembayaran = 'PAID' " & _
-            "                 AND tpd.DeletedDate IS NULL " & _
-            "                 AND tpd.JenisTindakan NOT LIKE '%Konsul%' " & _
-            "               FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 3, '')" & _
-            "       ), ''" & _
-            ") " & _
+            "   ISNULL(( " & _
+            "   SELECT STUFF(( " & _
+            "   SELECT ' | ' + tpd.NamaTindakan " & _
+            "   FROM TransaksiPoliDetail tpd " & _
+            "   WHERE(tpd.TransPoliID = a.TransPoliID) " & _
+            "  AND tpd.StatusPembayaran = 'PAID' " & _
+            "  AND tpd.DeletedDate IS NULL " & _
+            "  AND tpd.JenisTindakan NOT LIKE '%Konsul%' " & _
+            "   FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 3, '') " & _
+            "   ), '') " & _
             ") AS 'Tindakan', " & _
             "c.Rujukan AS 'Rujukan', a.DokterPoli AS 'Dokter', d.Sistole, d.Diastole, d.HeartRate, d.RespiratoryRate, d.Suhu " & _
             "FROM TransaksiPoli a " & _
@@ -6591,18 +6596,41 @@ Public Class FormRekamMedisDokter
         If ValidasiTambahTindakan() = True Then
             Dim queryString As String = ""
             Dim queryOrderString As String = ""
+            Dim jenisPoli As String = ""
+            Dim sqlPoli As String = "SELECT JenisPoli FROM TransaksiDetail WHERE NoUrut = '" & idTransaksi & "'"
+            Dim dtPoli As DataTable = ReadSQL(sqlPoli)
+
+            If dtPoli.Rows.Count > 0 Then
+                jenisPoli = dtPoli.Rows(0)("JenisPoli").ToString().Trim()
+            End If
+
 
             If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
-                queryString = "SELECT TindakanID, NamaTindakan, JenisTindakan, JenisDokter, PARSENAME(CONVERT(varchar,convert(money,BiayaTindakan),1),2) as [BiayaTindakan], StatusInformedConsent " & _
-                              "FROM MasterTindakan " & _
-                              "WHERE Closed = 0 AND JenisTindakan NOT LIKE '%Konsultasi%' AND JenisTindakan NOT LIKE '%Administrasi%'"
+                queryString = "SELECT TindakanID, NamaTindakan, JenisTindakan, JenisDokter, " & _
+                  "PARSENAME(CONVERT(varchar,convert(money,BiayaTindakan),1),2) as [BiayaTindakan], StatusInformedConsent " & _
+                  "FROM MasterTindakan " & _
+                  "WHERE Closed = 0 AND JenisTindakan NOT LIKE '%Konsultasi%' AND JenisTindakan NOT LIKE '%Administrasi%'"
+
+                ' Tambahkan filter PoliTujuan
+                If jenisPoli <> "" Then
+                    queryString &= " AND PoliTujuan LIKE '%" & jenisPoli.Replace("'", "''") & "%'"
+                End If
+
                 queryOrderString = " ORDER BY JenisTindakan, NamaTindakan"
+
             ElseIf jenisTransaksi = "GIGI" Then
-                queryString = "SELECT TindakanID, NamaTindakan, JenisTindakan, PARSENAME(CONVERT(varchar, CONVERT(money, BiayaTindakan), 1), 2) AS [BiayaTindakan], StatusInformedConsent " & _
-                              "FROM MasterTindakanGigi " & _
-                              "WHERE Closed = 0 AND JenisTindakan NOT LIKE '%Konsultasi%' AND JenisTindakan NOT LIKE '%Administrasi%'"
+                queryString = "SELECT TindakanID, NamaTindakan, JenisTindakan, " & _
+                  "PARSENAME(CONVERT(varchar, CONVERT(money, BiayaTindakan), 1), 2) AS [BiayaTindakan], StatusInformedConsent " & _
+                  "FROM MasterTindakanGigi " & _
+                  "WHERE Closed = 0 AND JenisTindakan NOT LIKE '%Konsultasi%' AND JenisTindakan NOT LIKE '%Administrasi%'"
+
+                If jenisPoli <> "" Then
+                    queryString &= " AND PoliTujuan LIKE '%" & jenisPoli.Replace("'", "''") & "%'"
+                End If
+
                 queryOrderString = " ORDER BY JenisTindakan, NamaTindakan"
             End If
+
 
             Find.Show()
             Find.Query(queryString, queryOrderString, "FindTindakanPoliPerencanaan", 1)
@@ -8545,55 +8573,98 @@ Public Class FormRekamMedisDokter
         End If
     End Sub
 
+    Private Sub HapusPaketReguler(ByVal kodeVoucher As String, ByVal poliIdDetail As String, ByVal tindakanID As String)
+
+        ' Hanya soft delete baris spesifik
+        WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
+                 "WHERE TransPoliIDDetail = '" & poliIdDetail & "' " & _
+                 "AND KodeVoucher = '" & kodeVoucher & "' " & _
+                 "AND DeletedDate IS NULL", 4)
+
+        ' Tambahkan kembali kuota paket
+        WriteSQL("UPDATE TransaksiPaketTindakan SET Kuota = ISNULL(Kuota, 0) + 1 " & _
+                 "WHERE KodeVoucher = '" & kodeVoucher & "'", 4)
+
+        ' Soft delete log spesifik tindakan
+        WriteSQL("UPDATE LogPenggunaanPaket SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
+                 "WHERE ID IN (SELECT TOP 1 ID FROM LogPenggunaanPaket " & _
+                 "WHERE KodeVoucher = '" & kodeVoucher & "' " & _
+                 "AND NoTransaksi = '" & idTransaksi & "' " & _
+                 "AND TindakanID = '" & tindakanID & "' " & _
+                 "AND DeletedDate IS NULL ORDER BY CreatedDate DESC)", 4)
+    End Sub
+
+    'Private Sub SoftDeleteReminder(ByVal reminderID As Integer)
+    '    Dim query As String = "UPDATE LogReminderPasien SET Status = 'CANCEL', DeletedBy = '" & userInput & "', " & _
+    '                          "DeletedDate = GETDATE()WHERE ReminderID = '" & reminderID & "'"
+    '    WriteSQL(query, 4)
+    'End Sub
+
+    Private Sub HapusPaketPerTindakan(ByVal kodeVoucher As String, ByVal tindakanID As String)
+        ' Soft delete 1 tindakan dari TransaksiPoliDetail
+        WriteSQL("WITH CTE AS (" & _
+                 "SELECT TOP 1 * FROM TransaksiPoliDetail " & _
+                 "WHERE KodeVoucher = '" & kodeVoucher & "' AND TindakanID = '" & tindakanID & "' " & _
+                 "AND CONVERT(DATE, TransaksiTime) = CONVERT(DATE, GETDATE()) " & _
+                 "AND DeletedDate IS NULL " & _
+                 "ORDER BY TransaksiTime DESC) " & _
+                 "UPDATE CTE SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE()", 4)
+
+        ' Tambahkan kembali kuota tindakan
+        WriteSQL("UPDATE TransaksiPaketTindakanDetail SET KuotaTindakan = ISNULL(KuotaTindakan, 0) + 1 " & _
+             "WHERE KodeVoucher = '" & kodeVoucher & "' AND TindakanID = '" & tindakanID & "'", 4)
+
+        ' Soft delete dari LogPenggunaanPaket
+        WriteSQL("UPDATE LogPenggunaanPaket SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
+                 "WHERE ID IN (SELECT TOP 1 ID FROM LogPenggunaanPaket " & _
+                 "WHERE KodeVoucher = '" & kodeVoucher & "' AND TindakanID = '" & tindakanID & "' AND NoTransaksi = '" & idTransaksi & "' AND DeletedDate IS NULL " & _
+                 "ORDER BY CreatedDate DESC)", 4)
+    End Sub
+
     Private Sub HapusTindakanPaket(ByVal idTindakanDetailObj As Object, ByVal namaTindakan As String, ByVal kodeVoucher As String)
+        Dim idTindakanDetail As String = ""
+
+        ' --- Jika ada ID Detail ---
         If Not IsDBNull(idTindakanDetailObj) AndAlso idTindakanDetailObj IsNot Nothing AndAlso idTindakanDetailObj.ToString() <> "" Then
-            ' Jika ID ada → hapus dari TransaksiPoliDetail / TransaksiGigiDetail
-            Dim idTindakanDetail As String = idTindakanDetailObj.ToString()
+            idTindakanDetail = idTindakanDetailObj.ToString()
+
             If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
+                ' Soft delete hanya baris yang dipilih
                 WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
                          "WHERE TransPoliIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
+
             ElseIf jenisTransaksi = "GIGI" Then
                 WriteSQL("UPDATE TransaksiGigiDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
                          "WHERE TransGigiIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
             End If
-        ElseIf kodeVoucher <> "" Then
-            Dim tindakanID As String = ReadSQLNIK("SELECT TOP 1 TindakanID FROM LogPenggunaanPaket WHERE KodeVoucher = '" & kodeVoucher & "' AND NoTransaksi = '" & idTransaksi & "' AND DeletedDate IS NULL ORDER BY CreatedDate DESC")
+        End If
 
-            WriteSQL("UPDATE LogPenggunaanPaket SET DeletedBy = 'Admin', DeletedDate = GETDATE() " & _
-                     "WHERE ID IN (" & _
-                     "SELECT TOP 1 ID FROM LogPenggunaanPaket " & _
-                     "WHERE KodeVoucher = '" & kodeVoucher & "' AND NoTransaksi = '" & idTransaksi & "' AND DeletedDate IS NULL " & _
-                     "ORDER BY CreatedDate DESC)", 4)
+        ' --- Jika ada kodeVoucher ---
+        If kodeVoucher.Trim() <> "" Then
+            ' Ambil TindakanID dari log penggunaan
+            Dim tindakanID As String = ReadSQLNIK("SELECT TOP 1 TindakanID FROM LogPenggunaanPaket " & _
+                                                  "WHERE KodeVoucher = '" & kodeVoucher & "' " & _
+                                                  "AND NoTransaksi = '" & idTransaksi & "' " & _
+                                                  "AND DeletedDate IS NULL ORDER BY CreatedDate DESC")
 
-            If tindakanID <> "" Then
-                WriteSQL("UPDATE TransaksiPaketTindakanDetail SET KuotaTindakan = ISNULL(KuotaTindakan, 0) + 1 " & _
-                         "WHERE KodeVoucher = '" & kodeVoucher & "' AND TindakanID = '" & tindakanID & "'", 4)
-            End If
+            ' Cek apakah Paket Reguler
+            Dim queryCek As String = _
+                "SELECT CASE WHEN EXISTS (" & vbCrLf & _
+                "    SELECT 1 FROM LogPenggunaanPaket logpaket " & vbCrLf & _
+                "    INNER JOIN TransaksiPaketTindakan tpt ON logpaket.KodeVoucher = tpt.KodeVoucher AND logpaket.PaketID = tpt.PaketID " & vbCrLf & _
+                "    WHERE logpaket.KodeVoucher = '" & kodeVoucher & "' " & vbCrLf & _
+                "    AND logpaket.NoTransaksi = '" & idTransaksi & "' " & vbCrLf & _
+                "    AND UPPER(tpt.JenisPaket) = 'PAKET REGULER' " & vbCrLf & _
+                "    AND logpaket.DeletedDate IS NULL" & vbCrLf & _
+                ") THEN 1 ELSE 0 END"
 
-            'WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
-            '         "WHERE TransPoliID IN (SELECT TransPoliID FROM TransaksiPoli WHERE NoUrut = '" & idTransaksi & "') " & _
-            '         "AND KodeVoucher = '" & kodeVoucher & "' " & _
-            '         "AND CONVERT(DATE, transaksitime) = CONVERT(DATE, GETDATE()) " & _
-            '         "AND DeletedDate IS NULL", 4)
-
-            WriteSQL("WITH CTE AS (" & _
-                 "SELECT TOP 1 * FROM TransaksiPoliDetail " & _
-                 "WHERE TransPoliID IN (SELECT TransPoliID FROM TransaksiPoli WHERE NoUrut = '" & idTransaksi & "') " & _
-                 "AND KodeVoucher = '" & kodeVoucher & "' " & _
-                 "AND TindakanID = '" & tindakanID & "' " & _
-                 "AND DeletedDate IS NULL " & _
-                 "AND CONVERT(DATE, transaksitime) = CONVERT(DATE, GETDATE()) " & _
-                 "ORDER BY TransaksiTime DESC) " & _
-                 "UPDATE CTE SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE()", 4)
-
-            Dim isPaketReguler As Boolean = CBool(ReadSQLNIK("SELECT CASE WHEN EXISTS (" & _
-                "SELECT 1 FROM TransaksiPoliDetail " & _
-                "WHERE KodeVoucher = '" & kodeVoucher & "' " & _
-                "AND CONVERT(DATE, transaksitime) = CONVERT(DATE, GETDATE()) " & _
-                "AND DeletedDate IS NULL AND TindakanID = '0') THEN 1 ELSE 0 END"))
+            Dim isPaketReguler As Boolean = CBool(ReadSQLNIK(queryCek))
 
             If isPaketReguler Then
-                WriteSQL("UPDATE TransaksiPaketTindakan SET Kuota = ISNULL(Kuota, 0) + 1 WHERE KodeVoucher = '" & kodeVoucher & "'", 4)
+                ' kirim idTindakanDetail juga
+                HapusPaketReguler(kodeVoucher, idTindakanDetail, tindakanID)
+            ElseIf tindakanID <> "" Then
+                HapusPaketPerTindakan(kodeVoucher, tindakanID)
             End If
         End If
     End Sub
@@ -11761,9 +11832,11 @@ Public Class FormRekamMedisDokter
         tblTindakan.Columns.Add("KodeVoucher", GetType(String))
         tblTindakan.Columns.Add("Jenis Paket", GetType(String))
 
+
         Try
             Dim totalTagihan As Decimal = 0
             Dim identitasPaket As String = ""
+            Dim listPaketID As New HashSet(Of String)
 
             If rowPaket IsNot Nothing AndAlso rowPaket.Length > 0 Then
                 For Each row As DataRow In rowPaket
@@ -11771,6 +11844,9 @@ Public Class FormRekamMedisDokter
                     Dim diskon As Decimal = 0D
                     Dim hargaNett As Decimal = hargaAwal - diskon
                     Dim idPaket As String = row("PaketID").ToString()
+                    If Not listPaketID.Contains(idPaket) Then
+                        listPaketID.Add(idPaket)
+                    End If
 
                     Dim Tnew As DataRow = tblTindakan.NewRow
                     Tnew("PaketID") = idPaket
@@ -11880,21 +11956,41 @@ Public Class FormRekamMedisDokter
 
             ' Tambahkan khusus untuk Paket Reguler (jika ditemukan)
             If tblTindakan.Rows.Count > 0 AndAlso tblTindakan.Rows(0)("Jenis Paket").ToString().ToUpper() = "Paket Reguler" Then
-                Dim namaPaket As String = tblTindakan.Rows(0)("Nama Paket").ToString()
                 Dim penjamin As String = tblTindakan.Rows(0)("Penjamin").ToString()
                 Dim kodeVoucher As String = tblTindakan.Rows(0)("KodeVoucher").ToString()
 
-                ' Ambil harga paket dari variabel hargaNettPaket (jika sudah dihitung sebelumnya)
-                WriteSQL("INSERT INTO TransaksiPoliDetail(Awal, TransPoliID, TindakanID, PaketID, NamaTindakan, JenisTindakan, BiayaTindakan, DiscTindakan, NettBayar, admin, transaksitime, DiscPersenTindakan, StatusPembayaran, KodeVoucher, Penjamin, FeeDokter, FeePerawat) " & _
-                         "VALUES('1', '" & transPoliId & "', " & _
-                         "'0', " & _
-                         "'" & identitasPaket & "', " & _
-                         "'" & namaPaket.Replace("'", "''") & "', " & _
-                         "'Tindakan', " & _
-                         hargaNettPaket & ", 0, " & hargaNettPaket & ", " & _
-                         "'" & userInput & "', GETDATE(), 0, 'PAID', " & _
-                         "'" & kodeVoucher & "', " & _
-                         "'" & penjamin & "', 0, 0)", 4)
+                ' Loop JSON Tindakan
+                For Each tindakan As TindakanDetail In listTindakan
+                    ' --- Ambil fee dokter/perawat ---
+                    Dim sqlFee As String = "SELECT FeeDokter, FeePerawat FROM MasterTindakan WHERE TindakanID = '" & tindakan.TindakanID & "'"
+                    Dim tblFee As DataTable = ReadSQL(sqlFee)
+
+                    Dim feeDokter As Decimal = 0D
+                    Dim feePerawat As Decimal = 0D
+                    If tblFee IsNot Nothing AndAlso tblFee.Rows.Count > 0 Then
+                        If Not IsDBNull(tblFee.Rows(0)("FeeDokter")) Then
+                            feeDokter = CDec(tblFee.Rows(0)("FeeDokter"))
+                        End If
+                        If Not IsDBNull(tblFee.Rows(0)("FeePerawat")) Then
+                            feePerawat = CDec(tblFee.Rows(0)("FeePerawat"))
+                        End If
+                    End If
+
+                    ' --- Insert ke TransaksiPoliDetail ---
+                    WriteSQL("INSERT INTO TransaksiPoliDetail(Awal, TransPoliID, TindakanID, PaketID, NamaTindakan, JenisTindakan, BiayaTindakan, DiscTindakan, NettBayar, admin, transaksitime, DiscPersenTindakan, StatusPembayaran, KodeVoucher, Penjamin, FeeDokter, FeePerawat) " & _
+                             "VALUES('1', '" & transPoliId & "', " & _
+                             "'" & tindakan.TindakanID & "', " & _
+                             "'" & identitasPaket & "', " & _
+                             "'" & tindakan.NamaTindakan.Replace("'", "''") & "', " & _
+                             "'" & tindakan.JenisTindakan.Replace("'", "''") & "', " & _
+                             CDec(tindakan.BiayaTindakan) & ", " & _
+                             CDec(tindakan.DiskonTindakan) & ", " & _
+                             CDec(tindakan.NettBayar) & ", " & _
+                             "'" & userInput & "', GETDATE(), 0, 'PAID', " & _
+                             "'" & kodeVoucher & "', " & _
+                             "'" & penjamin & "', " & _
+                             feeDokter & ", " & feePerawat & ")", 4)
+                Next
             End If
 
 

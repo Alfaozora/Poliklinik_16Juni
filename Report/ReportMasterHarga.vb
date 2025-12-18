@@ -36,7 +36,17 @@ Public Class ReportMasterHarga
         Select Case cmbtindakan.Text
             Case "Master Tindakan"
                 Tquery = "select TindakanID as ID,NamaTindakan as Nama,JenisTindakan as Jenis,PARSENAME(CONVERT(varchar,convert(money,BiayaTindakan),1),2) as Harga from MasterTindakan where closed=0 order by JenisTindakan,NamaTindakan"
-                Tjudul = "MASTER TINDAKAN POLI"
+                Tjudul = "MASTER TINDAKAN"
+            Case "Master Paket Tindakan"
+                Tquery = "SELECT " & _
+                      "PaketID as ID, " & _
+                      "NamaPaket as Nama, " & _
+                      "JenisPaket as Jenis, " & _
+                      "PARSENAME(CONVERT(varchar,convert(money,HargaNett),1),2) as Harga " & _
+                      "FROM MasterPaketTindakan " & _
+                      "WHERE DeletedBy IS NULL " & _
+                      "ORDER BY JenisPaket,NamaPaket"
+                Tjudul = "MASTER PAKET TINDAKAN"
             Case "Master Lab"
                 Tquery = "select TindakanID as ID,NamaTindakan as Nama,JenisTindakan  as Jenis,PARSENAME(CONVERT(varchar,convert(money,BiayaTindakan),1),2) as Harga from MasterLab where closed=0 order by JenisTindakan,NamaTindakan"
                 Tjudul = "MASTER TINDAKAN LAB"

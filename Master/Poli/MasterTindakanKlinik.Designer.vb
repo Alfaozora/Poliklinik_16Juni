@@ -41,9 +41,10 @@ Partial Class MasterTindakanKlinik
         Me.ButtonExportMasterTindakan = New System.Windows.Forms.Button
         Me.SplitContainer3 = New System.Windows.Forms.SplitContainer
         Me.PanelMasterTindakan = New System.Windows.Forms.Panel
+        Me.CheckedListBoxPoli = New System.Windows.Forms.CheckedListBox
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.Label33 = New System.Windows.Forms.Label
-        Me.TextBoxBulanReminder = New System.Windows.Forms.TextBox
+        Me.TextBoxHariReminder = New System.Windows.Forms.TextBox
         Me.CheckBoxReminder = New System.Windows.Forms.CheckBox
         Me.Panel5 = New System.Windows.Forms.Panel
         Me.RadioButtonPelaksanaDokter = New System.Windows.Forms.RadioButton
@@ -123,6 +124,7 @@ Partial Class MasterTindakanKlinik
         Me.ButtonExportMasterPaket = New System.Windows.Forms.Button
         Me.Button1 = New System.Windows.Forms.Button
         Me.SplitContainerMasterPaket = New System.Windows.Forms.SplitContainer
+        Me.CheckedListBoxPoli2 = New System.Windows.Forms.CheckedListBox
         Me.TextBox15 = New System.Windows.Forms.TextBox
         Me.Label2 = New System.Windows.Forms.Label
         Me.TextBoxMaksimalBHP_Paket = New System.Windows.Forms.TextBox
@@ -464,6 +466,7 @@ Partial Class MasterTindakanKlinik
         'PanelMasterTindakan
         '
         Me.PanelMasterTindakan.AutoScroll = True
+        Me.PanelMasterTindakan.Controls.Add(Me.CheckedListBoxPoli)
         Me.PanelMasterTindakan.Controls.Add(Me.GroupBox1)
         Me.PanelMasterTindakan.Controls.Add(Me.Panel5)
         Me.PanelMasterTindakan.Controls.Add(Me.CheckBoxStatusAktifTindakan)
@@ -495,14 +498,23 @@ Partial Class MasterTindakanKlinik
         Me.PanelMasterTindakan.Size = New System.Drawing.Size(757, 500)
         Me.PanelMasterTindakan.TabIndex = 563
         '
+        'CheckedListBoxPoli
+        '
+        Me.CheckedListBoxPoli.FormattingEnabled = True
+        Me.CheckedListBoxPoli.Location = New System.Drawing.Point(537, 139)
+        Me.CheckedListBoxPoli.Name = "CheckedListBoxPoli"
+        Me.CheckedListBoxPoli.ScrollAlwaysVisible = True
+        Me.CheckedListBoxPoli.Size = New System.Drawing.Size(174, 94)
+        Me.CheckedListBoxPoli.TabIndex = 574
+        '
         'GroupBox1
         '
         Me.GroupBox1.Controls.Add(Me.Label33)
-        Me.GroupBox1.Controls.Add(Me.TextBoxBulanReminder)
+        Me.GroupBox1.Controls.Add(Me.TextBoxHariReminder)
         Me.GroupBox1.Controls.Add(Me.CheckBoxReminder)
         Me.GroupBox1.Location = New System.Drawing.Point(537, 17)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(247, 116)
+        Me.GroupBox1.Size = New System.Drawing.Size(174, 116)
         Me.GroupBox1.TabIndex = 573
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Reminder Pasien ?"
@@ -513,20 +525,20 @@ Partial Class MasterTindakanKlinik
         Me.Label33.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
         Me.Label33.Location = New System.Drawing.Point(15, 51)
         Me.Label33.Name = "Label33"
-        Me.Label33.Size = New System.Drawing.Size(94, 17)
+        Me.Label33.Size = New System.Drawing.Size(85, 17)
         Me.Label33.TabIndex = 574
-        Me.Label33.Text = "Berapa Bulan?"
+        Me.Label33.Text = "Berapa Hari?"
         '
-        'TextBoxBulanReminder
+        'TextBoxHariReminder
         '
-        Me.TextBoxBulanReminder.BackColor = System.Drawing.Color.White
-        Me.TextBoxBulanReminder.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBoxBulanReminder.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
-        Me.TextBoxBulanReminder.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxBulanReminder.Location = New System.Drawing.Point(18, 71)
-        Me.TextBoxBulanReminder.Name = "TextBoxBulanReminder"
-        Me.TextBoxBulanReminder.Size = New System.Drawing.Size(109, 23)
-        Me.TextBoxBulanReminder.TabIndex = 573
+        Me.TextBoxHariReminder.BackColor = System.Drawing.Color.White
+        Me.TextBoxHariReminder.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxHariReminder.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
+        Me.TextBoxHariReminder.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxHariReminder.Location = New System.Drawing.Point(18, 71)
+        Me.TextBoxHariReminder.Name = "TextBoxHariReminder"
+        Me.TextBoxHariReminder.Size = New System.Drawing.Size(109, 23)
+        Me.TextBoxHariReminder.TabIndex = 573
         '
         'CheckBoxReminder
         '
@@ -1488,6 +1500,7 @@ Partial Class MasterTindakanKlinik
         'SplitContainerMasterPaket.Panel1
         '
         Me.SplitContainerMasterPaket.Panel1.BackColor = System.Drawing.Color.White
+        Me.SplitContainerMasterPaket.Panel1.Controls.Add(Me.CheckedListBoxPoli2)
         Me.SplitContainerMasterPaket.Panel1.Controls.Add(Me.TextBox15)
         Me.SplitContainerMasterPaket.Panel1.Controls.Add(Me.Label2)
         Me.SplitContainerMasterPaket.Panel1.Controls.Add(Me.TextBoxMaksimalBHP_Paket)
@@ -1530,6 +1543,15 @@ Partial Class MasterTindakanKlinik
         Me.SplitContainerMasterPaket.SplitterDistance = 350
         Me.SplitContainerMasterPaket.SplitterWidth = 1
         Me.SplitContainerMasterPaket.TabIndex = 462
+        '
+        'CheckedListBoxPoli2
+        '
+        Me.CheckedListBoxPoli2.FormattingEnabled = True
+        Me.CheckedListBoxPoli2.Location = New System.Drawing.Point(496, 20)
+        Me.CheckedListBoxPoli2.Name = "CheckedListBoxPoli2"
+        Me.CheckedListBoxPoli2.ScrollAlwaysVisible = True
+        Me.CheckedListBoxPoli2.Size = New System.Drawing.Size(174, 94)
+        Me.CheckedListBoxPoli2.TabIndex = 577
         '
         'TextBox15
         '
@@ -2163,6 +2185,8 @@ Partial Class MasterTindakanKlinik
     Friend WithEvents ButtonExportMasterPaket As System.Windows.Forms.Button
     Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
     Friend WithEvents Label33 As System.Windows.Forms.Label
-    Friend WithEvents TextBoxBulanReminder As System.Windows.Forms.TextBox
+    Friend WithEvents TextBoxHariReminder As System.Windows.Forms.TextBox
     Friend WithEvents CheckBoxReminder As System.Windows.Forms.CheckBox
+    Friend WithEvents CheckedListBoxPoli As System.Windows.Forms.CheckedListBox
+    Friend WithEvents CheckedListBoxPoli2 As System.Windows.Forms.CheckedListBox
 End Class

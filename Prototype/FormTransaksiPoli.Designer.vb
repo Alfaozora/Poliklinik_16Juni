@@ -31,6 +31,7 @@ Partial Class FormTransaksiPoli
         Me.ToolStripTextBox1 = New System.Windows.Forms.ToolStripTextBox
         Me.CloseToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
+        Me.ButtonVoucher = New System.Windows.Forms.Button
         Me.butkalkulasi = New System.Windows.Forms.Button
         Me.ButtonSimpanTransaksi = New System.Windows.Forms.Button
         Me.TextBoxTotalBayar = New DevExpress.XtraEditors.TextEdit
@@ -86,7 +87,7 @@ Partial Class FormTransaksiPoli
         Me.GroupBox2.Dock = System.Windows.Forms.DockStyle.Fill
         Me.GroupBox2.Location = New System.Drawing.Point(0, 174)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(959, 243)
+        Me.GroupBox2.Size = New System.Drawing.Size(1029, 243)
         Me.GroupBox2.TabIndex = 11
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Detail"
@@ -98,7 +99,7 @@ Partial Class FormTransaksiPoli
         Me.gridtindakan.Location = New System.Drawing.Point(3, 40)
         Me.gridtindakan.MainView = Me.GridView1
         Me.gridtindakan.Name = "gridtindakan"
-        Me.gridtindakan.Size = New System.Drawing.Size(953, 200)
+        Me.gridtindakan.Size = New System.Drawing.Size(1023, 200)
         Me.gridtindakan.TabIndex = 3
         Me.gridtindakan.ViewCollection.AddRange(New DevExpress.XtraGrid.Views.Base.BaseView() {Me.GridView1})
         '
@@ -115,7 +116,7 @@ Partial Class FormTransaksiPoli
         Me.MenuStrip5.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripTextBox1})
         Me.MenuStrip5.Location = New System.Drawing.Point(3, 16)
         Me.MenuStrip5.Name = "MenuStrip5"
-        Me.MenuStrip5.Size = New System.Drawing.Size(953, 24)
+        Me.MenuStrip5.Size = New System.Drawing.Size(1023, 24)
         Me.MenuStrip5.TabIndex = 4
         Me.MenuStrip5.Text = "MenuStrip5"
         '
@@ -137,6 +138,7 @@ Partial Class FormTransaksiPoli
         '
         'GroupBox1
         '
+        Me.GroupBox1.Controls.Add(Me.ButtonVoucher)
         Me.GroupBox1.Controls.Add(Me.butkalkulasi)
         Me.GroupBox1.Controls.Add(Me.ButtonSimpanTransaksi)
         Me.GroupBox1.Controls.Add(Me.TextBoxTotalBayar)
@@ -152,10 +154,25 @@ Partial Class FormTransaksiPoli
         Me.GroupBox1.Dock = System.Windows.Forms.DockStyle.Bottom
         Me.GroupBox1.Location = New System.Drawing.Point(0, 417)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(959, 136)
+        Me.GroupBox1.Size = New System.Drawing.Size(1029, 136)
         Me.GroupBox1.TabIndex = 10
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Summary Total"
+        '
+        'ButtonVoucher
+        '
+        Me.ButtonVoucher.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(192, Byte), Integer), CType(CType(128, Byte), Integer))
+        Me.ButtonVoucher.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonVoucher.FlatStyle = System.Windows.Forms.FlatStyle.Popup
+        Me.ButtonVoucher.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ButtonVoucher.Image = CType(resources.GetObject("ButtonVoucher.Image"), System.Drawing.Image)
+        Me.ButtonVoucher.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.ButtonVoucher.Location = New System.Drawing.Point(865, 42)
+        Me.ButtonVoucher.Name = "ButtonVoucher"
+        Me.ButtonVoucher.Size = New System.Drawing.Size(100, 36)
+        Me.ButtonVoucher.TabIndex = 127
+        Me.ButtonVoucher.Text = "   VOUCHER"
+        Me.ButtonVoucher.UseVisualStyleBackColor = False
         '
         'butkalkulasi
         '
@@ -308,7 +325,7 @@ Partial Class FormTransaksiPoli
         Me.GroupBoxDetailPasien.Dock = System.Windows.Forms.DockStyle.Top
         Me.GroupBoxDetailPasien.Location = New System.Drawing.Point(0, 24)
         Me.GroupBoxDetailPasien.Name = "GroupBoxDetailPasien"
-        Me.GroupBoxDetailPasien.Size = New System.Drawing.Size(959, 150)
+        Me.GroupBoxDetailPasien.Size = New System.Drawing.Size(1029, 150)
         Me.GroupBoxDetailPasien.TabIndex = 9
         Me.GroupBoxDetailPasien.TabStop = False
         '
@@ -512,7 +529,7 @@ Partial Class FormTransaksiPoli
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewToolStripMenuItem, Me.CloseToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(959, 24)
+        Me.MenuStrip1.Size = New System.Drawing.Size(1029, 24)
         Me.MenuStrip1.TabIndex = 8
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -525,7 +542,7 @@ Partial Class FormTransaksiPoli
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(959, 553)
+        Me.ClientSize = New System.Drawing.Size(1029, 553)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.GroupBoxDetailPasien)
@@ -595,4 +612,5 @@ Partial Class FormTransaksiPoli
     Friend WithEvents ButtonFindTransaksi As System.Windows.Forms.Button
     Friend WithEvents ToolStripTextBox1 As System.Windows.Forms.ToolStripTextBox
     Friend WithEvents TimerCekTransaksiBaru As System.Windows.Forms.Timer
+    Friend WithEvents ButtonVoucher As System.Windows.Forms.Button
 End Class

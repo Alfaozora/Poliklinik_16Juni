@@ -195,6 +195,39 @@ Public Class FormTransaksiPoli
         End If
     End Sub
 
+    'Public Sub LoadTindakan(ByRef Trow() As DataRow)
+    '    If CheckTambahTindakan(Trow) = True Then
+    '        Dim Tbls As DataTable = gridtindakan.DataSource
+    '        Tbls.AcceptChanges()
+    '        If Trow.Count > 0 Then
+    '            For i As Integer = 0 To Trow.Length - 1
+    '                Dim Tnew As DataRow = Tbls.NewRow
+    '                Tnew("TransPoliIDDetail") = "0"
+    '                Tnew("TindakanID") = Trow(i)("TindakanID")
+    '                Tnew("Nama") = Trow(i)("Nama")
+    '                Tnew("Jenis") = Trow(i)("Jenis")
+    '                Tnew("Biaya Tindakan") = Splitmoney(Trow(i)("Biaya Tindakan"))
+    '                Tnew("DiscTindakan") = 0
+    '                Tnew("DiscNilai") = 0
+    '                Tnew("NettBayar") = 0
+
+    '                ' Jika ada voucher tindakan aktif dan TindakanID cocok
+    '                If voucherIsTindakan AndAlso voucherTindakanID <> "" AndAlso voucherTindakanID = Tnew("TindakanID").ToString() Then
+    '                    If voucherTipe.ToUpper() = "NOMINAL" Then
+    '                        Tnew("DiscNilai") = voucherNilai
+    '                    ElseIf voucherTipe.ToUpper() = "PERCENT" Then
+    '                        Tnew("DiscTindakan") = voucherNilai
+    '                    End If
+    '                End If
+
+    '                Tbls.Rows.Add(Tnew)
+    '            Next
+    '            Tbls.AcceptChanges()
+    '            Kalkulasi()
+    '        End If
+    '    End If
+    'End Sub
+
     Private Sub GridView1_KeyUp(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles GridView1.KeyUp
         If e.KeyCode = Keys.Delete And GridView1.SelectedRowsCount > 0 Then
             Dim Trow As DataRow = GridView1.GetDataRow(GridView1.FocusedRowHandle)
@@ -318,6 +351,7 @@ Public Class FormTransaksiPoli
                 dataDictionary.Add("No Rekam Medis", TextBoxNoRekamMedis.Text)
                 dataDictionary.Add("Nama Pasien", TextBoxNamaPasien.Text)
                 dataDictionary.Add("Nama Dokter", TextBoxNamaDokter.Text)
+                dataDictionary.Add("Kode Voucher", voucherAktifKode)
 
                 FormPembayaran.DataDictionary = dataDictionary
                 FormPembayaran.SetDataFromPendaftaran(TextBoxTotalBayar.Text, Tbls, TextBoxTotalBruto.Text, TextBoxTotalDiskon.Text, TextBoxTotalPembulatan.Text)
@@ -397,6 +431,74 @@ Public Class FormTransaksiPoli
                 'NotifyIconTransaksiBaru.ShowBalloonTip(10000)
                 'NotifyIconTransaksiBaru.BalloonTipIcon = ToolTipIcon.Warning
             End If
+        End If
+    End Sub
+
+    ' Informasi voucher aktif
+    Private voucherAktifKode As String = ""
+    Private voucherTipe As String = ""
+    Private voucherNilai As Decimal = 0
+    Private voucherTindakanID As String = ""
+    Private voucherIsTindakan As Boolean = False
+    Private voucherTindakanNama As String = ""
+
+    Private Sub ButtonVoucher_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonVoucher.Click
+        Dim f As New PopUpVoucher()
+        f.NoRekamMedis = TextBoxNoRekamMedis.Text ' Kirim No RM pasien
+        AddHandler f.VoucherDipilih, AddressOf ProsesVoucher
+        f.ShowDialog()
+    End Sub
+
+    Private Sub ProsesVoucher(ByVal kode As String, ByVal jenis As String, ByVal nilai As Decimal, Optional ByVal isTindakan As Boolean = False, Optional ByVal namaTindakan As String = "")
+        voucherAktifKode = kode
+        voucherTipe = jenis
+        voucherNilai = nilai
+        voucherIsTindakan = isTindakan
+        voucherTindakanNama = namaTindakan
+
+        Dim Tbls As DataTable = CType(gridtindakan.DataSource, DataTable)
+        If Tbls Is Nothing Then Exit Sub
+
+        If voucherIsTindakan = False Then
+            ' Voucher umum (berlaku ke semua tindakan)
+            For Each row As DataRow In Tbls.Rows
+                If jenis.ToUpper() = "NOMINAL" Then
+                    row("DiscNilai") = nilai
+                ElseIf jenis.ToUpper() = "PERCENT" Then
+                    row("DiscTindakan") = nilai
+                End If
+            Next
+            Kalkulasi()
+            Exit Sub
+        End If
+
+        ' Voucher khusus tindakan → cocokkan berdasarkan kolom "Tindakan"
+        Dim adaTindakan As Boolean = False
+        For Each row As DataRow In Tbls.Rows
+            If Not IsDBNull(row("Tindakan")) Then
+                Dim tindakanGrid As String = row("Tindakan").ToString().Trim().ToUpper()
+                Dim arrVoucherTindakan() As String = namaTindakan.Split(","c)
+                For i As Integer = 0 To arrVoucherTindakan.Length - 1
+                    If tindakanGrid = arrVoucherTindakan(i).Trim().ToUpper() Then
+                        adaTindakan = True
+
+                        If jenis.ToUpper() = "NOMINAL" Then
+                            row("DiscNilai") = nilai
+                        ElseIf jenis.ToUpper() = "PERCENT" Then
+                            row("DiscTindakan") = nilai
+                        End If
+
+                        Exit For
+                    End If
+                Next
+            End If
+        Next
+
+        If adaTindakan Then
+            Kalkulasi()
+            MessageBox.Show("Voucher tindakan diterapkan pada '" & namaTindakan & "'.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        Else
+            MessageBox.Show("Tindakan '" & namaTindakan & "' belum ada di daftar, voucher akan diterapkan nanti.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
         End If
     End Sub
 End Class
