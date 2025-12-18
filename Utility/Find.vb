@@ -38,6 +38,22 @@ Public Class Find
         Dim Tpass As String
     End Structure
 
+    Public Enum FindPickMode
+        ReplaceText = 0   ' default lama
+        AppendText = 1    ' tambah (multi)
+    End Enum
+
+    Private _PickMode As FindPickMode = FindPickMode.ReplaceText
+
+    Public Property PickMode() As FindPickMode
+        Get
+            Return _PickMode
+        End Get
+        Set(ByVal value As FindPickMode)
+            _PickMode = value
+        End Set
+    End Property
+
     Private DBFind As New DBSQLConn
     Private DBFind2 As New DBSQLConn
     Private TForm As String
@@ -275,6 +291,29 @@ Public Class Find
         Catch ex As Exception
             MsgBox(ex.Message)
         End Try
+
+    End Sub
+
+    Private Sub AppendToTextBox(ByVal txt As TextBox, ByVal value As String)
+
+        If txt.Text.Trim() = "" Then
+            txt.Text = value
+            Exit Sub
+        End If
+
+        Dim exists As Boolean = False
+        Dim arr() As String = txt.Text.Split(","c)
+
+        For i As Integer = 0 To arr.Length - 1
+            If arr(i).Trim().Equals(value, StringComparison.OrdinalIgnoreCase) Then
+                exists = True
+                Exit For
+            End If
+        Next
+
+        If Not exists Then
+            txt.Text &= ", " & value
+        End If
 
     End Sub
 
@@ -549,9 +588,16 @@ Public Class Find
                 Case "FindMasterSesi"
                     FormReservasi.LoadReservasi(Grdrow("RuanganID").ToString)
                 Case "FindMasterTindakanVoc"
-                    Dim tindakanID As String = Grdrow("TindakanID").ToString()
-                    Dim namaTindakan As String = Grdrow("NamaTindakan").ToString()
-                    FormKodeVoucher.TextBoxTindakan.Text = tindakanID & " - " & namaTindakan
+                    Dim tindakanID As String = GridViewListData.GetRowCellValue(Baris, "TindakanID").ToString()
+                    Dim namaTindakan As String = GridViewListData.GetRowCellValue(Baris, "NamaTindakan").ToString()
+                    Dim dataBaru As String = tindakanID & " - " & namaTindakan
+                    If PickMode = FindPickMode.ReplaceText Then
+                        FormKodeVoucher.TextBoxTindakan.Text = dataBaru
+
+                    ElseIf PickMode = FindPickMode.AppendText Then
+                        AppendToTextBox(FormKodeVoucher.TextBoxTindakan, dataBaru)
+
+                    End If
                 Case Else : MsgBox("Error...")
             End Select
             Me.Close()

@@ -51,6 +51,7 @@
     End Sub
 
     Private Sub ButtonFind_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonFind.Click
+        Find.PickMode = Find.FindPickMode.AppendText
         Find.Show()
         Find.Query("SELECT TindakanID, NamaTindakan, BiayaTindakan FROM MasterTindakan WHERE ClosedDate IS NULL", " ORDER BY NamaTindakan ASC", "FindMasterTindakanVoc", 1)
     End Sub
@@ -89,12 +90,20 @@
         Dim createdBy As String = userInput
 
         Dim tindakanID As String = ""
-        If TextBoxTindakan.Text.Contains("-") Then
-            Dim split() As String = TextBoxTindakan.Text.Split("-"c)
-            tindakanID = split(0).Trim()
-        Else
-            tindakanID = TextBoxTindakan.Text.Trim()
+        Dim listID As New List(Of String)
+
+        If TextBoxTindakan.Text.Trim() <> "" Then
+            Dim items() As String = TextBoxTindakan.Text.Split(","c)
+
+            For i As Integer = 0 To items.Length - 1
+                Dim part() As String = items(i).Split("-"c)
+                If part.Length > 0 Then
+                    listID.Add(part(0).Trim())
+                End If
+            Next
         End If
+
+        tindakanID = String.Join(",", listID.ToArray())
 
         ' --- Validasi ---
         If kode = "" Or nama = "" Then
@@ -165,15 +174,16 @@
                 "MV.JumlahMaks, " & _
                 "MV.JumlahTerpakai, " & _
                 "MV.Status, " & _
-                "ISNULL(MT.NamaTindakan, '-') AS NamaTindakan, " & _
+                "MV.KodeTindakan, " & _
                 "MV.CreatedDate, " & _
                 "MV.CreatedBy " & _
             "FROM MasterVoucher MV " & _
-            "LEFT JOIN MasterTindakan MT ON MT.TindakanID = MV.KodeTindakan " & _
             "WHERE(MV.DeletedBy Is NULL) " & _
             "ORDER BY MV.CreatedDate DESC"
 
         Dim dt As DataTable = ReadSQL(sql)
+
+        Dim dtTindakan As DataTable = ReadSQL("SELECT TindakanID, NamaTindakan FROM MasterTindakan")
 
         ' --- Tambahkan kolom tampilan untuk user ---
         dt.Columns.Add("Nama Voucher", GetType(String))
@@ -185,7 +195,7 @@
         dt.Columns.Add("Kuota", GetType(String))
         dt.Columns.Add("Terpakai", GetType(String))
         dt.Columns.Add("Status Voucher", GetType(String))
-        'dt.Columns.Add("Nama Tindakan", GetType(String))
+        dt.Columns.Add("Nama Tindakan", GetType(String))
 
         For Each row As DataRow In dt.Rows
             Dim nama As String = If(IsDBNull(row("NamaVoucher")), "", row("NamaVoucher").ToString())
@@ -206,7 +216,7 @@
                     status = CInt(statusVal)
                 End If
             End If
-            Dim tindakan As String = If(IsDBNull(row("NamaTindakan")), "-", row("NamaTindakan").ToString())
+            'Dim tindakan As String = If(IsDBNull(row("NamaTindakan")), "-", row("NamaTindakan").ToString())
 
             row("Nama Voucher") = nama
             row("Kode Voucher") = kode
@@ -222,7 +232,31 @@
             row("Kuota") = kuota & "x"
             row("Terpakai") = terpakai
             row("Status Voucher") = If(status = 1, "Aktif", "Nonaktif")
-            'row("Nama Tindakan") = tindakan
+
+            Dim namaTindakanGabung As String = "-"
+
+            If Not IsDBNull(row("KodeTindakan")) Then
+                Dim ids() As String = row("KodeTindakan").ToString().Split(","c)
+                Dim namaList As New List(Of String)
+
+                For i As Integer = 0 To ids.Length - 1
+                    Dim idVal As Integer
+
+                    If Integer.TryParse(ids(i).Trim(), idVal) Then
+                        Dim found() As DataRow = dtTindakan.Select("TindakanID = " & idVal)
+
+                        If found.Length > 0 Then
+                            namaList.Add(found(0)("NamaTindakan").ToString())
+                        End If
+                    End If
+                Next
+
+                If namaList.Count > 0 Then
+                    namaTindakanGabung = String.Join(", ", namaList.ToArray())
+                End If
+            End If
+
+            row("Nama Tindakan") = namaTindakanGabung
         Next
 
         DataGridView1.DataSource = dt
@@ -329,15 +363,28 @@
             Dim status As Integer = 1
             Dim createdBy As String = userInput
 
-            Dim tindakanID As String = ""
-            If TextBoxTindakan.Text.Contains("-") Then
-                Dim split() As String = TextBoxTindakan.Text.Split("-"c)
-                tindakanID = split(0).Trim()
-            Else
-                tindakanID = TextBoxTindakan.Text.Trim()
+            Dim listID As New List(Of String)
+
+            If TextBoxTindakan.Text.Trim() <> "" Then
+                Dim items() As String = TextBoxTindakan.Text.Split(","c)
+
+                For i As Integer = 0 To items.Length - 1
+                    Dim part() As String = items(i).Split("-"c)
+                    If part.Length > 0 Then
+                        listID.Add(part(0).Trim())
+                    End If
+                Next
             End If
 
+            Dim tindakanID As String = String.Join(",", listID.ToArray())
+
+
             ' --- Validasi umum ---
+            If tindakanID = "" Then
+                MsgBox("Pilih minimal satu tindakan.", MsgBoxStyle.Exclamation)
+                Exit Sub
+            End If
+
             If nama = "" Or tipe = "" Then
                 MsgBox("Nama dan tipe voucher harus diisi.", MsgBoxStyle.Exclamation)
                 Exit Sub

@@ -121,7 +121,7 @@ Partial Class FormKodeVoucher
         Me.ButtonFind.Enabled = False
         Me.ButtonFind.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonFind.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.ButtonFind.Location = New System.Drawing.Point(588, 98)
+        Me.ButtonFind.Location = New System.Drawing.Point(666, 98)
         Me.ButtonFind.Name = "ButtonFind"
         Me.ButtonFind.Size = New System.Drawing.Size(35, 25)
         Me.ButtonFind.TabIndex = 519
@@ -143,10 +143,11 @@ Partial Class FormKodeVoucher
         '
         Me.TextBoxTindakan.Enabled = False
         Me.TextBoxTindakan.Location = New System.Drawing.Point(457, 98)
+        Me.TextBoxTindakan.Multiline = True
         Me.TextBoxTindakan.Name = "TextBoxTindakan"
-        Me.TextBoxTindakan.Size = New System.Drawing.Size(125, 22)
+        Me.TextBoxTindakan.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal
+        Me.TextBoxTindakan.Size = New System.Drawing.Size(203, 73)
         Me.TextBoxTindakan.TabIndex = 517
-        Me.TextBoxTindakan.WordWrap = False
         '
         'ButtonSimpanVoc
         '
@@ -166,7 +167,7 @@ Partial Class FormKodeVoucher
         '
         Me.Label9.AutoSize = True
         Me.Label9.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label9.Location = New System.Drawing.Point(779, 78)
+        Me.Label9.Location = New System.Drawing.Point(857, 78)
         Me.Label9.Name = "Label9"
         Me.Label9.Size = New System.Drawing.Size(85, 17)
         Me.Label9.TabIndex = 514
@@ -174,7 +175,7 @@ Partial Class FormKodeVoucher
         '
         'TextBoxNominalVoc
         '
-        Me.TextBoxNominalVoc.Location = New System.Drawing.Point(782, 98)
+        Me.TextBoxNominalVoc.Location = New System.Drawing.Point(860, 98)
         Me.TextBoxNominalVoc.Multiline = True
         Me.TextBoxNominalVoc.Name = "TextBoxNominalVoc"
         Me.TextBoxNominalVoc.Size = New System.Drawing.Size(138, 25)
@@ -185,7 +186,7 @@ Partial Class FormKodeVoucher
         '
         Me.Label8.AutoSize = True
         Me.Label8.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label8.Location = New System.Drawing.Point(630, 78)
+        Me.Label8.Location = New System.Drawing.Point(708, 78)
         Me.Label8.Name = "Label8"
         Me.Label8.Size = New System.Drawing.Size(89, 17)
         Me.Label8.TabIndex = 512
@@ -199,7 +200,7 @@ Partial Class FormKodeVoucher
         Me.ComboBoxNominalVoc.Font = New System.Drawing.Font("Segoe UI", 9.75!)
         Me.ComboBoxNominalVoc.FormattingEnabled = True
         Me.ComboBoxNominalVoc.Items.AddRange(New Object() {"NOMINAL", "PERCENT"})
-        Me.ComboBoxNominalVoc.Location = New System.Drawing.Point(633, 98)
+        Me.ComboBoxNominalVoc.Location = New System.Drawing.Point(711, 98)
         Me.ComboBoxNominalVoc.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
         Me.ComboBoxNominalVoc.Name = "ComboBoxNominalVoc"
         Me.ComboBoxNominalVoc.Size = New System.Drawing.Size(143, 25)

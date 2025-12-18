@@ -65,15 +65,16 @@
                 "MV.JumlahMaks, " & _
                 "MV.JumlahTerpakai, " & _
                 "MV.Status, " & _
-                "ISNULL(MT.NamaTindakan, '') AS NamaTindakan " & _
+                "MV.KodeTindakan " & _
             "FROM MasterVoucher MV " & _
-            "LEFT JOIN MasterTindakan MT ON MT.TindakanID = MV.KodeTindakan " & _
             "WHERE MV.KodeVoucher = '" & kodeVoucher.Replace("'", "''") & "' " & _
             "AND (MV.DeletedBy IS NULL OR MV.DeletedBy = '') " & _
             "AND (MV.JumlahTerpakai < MV.JumlahMaks OR MV.JumlahMaks = 0)"
 
 
         Dim dt As DataTable = ReadSQL(sql)
+
+        Dim dtTindakan As DataTable = ReadSQL("SELECT TindakanID, NamaTindakan FROM MasterTindakan")
 
         If dt.Rows.Count = 0 Then
             MessageBox.Show("Kode voucher tidak ditemukan.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
@@ -113,7 +114,28 @@
         Dim nominal As String = If(tipe = "PERCENT", nilai.ToString("N0") & "%", "Rp " & nilai.ToString("N0"))
         Dim tglAkhirStr As String = If(tglAkhir = DateTime.MinValue, "-", tglAkhir.ToString("dd MMM yyyy"))
 
-        dtDisplay.Rows.Add(row("KodeVoucher"), row("NamaVoucher"), tipe, nominal, row.Item("NamaTindakan"), tglAkhirStr)
+        Dim namaTindakan As String = "-"
+
+        If Not IsDBNull(row("KodeTindakan")) Then
+            Dim ids() As String = row("KodeTindakan").ToString().Split(","c)
+            Dim namaList As New List(Of String)
+
+            For i As Integer = 0 To ids.Length - 1
+                Dim idVal As Integer
+                If Integer.TryParse(ids(i).Trim(), idVal) Then
+                    Dim found() As DataRow = dtTindakan.Select("TindakanID = " & idVal)
+                    If found.Length > 0 Then
+                        namaList.Add(found(0)("NamaTindakan").ToString())
+                    End If
+                End If
+            Next
+
+            If namaList.Count > 0 Then
+                namaTindakan = String.Join(", ", namaList.ToArray())
+            End If
+        End If
+
+        dtDisplay.Rows.Add(row("KodeVoucher"), row("NamaVoucher"), tipe, nominal, namatindakan, tglAkhirStr)
 
         DataGridVoucher.DataSource = dtDisplay
         DataGridVoucher.AllowUserToAddRows = False

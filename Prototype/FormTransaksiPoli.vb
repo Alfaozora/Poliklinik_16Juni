@@ -476,14 +476,21 @@ Public Class FormTransaksiPoli
         Dim adaTindakan As Boolean = False
         For Each row As DataRow In Tbls.Rows
             If Not IsDBNull(row("Tindakan")) Then
-                If row("Tindakan").ToString().Trim().ToUpper() = namaTindakan.Trim().ToUpper() Then
-                    adaTindakan = True
-                    If jenis.ToUpper() = "NOMINAL" Then
-                        row("DiscNilai") = nilai
-                    ElseIf jenis.ToUpper() = "PERCENT" Then
-                        row("DiscTindakan") = nilai
+                Dim tindakanGrid As String = row("Tindakan").ToString().Trim().ToUpper()
+                Dim arrVoucherTindakan() As String = namaTindakan.Split(","c)
+                For i As Integer = 0 To arrVoucherTindakan.Length - 1
+                    If tindakanGrid = arrVoucherTindakan(i).Trim().ToUpper() Then
+                        adaTindakan = True
+
+                        If jenis.ToUpper() = "NOMINAL" Then
+                            row("DiscNilai") = nilai
+                        ElseIf jenis.ToUpper() = "PERCENT" Then
+                            row("DiscTindakan") = nilai
+                        End If
+
+                        Exit For
                     End If
-                End If
+                Next
             End If
         Next
 
