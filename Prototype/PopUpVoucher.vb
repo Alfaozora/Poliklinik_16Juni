@@ -25,13 +25,12 @@
                 "MV.NamaVoucher, " & _
                 "MV.Tipe, " & _
                 "MV.Nilai, " & _
-                "ISNULL(MT.NamaTindakan, '') AS NamaTindakan, " & _
                 "CONVERT(VARCHAR(10), MV.TanggalAkhir, 105) AS TanggalAkhir " & _
                 "FROM TransaksiPoli TP " & _
                 "INNER JOIN TransaksiPoliDetail TPD ON TP.TransPoliID = TPD.TransPoliID " & _
                 "INNER JOIN MasterVoucher MV ON TPD.KodeVoucher = MV.KodeVoucher " & _
-                "LEFT JOIN MasterTindakan MT ON MV.KodeTindakan = MT.TindakanID " & _
-                "WHERE TP.IDInternet = '" & _NoRekamMedis & "'"
+                "WHERE TP.IDInternet = '" & _NoRekamMedis.Replace("'", "''") & "' " & _
+                "AND TPD.DeletedBy IS NULL "
 
             Dim dt As DataTable = ReadSQL(sql)
             DataGridRiwayat.DataSource = dt
@@ -107,6 +106,7 @@
         dtDisplay.Columns.Add("Nominal")
         dtDisplay.Columns.Add("Nama Tindakan")
         dtDisplay.Columns.Add("Berakhir Tanggal")
+        dtDisplay.Columns.Add("KodeTindakan")
 
         Dim tipe As String = row("Tipe").ToString().ToUpper()
         Dim nilai As Decimal = CDec(row("Nilai"))
@@ -135,12 +135,13 @@
             End If
         End If
 
-        dtDisplay.Rows.Add(row("KodeVoucher"), row("NamaVoucher"), tipe, nominal, namatindakan, tglAkhirStr)
+        dtDisplay.Rows.Add(row("KodeVoucher"), row("NamaVoucher"), tipe, nominal, namaTindakan, tglAkhirStr, row("KodeTindakan").ToString())
 
         DataGridVoucher.DataSource = dtDisplay
         DataGridVoucher.AllowUserToAddRows = False
         DataGridVoucher.AllowUserToDeleteRows = False
         DataGridVoucher.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+        DataGridVoucher.Columns("KodeTindakan").Visible = False
 
         If Not DataGridVoucher.Columns.Contains("Pilih") Then
             Dim chk As New DataGridViewCheckBoxColumn()
@@ -161,25 +162,67 @@
         MessageBox.Show("Voucher ditemukan dan ditambahkan.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
     End Sub
 
+    'Private Sub ButtonSubmit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonSubmit.Click
+    '    For Each row As DataGridViewRow In DataGridVoucher.Rows
+    '        If Convert.ToBoolean(row.Cells("Pilih").Value) = True Then
+    '            Dim kode As String = row.Cells("Kode Voucher").Value.ToString()
+    '            Dim jenis As String = row.Cells("Jenis Voucher").Value.ToString() ' NOMINAL atau PERCENT
+    '            Dim nilai As Decimal = CDec(row.Cells("NOMINAL").Value.ToString().Replace("Rp", "").Replace("%", "").Trim())
+
+    '            ' Tambahkan nama tindakan (jika voucher jenis tindakan)
+    '            Dim namaTindakan As String = ""
+    '            If DataGridVoucher.Columns.Contains("Nama Tindakan") Then
+    '                namaTindakan = row.Cells("Nama Tindakan").Value.ToString()
+    '            End If
+
+    '            ' Tentukan apakah voucher ini untuk tindakan tertentu
+    '            Dim isTindakan As Boolean = Not String.IsNullOrEmpty(namaTindakan)
+
+    '            ' 🟡 Validasi: cek apakah voucher sudah pernah digunakan pasien ini
+    '            Dim sudahDipakai As Boolean = False
+
+    '            For Each r As DataGridViewRow In DataGridRiwayat.Rows
+    '                If r.Cells("KodeVoucher").Value.ToString().Trim().ToUpper() = kode.Trim().ToUpper() Then
+    '                    sudahDipakai = True
+    '                    Exit For
+    '                End If
+    '            Next
+
+    '            If sudahDipakai Then
+    '                MsgBox("Voucher ini sudah pernah digunakan oleh pasien ini dan tidak dapat digunakan lagi.", MsgBoxStyle.Exclamation, "Voucher Sudah Digunakan")
+    '                Exit Sub
+    '            End If
+
+    '            ' Kirim semua parameter ke FormTransaksiPoli
+    '            RaiseEvent VoucherDipilih(kode, jenis, nilai, isTindakan, namaTindakan)
+
+    '            Exit For
+    '        End If
+    '    Next
+
+    '    Me.Close()
+    'End Sub
+
     Private Sub ButtonSubmit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonSubmit.Click
         For Each row As DataGridViewRow In DataGridVoucher.Rows
             If Convert.ToBoolean(row.Cells("Pilih").Value) = True Then
-                Dim kode As String = row.Cells("Kode Voucher").Value.ToString()
-                Dim jenis As String = row.Cells("Jenis Voucher").Value.ToString() ' NOMINAL atau PERCENT
-                Dim nilai As Decimal = CDec(row.Cells("NOMINAL").Value.ToString().Replace("Rp", "").Replace("%", "").Trim())
 
-                ' Tambahkan nama tindakan (jika voucher jenis tindakan)
-                Dim namaTindakan As String = ""
-                If DataGridVoucher.Columns.Contains("Nama Tindakan") Then
-                    namaTindakan = row.Cells("Nama Tindakan").Value.ToString()
+                Dim kode As String = row.Cells("Kode Voucher").Value.ToString()
+                Dim jenis As String = row.Cells("Jenis Voucher").Value.ToString()
+
+                Dim nilai As Decimal = CDec(row.Cells("Nominal").Value.ToString().Replace("Rp", "").Replace("%", "").Replace(",", "").Trim())
+
+                ' 🔑 AMBIL KODE TINDAKAN (CSV ID)
+                Dim kodeTindakan As String = ""
+                If DataGridVoucher.Columns.Contains("KodeTindakan") Then
+                    kodeTindakan = row.Cells("KodeTindakan").Value.ToString()
                 End If
 
-                ' Tentukan apakah voucher ini untuk tindakan tertentu
-                Dim isTindakan As Boolean = Not String.IsNullOrEmpty(namaTindakan)
+                ' Voucher khusus tindakan jika KodeTindakan tidak kosong
+                Dim isTindakan As Boolean = (kodeTindakan.Trim() <> "")
 
                 ' 🟡 Validasi: cek apakah voucher sudah pernah digunakan pasien ini
                 Dim sudahDipakai As Boolean = False
-
                 For Each r As DataGridViewRow In DataGridRiwayat.Rows
                     If r.Cells("KodeVoucher").Value.ToString().Trim().ToUpper() = kode.Trim().ToUpper() Then
                         sudahDipakai = True
@@ -192,8 +235,8 @@
                     Exit Sub
                 End If
 
-                ' Kirim semua parameter ke FormTransaksiPoli
-                RaiseEvent VoucherDipilih(kode, jenis, nilai, isTindakan, namaTindakan)
+                ' ✅ KIRIM KE FORM TUJUAN (KASIR / FORM TINDAKAN)
+                RaiseEvent VoucherDipilih(kode, jenis, nilai, isTindakan, kodeTindakan)
 
                 Exit For
             End If

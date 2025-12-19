@@ -440,7 +440,7 @@ Public Class FormTransaksiPoli
     Private voucherNilai As Decimal = 0
     Private voucherTindakanID As String = ""
     Private voucherIsTindakan As Boolean = False
-    Private voucherTindakanNama As String = ""
+    'Private voucherTindakanNama As String = ""
 
     Private Sub ButtonVoucher_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonVoucher.Click
         Dim f As New PopUpVoucher()
@@ -449,12 +449,13 @@ Public Class FormTransaksiPoli
         f.ShowDialog()
     End Sub
 
-    Private Sub ProsesVoucher(ByVal kode As String, ByVal jenis As String, ByVal nilai As Decimal, Optional ByVal isTindakan As Boolean = False, Optional ByVal namaTindakan As String = "")
+    Private Sub ProsesVoucher(ByVal kode As String, ByVal jenis As String, ByVal nilai As Decimal, Optional ByVal isTindakan As Boolean = False, Optional ByVal kodeTindakanVoucher As String = "")
         voucherAktifKode = kode
         voucherTipe = jenis
         voucherNilai = nilai
         voucherIsTindakan = isTindakan
-        voucherTindakanNama = namaTindakan
+        voucherTindakanID = kodeTindakanVoucher
+        'voucherTindakanNama = namaTindakan
 
         Dim Tbls As DataTable = CType(gridtindakan.DataSource, DataTable)
         If Tbls Is Nothing Then Exit Sub
@@ -474,12 +475,18 @@ Public Class FormTransaksiPoli
 
         ' Voucher khusus tindakan → cocokkan berdasarkan kolom "Tindakan"
         Dim adaTindakan As Boolean = False
+        Dim arrVoucher() As String = voucherTindakanID.Split(","c)
+
         For Each row As DataRow In Tbls.Rows
-            If Not IsDBNull(row("Tindakan")) Then
-                Dim tindakanGrid As String = row("Tindakan").ToString().Trim().ToUpper()
-                Dim arrVoucherTindakan() As String = namaTindakan.Split(","c)
-                For i As Integer = 0 To arrVoucherTindakan.Length - 1
-                    If tindakanGrid = arrVoucherTindakan(i).Trim().ToUpper() Then
+            If IsDBNull(row("TindakanID")) Then Continue For
+
+            Dim tindakanIDGrid As Integer
+            If Not Integer.TryParse(row("TindakanID").ToString(), tindakanIDGrid) Then Continue For
+
+            For i As Integer = 0 To arrVoucher.Length - 1
+                Dim idVal As Integer
+                If Integer.TryParse(arrVoucher(i).Trim(), idVal) Then
+                    If idVal = tindakanIDGrid Then
                         adaTindakan = True
 
                         If jenis.ToUpper() = "NOMINAL" Then
@@ -490,15 +497,15 @@ Public Class FormTransaksiPoli
 
                         Exit For
                     End If
-                Next
-            End If
+                End If
+            Next
         Next
 
         If adaTindakan Then
             Kalkulasi()
-            MessageBox.Show("Voucher tindakan diterapkan pada '" & namaTindakan & "'.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            MessageBox.Show("Voucher Tindakan Berhasil Diterapkan.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
         Else
-            MessageBox.Show("Tindakan '" & namaTindakan & "' belum ada di daftar, voucher akan diterapkan nanti.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            MessageBox.Show("Voucher tidak berlaku untuk tindakan yang dipilih.", "Informasi")
         End If
     End Sub
 End Class

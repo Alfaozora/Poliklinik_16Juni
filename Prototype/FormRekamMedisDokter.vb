@@ -158,6 +158,12 @@ Public Class FormRekamMedisDokter
     Private startPoint2 As Point
     Private endPoint2 As Point
 
+    Private voucherKode As String = ""
+    Private voucherJenis As String = ""
+    Private voucherNilai As Decimal = 0
+    Private voucherIsTindakan As Boolean = False
+    Private voucherTindakanID As String = ""
+
     Dim sedangLoadData As Boolean = False
 
     ' Set Default
@@ -1452,6 +1458,8 @@ Public Class FormRekamMedisDokter
         TextBoxNamaTindakan.ResetText()
         TextBoxJenisTindakan.ResetText()
         TextBoxBiayaTindakan.ResetText()
+        TextBoxDiskonTindakan.ResetText()
+        TextBoxLabel.Text = "Rp"
         CheckBoxInformedConsent.Checked = False
         SplitContainerTindakan.Panel2Collapsed = True
     End Sub
@@ -1994,12 +2002,34 @@ Public Class FormRekamMedisDokter
 
     Public Sub LoadTindakanPoli(ByRef Trow As DataRowView)
         If CheckTambahTindakanPoli(Trow) = True Then
-            If Trow("TindakanID") > 0 Then
-                TextBoxTindakanID.Text = Trow("TindakanID")
-                TextBoxNamaTindakan.Text = Trow("NamaTindakan")
-                TextBoxJenisTindakan.Text = Trow("JenisTindakan")
-                TextBoxBiayaTindakan.Text = Trow("BiayaTindakan")
-                CheckBoxInformedConsent.Checked = Trow("StatusInformedConsent").ToString
+            If Val(Trow("TindakanID")) > 0 Then
+
+                ' --- Identitas tindakan ---
+                TextBoxTindakanID.Text = Trow("TindakanID").ToString()
+                TextBoxNamaTindakan.Text = Trow("NamaTindakan").ToString()
+                TextBoxJenisTindakan.Text = Trow("JenisTindakan").ToString()
+
+                ' --- Biaya asli ---
+                Dim biayaAsli As Decimal = 0
+                Decimal.TryParse(Trow("BiayaTindakan").ToString(), biayaAsli)
+
+                ' 🔑 Simpan biaya asli
+                LabelBiaya.Text = biayaAsli.ToString("N0")
+
+                ' --- Reset diskon & nett ---
+                TextBoxDiskonTindakan.Text = "0"
+                TextBoxBiayaTindakan.Text = biayaAsli.ToString("N0")
+
+                ' --- Reset voucher ---
+                voucherKode = ""
+                voucherJenis = ""
+                voucherNilai = 0
+                voucherIsTindakan = False
+                voucherTindakanID = ""
+
+                ' --- Informed consent ---
+                CheckBoxInformedConsent.Checked = CBool(Trow("StatusInformedConsent"))
+
             End If
         End If
     End Sub
@@ -2032,6 +2062,34 @@ Public Class FormRekamMedisDokter
             ' Get data poli
             Dim trowPoli As DataRow = tblsRekamMedis.Rows(0)
 
+            Dim biayaAsli As Decimal = 0
+            Dim discNominal As Decimal = 0
+            Dim discTindakan As Decimal = 0
+            Dim discPersenTindakan As Decimal = 0
+            Dim nettBayar As Decimal = 0
+
+            Decimal.TryParse(LabelBiaya.Text.Replace(",", ""), biayaAsli)
+            If voucherJenis.Trim().ToUpper() = "NOMINAL" Then
+                ' NOMINAL → simpan ke DiscPersenTindakan
+                discPersenTindakan = voucherNilai
+                discTindakan = 0
+
+                discNominal = voucherNilai
+
+            ElseIf voucherJenis.Trim().ToUpper() = "PERCENT" Then
+                ' PERCENT → simpan ANGKA PERSEN SAJA
+                discTindakan = voucherNilai
+                discPersenTindakan = 0
+
+                discNominal = biayaAsli * voucherNilai / 100
+            End If
+
+            ' safety
+            If discNominal > biayaAsli Then discNominal = biayaAsli
+
+            nettBayar = biayaAsli - discNominal
+            If nettBayar < 0 Then nettBayar = 0
+
             ' Get Penjamin
             Dim penjaminTindakan As String = ""
             If RadioButtonPenjaminUmum.Checked = True Then
@@ -2057,8 +2115,23 @@ Public Class FormRekamMedisDokter
 
             If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
                 ' Insert ke tabel TransaksiPoliDetail
-                WriteSQL("INSERT INTO TransaksiPoliDetail(TransPoliID,TindakanID,NamaTindakan,JenisTindakan,BiayaTindakan,DiscTindakan,NettBayar,Penjamin,GroupBayar,StatusPembayaran,CreatedBy,CreatedDate) " & _
-                         "VALUES('" & trowPoli("TransPoliID") & "','" & TextBoxTindakanID.Text & "','" & TextBoxNamaTindakan.Text & "','" & TextBoxJenisTindakan.Text & "'," & CDbl(TextBoxBiayaTindakan.Text) & ", 0," & CDbl(TextBoxBiayaTindakan.Text) & ", '" & penjaminTindakan & "', '', 'PENDING', '" & userInput & "', GETDATE())", 4)
+                WriteSQL( _
+                    "INSERT INTO TransaksiPoliDetail(" & _
+                    "TransPoliID, TindakanID, NamaTindakan, JenisTindakan, " & _
+                    "BiayaTindakan, DiscTindakan, DiscPersenTindakan, NettBayar, KodeVoucher, " & _
+                    "Penjamin, GroupBayar, StatusPembayaran, CreatedBy, CreatedDate) VALUES (" & _
+                    "'" & trowPoli("TransPoliID") & "', " & _
+                    "'" & TextBoxTindakanID.Text & "', " & _
+                    "'" & TextBoxNamaTindakan.Text.Replace("'", "''") & "', " & _
+                    "'" & TextBoxJenisTindakan.Text & "', " & _
+                    biayaAsli & ", " & _
+                    discTindakan & ", " & _
+                    discPersenTindakan & ", " & _
+                    nettBayar & ", " & _
+                    "'" & voucherKode.Replace("'", "''") & "', " & _
+                    "'" & penjaminTindakan & "', '', 'PENDING', '" & userInput & "', GETDATE()" & _
+                    ")", 4)
+
 
                 Dim dtReminder As DataTable = ReadSQL("SELECT Reminder, Hari FROM MasterTindakan WHERE TindakanID = '" & TextBoxTindakanID.Text & "'")
 
@@ -12007,5 +12080,100 @@ Public Class FormRekamMedisDokter
     Private Sub ButtonScanQR_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonScanQR.Click
         DialogBoxPaketTindakan.SetForm("Perencanaan Tindakan")
         DialogBoxPaketTindakan.ShowDialog()
+    End Sub
+
+    Private Sub ProsesVoucherTindakan(ByVal kode As String, ByVal jenis As String, ByVal nilai As Decimal, Optional ByVal isTindakan As Boolean = False, Optional ByVal kodeTindakanVoucher As String = "")
+        voucherKode = kode
+        voucherJenis = jenis
+        voucherNilai = nilai
+        voucherIsTindakan = isTindakan
+        voucherTindakanID = kodeTindakanVoucher
+
+        Dim tindakanID As Integer
+        If Not Integer.TryParse(TextBoxTindakanID.Text.Trim(), tindakanID) Then
+            MessageBox.Show("Tindakan belum dipilih.", "Validasi")
+            Exit Sub
+        End If
+
+        ' Jika voucher khusus tindakan → cek kecocokan
+        If voucherIsTindakan Then
+            Dim cocok As Boolean = False
+            Dim arr() As String = voucherTindakanID.Split(","c)
+
+            For i As Integer = 0 To arr.Length - 1
+                Dim idVal As Integer
+                If Integer.TryParse(arr(i).Trim(), idVal) Then
+                    If idVal = tindakanID Then
+                        cocok = True
+                        Exit For
+                    End If
+                End If
+            Next
+
+            If Not cocok Then
+                MessageBox.Show("Voucher tidak berlaku untuk tindakan ini.", "Informasi")
+                Exit Sub
+            End If
+        End If
+
+        ' Hitung diskon
+        HitungDiskonTindakan()
+
+        MessageBox.Show("Voucher berhasil diterapkan.", "Informasi")
+    End Sub
+
+    'Private Sub HitungDiskonTindakan()
+    '    Dim biaya As Decimal = CDec(TextBoxBiayaTindakan.Text)
+
+    '    Dim diskon As Decimal = 0
+    '    If voucherJenis = "NOMINAL" Then
+    '        diskon = voucherNilai
+    '    ElseIf voucherJenis = "PERCENT" Then
+    '        diskon = biaya * voucherNilai / 100
+    '    End If
+
+    '    If diskon > biaya Then diskon = biaya
+
+    '    TextBoxDiskonTindakan.Text = diskon.ToString("N0")
+    '    TextBoxBiayaTindakan.Text = (biaya - diskon).ToString("N0")
+    'End Sub
+
+    Private Sub HitungDiskonTindakan()
+        Dim biayaAsli As Decimal = 0
+        Decimal.TryParse(LabelBiaya.Text.Replace(",", ""), biayaAsli)
+
+        Dim diskonNominal As Decimal = 0
+        If voucherJenis = "NOMINAL" Then
+            'Diskon langsung nominal
+            diskonNominal = voucherNilai
+
+            ' TAMPILKAN NOMINAL
+            TextBoxDiskonTindakan.Text = diskonNominal.ToString("N0")
+
+        ElseIf voucherJenis = "PERCENT" Then
+            'Diskon persen
+            diskonNominal = biayaAsli * voucherNilai / 100
+
+            ' TAMPILKAN PERSEN SAJA
+            TextBoxDiskonTindakan.Text = voucherNilai.ToString("N0")
+            TextBoxLabel.Text = "%"
+        End If
+
+        ' Safety
+        If diskonNominal > biayaAsli Then diskonNominal = biayaAsli
+
+        ' Nett bayar
+        Dim nettBayar As Decimal = biayaAsli - diskonNominal
+        If nettBayar < 0 Then nettBayar = 0
+
+        TextBoxBiayaTindakan.Text = nettBayar.ToString("N0")
+
+    End Sub
+
+    Private Sub ButtonVoucher_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonVoucher.Click
+        Dim f As New PopUpVoucher()
+        f.NoRekamMedis = idPasien
+        AddHandler f.VoucherDipilih, AddressOf ProsesVoucherTindakan
+        f.ShowDialog()
     End Sub
 End Class
