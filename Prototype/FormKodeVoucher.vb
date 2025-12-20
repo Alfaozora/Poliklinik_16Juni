@@ -62,6 +62,7 @@
         ComboBoxNominalVoc.SelectedIndex = -1
         TextBoxNominalVoc.Clear()
         TextBoxMinVoc.Clear()
+        ComboBoxJenisPemakaian.SelectedIndex = -1
         dtAwal.Value = DateTime.Now
         dtAkhir.Value = DateTime.Now
         TextBoxKuotaVoc.Clear()
@@ -74,12 +75,14 @@
         Dim kode As String = TextBoxKodeVoc.Text.Trim()
         Dim nama As String = TextBoxNamaVoc.Text.Trim()
         Dim tipe As String = ComboBoxNominalVoc.Text.Trim()
+        Dim pemakaian As String = ComboBoxJenisPemakaian.Text.Trim()
         Dim nilai As Integer = If(TextBoxNominalVoc.Text = "", 0, CInt(TextBoxNominalVoc.Text))
         Dim minTransaksi As Integer = If(TextBoxMinVoc.Text = "", 0, CInt(TextBoxMinVoc.Text))
         Dim tglMulai As DateTime = dtAwal.Value
         Dim tglAkhir As DateTime = dtAkhir.Value
         Dim maks As Integer = If(TextBoxKuotaVoc.Text = "", 0, CInt(TextBoxKuotaVoc.Text))
         Dim jenis As Integer
+
         If ComboBoxJenisVoc.Text.Trim().ToLower() = "voucher tindakan" Then
             jenis = 1
         Else
@@ -111,6 +114,16 @@
             Exit Sub
         End If
 
+        ' === VALIDASI JENIS PEMAKAIAN VOUCHER ===
+        If ComboBoxJenisPemakaian.SelectedIndex = -1 OrElse _
+           String.IsNullOrEmpty(ComboBoxJenisPemakaian.Text) Then
+
+            MsgBox("Jenis pemakaian voucher wajib dipilih.", _
+                   MsgBoxStyle.Exclamation, "Validasi")
+            ComboBoxJenisPemakaian.Focus()
+            Exit Sub
+        End If
+
         ' ✅ Validasi kode voucher tidak boleh sama
         Dim cekSql As String = "SELECT COUNT(*) FROM MasterVoucher WHERE KodeVoucher = '" & kode.Replace("'", "''") & "'"
         Dim dtCek As DataTable = ReadSQL(cekSql)
@@ -137,7 +150,7 @@
 
         ' --- Simpan ke database ---
         Dim sql As String = "INSERT INTO MasterVoucher " & _
-            "(NamaVoucher, KodeVoucher, Tipe, Nilai, MinTransaksi, TanggalMulai, TanggalAkhir, JumlahMaks, JumlahTerpakai, Status, Tindakan, KodeTindakan, CreatedDate, CreatedBy) VALUES (" & _
+            "(NamaVoucher, KodeVoucher, Tipe, Nilai, MinTransaksi, TanggalMulai, TanggalAkhir, JumlahMaks, JumlahTerpakai, Status, Tindakan, TipePemakaian, KodeTindakan, CreatedDate, CreatedBy) VALUES (" & _
             "'" & nama.Replace("'", "''") & "', " & _
             "'" & kode.Replace("'", "''") & "', " & _
             "'" & tipe.Replace("'", "''") & "', " & _
@@ -149,6 +162,7 @@
             "0, " & _
             status & ", " & _
             jenis & ", " & _
+            "'" & pemakaian.Replace("'", "''") & "', " & _
             "'" & tindakanID.Replace("'", "''") & "', " & _
             "GETDATE(), " & _
             "'" & createdBy.Replace("'", "''") & "'" & _
@@ -176,7 +190,8 @@
                 "MV.Status, " & _
                 "MV.KodeTindakan, " & _
                 "MV.CreatedDate, " & _
-                "MV.CreatedBy " & _
+                "MV.CreatedBy, " & _
+                "MV.TipePemakaian " & _
             "FROM MasterVoucher MV " & _
             "WHERE(MV.DeletedBy Is NULL) " & _
             "ORDER BY MV.CreatedDate DESC"
@@ -196,6 +211,7 @@
         dt.Columns.Add("Terpakai", GetType(String))
         dt.Columns.Add("Status Voucher", GetType(String))
         dt.Columns.Add("Nama Tindakan", GetType(String))
+        dt.Columns.Add("Tipe Pemakaian", GetType(String))
 
         For Each row As DataRow In dt.Rows
             Dim nama As String = If(IsDBNull(row("NamaVoucher")), "", row("NamaVoucher").ToString())
@@ -216,6 +232,23 @@
                     status = CInt(statusVal)
                 End If
             End If
+
+            Dim tipePemakaian As String = ""
+            If Not IsDBNull(row("TipePemakaian")) Then
+                tipePemakaian = CStr(row("TipePemakaian"))
+            End If
+
+            Select Case tipePemakaian
+                Case "ONCE"
+                    row("Tipe Pemakaian") = "Sekali Pakai (Per Pasien)"
+                Case "UNLIMITED"
+                    row("Tipe Pemakaian") = "Bisa Berkali-kali"
+                Case "DAILY"
+                    row("Tipe Pemakaian") = "1x Per Hari (Per Pasien)"
+                Case Else
+                    row("Tipe Pemakaian") = "-"
+            End Select
+
             'Dim tindakan As String = If(IsDBNull(row("NamaTindakan")), "-", row("NamaTindakan").ToString())
 
             row("Nama Voucher") = nama
@@ -277,7 +310,7 @@
         End If
 
         ' --- Sembunyikan kolom mentah ---
-        Dim hiddenCols() As String = {"ID", "NamaVoucher", "KodeVoucher", "Tipe", "Nilai", "MinTransaksi", "TanggalMulai", "TanggalAkhir", "JumlahMaks", "JumlahTerpakai", "Status", "KodeTindakan", "CreatedDate", "CreatedBy"}
+        Dim hiddenCols() As String = {"ID", "NamaVoucher", "KodeVoucher", "Tipe", "Nilai", "MinTransaksi", "TanggalMulai", "TanggalAkhir", "JumlahMaks", "JumlahTerpakai", "Status", "KodeTindakan", "CreatedDate", "CreatedBy", "TipePemakaian"}
         For Each colName In hiddenCols
             If DataGridView1.Columns.Contains(colName) Then
                 DataGridView1.Columns(colName).Visible = False

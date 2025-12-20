@@ -1206,23 +1206,7 @@ Public Class FormPembayaran
                               "AND NamaTindakan = '" & Trow("Tindakan").ToString().Replace("'", "''") & "' " & _
                               "AND JenisTindakan = '" & Trow("Jenis").ToString().Replace("'", "''") & "'", 4)
 
-                        ' === Setelah semua transaksi tersimpan ===
-                        If _kodeVoucher <> "" Then
-                            Try
-                                ' Update jumlah terpakai voucher
-                                Dim sqlUpdateVoucher As String = _
-                                    "UPDATE MasterVoucher " & _
-                                    "SET JumlahTerpakai = ISNULL(JumlahTerpakai, 0) + 1 " & _
-                                    "WHERE KodeVoucher = '" & _kodeVoucher.Replace("'", "''") & "'"
-
-                                WriteSQL(sqlUpdateVoucher, 4)
-
-                                ' Opsional: tampilkan notifikasi sukses
-                                MessageBox.Show("Voucher berhasil digunakan dan jumlah pemakaian diperbarui.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                            Catch ex As Exception
-                                MessageBox.Show("Gagal memperbarui jumlah pemakaian voucher: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                            End Try
-                        End If
+                        
 
                     End If
 
@@ -1261,6 +1245,23 @@ Public Class FormPembayaran
                 Next
 
                 WriteSQL("UPDATE TransaksiPoli SET TotalTagihan = TotalTagihan + " & CDbl(txtotalbruto) & ", TotalDisc = TotalDisc + " & CDbl(txtotaldisc) & ", Pembulatan = Pembulatan + " & CDbl(txtotalpembulatan) & ", NettBayar = NettBayar + " & CDbl(TextBoxTotalTagihan.Value) & ", TotalBayar = TotalBayar + " & CDbl(TextBoxTotalBayar.Value) & ", Pengembalian = Pengembalian + " & CDbl(TextBoxTotalKembali.Value) & ", ClosedBayar = '" & Format(DateAndTime.Now, "MM/dd/yyyy") & "', Status = 'CLOSED' WHERE TransPoliID = '" & _idTransaksi & "'", 4)
+
+
+                ' ================================
+                ' UPDATE JUMLAH TERPAKAI VOUCHER
+                ' ================================
+                If _kodeVoucher.Trim() <> "" Then
+                    Try
+                        Dim sqlUpdateVoucher As String = _
+                            "UPDATE MasterVoucher SET " & _
+                            "JumlahTerpakai = ISNULL(JumlahTerpakai, 0) + 1 " & _
+                            "WHERE KodeVoucher = '" & _kodeVoucher.Replace("'", "''") & "'"
+
+                        WriteSQL(sqlUpdateVoucher, 4)
+                    Catch ex As Exception
+                        MsgBox("Gagal update jumlah pemakaian voucher: " & ex.Message, MsgBoxStyle.Critical)
+                    End Try
+                End If
 
                 If TextBoxTotalKembali.Value > 0 Then
                     WriteSQL("UPDATE TransaksiPoliBayar SET Kembali = '" & CDbl(TextBoxTotalKembali.Value) & "' WHERE TransPoliID = '" & _idTransaksi & "' AND JenisBayar = 'TUNAI' ", 4)
