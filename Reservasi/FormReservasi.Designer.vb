@@ -36,6 +36,8 @@ Partial Class FormReservasi
         Dim DataGridViewCellStyle10 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Dim DataGridViewCellStyle11 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Dim DataGridViewCellStyle12 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle13 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle14 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Me.PanelTop = New System.Windows.Forms.Panel
         Me.btnClose = New System.Windows.Forms.Button
         Me.PanelSide = New System.Windows.Forms.Panel
@@ -124,6 +126,13 @@ Partial Class FormReservasi
         Me.RescheduleToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.Timer1 = New System.Windows.Forms.Timer(Me.components)
         Me.NotifyIcon1 = New System.Windows.Forms.NotifyIcon(Me.components)
+        Me.SplitContainer4 = New System.Windows.Forms.SplitContainer
+        Me.DataGridViewLogPesan = New System.Windows.Forms.DataGridView
+        Me.Label25 = New System.Windows.Forms.Label
+        Me.Label27 = New System.Windows.Forms.Label
+        Me.dtAwalLog = New System.Windows.Forms.DateTimePicker
+        Me.dtAkhirLog = New System.Windows.Forms.DateTimePicker
+        Me.ButtonCariLogPesan = New System.Windows.Forms.Button
         Me.PanelTop.SuspendLayout()
         Me.PanelSide.SuspendLayout()
         Me.TabControlMenu.SuspendLayout()
@@ -147,11 +156,16 @@ Partial Class FormReservasi
         Me.SplitContainer3.SuspendLayout()
         CType(Me.DataGridViewSesi, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabPage4.SuspendLayout()
+        Me.PanelLayoutMenu4TopMain.SuspendLayout()
         Me.SplitContainer9.Panel1.SuspendLayout()
         Me.SplitContainer9.Panel2.SuspendLayout()
         Me.SplitContainer9.SuspendLayout()
         Me.PanelButton.SuspendLayout()
         Me.ContextMenuStatus.SuspendLayout()
+        Me.SplitContainer4.Panel1.SuspendLayout()
+        Me.SplitContainer4.Panel2.SuspendLayout()
+        Me.SplitContainer4.SuspendLayout()
+        CType(Me.DataGridViewLogPesan, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'PanelTop
@@ -208,7 +222,7 @@ Partial Class FormReservasi
         Me.btnMenu4.Padding = New System.Windows.Forms.Padding(5, 0, 0, 0)
         Me.btnMenu4.Size = New System.Drawing.Size(150, 45)
         Me.btnMenu4.TabIndex = 5
-        Me.btnMenu4.Text = "Asuransi"
+        Me.btnMenu4.Text = "Log Pesan"
         Me.ToolTipBtnMenu.SetToolTip(Me.btnMenu4, "Asuransi")
         Me.btnMenu4.UseVisualStyleBackColor = True
         Me.btnMenu4.Visible = False
@@ -1225,10 +1239,10 @@ Partial Class FormReservasi
         'TabPage4
         '
         Me.TabPage4.Controls.Add(Me.PanelLayoutMenu4TopMain)
-        Me.TabPage4.Location = New System.Drawing.Point(4, 25)
+        Me.TabPage4.Location = New System.Drawing.Point(4, 27)
         Me.TabPage4.Name = "TabPage4"
         Me.TabPage4.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage4.Size = New System.Drawing.Size(942, 565)
+        Me.TabPage4.Size = New System.Drawing.Size(942, 563)
         Me.TabPage4.TabIndex = 3
         Me.TabPage4.Text = "Tab Menu 4"
         Me.TabPage4.UseVisualStyleBackColor = True
@@ -1237,10 +1251,11 @@ Partial Class FormReservasi
         '
         Me.PanelLayoutMenu4TopMain.AutoScroll = True
         Me.PanelLayoutMenu4TopMain.BackColor = System.Drawing.Color.White
+        Me.PanelLayoutMenu4TopMain.Controls.Add(Me.SplitContainer4)
         Me.PanelLayoutMenu4TopMain.Dock = System.Windows.Forms.DockStyle.Fill
         Me.PanelLayoutMenu4TopMain.Location = New System.Drawing.Point(3, 3)
         Me.PanelLayoutMenu4TopMain.Name = "PanelLayoutMenu4TopMain"
-        Me.PanelLayoutMenu4TopMain.Size = New System.Drawing.Size(936, 559)
+        Me.PanelLayoutMenu4TopMain.Size = New System.Drawing.Size(936, 557)
         Me.PanelLayoutMenu4TopMain.TabIndex = 7
         '
         'ButtonCari
@@ -1373,6 +1388,122 @@ Partial Class FormReservasi
         Me.NotifyIcon1.Text = "Aplikasi Reminder WhatsApp"
         Me.NotifyIcon1.Visible = True
         '
+        'SplitContainer4
+        '
+        Me.SplitContainer4.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.SplitContainer4.Location = New System.Drawing.Point(0, 0)
+        Me.SplitContainer4.Name = "SplitContainer4"
+        Me.SplitContainer4.Orientation = System.Windows.Forms.Orientation.Horizontal
+        '
+        'SplitContainer4.Panel1
+        '
+        Me.SplitContainer4.Panel1.Controls.Add(Me.ButtonCariLogPesan)
+        Me.SplitContainer4.Panel1.Controls.Add(Me.dtAkhirLog)
+        Me.SplitContainer4.Panel1.Controls.Add(Me.dtAwalLog)
+        Me.SplitContainer4.Panel1.Controls.Add(Me.Label27)
+        Me.SplitContainer4.Panel1.Controls.Add(Me.Label25)
+        '
+        'SplitContainer4.Panel2
+        '
+        Me.SplitContainer4.Panel2.Controls.Add(Me.DataGridViewLogPesan)
+        Me.SplitContainer4.Size = New System.Drawing.Size(936, 557)
+        Me.SplitContainer4.SplitterDistance = 100
+        Me.SplitContainer4.SplitterWidth = 5
+        Me.SplitContainer4.TabIndex = 0
+        '
+        'DataGridViewLogPesan
+        '
+        Me.DataGridViewLogPesan.AllowUserToAddRows = False
+        Me.DataGridViewLogPesan.AllowUserToDeleteRows = False
+        Me.DataGridViewLogPesan.BackgroundColor = System.Drawing.Color.White
+        Me.DataGridViewLogPesan.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.DataGridViewLogPesan.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None
+        Me.DataGridViewLogPesan.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None
+        DataGridViewCellStyle13.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle13.BackColor = System.Drawing.Color.FromArgb(CType(CType(37, Byte), Integer), CType(CType(160, Byte), Integer), CType(CType(218, Byte), Integer))
+        DataGridViewCellStyle13.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle13.ForeColor = System.Drawing.SystemColors.WindowText
+        DataGridViewCellStyle13.Padding = New System.Windows.Forms.Padding(3)
+        DataGridViewCellStyle13.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle13.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle13.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
+        Me.DataGridViewLogPesan.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle13
+        Me.DataGridViewLogPesan.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        DataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle14.BackColor = System.Drawing.Color.White
+        DataGridViewCellStyle14.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle14.ForeColor = System.Drawing.Color.Black
+        DataGridViewCellStyle14.Padding = New System.Windows.Forms.Padding(3)
+        DataGridViewCellStyle14.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle14.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle14.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
+        Me.DataGridViewLogPesan.DefaultCellStyle = DataGridViewCellStyle14
+        Me.DataGridViewLogPesan.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.DataGridViewLogPesan.Location = New System.Drawing.Point(0, 0)
+        Me.DataGridViewLogPesan.Name = "DataGridViewLogPesan"
+        Me.DataGridViewLogPesan.ReadOnly = True
+        Me.DataGridViewLogPesan.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing
+        Me.DataGridViewLogPesan.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
+        Me.DataGridViewLogPesan.Size = New System.Drawing.Size(936, 452)
+        Me.DataGridViewLogPesan.TabIndex = 0
+        '
+        'Label25
+        '
+        Me.Label25.AutoSize = True
+        Me.Label25.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label25.Location = New System.Drawing.Point(21, 10)
+        Me.Label25.Name = "Label25"
+        Me.Label25.Size = New System.Drawing.Size(78, 15)
+        Me.Label25.TabIndex = 0
+        Me.Label25.Text = "Tanggal Awal"
+        '
+        'Label27
+        '
+        Me.Label27.AutoSize = True
+        Me.Label27.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label27.Location = New System.Drawing.Point(150, 10)
+        Me.Label27.Name = "Label27"
+        Me.Label27.Size = New System.Drawing.Size(80, 15)
+        Me.Label27.TabIndex = 1
+        Me.Label27.Text = "Tanggal Akhir"
+        '
+        'dtAwalLog
+        '
+        Me.dtAwalLog.CalendarFont = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.dtAwalLog.CustomFormat = "dd-MMM-yyyy"
+        Me.dtAwalLog.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.dtAwalLog.Format = System.Windows.Forms.DateTimePickerFormat.Custom
+        Me.dtAwalLog.Location = New System.Drawing.Point(24, 30)
+        Me.dtAwalLog.Name = "dtAwalLog"
+        Me.dtAwalLog.Size = New System.Drawing.Size(119, 25)
+        Me.dtAwalLog.TabIndex = 538
+        '
+        'dtAkhirLog
+        '
+        Me.dtAkhirLog.CalendarFont = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.dtAkhirLog.CustomFormat = "dd-MMM-yyyy"
+        Me.dtAkhirLog.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.dtAkhirLog.Format = System.Windows.Forms.DateTimePickerFormat.Custom
+        Me.dtAkhirLog.Location = New System.Drawing.Point(153, 30)
+        Me.dtAkhirLog.Name = "dtAkhirLog"
+        Me.dtAkhirLog.Size = New System.Drawing.Size(119, 25)
+        Me.dtAkhirLog.TabIndex = 539
+        '
+        'ButtonCariLogPesan
+        '
+        Me.ButtonCariLogPesan.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonCariLogPesan.Cursor = System.Windows.Forms.Cursors.Default
+        Me.ButtonCariLogPesan.FlatAppearance.BorderSize = 0
+        Me.ButtonCariLogPesan.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonCariLogPesan.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ButtonCariLogPesan.ForeColor = System.Drawing.Color.White
+        Me.ButtonCariLogPesan.Location = New System.Drawing.Point(24, 64)
+        Me.ButtonCariLogPesan.Name = "ButtonCariLogPesan"
+        Me.ButtonCariLogPesan.Size = New System.Drawing.Size(95, 27)
+        Me.ButtonCariLogPesan.TabIndex = 548
+        Me.ButtonCariLogPesan.Text = "Cari"
+        Me.ButtonCariLogPesan.UseVisualStyleBackColor = False
+        '
         'FormReservasi
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)
@@ -1416,11 +1547,17 @@ Partial Class FormReservasi
         Me.SplitContainer3.ResumeLayout(False)
         CType(Me.DataGridViewSesi, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabPage4.ResumeLayout(False)
+        Me.PanelLayoutMenu4TopMain.ResumeLayout(False)
         Me.SplitContainer9.Panel1.ResumeLayout(False)
         Me.SplitContainer9.Panel2.ResumeLayout(False)
         Me.SplitContainer9.ResumeLayout(False)
         Me.PanelButton.ResumeLayout(False)
         Me.ContextMenuStatus.ResumeLayout(False)
+        Me.SplitContainer4.Panel1.ResumeLayout(False)
+        Me.SplitContainer4.Panel1.PerformLayout()
+        Me.SplitContainer4.Panel2.ResumeLayout(False)
+        Me.SplitContainer4.ResumeLayout(False)
+        CType(Me.DataGridViewLogPesan, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -1513,4 +1650,11 @@ Partial Class FormReservasi
     Friend WithEvents LabelJamAwal As System.Windows.Forms.Label
     Friend WithEvents Label24 As System.Windows.Forms.Label
     Friend WithEvents LabelJamAkhir As System.Windows.Forms.Label
+    Friend WithEvents SplitContainer4 As System.Windows.Forms.SplitContainer
+    Friend WithEvents DataGridViewLogPesan As System.Windows.Forms.DataGridView
+    Friend WithEvents Label27 As System.Windows.Forms.Label
+    Friend WithEvents Label25 As System.Windows.Forms.Label
+    Friend WithEvents ButtonCariLogPesan As System.Windows.Forms.Button
+    Friend WithEvents dtAkhirLog As System.Windows.Forms.DateTimePicker
+    Friend WithEvents dtAwalLog As System.Windows.Forms.DateTimePicker
 End Class

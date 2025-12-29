@@ -270,6 +270,7 @@ Partial Class PoliKlinik
         Me.TimerUpdateProgram = New System.Windows.Forms.Timer(Me.components)
         Me.TimerShutdown = New System.Windows.Forms.Timer(Me.components)
         Me.TimerKirimReminderWA = New System.Windows.Forms.Timer(Me.components)
+        Me.TimerBirthday = New System.Windows.Forms.Timer(Me.components)
         Me.MenuStrip.SuspendLayout()
         Me.StatusStrip.SuspendLayout()
         Me.SuspendLayout()
@@ -1979,6 +1980,11 @@ Partial Class PoliKlinik
         Me.TimerKirimReminderWA.Enabled = True
         Me.TimerKirimReminderWA.Interval = 60000
         '
+        'TimerBirthday
+        '
+        Me.TimerBirthday.Enabled = True
+        Me.TimerBirthday.Interval = 300000
+        '
         'PoliKlinik
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -2250,4 +2256,5 @@ Partial Class PoliKlinik
     Friend WithEvents ReservasiDanReminderToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents MasterHargaToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents MasterVoucherToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents TimerBirthday As System.Windows.Forms.Timer
 End Class

@@ -684,6 +684,22 @@ Module Test
 
     End Sub
 
+    Public Function WriteSQLResult(ByVal Txt As String, ByRef Txtype As Integer) As Integer
+        Dim Dbsql As New DBSQLConn
+        Dim result As Integer = 0
+        Try
+            Dbsql.Con = New SqlConnection(PusatSQL.Con.ConnectionString)
+            Dbsql.Con.Open()
+            Dbsql.Cmd = New SqlCommand(Txt, Dbsql.Con)
+            result = Dbsql.Cmd.ExecuteNonQuery()
+            Dbsql.Con.Close()
+        Catch ex As Exception
+            MsgBox("Error WriteSQLResult: " & ex.Message)
+            result = 0
+        End Try
+        Return result
+    End Function
+
     Function CheckOLE(ByVal txt As String) As Boolean
         Dim Dttable As New DataTable
         Dim Dbsql As New DBOLEConn

@@ -1,9 +1,15 @@
+Version : 2.0.0.55 (29 Desember 2025)
+# [New Feature] Penambahan Master Voucher dan penerapan voucher
+# [New Feature] Penambahan Fitur Ucapan Selamat Ulang Tahun kepada Pasien
+# [Bug Fix] Memperbaiki Error Saat Mengirim Pesan Reminder Otomatis
+# [Usability Improvement] Penyesuaian Kirim Pesan Reminder Menjadi H-7 yang Sebelumnya H-1
+# [Usability Improvement] Optimalisasi Kalimat pada Pesan Pengingat dan Ucapan Ulang Tahun
+
 Version : 2.0.0.54 (28 Oktober 2025)
 # [Usability Improvement] Penambahan Hari, Reminder, PoliTujuan saat export Excel Master Tindakan
 # [Usability Improvement] Penambahan PoliTujuan saat export Excel Master Paket Tindakan
 # [Usability Improvement] Menu Validasi Faskes Pasien bisa dipakai menggunakan NIK/No BPJS atau keduanya
 # [Usability Improvement] Mengaktifkan Kembali Master Harga Tindakan dan Paket Tindakan
-# [New Feature] Penambahan Master Voucher dan penerapan voucher
 
 Version : 2.0.0.53 (30 Juli 2025)
 # [New Feature] Penambahan Menu Reminder Pasien Untuk Mengingatkan Pasien Untuk Berkunjung ke Faskes
