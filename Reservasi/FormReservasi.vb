@@ -37,16 +37,17 @@ Public Class FormReservasi
             Dim strValue As String = row("StrValue").ToString()
 
             Select Case strValue
-                Case "W001" : Return "KLINIK MITRA MEDICARE SUCI"
-                Case "W002" : Return "KLINIK MITRA MEDICARE MANYAR"
-                Case "W003" : Return "KLINIK MITRA MEDICARE DRIYOREJO"
-                Case "L001" : Return "KLINIK MITRA MEDICARE DHARMAHUSADA"
-                Case "L002" : Return "KLINIK MITRA MEDICARE DIPONEGORO"
-                Case "L003" : Return "KLINIK LUMIERA LUZELLA"
-                Case "A002" : Return "KLINIK MITRA MEDICARE JATIUWUH"
-                Case "AD01" : Return "KLINIK MITRA MEDICARE BOYOLALI"
-                Case "D002" : Return "KLINIK MITRA MEDICARE RANCAEKEK"
-                Case Else : Return "KLINIK CITRA MEDICARE KARAWANG"
+                Case "W001" : Return "Klinik Mitra Medicare Suci"
+                Case "W002" : Return "Klinik Mitra Medicare Manyar"
+                Case "W003" : Return "Klinik Mitra Medicare Driyorejo"
+                Case "L001" : Return "Klinik Mitra Medicare Dharmahusada"
+                Case "L002" : Return "Cahaya Diagnostic Centre Diponegoro"
+                Case "L003" : Return "Lumiera Luzella"
+                Case "L005" : Return "Inhouse Wings Surya"
+                Case "A002" : Return "Klinik Mitra Medicare Jatiuwuh"
+                Case "AD01" : Return "Klinik Mitra Medicare Boyolali"
+                Case "D002" : Return "Klinik Mitra Medicare Rancaekek"
+                Case "T001" : Return "Klinik Citra Medika Karawang"
             End Select
         End If
 
@@ -59,6 +60,8 @@ Public Class FormReservasi
             Dim strValue As String = row("StrValue").ToString()
 
             btnMenu1.Visible = (strValue = "L003")
+            btnMenu1.BackColor = Color.FromArgb(81, 168, 255)
+            btnMenu1.ForeColor = Color.White
             ButtonCari.Visible = (strValue = "L003")
             btnMenu3.Visible = (strValue = "L003")
 
@@ -96,6 +99,8 @@ Public Class FormReservasi
     End Sub
 
     Private Sub LoadReservasi()
+        dtReservasi.MinDate = Date.Today
+
         Dim query As String = "SELECT JR.JadwalID, R.Hari, R.Sesi, R.Tindakan, JR.NamaRuangan, JR.TglMulai, JR.NamaPasien, JR.NoHP, JR.Catatan, JR.Status " & _
                     "FROM JadwalRuangan JR " & _
                     "INNER JOIN MasterRuangan R ON JR.RuanganID = R.RuanganID " & _
@@ -166,7 +171,14 @@ Public Class FormReservasi
             DataGridViewReservasi.Columns("Status").Visible = False
         End If
 
-            TambahKolomAksi()
+        TambahKolomAksi()
+    End Sub
+
+    Private Sub dtReservasi_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles dtReservasi.ValueChanged
+        If dtReservasi.Value.Date < Date.Today Then
+            MsgBox("Tanggal reservasi tidak boleh kurang dari hari ini.", MsgBoxStyle.Exclamation)
+            dtReservasi.Value = Date.Today
+        End If
     End Sub
 
     Private Sub LoadReminder()
@@ -360,61 +372,6 @@ Public Class FormReservasi
         End If
     End Sub
 
-    Public Function SetParameterWhatsappText(ByVal nomor As String, ByVal pesan As String) As String
-        ' Bersihkan format pesan: ganti newline jadi \n, escape kutip dua
-        Dim cleanPesan As String = pesan.Replace(vbCrLf, "\n").Replace("""", "\""")
-
-        ' Buat JSON manual
-        Dim json As String = "{" & _
-            """number"": """ & nomor & """," & _
-            """message"": """ & cleanPesan & """" & _
-        "}"
-
-        Return json
-    End Function
-
-    Public Sub KirimReminderReservasiWhatsApp(ByVal namaPasien As String, ByVal noHP As String, ByVal tglReservasi As DateTime, ByVal ruangan As String, ByVal hari As String, ByVal sesi As String, ByVal tindakan As String)
-        Try
-            If Strings.Left(noHP, 2) = "08" Then
-                noHP = "62" & noHP.Substring(1)
-            End If
-
-            Dim waStatus As String = ReadSQLNIK("SELECT StrValue FROM msconfig WHERE ConfigName = 'whatsapp_klinik_status'")
-            Dim waIP As String = ReadSQLNIK("SELECT StrValue FROM msconfig WHERE ConfigName = 'whatsapp_klinik_ip'")
-            Dim lokasiKlinik As String = ReadSQLNIK("SELECT StrValue FROM msconfig WHERE ConfigName = 'InvoiceTempat_Klinik'")
-            Dim namaKlinik As String = GetNamaKlinik()
-
-            If waStatus <> "Yes" Then
-                MsgBox("WhatsApp belum disetting. Hubungi IT.", MsgBoxStyle.Exclamation)
-                Exit Sub
-            End If
-
-            Dim tanggalIndo As String = tglReservasi.ToString("dddd, dd MMMM yyyy", New Globalization.CultureInfo("id-ID"))
-
-            Dim pesan As String = "Salam Sehat *" & namaPasien & "*" & vbCrLf & vbCrLf & _
-                                  "Pengingat reservasi Anda di *" & namaKlinik & "*." & vbCrLf & _
-                                  "Untuk tindakan *" & tindakan & "* Pada sesi " & sesi & "" & vbCrLf & _
-                                  "Tanggal: " & tanggalIndo & vbCrLf & _
-                                  "Jam: " & tglReservasi.ToString("HH:mm") & " WIB" & vbCrLf & _
-                                  "Ruangan: " & ruangan & vbCrLf & vbCrLf & _
-                                  "Mohon datang tepat waktu." & vbCrLf & _
-                                  "Terima kasih" & vbCrLf & vbCrLf & _
-                                  "----- Pesan otomatis, mohon tidak dibalas -----"
-
-            Dim parameter As String = SetParameterWhatsappText(noHP, pesan)
-            Dim urlSend As String = "http://" & waIP & ":4444/send"
-            Dim statusKirim As String = SendDataWhatsapp(parameter, urlSend)
-
-            If statusKirim = "Success" Then
-                MsgBox("Reminder berhasil dikirim ke " & noHP, MsgBoxStyle.Information)
-            Else
-                MsgBox("Gagal mengirim WhatsApp. Periksa koneksi atau server WhatsApp.", MsgBoxStyle.Exclamation)
-            End If
-        Catch ex As Exception
-            MsgBox("Terjadi kesalahan saat kirim reminder: " & ex.Message, MsgBoxStyle.Critical)
-        End Try
-    End Sub
-
     Private selectedJadwalID As Integer = 0
 
     Private Sub DataGridViewReservasi_CellClick(ByVal sender As Object, ByVal e As DataGridViewCellEventArgs) Handles DataGridViewReservasi.CellClick
@@ -454,6 +411,74 @@ Public Class FormReservasi
         End If
     End Sub
 
+    Public Function SetParameterWhatsappText(ByVal nomor As String, ByVal pesan As String) As String
+        ' Bersihkan format pesan: ganti newline jadi \n, escape kutip dua
+        Dim cleanPesan As String = pesan.Replace(vbCrLf, "\n").Replace("""", "\""")
+
+        ' Buat JSON manual
+        Dim json As String = "{" & _
+            """number"": """ & nomor & """," & _
+            """message"": """ & cleanPesan & """" & _
+        "}"
+
+        Return json
+    End Function
+
+    Public Sub KirimReminderReservasiWhatsApp(ByVal namaPasien As String, ByVal noHP As String, ByVal tglReservasi As DateTime, ByVal ruangan As String, ByVal hari As String, ByVal sesi As String, ByVal tindakan As String)
+        Try
+            If Strings.Left(noHP, 2) = "08" Then
+                noHP = "62" & noHP.Substring(1)
+            End If
+
+            Dim waStatus As String = ReadSQLNIK("SELECT StrValue FROM msconfig WHERE ConfigName = 'whatsapp_klinik_status'")
+            Dim waIP As String = ReadSQLNIK("SELECT StrValue FROM msconfig WHERE ConfigName = 'whatsapp_klinik_ip'")
+            Dim lokasiKlinik As String = ReadSQLNIK("SELECT StrValue FROM msconfig WHERE ConfigName = 'InvoiceTempat_Klinik'")
+            Dim namaKlinik As String = ""
+            Dim jenisKelamin As String = ReadSQLNIK("SELECT JenisKelamin FROM MasterPasien WHERE Nama = '" & namaPasien.Replace("'", "''") & "'")
+
+            Dim sapaan As String = ""
+            If jenisKelamin.Trim().ToUpper() = "L" Then
+                sapaan = "Bapak"
+            ElseIf jenisKelamin.Trim().ToUpper() = "P" Then
+                sapaan = "Ibu"
+            Else
+                sapaan = ""
+            End If
+
+            Dim poli As String = ruangan.Trim().ToUpper()
+            If poli.Contains("HBOT") Then
+                ruangan = "Hyperbaric Oxygen Therapy"
+            Else
+                ruangan = "Lumiera Luzelle"
+            End If
+
+            If waStatus <> "Yes" Then
+                MsgBox("WhatsApp belum disetting. Hubungi IT.", MsgBoxStyle.Exclamation)
+                Exit Sub
+            End If
+
+            Dim tanggalIndo As String = tglReservasi.ToString("dddd, dd MMMM yyyy", New Globalization.CultureInfo("id-ID"))
+
+            Dim pesan As String = "*Yth. " & sapaan & " " & namaPasien & "*," & vbCrLf & _
+                                 "Kami dari *" & ruangan & "* ingin mengonfirmasi apakah " & sapaan & " dapat hadir yang dijadwalkan *" & tanggalIndo & "* " & _
+                                 "untuk treatment *" & tindakan & "* di *" & ruangan & "*." & vbCrLf & vbCrLf & _
+                                 "Mohon konfirmasi kehadiran dengan membalas *HADIR* atau *TIDAK HADIR* ya 😊" & vbCrLf & _
+                                 "Terima kasih 🙏"
+
+            Dim parameter As String = SetParameterWhatsappText(noHP, pesan)
+            Dim urlSend As String = "http://" & waIP & ":4444/send"
+            Dim statusKirim As String = SendDataWhatsapp(parameter, urlSend)
+
+            If statusKirim = "Success" Then
+                MsgBox("Reminder berhasil dikirim ke " & noHP, MsgBoxStyle.Information)
+            Else
+                MsgBox("Gagal mengirim WhatsApp. Periksa koneksi atau server WhatsApp.", MsgBoxStyle.Exclamation)
+            End If
+        Catch ex As Exception
+            MsgBox("Terjadi kesalahan saat kirim reminder: " & ex.Message, MsgBoxStyle.Critical)
+        End Try
+    End Sub
+
     Private Sub CancelToolStripMenuItem_Click(ByVal sender As Object, ByVal e As EventArgs) Handles CancelToolStripMenuItem.Click
         Try
             Dim query As String = "UPDATE JadwalRuangan SET " & _
@@ -470,65 +495,95 @@ Public Class FormReservasi
         End Try
     End Sub
 
-    'Private Sub RescheduleToolStripMenuItem_Click(ByVal sender As Object, ByVal e As EventArgs) Handles RescheduleToolStripMenuItem.Click
-    '    Try
-    '        Dim dlg As New Dialog1()
+    Private Sub HadirToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HadirToolStripMenuItem.Click
+        Try
+            Dim query As String = "UPDATE JadwalRuangan SET " & _
+                              "Status = 'HADIR', " & _
+                              "DeletedBy = '" & userInput & "', " & _
+                              "DeletedDate = GETDATE() " & _
+                              "WHERE JadwalID = " & selectedJadwalID
+            WriteSQL(query, 4)
 
-    '        If dlg.ShowDialog() = DialogResult.OK Then
-    '            Dim mulaiBaru As DateTime = dlg.TglMulaiBaru
-    '            Dim akhirBaru As DateTime = dlg.TglAkhirBaru
-    '            Dim hariBaru As String = mulaiBaru.ToString("dddd", New Globalization.CultureInfo("id-ID"))
+            MsgBox("Status diubah menjadi HADIR", MsgBoxStyle.Information)
+            LoadReservasi()
+        Catch ex As Exception
+            MsgBox("Status gagal diubah", MsgBoxStyle.Exclamation)
+        End Try
+    End Sub
 
-    '            ' Ambil data lama dari database
-    '            Dim dt As DataTable = ReadSQL("SELECT JR.RuanganID, R.Sesi, R.Hari, R.NamaRuangan " & _
-    '                                          "FROM JadwalRuangan JR " & _
-    '                                          "INNER JOIN MasterRuangan R ON JR.RuanganID = R.RuanganID " & _
-    '                                          "WHERE JR.JadwalID = " & selectedJadwalID)
+    Private Sub TidakHadirToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TidakHadirToolStripMenuItem.Click
+        Try
+            Dim query As String = "UPDATE JadwalRuangan SET " & _
+                              "Status = 'TIDAK HADIR', " & _
+                              "DeletedBy = '" & userInput & "', " & _
+                              "DeletedDate = GETDATE() " & _
+                              "WHERE JadwalID = " & selectedJadwalID
+            WriteSQL(query, 4)
 
-    '            If dt.Rows.Count = 0 Then
-    '                MsgBox("Data jadwal tidak ditemukan.", MsgBoxStyle.Exclamation)
-    '                Exit Sub
-    '            End If
+            MsgBox("Status diubah menjadi TIDAK HADIR", MsgBoxStyle.Information)
+            LoadReservasi()
+        Catch ex As Exception
+            MsgBox("Status gagal diubah", MsgBoxStyle.Exclamation)
+        End Try
+    End Sub
 
-    '            Dim ruanganID As String = dt.Rows(0)("RuanganID").ToString()
-    '            Dim sesiLama As String = dt.Rows(0)("Sesi").ToString()
-    '            Dim namaRuangan As String = dt.Rows(0)("NamaRuangan").ToString()
+    Private Sub RescheduleToolStripMenuItem_Click(ByVal sender As Object, ByVal e As EventArgs) Handles RescheduleToolStripMenuItem.Click
+        Try
+            Dim dlg As New Dialog1()
 
-    '            ' Validasi kuota baru untuk sesi dan hari baru
-    '            Dim queryCek As String = "SELECT COUNT(*) FROM JadwalRuangan " & _
-    '                                     "WHERE RuanganID = '" & ruanganID & "' " & _
-    '                                     "AND Sesi = '" & sesiLama & "' " & _
-    '                                     "AND DATENAME(WEEKDAY, TglMulai) = '" & hariBaru & "' " & _
-    '                                     "AND Status <> 'CANCEL'"
+            If dlg.ShowDialog() = DialogResult.OK Then
+                Dim mulaiBaru As DateTime = dlg.TglMulaiBaru
+                Dim hariBaru As String = mulaiBaru.ToString("dddd", New Globalization.CultureInfo("id-ID"))
 
-    '            Dim jumlahBooking As Integer = CInt(ReadSQLValue(queryCek))
+                ' Ambil data lama dari database
+                Dim dt As DataTable = ReadSQL("SELECT JR.RuanganID, R.Sesi, R.Hari, R.NamaRuangan " & _
+                                              "FROM JadwalRuangan JR " & _
+                                              "INNER JOIN MasterRuangan R ON JR.RuanganID = R.RuanganID " & _
+                                              "WHERE JR.JadwalID = " & selectedJadwalID)
 
-    '            Dim queryKuota As String = "SELECT Kuota FROM MasterRuangan WHERE RuanganID = '" & ruanganID & "'"
-    '            Dim kuotaRuangan As Integer = CInt(ReadSQLValue(queryKuota))
+                If dt.Rows.Count = 0 Then
+                    MsgBox("Data jadwal tidak ditemukan.", MsgBoxStyle.Exclamation)
+                    Exit Sub
+                End If
 
-    '            If jumlahBooking >= kuotaRuangan Then
-    '                MsgBox("Kuota untuk sesi '" & sesiLama & "' di hari " & hariBaru & " sudah penuh.", MsgBoxStyle.Critical)
-    '                Exit Sub
-    '            End If
+                Dim ruanganID As String = dt.Rows(0)("RuanganID").ToString()
+                Dim sesiLama As String = dt.Rows(0)("Sesi").ToString()
+                Dim namaRuangan As String = dt.Rows(0)("NamaRuangan").ToString()
 
-    '            ' Update jadwal jika kuota cukup
-    '            Dim queryUpdate As String = "UPDATE JadwalRuangan SET " & _
-    '                                        "Status = 'RESCHEDULE', " & _
-    '                                        "TglMulai = '" & mulaiBaru.ToString("yyyy-MM-dd HH:mm") & "', " & _
-    '                                        "TglAkhir = '" & akhirBaru.ToString("yyyy-MM-dd HH:mm") & "', " & _
-    '                                        "ChangedBy = '" & userInput & "', " & _
-    '                                        "ChangedDate = GETDATE() " & _
-    '                                        "WHERE JadwalID = " & selectedJadwalID
+                ' Validasi kuota baru untuk sesi dan hari baru
+                Dim queryCek As String = "SELECT COUNT(*) FROM JadwalRuangan " & _
+                                         "WHERE RuanganID = '" & ruanganID & "' " & _
+                                         "AND Sesi = '" & sesiLama & "' " & _
+                                         "AND DATENAME(WEEKDAY, TglMulai) = '" & hariBaru & "' " & _
+                                         "AND Status <> 'CANCEL'"
 
-    '            WriteSQL(queryUpdate, 4)
+                Dim jumlahBooking As Integer = CInt(ReadSQLValue(queryCek))
 
-    '            MsgBox("Status diubah menjadi RESCHEDULE dan jadwal diperbarui.", MsgBoxStyle.Information)
-    '            LoadReservasi()
-    '        End If
-    '    Catch ex As Exception
-    '        MsgBox("Status gagal diubah: " & ex.Message, MsgBoxStyle.Exclamation)
-    '    End Try
-    'End Sub
+                Dim queryKuota As String = "SELECT Kuota FROM MasterRuangan WHERE RuanganID = '" & ruanganID & "'"
+                Dim kuotaRuangan As Integer = CInt(ReadSQLValue(queryKuota))
+
+                If jumlahBooking >= kuotaRuangan Then
+                    MsgBox("Kuota untuk sesi '" & sesiLama & "' di hari " & hariBaru & " sudah penuh.", MsgBoxStyle.Critical)
+                    Exit Sub
+                End If
+
+                ' Update jadwal jika kuota cukup
+                Dim queryUpdate As String = "UPDATE JadwalRuangan SET " & _
+                                            "Status = 'RESCHEDULE', " & _
+                                            "TglMulai = '" & mulaiBaru.ToString("yyyy-MM-dd HH:mm") & "', " & _
+                                            "ChangedBy = '" & userInput & "', " & _
+                                            "ChangedDate = GETDATE() " & _
+                                            "WHERE JadwalID = " & selectedJadwalID
+
+                WriteSQL(queryUpdate, 4)
+
+                MsgBox("Status diubah menjadi RESCHEDULE dan jadwal diperbarui.", MsgBoxStyle.Information)
+                LoadReservasi()
+            End If
+        Catch ex As Exception
+            MsgBox("Status gagal diubah: " & ex.Message, MsgBoxStyle.Exclamation)
+        End Try
+    End Sub
 
     Private Sub TambahKolomAksi()
         ' Bersihkan kolom button yang sudah ada

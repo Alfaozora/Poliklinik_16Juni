@@ -25,11 +25,8 @@ Partial Class Dialog1
         Me.TableLayoutPanel1 = New System.Windows.Forms.TableLayoutPanel
         Me.OK_Button = New System.Windows.Forms.Button
         Me.Cancel_Button = New System.Windows.Forms.Button
-        Me.dtSelesaiUlang = New System.Windows.Forms.DateTimePicker
         Me.dtReservasiUlang = New System.Windows.Forms.DateTimePicker
-        Me.Label5 = New System.Windows.Forms.Label
         Me.Label2 = New System.Windows.Forms.Label
-        Me.Label1 = New System.Windows.Forms.Label
         Me.TableLayoutPanel1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -41,7 +38,7 @@ Partial Class Dialog1
         Me.TableLayoutPanel1.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
         Me.TableLayoutPanel1.Controls.Add(Me.OK_Button, 0, 0)
         Me.TableLayoutPanel1.Controls.Add(Me.Cancel_Button, 1, 0)
-        Me.TableLayoutPanel1.Location = New System.Drawing.Point(270, 130)
+        Me.TableLayoutPanel1.Location = New System.Drawing.Point(115, 104)
         Me.TableLayoutPanel1.Name = "TableLayoutPanel1"
         Me.TableLayoutPanel1.RowCount = 1
         Me.TableLayoutPanel1.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.0!))
@@ -67,57 +64,26 @@ Partial Class Dialog1
         Me.Cancel_Button.TabIndex = 1
         Me.Cancel_Button.Text = "Cancel"
         '
-        'dtSelesaiUlang
-        '
-        Me.dtSelesaiUlang.CalendarFont = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.dtSelesaiUlang.CustomFormat = "dd-MMM-yyyy HH:mm"
-        Me.dtSelesaiUlang.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.dtSelesaiUlang.Format = System.Windows.Forms.DateTimePickerFormat.Custom
-        Me.dtSelesaiUlang.Location = New System.Drawing.Point(244, 59)
-        Me.dtSelesaiUlang.Name = "dtSelesaiUlang"
-        Me.dtSelesaiUlang.Size = New System.Drawing.Size(151, 25)
-        Me.dtSelesaiUlang.TabIndex = 522
-        '
         'dtReservasiUlang
         '
         Me.dtReservasiUlang.CalendarFont = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.dtReservasiUlang.CustomFormat = "dd-MMM-yyyy HH:mm"
         Me.dtReservasiUlang.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.dtReservasiUlang.Format = System.Windows.Forms.DateTimePickerFormat.Custom
-        Me.dtReservasiUlang.Location = New System.Drawing.Point(29, 59)
+        Me.dtReservasiUlang.Location = New System.Drawing.Point(62, 54)
         Me.dtReservasiUlang.Name = "dtReservasiUlang"
-        Me.dtReservasiUlang.Size = New System.Drawing.Size(151, 25)
+        Me.dtReservasiUlang.Size = New System.Drawing.Size(149, 25)
         Me.dtReservasiUlang.TabIndex = 521
-        '
-        'Label5
-        '
-        Me.Label5.AutoSize = True
-        Me.Label5.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label5.Location = New System.Drawing.Point(241, 39)
-        Me.Label5.Name = "Label5"
-        Me.Label5.Size = New System.Drawing.Size(52, 17)
-        Me.Label5.TabIndex = 528
-        Me.Label5.Text = "Sampai"
         '
         'Label2
         '
         Me.Label2.AutoSize = True
         Me.Label2.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label2.Location = New System.Drawing.Point(26, 39)
+        Me.Label2.Location = New System.Drawing.Point(73, 22)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(86, 17)
+        Me.Label2.Size = New System.Drawing.Size(127, 17)
         Me.Label2.TabIndex = 527
-        Me.Label2.Text = "Tgl Reservasi"
-        '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label1.Location = New System.Drawing.Point(196, 65)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(27, 17)
-        Me.Label1.TabIndex = 529
-        Me.Label1.Text = "s/d"
+        Me.Label2.Text = "Tanggal Reschedule"
         '
         'Dialog1
         '
@@ -125,11 +91,8 @@ Partial Class Dialog1
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.Cancel_Button
-        Me.ClientSize = New System.Drawing.Size(428, 171)
-        Me.Controls.Add(Me.Label1)
-        Me.Controls.Add(Me.Label5)
+        Me.ClientSize = New System.Drawing.Size(273, 145)
         Me.Controls.Add(Me.Label2)
-        Me.Controls.Add(Me.dtSelesaiUlang)
         Me.Controls.Add(Me.dtReservasiUlang)
         Me.Controls.Add(Me.TableLayoutPanel1)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
@@ -147,10 +110,7 @@ Partial Class Dialog1
     Friend WithEvents TableLayoutPanel1 As System.Windows.Forms.TableLayoutPanel
     Friend WithEvents OK_Button As System.Windows.Forms.Button
     Friend WithEvents Cancel_Button As System.Windows.Forms.Button
-    Friend WithEvents dtSelesaiUlang As System.Windows.Forms.DateTimePicker
     Friend WithEvents dtReservasiUlang As System.Windows.Forms.DateTimePicker
-    Friend WithEvents Label5 As System.Windows.Forms.Label
     Friend WithEvents Label2 As System.Windows.Forms.Label
-    Friend WithEvents Label1 As System.Windows.Forms.Label
 
 End Class

@@ -1570,4 +1570,9 @@ Public Class PoliKlinik
         FormKodeVoucher.Show()
         FormKodeVoucher.Focus()
     End Sub
+
+    Private Sub SettingWhatsAppToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SettingWhatsAppToolStripMenuItem.Click
+        WhatsAppSetting.Show()
+        WhatsAppSetting.Focus()
+    End Sub
 End Class

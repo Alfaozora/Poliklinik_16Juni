@@ -834,10 +834,22 @@
     <Compile Include="Prototype\PopUpVoucher.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Prototype\ToggleSwitch.Designer.vb">
+      <DependentUpon>ToggleSwitch.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\ToggleSwitch.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
     <Compile Include="Prototype\UploadTindakan.Designer.vb">
       <DependentUpon>UploadTindakan.vb</DependentUpon>
     </Compile>
     <Compile Include="Prototype\UploadTindakan.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Prototype\WhatsAppSetting.Designer.vb">
+      <DependentUpon>WhatsAppSetting.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\WhatsAppSetting.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Report\ReportFeeDokterPengirim.Designer.vb">
@@ -1652,8 +1664,14 @@
     <EmbeddedResource Include="Prototype\PopUpVoucher.resx">
       <DependentUpon>PopUpVoucher.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\ToggleSwitch.resx">
+      <DependentUpon>ToggleSwitch.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Prototype\UploadTindakan.resx">
       <DependentUpon>UploadTindakan.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\WhatsAppSetting.resx">
+      <DependentUpon>WhatsAppSetting.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Report\ReportFeeDokterPengirim.resx">
       <DependentUpon>ReportFeeDokterPengirim.vb</DependentUpon>

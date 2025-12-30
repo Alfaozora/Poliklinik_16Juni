@@ -1,6 +1,7 @@
 Version : 2.0.0.55 (29 Desember 2025)
 # [New Feature] Penambahan Master Voucher dan penerapan voucher
 # [New Feature] Penambahan Fitur Ucapan Selamat Ulang Tahun kepada Pasien
+# [New Feature] Penambahan Fitur Setting WhatsApp Baileys 
 # [Bug Fix] Memperbaiki Error Saat Mengirim Pesan Reminder Otomatis
 # [Usability Improvement] Penyesuaian Kirim Pesan Reminder Menjadi H-7 yang Sebelumnya H-1
 # [Usability Improvement] Optimalisasi Kalimat pada Pesan Pengingat dan Ucapan Ulang Tahun
