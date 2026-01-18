@@ -10712,6 +10712,7 @@ Me.RadioButtonPenjaminMandiriInhealth.Size = New System.Drawing.Size(113, 19)
 Me.RadioButtonPenjaminMandiriInhealth.TabIndex = 530
 Me.RadioButtonPenjaminMandiriInhealth.Text = "Mandiri Inhealth"
 Me.RadioButtonPenjaminMandiriInhealth.UseVisualStyleBackColor = true
+Me.RadioButtonPenjaminMandiriInhealth.Visible = false
 '
 'TextBoxJenisTindakan
 '
@@ -10791,6 +10792,7 @@ Me.RadioButtonPenjaminBPJS.Size = New System.Drawing.Size(50, 19)
 Me.RadioButtonPenjaminBPJS.TabIndex = 246
 Me.RadioButtonPenjaminBPJS.Text = "BPJS"
 Me.RadioButtonPenjaminBPJS.UseVisualStyleBackColor = true
+Me.RadioButtonPenjaminBPJS.Visible = false
 '
 'Label55
 '

@@ -19,6 +19,7 @@ Imports DevExpress.XtraPrinting.Drawing
 Imports PoliKlinik_Net2.ShapeDrawingFunctions
 Imports System.Text
 Imports System.Globalization
+Imports System.Net
 
 Public Class FormRekamMedisDokter
     Public Class TindakanDetail
@@ -2257,104 +2258,199 @@ Public Class FormRekamMedisDokter
         Return True
     End Function
 
+    'OLD
+    'Function ValidasiSignatureInformedConsent() As Boolean
+    '    Dim kodeLokasi As String = ReadSQLNIK("select StrValue from MsConfig where ConfigName = 'NoPoli'")
+    '    Dim statusInformedConsent As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'SettingInformedConsent'")
+
+    '    ' Skip jika setting informed consent tidak aktif
+    '    If statusInformedConsent = "No" Then Return True
+
+    '    ' Skip jika tindakan tidak membutuhkan informed consent
+    '    If CheckBoxInformedConsent.Checked = False Then Return True
+
+    '    Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'web_service_klinik'")
+    '    Dim urlWebService As String = baseURL & "api/lumiera-luzelle/" & idTransaksi & "/" & TextBoxTindakanID.Text
+    '    Dim response As String = "[" & GetDataAPI(urlWebService) & "]"
+
+    '    Dim jsonObject() = Newtonsoft.Json.JsonConvert.DeserializeObject(Of InformedConsent())(response)
+
+    '    For Each rowData As InformedConsent In jsonObject
+    '        If rowData.response.message <> "Transaksi berhasil" Then
+    '            MsgBox(rowData.response.message, MsgBoxStyle.Exclamation, "Warning!")
+    '            Return False
+    '        Else
+    '            ' Insert Informed Consent
+    '            Dim query As String = "INSERT INTO InformedConsent (NoTransaksi, NoRekamMedis, TglTransaksi, JenisPoli, KeteranganLokasi, NoNIK, NamaPasien, UmurPasien, JenisKelaminPasien, AlamatPasien, NamaDokter, NamaPerawat, KeteranganDiagnosis, DasarDiagnosis, TindakanID, KeteranganTindakan, IndikasiTindakan, TataCara, TujuanTindakan, Risiko, Komplikasi, Prognosis, AlternatifTindakan, BiayaTindakan, NamaPenanggungJawab, UmurPenanggungJawab, JenisKelaminPenanggungJawab, HubunganPenanggungJawab, AlamatPenanggungJawab, StatusSaksiPasien, NamaSaksiPasien, HubunganSaksiPasien, StatusPersetujuan, StatusTransaksi, SignatureDokter1, SignatureDokter2, SignaturePerawat, SignaturePasien1, SignaturePasien2, SignatureKeluarga, CreatedBy, CreatedDate) " & _
+    '                                  "VALUES (@NoTransaksi, @NoRekamMedis, @TglTransaksi, @JenisPoli, @KeteranganLokasi, @NoNIK, @NamaPasien, @UmurPasien, @JenisKelaminPasien, @AlamatPasien, @NamaDokter, @NamaPerawat, @KeteranganDiagnosis, @DasarDiagnosis, @TindakanID, @KeteranganTindakan, @IndikasiTindakan, @TataCara, @TujuanTindakan, @Risiko, @Komplikasi, @Prognosis, @AlternatifTindakan, @BiayaTindakan, @NamaPenanggungJawab, @UmurPenanggungJawab, @JenisKelaminPenanggungJawab, @HubunganPenanggungJawab, @AlamatPenanggungJawab, @StatusSaksiPasien, @NamaSaksiPasien, @HubunganSaksiPasien, @StatusPersetujuan, @StatusTransaksi, @SignatureDokter1, @SignatureDokter2, @SignaturePerawat, @SignaturePasien1, @SignaturePasien2, @SignatureKeluarga, @CreatedBy, GETDATE())"
+
+    '            ' Memanggil fungsi WriteParameterizedSQL untuk eksekusi query
+    '            WriteParameterizedLokalSQL(query, 4, _
+    '                New SqlParameter("@NoTransaksi", rowData.response.data.no_transaksi), _
+    '                New SqlParameter("@NoRekamMedis", rowData.response.data.no_rekam_medis), _
+    '                New SqlParameter("@TglTransaksi", rowData.response.data.tgl_transaksi), _
+    '                New SqlParameter("@JenisPoli", rowData.response.data.jenis_poli), _
+    '                New SqlParameter("@KeteranganLokasi", rowData.response.data.ket_lokasi), _
+    '                New SqlParameter("@NoNIK", rowData.response.data.no_nik), _
+    '                New SqlParameter("@NamaPasien", rowData.response.data.nama_pasien), _
+    '                New SqlParameter("@UmurPasien", rowData.response.data.umur_pasien), _
+    '                New SqlParameter("@JenisKelaminPasien", rowData.response.data.jenis_kelamin_pasien), _
+    '                New SqlParameter("@AlamatPasien", rowData.response.data.alamat_pasien), _
+    '                New SqlParameter("@NamaDokter", rowData.response.data.nama_dokter), _
+    '                New SqlParameter("@NamaPerawat", rowData.response.data.nama_perawat), _
+    '                New SqlParameter("@KeteranganDiagnosis", rowData.response.data.ket_diagnosis), _
+    '                New SqlParameter("@DasarDiagnosis", rowData.response.data.dasar_diagnosis), _
+    '                New SqlParameter("@TindakanID", rowData.response.data.id_tindakan), _
+    '                New SqlParameter("@KeteranganTindakan", rowData.response.data.ket_tindakan), _
+    '                New SqlParameter("@IndikasiTindakan", rowData.response.data.indikasi_tindakan), _
+    '                New SqlParameter("@TataCara", rowData.response.data.tata_cara), _
+    '                New SqlParameter("@TujuanTindakan", rowData.response.data.tujuan_tindakan), _
+    '                New SqlParameter("@Risiko", rowData.response.data.risiko), _
+    '                New SqlParameter("@Komplikasi", rowData.response.data.komplikasi), _
+    '                New SqlParameter("@Prognosis", rowData.response.data.prognosis), _
+    '                New SqlParameter("@AlternatifTindakan", rowData.response.data.alternatif_tindakan), _
+    '                New SqlParameter("@BiayaTindakan", rowData.response.data.biaya_tindakan), _
+    '                New SqlParameter("@NamaPenanggungJawab", rowData.response.data.nama_penanggung_jawab), _
+    '                New SqlParameter("@UmurPenanggungJawab", rowData.response.data.umur_penanggung_jawab), _
+    '                New SqlParameter("@JenisKelaminPenanggungJawab", rowData.response.data.jenis_kelamin_penanggung_jawab), _
+    '                New SqlParameter("@HubunganPenanggungJawab", rowData.response.data.hubungan_penanggung_jawab), _
+    '                New SqlParameter("@AlamatPenanggungJawab", rowData.response.data.alamat_penanggung_jawab), _
+    '                New SqlParameter("@StatusSaksiPasien", rowData.response.data.status_saksi_pasien), _
+    '                New SqlParameter("@NamaSaksiPasien", rowData.response.data.nama_saksi_pasien), _
+    '                New SqlParameter("@HubunganSaksiPasien", rowData.response.data.hubungan_saksi_pasien), _
+    '                New SqlParameter("@StatusPersetujuan", rowData.response.data.status_persetujuan), _
+    '                New SqlParameter("@StatusTransaksi", rowData.response.data.status_transaksi), _
+    '                New SqlParameter("@SignatureDokter1", rowData.response.data.signed_dokter_1), _
+    '                New SqlParameter("@SignatureDokter2", rowData.response.data.signed_dokter_2), _
+    '                New SqlParameter("@SignaturePerawat", rowData.response.data.signed_perawat), _
+    '                New SqlParameter("@SignaturePasien1", rowData.response.data.signed_pasien_1), _
+    '                New SqlParameter("@SignaturePasien2", rowData.response.data.signed_pasien_2), _
+    '                New SqlParameter("@SignatureKeluarga", rowData.response.data.signed_keluarga), _
+    '                New SqlParameter("@CreatedBy", userInput))
+    '        End If
+
+    '        'MsgBox(rowData.response.message)
+    '        'MsgBox(rowData.response.data.nama_pasien)
+    '    Next
+
+    '    ' ============================================
+
+    '    '' Deserialize JSON response
+    '    'Dim jsonObject As JObject = JObject.Parse(response)
+
+    '    '' Set Response
+    '    'Dim responseObj As JObject = jsonObject("response")
+    '    'Dim responseMessage As String = responseObj("message").ToString()
+
+    '    '' Set MetaData
+    '    'Dim metaDataObj As JObject = jsonObject("metaData")
+    '    'Dim codeMetaData As Integer = Convert.ToInt32(metaDataObj("code").ToString)
+
+    '    'If responseMessage <> "Transaksi berhasil" Then
+    '    '    MsgBox(responseMessage, MsgBoxStyle.Exclamation, "Warning!")
+    '    '    Return False
+    '    'Else
+    '    '    Dim responseData As String = responseObj("data").ToString()
+
+    '    '    ' Insert Informed Consent
+
+    '    'End If
+
+    '    Return True
+    'End Function
+
     Function ValidasiSignatureInformedConsent() As Boolean
-        Dim kodeLokasi As String = ReadSQLNIK("select StrValue from MsConfig where ConfigName = 'NoPoli'")
+
         Dim statusInformedConsent As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'SettingInformedConsent'")
 
-        ' Skip jika setting informed consent tidak aktif
+        ' Skip jika fitur tidak aktif
         If statusInformedConsent = "No" Then Return True
 
-        ' Skip jika tindakan tidak membutuhkan informed consent
+        ' Skip jika tindakan tidak membutuhkan IC
         If CheckBoxInformedConsent.Checked = False Then Return True
 
-        Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'web_service_klinik'")
-        Dim urlWebService As String = baseURL & "api/informed_consent/no_transaksi/" & idTransaksi & "/id_tindakan/" & TextBoxTindakanID.Text & "/kode_lokasi/" & kodeLokasi
-        Dim response As String = "[" & GetDataAPI(urlWebService) & "]"
+        Try
+            Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
 
-        Dim jsonObject() = Newtonsoft.Json.JsonConvert.DeserializeObject(Of InformedConsent())(response)
+            Dim urlWebService As String = baseURL & "api/lumiera-luzelle/" & idTransaksi & "/" & TextBoxTindakanID.Text
 
-        For Each rowData As InformedConsent In jsonObject
-            If rowData.response.message <> "Transaksi berhasil" Then
-                MsgBox(rowData.response.message, MsgBoxStyle.Exclamation, "Warning!")
+            Dim response As String = GetDataAPIRM(urlWebService)
+
+            Dim json As JObject = JObject.Parse(response)
+
+            ' ===============================
+            ' VALIDASI RESPONSE
+            ' ===============================
+            If json("status").ToString() <> "success" Then
+                MsgBox(json("message").ToString(), MsgBoxStyle.Exclamation, "Warning")
                 Return False
-            Else
-                ' Insert Informed Consent
-                Dim query As String = "INSERT INTO InformedConsent (NoTransaksi, NoRekamMedis, TglTransaksi, JenisPoli, KeteranganLokasi, NoNIK, NamaPasien, UmurPasien, JenisKelaminPasien, AlamatPasien, NamaDokter, NamaPerawat, KeteranganDiagnosis, DasarDiagnosis, TindakanID, KeteranganTindakan, IndikasiTindakan, TataCara, TujuanTindakan, Risiko, Komplikasi, Prognosis, AlternatifTindakan, BiayaTindakan, NamaPenanggungJawab, UmurPenanggungJawab, JenisKelaminPenanggungJawab, HubunganPenanggungJawab, AlamatPenanggungJawab, StatusSaksiPasien, NamaSaksiPasien, HubunganSaksiPasien, StatusPersetujuan, StatusTransaksi, SignatureDokter1, SignatureDokter2, SignaturePerawat, SignaturePasien1, SignaturePasien2, SignatureKeluarga, CreatedBy, CreatedDate) " & _
-                                      "VALUES (@NoTransaksi, @NoRekamMedis, @TglTransaksi, @JenisPoli, @KeteranganLokasi, @NoNIK, @NamaPasien, @UmurPasien, @JenisKelaminPasien, @AlamatPasien, @NamaDokter, @NamaPerawat, @KeteranganDiagnosis, @DasarDiagnosis, @TindakanID, @KeteranganTindakan, @IndikasiTindakan, @TataCara, @TujuanTindakan, @Risiko, @Komplikasi, @Prognosis, @AlternatifTindakan, @BiayaTindakan, @NamaPenanggungJawab, @UmurPenanggungJawab, @JenisKelaminPenanggungJawab, @HubunganPenanggungJawab, @AlamatPenanggungJawab, @StatusSaksiPasien, @NamaSaksiPasien, @HubunganSaksiPasien, @StatusPersetujuan, @StatusTransaksi, @SignatureDokter1, @SignatureDokter2, @SignaturePerawat, @SignaturePasien1, @SignaturePasien2, @SignatureKeluarga, @CreatedBy, GETDATE())"
-
-                ' Memanggil fungsi WriteParameterizedSQL untuk eksekusi query
-                WriteParameterizedLokalSQL(query, 4, _
-                    New SqlParameter("@NoTransaksi", rowData.response.data.no_transaksi), _
-                    New SqlParameter("@NoRekamMedis", rowData.response.data.no_rekam_medis), _
-                    New SqlParameter("@TglTransaksi", rowData.response.data.tgl_transaksi), _
-                    New SqlParameter("@JenisPoli", rowData.response.data.jenis_poli), _
-                    New SqlParameter("@KeteranganLokasi", rowData.response.data.ket_lokasi), _
-                    New SqlParameter("@NoNIK", rowData.response.data.no_nik), _
-                    New SqlParameter("@NamaPasien", rowData.response.data.nama_pasien), _
-                    New SqlParameter("@UmurPasien", rowData.response.data.umur_pasien), _
-                    New SqlParameter("@JenisKelaminPasien", rowData.response.data.jenis_kelamin_pasien), _
-                    New SqlParameter("@AlamatPasien", rowData.response.data.alamat_pasien), _
-                    New SqlParameter("@NamaDokter", rowData.response.data.nama_dokter), _
-                    New SqlParameter("@NamaPerawat", rowData.response.data.nama_perawat), _
-                    New SqlParameter("@KeteranganDiagnosis", rowData.response.data.ket_diagnosis), _
-                    New SqlParameter("@DasarDiagnosis", rowData.response.data.dasar_diagnosis), _
-                    New SqlParameter("@TindakanID", rowData.response.data.id_tindakan), _
-                    New SqlParameter("@KeteranganTindakan", rowData.response.data.ket_tindakan), _
-                    New SqlParameter("@IndikasiTindakan", rowData.response.data.indikasi_tindakan), _
-                    New SqlParameter("@TataCara", rowData.response.data.tata_cara), _
-                    New SqlParameter("@TujuanTindakan", rowData.response.data.tujuan_tindakan), _
-                    New SqlParameter("@Risiko", rowData.response.data.risiko), _
-                    New SqlParameter("@Komplikasi", rowData.response.data.komplikasi), _
-                    New SqlParameter("@Prognosis", rowData.response.data.prognosis), _
-                    New SqlParameter("@AlternatifTindakan", rowData.response.data.alternatif_tindakan), _
-                    New SqlParameter("@BiayaTindakan", rowData.response.data.biaya_tindakan), _
-                    New SqlParameter("@NamaPenanggungJawab", rowData.response.data.nama_penanggung_jawab), _
-                    New SqlParameter("@UmurPenanggungJawab", rowData.response.data.umur_penanggung_jawab), _
-                    New SqlParameter("@JenisKelaminPenanggungJawab", rowData.response.data.jenis_kelamin_penanggung_jawab), _
-                    New SqlParameter("@HubunganPenanggungJawab", rowData.response.data.hubungan_penanggung_jawab), _
-                    New SqlParameter("@AlamatPenanggungJawab", rowData.response.data.alamat_penanggung_jawab), _
-                    New SqlParameter("@StatusSaksiPasien", rowData.response.data.status_saksi_pasien), _
-                    New SqlParameter("@NamaSaksiPasien", rowData.response.data.nama_saksi_pasien), _
-                    New SqlParameter("@HubunganSaksiPasien", rowData.response.data.hubungan_saksi_pasien), _
-                    New SqlParameter("@StatusPersetujuan", rowData.response.data.status_persetujuan), _
-                    New SqlParameter("@StatusTransaksi", rowData.response.data.status_transaksi), _
-                    New SqlParameter("@SignatureDokter1", rowData.response.data.signed_dokter_1), _
-                    New SqlParameter("@SignatureDokter2", rowData.response.data.signed_dokter_2), _
-                    New SqlParameter("@SignaturePerawat", rowData.response.data.signed_perawat), _
-                    New SqlParameter("@SignaturePasien1", rowData.response.data.signed_pasien_1), _
-                    New SqlParameter("@SignaturePasien2", rowData.response.data.signed_pasien_2), _
-                    New SqlParameter("@SignatureKeluarga", rowData.response.data.signed_keluarga), _
-                    New SqlParameter("@CreatedBy", userInput))
             End If
 
-            'MsgBox(rowData.response.message)
-            'MsgBox(rowData.response.data.nama_pasien)
-        Next
+            Dim data As JObject = json("data")
 
-        ' ============================================
+            ' ===============================
+            ' INSERT KE DATABASE LOKAL
+            ' ===============================
+            Dim query As String = _
+                "INSERT INTO InformedConsent " & _
+                "(NoTransaksi, NoRekamMedis, TglTransaksi, NoNIK, NamaPasien, UmurPasien, " & _
+                "JenisKelaminPasien, AlamatPasien, NamaDokter, NamaPerawat, " & _
+                "KeteranganDiagnosis, DasarDiagnosis, TindakanID, KeteranganTindakan, " & _
+                "IndikasiTindakan, TataCara, TujuanTindakan, Risiko, Komplikasi, Prognosis, " & _
+                "AlternatifTindakan, BiayaTindakan, NamaPenanggungJawab, UmurPenanggungJawab, " & _
+                "JenisKelaminPenanggungJawab, HubunganPenanggungJawab, AlamatPenanggungJawab, " & _
+                "StatusPersetujuan, StatusTransaksi, SignatureDokter1, SignaturePerawat, SignaturePasien1, " & _
+                "CreatedBy, CreatedDate) " & _
+                "VALUES " & _
+                "(@NoTransaksi,@NoRekamMedis,@Tgl,@NoNIK,@Nama,@Umur,@Sex,@Alamat," & _
+                "@Dokter,@Perawat,@Diagnosis,@Dasar,@TindakanID,@KetTindakan," & _
+                "@Indikasi,@TataCara,@Tujuan,@Risiko,@Komplikasi,@Prognosis," & _
+                "@Alternatif,@Biaya,@PJ,@UmurPJ,@SexPJ,@HubunganPJ,@AlamatPJ," & _
+                "@StatusPersetujuan,@StatusTransaksi,@TTDDokter,@TTDPerawat,@TTDPasien," & _
+                "@User,GETDATE())"
 
-        '' Deserialize JSON response
-        'Dim jsonObject As JObject = JObject.Parse(response)
+            WriteParameterizedLokalSQL(query, 4, _
+                New SqlParameter("@NoTransaksi", data("no_transaksi").Value(Of String)()), _
+                New SqlParameter("@NoRekamMedis", data("no_rm").Value(Of String)()), _
+                New SqlParameter("@Tgl", Date.Parse(data("tgl").Value(Of String)())), _
+                New SqlParameter("@NoNIK", data("no_nik").Value(Of String)()), _
+                New SqlParameter("@Nama", data("nama").Value(Of String)()), _
+                New SqlParameter("@Umur", data("umur").Value(Of Integer)()), _
+                New SqlParameter("@Sex", data("sex").Value(Of String)()), _
+                New SqlParameter("@Alamat", data("alamat").Value(Of String)()), _
+                New SqlParameter("@Dokter", data("dokter").Value(Of String)()), _
+                New SqlParameter("@Perawat", data("perawat").Value(Of String)()), _
+                New SqlParameter("@Diagnosis", data("ket_diagnosis").Value(Of String)()), _
+                New SqlParameter("@Dasar", data("dasar_diagnosis").Value(Of String)()), _
+                New SqlParameter("@TindakanID", data("id_tindakan").Value(Of String)()), _
+                New SqlParameter("@KetTindakan", data("ket_tindakan").Value(Of String)()), _
+                New SqlParameter("@Indikasi", data("indikasi_tindakan").Value(Of String)()), _
+                New SqlParameter("@TataCara", data("tata_cara").Value(Of String)()), _
+                New SqlParameter("@Tujuan", data("tujuan_tindakan").Value(Of String)()), _
+                New SqlParameter("@Risiko", data("risiko").Value(Of String)()), _
+                New SqlParameter("@Komplikasi", data("komplikasi").Value(Of String)()), _
+                New SqlParameter("@Prognosis", data("prognosis").Value(Of String)()), _
+                New SqlParameter("@Alternatif", data("alternatif_tindakan").Value(Of String)()), _
+                New SqlParameter("@Biaya", data("biaya_tindakan").Value(Of Decimal)()), _
+                New SqlParameter("@PJ", data("nama_penanggung_jawab").Value(Of String)()), _
+                New SqlParameter("@UmurPJ", data("umur_penanggung_jawab").Value(Of Integer)()), _
+                New SqlParameter("@SexPJ", data("sex_penanggung_jawab").Value(Of String)()), _
+                New SqlParameter("@HubunganPJ", data("hubungan_penanggung_jawab").Value(Of String)()), _
+                New SqlParameter("@AlamatPJ", data("alamat_penanggung_jawab").Value(Of String)()), _
+                New SqlParameter("@StatusPersetujuan", data("status_persetujuan").Value(Of Boolean)()), _
+                New SqlParameter("@StatusTransaksi", data("status_transaksi").Value(Of String)()), _
+                New SqlParameter("@TTDDokter", data("ttd_dokter").Value(Of String)()), _
+                New SqlParameter("@TTDPerawat", data("ttd_perawat").Value(Of String)()), _
+                New SqlParameter("@TTDPasien", data("ttd_pasien").Value(Of String)()), _
+                New SqlParameter("@User", userInput))
 
-        '' Set Response
-        'Dim responseObj As JObject = jsonObject("response")
-        'Dim responseMessage As String = responseObj("message").ToString()
+            Return True
 
-        '' Set MetaData
-        'Dim metaDataObj As JObject = jsonObject("metaData")
-        'Dim codeMetaData As Integer = Convert.ToInt32(metaDataObj("code").ToString)
+        Catch ex As Exception
+            MsgBox("Gagal validasi informed consent:" & vbCrLf & ex.Message, MsgBoxStyle.Critical, "ERROR")
+            Return False
+        End Try
 
-        'If responseMessage <> "Transaksi berhasil" Then
-        '    MsgBox(responseMessage, MsgBoxStyle.Exclamation, "Warning!")
-        '    Return False
-        'Else
-        '    Dim responseData As String = responseObj("data").ToString()
-
-        '    ' Insert Informed Consent
-
-        'End If
-
-        Return True
     End Function
 
     Private Sub SaveMedikSubjektif()
@@ -2449,6 +2545,99 @@ Public Class FormRekamMedisDokter
         End Try
     End Sub
 
+    Function ApiCekPasien(ByVal noRM As String) As Boolean
+        Try
+
+            Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+
+            If Not baseURL.EndsWith("/") Then baseURL &= "/"
+
+            Dim url As String = baseURL & "api/pasien/cek?NoRekamMedis=" & noRM
+
+            Dim client As New WebClient()
+            client.Headers.Add("X-API-KEY", "M1tR4M3D1c@rECaH4Y42025")
+
+            Dim response As String = client.DownloadString(url)
+            Dim json As JObject = JObject.Parse(response)
+
+            Dim status As String = json("status").ToString().ToLower()
+
+            Return status = "success"
+
+        Catch ex As WebException
+            Return False
+        End Try
+    End Function
+
+    Sub ApiInsertPasien(ByVal noRM As String, ByVal nama As String, ByVal tglLahir As Date, ByVal jenisKelamin As String)
+
+        Dim baseUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+
+        If Not baseUrl.EndsWith("/") Then baseUrl &= "/"
+
+        Dim json As String = _
+            "{" & _
+            """NoRekamMedis"":""" & noRM & """," & _
+            """Nama"":""" & nama & """," & _
+            """TglLahir"":""" & Format(tglLahir, "yyyy-MM-dd") & """," & _
+            """JenisKelamin"":""" & jenisKelamin & """" & _
+            "}"
+
+        InsertDataAPIRM(json, baseUrl & "api/pasien/store")
+
+    End Sub
+
+    Private Sub SendToApiPemFisik(ByVal noTransaksi As String, ByVal noRM As String, ByVal keadaanUmum As String, ByVal sistole As Double, ByVal diastole As Double, ByVal heartRate As Double, ByVal suhu As Double, ByVal Saturasi As Double, ByVal tinggi As Double, ByVal berat As Double, ByVal lingkarPerut As Double, ByVal imt As Double, ByVal KeteranganIMT As String, ByVal nafas As Double)
+        Try
+            Dim client As New Net.WebClient()
+
+            Dim json As String = "{" & _
+                 """NoRM"":""" & noRM & """," & _
+                 """NoTransaksi"":""" & noTransaksi & """," & _
+                 """KeadaanUmum"":""" & keadaanUmum & """," & _
+                 """Sistole"":""" & sistole & """," & _
+                 """Diastole"":""" & diastole & """," & _
+                 """HeartRate"":""" & heartRate & """," & _
+                 """Suhu"":""" & suhu & """," & _
+                 """Saturasi"":""" & Saturasi & """," & _
+                 """Tinggi"":""" & tinggi & """," & _
+                 """Berat"":""" & berat & """," & _
+                 """LingkarPerut"":""" & lingkarPerut & """," & _
+                 """IMT"":""" & imt & """," & _
+                 """KeteranganIMT"":""" & KeteranganIMT & """," & _
+                 """Nafas"":""" & nafas & """" & _
+             "}"
+
+            Dim baseUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+            Dim urlWebService As String = baseUrl & "api/statistikVital/save"
+            Dim response As String = InsertDataAPIRM(json, urlWebService)
+
+            ' --- Parse JSON response ---
+            Dim result As JObject = JObject.Parse(response)
+
+            Dim status As String = result("status").ToString()
+            Dim message As String = result("message").ToString()
+
+            Dim insertedId As String = ""
+            Dim data As JObject = TryCast(result("data"), JObject)
+            If data IsNot Nothing AndAlso data("id") IsNot Nothing Then
+                insertedId = data("id").ToString()
+            End If
+
+            ' --- Tampilkan hasil ---
+            If status = "success" Then
+                MsgBox("Data berhasil dikirim ke API ERM." & vbCrLf & _
+                       "Pesan: " & message & vbCrLf & _
+                       "Dengan ID: " & insertedId)
+            Else
+                MsgBox("API mengembalikan status gagal: " & status & vbCrLf & message)
+            End If
+
+        Catch ex As Exception
+            MsgBox("Gagal kirim ke API: " & ex.Message)
+        End Try
+    End Sub
+
     Private Sub SavePemeriksaanFisik()
         Try
             Dim parameterUpdate As String = ""
@@ -2477,6 +2666,23 @@ Public Class FormRekamMedisDokter
 
             Dim tglLahirStr As String = tglLahir.ToString("yyyyMMdd")
             Dim orderDateStr As String = Date.Now.ToString("yyyyMMdd")
+
+            Dim noTransaksi As String = idTransaksi
+            Dim noRM As String = idPasien
+            Dim keadaanUmum As String = GetKeadaanUmum("Medik")
+            Dim sistole As Double = Val(TextBoxSistoleMedik.Text)
+            Dim diastole As Double = Val(TextBoxDiastoleMedik.Text)
+            Dim heartRate As Double = Val(TextBoxDetakNadiMedik.Text)
+            Dim suhu As Double = Val(TextBoxSuhuMedik.Text)
+            Dim saturasi As Double = Val(TextBoxSaturasiMedik.Text)
+            Dim tinggi As Double = Val(TextBoxTinggiBadanMedik.Text)
+            Dim berat As Double = Val(TextBoxBeratBadanMedik.Text)
+            Dim lingkarPerut As Double = Val(TextBoxLingkarPerutMedik.Text)
+            Dim imt As Double = Val(TextBoxIndeksMedik.Text)
+            Dim keteranganIMT As String = TextBoxIndeksKeteranganMedik.Text
+            Dim nafas As Double = Val(TextBoxNafasMedik.Text)
+
+            Dim statusAPI As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'status_ws_RM'")
 
             If CheckInputPemeriksaanFisik() = True Then
                 If CheckSQL("SELECT * FROM TransaksiDetailFisik WHERE NoTransaksi = '" & idTransaksi & "'") = False Then
@@ -2531,6 +2737,16 @@ Public Class FormRekamMedisDokter
                     WriteSQL("UPDATE TransaksiDetailFisik SET " & parameterUpdate & " WHERE NoTransaksi = '" & idTransaksi & "'", 4)
 
                     WriteSQL("UPDATE Inbody_User_Info SET " & parameterUpdateInbody & " WHERE USER_ID = '" & idTransaksi & "'", 4)
+
+                    If statusAPI IsNot Nothing AndAlso statusAPI = "Yes" Then
+                        If ApiCekPasien(noRM) = False Then
+
+                            ApiInsertPasien(noRM, nama, tglLahir, jenisKelamin)
+
+                        End If
+
+                        SendToApiPemFisik(noTransaksi, noRM, keadaanUmum, sistole, diastole, heartRate, suhu, saturasi, tinggi, berat, lingkarPerut, imt, keteranganIMT, nafas)
+                    End If
                 End If
 
                 If statusBPJS = True AndAlso CheckBridgingPcareActive() = True Then SaveKunjunganBPJS() ' Save PCare BPJS

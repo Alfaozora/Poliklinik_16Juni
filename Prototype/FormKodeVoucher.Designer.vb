@@ -25,6 +25,8 @@ Partial Class FormKodeVoucher
         Me.components = New System.ComponentModel.Container
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(FormKodeVoucher))
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer
+        Me.Label11 = New System.Windows.Forms.Label
+        Me.ComboBoxJenisPemakaian = New System.Windows.Forms.ComboBox
         Me.ButtonGenerateVoc = New System.Windows.Forms.Button
         Me.ButtonFind = New System.Windows.Forms.Button
         Me.Label10 = New System.Windows.Forms.Label
@@ -51,8 +53,6 @@ Partial Class FormKodeVoucher
         Me.Label1 = New System.Windows.Forms.Label
         Me.DataGridView1 = New System.Windows.Forms.DataGridView
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-        Me.Label11 = New System.Windows.Forms.Label
-        Me.ComboBoxJenisPemakaian = New System.Windows.Forms.ComboBox
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
@@ -105,6 +105,30 @@ Partial Class FormKodeVoucher
         Me.SplitContainer1.SplitterWidth = 5
         Me.SplitContainer1.TabIndex = 0
         '
+        'Label11
+        '
+        Me.Label11.AutoSize = True
+        Me.Label11.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label11.Location = New System.Drawing.Point(766, 12)
+        Me.Label11.Name = "Label11"
+        Me.Label11.Size = New System.Drawing.Size(102, 17)
+        Me.Label11.TabIndex = 522
+        Me.Label11.Text = "Jenis Pemakaian"
+        '
+        'ComboBoxJenisPemakaian
+        '
+        Me.ComboBoxJenisPemakaian.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource
+        Me.ComboBoxJenisPemakaian.BackColor = System.Drawing.SystemColors.Window
+        Me.ComboBoxJenisPemakaian.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBoxJenisPemakaian.Font = New System.Drawing.Font("Segoe UI", 9.75!)
+        Me.ComboBoxJenisPemakaian.FormattingEnabled = True
+        Me.ComboBoxJenisPemakaian.Items.AddRange(New Object() {"ONCE", "DAILY", "UNLIMITED"})
+        Me.ComboBoxJenisPemakaian.Location = New System.Drawing.Point(769, 32)
+        Me.ComboBoxJenisPemakaian.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.ComboBoxJenisPemakaian.Name = "ComboBoxJenisPemakaian"
+        Me.ComboBoxJenisPemakaian.Size = New System.Drawing.Size(143, 25)
+        Me.ComboBoxJenisPemakaian.TabIndex = 521
+        '
         'ButtonGenerateVoc
         '
         Me.ButtonGenerateVoc.BackColor = System.Drawing.Color.White
@@ -149,7 +173,7 @@ Partial Class FormKodeVoucher
         Me.TextBoxTindakan.Location = New System.Drawing.Point(457, 98)
         Me.TextBoxTindakan.Multiline = True
         Me.TextBoxTindakan.Name = "TextBoxTindakan"
-        Me.TextBoxTindakan.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal
+        Me.TextBoxTindakan.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
         Me.TextBoxTindakan.Size = New System.Drawing.Size(203, 73)
         Me.TextBoxTindakan.TabIndex = 517
         '
@@ -377,30 +401,6 @@ Partial Class FormKodeVoucher
         Me.DataGridView1.ReadOnly = True
         Me.DataGridView1.Size = New System.Drawing.Size(950, 270)
         Me.DataGridView1.TabIndex = 0
-        '
-        'Label11
-        '
-        Me.Label11.AutoSize = True
-        Me.Label11.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label11.Location = New System.Drawing.Point(766, 12)
-        Me.Label11.Name = "Label11"
-        Me.Label11.Size = New System.Drawing.Size(102, 17)
-        Me.Label11.TabIndex = 522
-        Me.Label11.Text = "Jenis Pemakaian"
-        '
-        'ComboBoxJenisPemakaian
-        '
-        Me.ComboBoxJenisPemakaian.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource
-        Me.ComboBoxJenisPemakaian.BackColor = System.Drawing.SystemColors.Window
-        Me.ComboBoxJenisPemakaian.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboBoxJenisPemakaian.Font = New System.Drawing.Font("Segoe UI", 9.75!)
-        Me.ComboBoxJenisPemakaian.FormattingEnabled = True
-        Me.ComboBoxJenisPemakaian.Items.AddRange(New Object() {"ONCE", "DAILY", "UNLIMITED"})
-        Me.ComboBoxJenisPemakaian.Location = New System.Drawing.Point(769, 32)
-        Me.ComboBoxJenisPemakaian.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-        Me.ComboBoxJenisPemakaian.Name = "ComboBoxJenisPemakaian"
-        Me.ComboBoxJenisPemakaian.Size = New System.Drawing.Size(143, 25)
-        Me.ComboBoxJenisPemakaian.TabIndex = 521
         '
         'FormKodeVoucher
         '

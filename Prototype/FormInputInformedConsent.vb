@@ -194,13 +194,14 @@ Public Class FormInputInformedConsent
         Try
             If ValidasiPostInformedConsent() = True Then
                 Dim Trow As DataRow = tblsRekamMedis.Rows(0)
-                Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'web_service_klinik'")
-                Dim urlWebService As String = baseURL & "api/informed_consent"
+                Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+                Dim urlWebService As String = baseURL & "api/lumiera-luzelle/ic"
                 Dim parameter As String = ""
                 Dim uri_message As String = ""
 
                 Dim kodeLokasi As String = ReadSQLNIK("select StrValue from MsConfig where ConfigName = 'NoPoli'")
                 Dim keteranganLokasi As String = ReadSQLNIK("select StrValue from MsConfig where ConfigName = 'Kota'")
+                Dim noHP As String = ReadSQLNIK("SELECT NoHandphone FROM MasterPasien WHERE NoRekamMedis = '" & Trow("IDInternet") & "'")
 
                 ' Set Jenis Kelamin
                 Dim jenisKelamin As String = ""
@@ -219,69 +220,179 @@ Public Class FormInputInformedConsent
                 End If
 
                 parameter = "{" & _
-                              """tgl_transaksi"" : """ & Format(Trow("TglTransaksi"), "yyyy-MM-dd HH:mm:ss.fff") & """," & _
-                              """kode_lokasi"" : """ & kodeLokasi & """," & _
-                              """ket_lokasi"" : """ & keteranganLokasi & """," & _
-                              """jenis_poli"" : """ & Trow("JenisPoli") & """," & _
-                              """status_transaksi"" : ""Pending""," & _
-                              """no_transaksi"" : """ & Trow("NoUrut") & """," & _
-                              """no_rekam_medis"" : """ & Trow("IDInternet") & """," & _
-                              """no_nik"" : """ & Trow("NoNIK") & """," & _
-                              """nama_pasien"" : """ & Trow("Nama") & """," & _
-                              """umur_pasien"" : """ & HitungUsia(Trow("TglLahir")) & """," & _
-                              """jenis_kelamin_pasien"" : """ & Trow("JenisKelamin") & """," & _
-                              """alamat_pasien"" : """ & Trow("DomisiliAlamat") & """," & _
-                              """id_dokter"" : """ & Trow("KodeDokter") & """," & _
-                              """nama_dokter"" : """ & Trow("NamaDokter") & """," & _
-                              """id_perawat"" : null," & _
-                              """nama_perawat"" : """ & Trow("NamaPerawat") & """," & _
-                              """penerima_informasi"" : """ & Trow("Nama") & """," & _
-                              """ket_diagnosis"" : """ & TextBoxDiagnosa.Text & """," & _
-                              """dasar_diagnosis"" : """ & TextBoxDasarDiagnosa.Text & """," & _
-                              """id_tindakan"" : """ & tindakanID & """," & _
-                              """ket_tindakan"" : """ & TextBoxNamaTindakan.Text & """," & _
-                              """indikasi_tindakan"" : """ & ComboBoxIndikasiTindakan.Text & """," & _
-                              """tata_cara"" : """ & ComboBoxTataCara.Text & """," & _
-                              """tujuan_tindakan"" : """ & ComboBoxTujuanTindakan.Text & """," & _
-                              """risiko"" : """ & ComboBoxResiko.Text & """," & _
-                              """komplikasi"" : """ & ComboBoxKomplikasi.Text & """," & _
-                              """prognosis"" : """ & ComboBoxPrognosa.Text & """," & _
-                              """alternatif_tindakan"" : """ & ComboBoxAlternatif.Text & """," & _
-                              """biaya_tindakan"": " & CDbl(TextBoxBiayaTindakan.Text) & "," & _
-                              """status_persetujuan"" : " & statusPersetujuan & "," & _
-                              """nama_penanggung_jawab"" : """ & TextBoxPenanggungJawabNama.Text & """," & _
-                              """umur_penanggung_jawab"" : """ & TextBoxPenanggungJawabUsia.Text & """," & _
-                              """jenis_kelamin_penanggung_jawab"" : """ & jenisKelamin & """," & _
-                              """hubungan_penanggung_jawab"" : """ & TextBoxPenanggungJawabHubunganPasien.Text & """," & _
-                              """alamat_penanggung_jawab"" : """ & TextBoxPenanggungJawabAlamat.Text & """," & _
-                              """status_saksi_pasien"" : " & statusSaksiPasien & "," & _
-                              """nama_saksi_pasien"" : """ & TextBoxSaksiPasienNama.Text & """," & _
-                              """hubungan_saksi_pasien"" : """ & TextBoxSaksiPasienHubunganPasien.Text & """" & _
-                             "}"
+                    """nama"":""" & Trow("Nama") & """," & _
+                    """no_rm"":""" & Trow("IDInternet") & """," & _
+                    """no_hp"":""" & noHP & """," & _
+                    """no_nik"":""" & Trow("NoNIK") & """," & _
+                    """umur"":""" & HitungUsia(Trow("TglLahir")) & """," & _
+                    """sex"":""" & Trow("JenisKelamin") & """," & _
+                    """alamat"":""" & Trow("DomisiliAlamat") & """," & _
+                    """no_transaksi"":""" & Trow("NoUrut") & """," & _
+                    """tgl"":""" & Format(Trow("TglTransaksi"), "yyyy-MM-dd") & """," & _
+                    """perawatan"":""" & TextBoxNamaTindakan.Text & """," & _
+                    """dokter"":""" & Trow("NamaDokter") & """," & _
+                    """kode_dokter"":""" & Trow("KodeDokter") & """," & _
+                    """perawat"":""" & Trow("NamaPerawat") & """," & _
+                    """ket_diagnosis"":""" & TextBoxDiagnosa.Text & """," & _
+                    """dasar_diagnosis"":""" & TextBoxDasarDiagnosa.Text & """," & _
+                    """id_tindakan"":""" & tindakanID & """," & _
+                    """ket_tindakan"":""" & TextBoxNamaTindakan.Text & """," & _
+                    """indikasi_tindakan"":""" & ComboBoxIndikasiTindakan.Text & """," & _
+                    """tata_cara"":""" & ComboBoxTataCara.Text & """," & _
+                    """tujuan_tindakan"":""" & ComboBoxTujuanTindakan.Text & """," & _
+                    """risiko"":""" & ComboBoxResiko.Text & """," & _
+                    """komplikasi"":""" & ComboBoxKomplikasi.Text & """," & _
+                    """prognosis"":""" & ComboBoxPrognosa.Text & """," & _
+                    """alternatif_tindakan"":""" & ComboBoxAlternatif.Text & """," & _
+                    """biaya_tindakan"":" & CDbl(TextBoxBiayaTindakan.Text) & "," & _
+                    """nama_penanggung_jawab"":""" & TextBoxPenanggungJawabNama.Text & """," & _
+                    """umur_penanggung_jawab"":""" & TextBoxPenanggungJawabUsia.Text & """," & _
+                    """sex_penanggung_jawab"":""" & jenisKelamin & """," & _
+                    """hubungan_penanggung_jawab"":""" & TextBoxPenanggungJawabHubunganPasien.Text & """," & _
+                    """alamat_penanggung_jawab"":""" & TextBoxPenanggungJawabAlamat.Text & """," & _
+                    """status_persetujuan"":" & statusPersetujuan & "," & _
+                    """status_transaksi"":""pending""" & _
+                "}"
 
                 uri_message = urlWebService
 
-                Dim response As String = InsertDataAPI(parameter, uri_message)
+                Dim response As String = InsertDataAPIRM(parameter, uri_message)
 
-                Dim jsonArray As JArray = JArray.Parse(response)
+                Dim jsonObj As JObject = JObject.Parse(response)
 
-                Dim responseObj As JObject = jsonArray(0)("response")
-                Dim responseMessage As String = responseObj("message").ToString()
+                If jsonObj("metaData") Is Nothing OrElse jsonObj("response") Is Nothing Then
+                    MsgBox("Response API tidak sesuai format:" & vbCrLf & vbCrLf & response, MsgBoxStyle.Critical, "API ERROR")
+                    Exit Sub
+                End If
 
-                Dim metaDataObj As JObject = jsonArray(0)("metaData")
-                Dim metaDataMessage As String = metaDataObj("message").ToString()
+                Dim metaDataMessage As String = jsonObj("metaData")("message").ToString()
+
+                Dim responseMessage As String = jsonObj("response")("message").ToString()
 
                 If metaDataMessage = "TRANSACTION_COMPLETE" Then
-                    MsgBox(responseMessage, MsgBoxStyle.Critical, "Warning!")
-                Else
-                    MsgBox(responseMessage & vbCr & vbLf & "Kunjungi dashboard web untuk melakukan tanda tangan.", MsgBoxStyle.Information, "Success!")
+                    MsgBox(responseMessage, MsgBoxStyle.Information, "Success!")
                     Me.Close()
+                Else
+                    MsgBox(responseMessage, MsgBoxStyle.Critical, "Warning!")
                 End If
             End If
         Catch ex As Exception
             MsgBox(ex.Message)
         End Try
     End Sub
+
+    ' Debug
+    'Private Sub SaveData()
+
+    '    Try
+    '        MsgBox("DEBUG 1 : Masuk SaveData")
+
+    '        If ValidasiPostInformedConsent() = False Then
+    '            MsgBox("DEBUG STOP : ValidasiPostInformedConsent = FALSE")
+    '            Exit Sub
+    '        End If
+
+    '        MsgBox("DEBUG 2 : Validasi OK")
+
+    '        Dim Trow As DataRow = tblsRekamMedis.Rows(0)
+
+    '        MsgBox("DEBUG 3 : DataRow OK")
+
+    '        Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+
+    '        MsgBox("DEBUG 4 : baseURL = " & baseURL)
+
+    '        Dim urlWebService As String = baseURL & "api/lumiera-luzelle/ic"
+
+    '        MsgBox("DEBUG 5 : url = " & urlWebService)
+
+    '        Dim noHP As String = ReadSQLNIK("SELECT NoHandphone FROM MasterPasien WHERE NoRekamMedis = '" & Trow("IDInternet") & "'")
+
+    '        MsgBox("DEBUG 6 : No HP = " & noHP)
+
+    '        Dim jenisKelamin As String = ""
+    '        If ComboBoxPenanggungJawabJenisKelamin.Text = "Laki-laki" Then
+    '            jenisKelamin = "L"
+    '        ElseIf ComboBoxPenanggungJawabJenisKelamin.Text = "Perempuan" Then
+    '            jenisKelamin = "P"
+    '        End If
+
+    '        MsgBox("DEBUG 7 : Jenis Kelamin = " & jenisKelamin)
+
+    '        Dim parameter As String = _
+    '        "{" & _
+    '            """nama"":""" & Trow("Nama") & """," & _
+    '            """no_rm"":""" & Trow("IDInternet") & """," & _
+    '            """no_hp"":""" & noHP & """," & _
+    '            """no_nik"":""" & Trow("NoNIK") & """," & _
+    '            """umur"":""" & HitungUsia(Trow("TglLahir")) & """," & _
+    '            """sex"":""" & Trow("JenisKelamin") & """," & _
+    '            """alamat"":""" & Trow("DomisiliAlamat") & """," & _
+    '            """no_transaksi"":""" & Trow("NoUrut") & """," & _
+    '            """tgl"":""" & Format(Trow("TglTransaksi"), "yyyy-MM-dd") & """," & _
+    '            """perawatan"":""" & TextBoxNamaTindakan.Text & """," & _
+    '            """dokter"":""" & Trow("NamaDokter") & """," & _
+    '            """kode_dokter"":""" & Trow("KodeDokter") & """," & _
+    '            """perawat"":""" & Trow("NamaPerawat") & """," & _
+    '            """ket_diagnosis"":""" & TextBoxDiagnosa.Text & """," & _
+    '            """dasar_diagnosis"":""" & TextBoxDasarDiagnosa.Text & """," & _
+    '            """id_tindakan"":""" & tindakanID & """," & _
+    '            """ket_tindakan"":""" & TextBoxNamaTindakan.Text & """," & _
+    '            """indikasi_tindakan"":""" & ComboBoxIndikasiTindakan.Text & """," & _
+    '            """tata_cara"":""" & ComboBoxTataCara.Text & """," & _
+    '            """tujuan_tindakan"":""" & ComboBoxTujuanTindakan.Text & """," & _
+    '            """risiko"":""" & ComboBoxResiko.Text & """," & _
+    '            """komplikasi"":""" & ComboBoxKomplikasi.Text & """," & _
+    '            """prognosis"":""" & ComboBoxPrognosa.Text & """," & _
+    '            """alternatif_tindakan"":""" & ComboBoxAlternatif.Text & """," & _
+    '            """biaya_tindakan"":" & CDbl(TextBoxBiayaTindakan.Text) & "," & _
+    '            """nama_penanggung_jawab"":""" & TextBoxPenanggungJawabNama.Text & """," & _
+    '            """umur_penanggung_jawab"":""" & TextBoxPenanggungJawabUsia.Text & """," & _
+    '            """sex_penanggung_jawab"":""" & jenisKelamin & """," & _
+    '            """hubungan_penanggung_jawab"":""" & TextBoxPenanggungJawabHubunganPasien.Text & """," & _
+    '            """alamat_penanggung_jawab"":""" & TextBoxPenanggungJawabAlamat.Text & """," & _
+    '            """status_persetujuan"":" & statusPersetujuan & "," & _
+    '            """status_transaksi"":""Pending""" & _
+    '        "}"
+
+    '        MsgBox("DEBUG 8 : JSON SIAP" & vbCrLf & vbCrLf & parameter)
+
+    '        MsgBox("DEBUG 9 : MULAI KIRIM KE API")
+
+    '        Dim response As String = InsertDataAPIRM(parameter, urlWebService)
+
+    '        MsgBox("DEBUG 10 : RESPONSE RAW" & vbCrLf & vbCrLf & response)
+
+    '        Dim jsonObj As JObject = JObject.Parse(response)
+
+    '        MsgBox("DEBUG 11 : JSON PARSE OK")
+
+    '        If jsonObj("metaData") Is Nothing Then
+    '            MsgBox("DEBUG ERROR : metaData NULL" & vbCrLf & response)
+    '            Exit Sub
+    '        End If
+
+    '        If jsonObj("response") Is Nothing Then
+    '            MsgBox("DEBUG ERROR : response NULL" & vbCrLf & response)
+    '            Exit Sub
+    '        End If
+
+    '        MsgBox("DEBUG 12 : metaData & response ADA")
+
+    '        Dim metaMessage As String = jsonObj("metaData")("message").ToString()
+
+    '        Dim respMessage As String = jsonObj("response")("message").ToString()
+
+    '        MsgBox("DEBUG 13 : meta=" & metaMessage & vbCrLf & "response=" & respMessage)
+
+    '        MsgBox("DEBUG 14 : SELESAI")
+
+    '    Catch ex As Exception
+    '        MsgBox("DEBUG EXCEPTION:" & vbCrLf & ex.Message)
+    '    End Try
+
+    'End Sub
+
 
     Function ValidasiPostInformedConsent() As Boolean
         ' Validasi hubungan keluarga valid / tidak
