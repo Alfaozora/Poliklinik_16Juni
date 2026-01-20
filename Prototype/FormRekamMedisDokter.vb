@@ -2134,6 +2134,21 @@ Public Class FormRekamMedisDokter
                     ")", 4)
 
 
+                Dim jsonParam As String = _
+                    "{" & _
+                    """nama"":""" & namaPasien.Replace("""", "'") & """," & _
+                    """no_rm"":""" & idPasien & """," & _
+                    """no_transaksi"":""" & idTransaksi & """," & _
+                    """tindakan"":""" & TextBoxNamaTindakan.Text.Replace("""", "'") & """," & _
+                    """id_tindakan"":""" & TextBoxTindakanID.Text & """" & _
+                    "}"
+
+                Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+
+                Dim urlWebService As String = baseURL & "api/lumiera-luzelle/persetujuan-treatment"
+
+                Dim responseApi As String = InsertDataAPIRM(jsonParam, urlWebService)
+
                 Dim dtReminder As DataTable = ReadSQL("SELECT Reminder, Hari FROM MasterTindakan WHERE TindakanID = '" & TextBoxTindakanID.Text & "'")
 
                 If dtReminder.Rows.Count > 0 AndAlso CBool(dtReminder.Rows(0)("Reminder")) = True Then
@@ -8807,111 +8822,226 @@ Public Class FormRekamMedisDokter
         End If
     End Sub
 
-    Private Sub PreviewInformedConsent(ByRef _idTransaksi As String, ByRef _idTindakan As String)
-        Dim tblsInformedConsent As DataTable = ReadSQL("SELECT * FROM InformedConsent WHERE NoTransaksi = '" & _idTransaksi & "' AND TindakanID = '" & _idTindakan & "'")
+    'Private Sub PreviewInformedConsent(ByRef _idTransaksi As String, ByRef _idTindakan As String)
+    '    Dim tblsInformedConsent As DataTable = ReadSQL("SELECT * FROM InformedConsent WHERE NoTransaksi = '" & _idTransaksi & "' AND TindakanID = '" & _idTindakan & "'")
 
-        If tblsInformedConsent.Rows.Count > 0 Then
-            Dim rowData As DataRow = tblsInformedConsent.Rows(0)
+    '    If tblsInformedConsent.Rows.Count > 0 Then
+    '        Dim rowData As DataRow = tblsInformedConsent.Rows(0)
 
-            Report = New XtraReport
-            Report = XtraReport.FromFile(Application.StartupPath + "\Reports\Klinik\RekamMedis\ReportInformedConsent.repx", True)
-            Report.DataSource = tblsInformedConsent
+    '        Report = New XtraReport
+    '        Report = XtraReport.FromFile(Application.StartupPath + "\Reports\Klinik\RekamMedis\ReportInformedConsent.repx", True)
+    '        Report.DataSource = tblsInformedConsent
 
-            ' Set Jenis Kelamin Penanggung Jawab
-            Dim jenisKelaminPenanggungJawab As String = ""
-            If rowData("JenisKelaminPenanggungJawab").ToString = "L" Then
-                jenisKelaminPenanggungJawab = "Laki-laki"
-            ElseIf rowData("JenisKelaminPenanggungJawab").ToString = "P" Then
-                jenisKelaminPenanggungJawab = "Perempuan"
+    '        ' Set Jenis Kelamin Penanggung Jawab
+    '        Dim jenisKelaminPenanggungJawab As String = ""
+    '        If rowData("JenisKelaminPenanggungJawab").ToString = "L" Then
+    '            jenisKelaminPenanggungJawab = "Laki-laki"
+    '        ElseIf rowData("JenisKelaminPenanggungJawab").ToString = "P" Then
+    '            jenisKelaminPenanggungJawab = "Perempuan"
+    '        End If
+
+    '        ' Set Jenis Kelamin Pasien
+    '        Dim jenisKelaminPasien As String = ""
+    '        If rowData("JenisKelaminPasien").ToString = "L" Then
+    '            jenisKelaminPasien = "Laki-laki"
+    '        ElseIf rowData("JenisKelaminPasien").ToString = "P" Then
+    '            jenisKelaminPasien = "Perempuan"
+    '        End If
+
+    '        ' Set Hubungan Penanggung Jawab
+    '        Dim hubunganPenanggungJawab As String = ""
+    '        If rowData("HubunganPenanggungJawab") = "Pasien Sendiri" Then
+    '            hubunganPenanggungJawab = "saya"
+    '        Else
+    '            hubunganPenanggungJawab = rowData("HubunganPenanggungJawab") & " saya"
+    '        End If
+
+    '        ' Set Lokasi & Waktu
+    '        Dim waktuDariDatabase As DateTime = rowData("TglTransaksi")
+
+    '        Dim tanggal As String = waktuDariDatabase.ToString("dd-MM-yyyy")
+    '        Dim jam As String = waktuDariDatabase.ToString("HH:mm:ss")
+    '        Dim waktuInformedConsent As String = rowData("KeteranganLokasi") & ", tanggal " & tanggal & " pukul " & jam
+
+    '        ' Set Field Penyataan Pasien
+    '        Dim panelPernyataanPasien As XRPanel = CType(Report.Bands(BandKind.Detail).Controls("xrPanelPernyataan"), XRPanel)
+    '        Dim panelPersetujuanPasien As XRPanel = CType(Report.Bands(BandKind.Detail).Controls("xrPanelPersetujuan"), XRPanel)
+    '        Dim panelPenolakanPasien As XRPanel = CType(Report.Bands(BandKind.Detail).Controls("xrPanelPenolakan"), XRPanel)
+
+    '        Dim stringPenyataanPasien As String = "Yang bertandatangan di bawah ini, saya, nama " & rowData("NamaPenanggungJawab") & ", umur " & rowData("UmurPenanggungJawab") & " tahun, " & jenisKelaminPenanggungJawab & ", alamat " & rowData("AlamatPenanggungJawab") & _
+    '                                              " dengan ini menyatakan persetujuan untuk dilakukannya tindakan " & rowData("KeteranganTindakan") & _
+    '                                              " terhadap " & hubunganPenanggungJawab & " bernama " & rowData("NamaPasien") & ", umur " & rowData("UmurPasien") & " tahun, " & jenisKelaminPasien & ", alamat " & rowData("AlamatPasien")
+    '        panelPernyataanPasien.Controls("xrLabelPernyataanPasien").Text = stringPenyataanPasien
+    '        panelPersetujuanPasien.Controls("xrLabelTanggalPersetujuanPasien").Text = waktuInformedConsent
+    '        panelPenolakanPasien.Controls("xrLabelTanggalPenolakanPasien").Text = waktuInformedConsent
+
+    '        '# Set Signature Page 1
+    '        Dim xrTablePage1 As XRTable = CType(Report.Bands(BandKind.Detail).Controls("xrTableSignaturePage1"), XRTable)
+
+    '        Dim rowDokterSignatureTablePage1 As XRTableRow = CType(xrTablePage1.Controls("xrTableRowDokterSignature"), XRTableRow)
+    '        Dim cellDokterSignatureTablePage1 As XRTableCell = CType(rowDokterSignatureTablePage1.Controls("xrTableCellDokterSignature"), XRTableCell)
+    '        Dim panelDokterSignatureTablePage1 As XRPanel = CType(cellDokterSignatureTablePage1.Controls("xrPanelDokterSignature"), XRPanel)
+
+    '        Dim rowPasienSignatureTablePage1 As XRTableRow = CType(xrTablePage1.Controls("xrTableRowPasienSignature"), XRTableRow)
+    '        Dim cellPasienSignatureTablePage1 As XRTableCell = CType(rowPasienSignatureTablePage1.Controls("xrTableCellPasienSignature"), XRTableCell)
+    '        Dim panelPasienSignatureTablePage1 As XRPanel = CType(cellPasienSignatureTablePage1.Controls("xrPanelPasienSignature"), XRPanel)
+
+    '        ' Signature Dokter
+    '        Dim pictureBoxDokterSignaturePage1 As XRPictureBox = CreateXRPictureBoxReportFromBase64(rowData("SignatureDokter1"), "DokterSignaturePage1", 5, 20, 125, 50)
+    '        panelDokterSignatureTablePage1.Controls.Add(pictureBoxDokterSignaturePage1)
+
+    '        ' Signature Pasien
+    '        Dim pictureBoxPasienSignaturePage1 As XRPictureBox = CreateXRPictureBoxReportFromBase64(rowData("SignaturePasien1"), "PasienSignaturePage1", 5, 20, 125, 50)
+    '        panelPasienSignatureTablePage1.Controls.Add(pictureBoxPasienSignaturePage1)
+
+    '        '# Set Signature Page 2
+    '        Dim panelSignaturePersetujuanDokter As XRPanel = CType(panelPersetujuanPasien.Controls("xrPanelSignaturePersetujuanDokter"), XRPanel)
+    '        Dim panelSignaturePersetujuanPasien As XRPanel = CType(panelPersetujuanPasien.Controls("xrPanelSignaturePersetujuanPasien"), XRPanel)
+    '        Dim panelSignaturePersetujuanPerawat As XRPanel = CType(panelPersetujuanPasien.Controls("xrPanelSignaturePersetujuanPerawat"), XRPanel)
+    '        Dim panelSignaturePersetujuanKeluarga As XRPanel = CType(panelPersetujuanPasien.Controls("xrPanelSignaturePersetujuanKeluarga"), XRPanel)
+
+    '        ' Signature Dokter
+    '        Dim pictureBoxSignaturePersetujuanDokter As XRPictureBox = CreateXRPictureBoxReportFromBase64(rowData("SignatureDokter2"), "SignaturePersetujuanDokter", 5, 20, 125, 50)
+    '        panelSignaturePersetujuanDokter.Controls.Add(pictureBoxSignaturePersetujuanDokter)
+    '        panelSignaturePersetujuanDokter.Controls("xrLabelSignaturePersetujuanDokter").Text = "( " & rowData("NamaDokter") & " )"
+
+    '        ' Signature Pasien
+    '        Dim pictureBoxSignaturePersetujuanPasien As XRPictureBox = CreateXRPictureBoxReportFromBase64(rowData("SignaturePasien2"), "SignaturePersetujuanPasien", 5, 20, 125, 50)
+    '        panelSignaturePersetujuanPasien.Controls.Add(pictureBoxSignaturePersetujuanPasien)
+    '        panelSignaturePersetujuanPasien.Controls("xrLabelSignaturePersetujuanPasien").Text = "( " & rowData("NamaPenanggungJawab") & " )"
+
+    '        ' Signature Perawat
+    '        Dim pictureBoxSignaturePersetujuanPerawat As XRPictureBox = CreateXRPictureBoxReportFromBase64(rowData("SignaturePerawat"), "SignaturePersetujuanPerawat", 5, 20, 125, 50)
+    '        panelSignaturePersetujuanPerawat.Controls.Add(pictureBoxSignaturePersetujuanPerawat)
+    '        panelSignaturePersetujuanPerawat.Controls("xrLabelSignaturePersetujuanPerawat").Text = "( " & rowData("NamaPerawat") & " )"
+
+    '        ' Signature Keluarga
+    '        If rowData("StatusSaksiPasien") = True Then
+    '            Dim pictureBoxSignaturePersetujuanKeluarga As XRPictureBox = CreateXRPictureBoxReportFromBase64(rowData("SignatureKeluarga"), "SignaturePersetujuanKeluarga", 5, 20, 125, 50)
+    '            panelSignaturePersetujuanKeluarga.Controls.Add(pictureBoxSignaturePersetujuanKeluarga)
+    '            panelSignaturePersetujuanKeluarga.Controls("xrLabelSignaturePersetujuanKeluarga").Text = "( " & rowData("NamaSaksiPasien") & " )"
+    '        End If
+
+    '        'Report.RunDesigner()
+    '        Report.ShowPreview()
+    '    Else
+    '        MsgBox("Data tidak ditemukan.", MsgBoxStyle.Critical, "Warning!")
+    '    End If
+    'End Sub
+
+    Private Sub PreviewInformedConsent(ByRef idTransaksi As String, ByRef idTindakan As String)
+
+        Try
+            'MessageBox.Show("STEP 1: Masuk fungsi PreviewInformedConsent")
+
+            ' ================================
+            ' VALIDASI DATA
+            ' ================================
+            'MessageBox.Show("STEP 2: Validasi parameter")
+
+            If String.IsNullOrEmpty(idTransaksi) Then
+                'MessageBox.Show("STOP: idTransaksi kosong")
+                Exit Sub
             End If
 
-            ' Set Jenis Kelamin Pasien
-            Dim jenisKelaminPasien As String = ""
-            If rowData("JenisKelaminPasien").ToString = "L" Then
-                jenisKelaminPasien = "Laki-laki"
-            ElseIf rowData("JenisKelaminPasien").ToString = "P" Then
-                jenisKelaminPasien = "Perempuan"
+            If String.IsNullOrEmpty(idTindakan) Then
+                'MessageBox.Show("STOP: idTindakan kosong")
+                Exit Sub
             End If
 
-            ' Set Hubungan Penanggung Jawab
-            Dim hubunganPenanggungJawab As String = ""
-            If rowData("HubunganPenanggungJawab") = "Pasien Sendiri" Then
-                hubunganPenanggungJawab = "saya"
+
+            ' ================================
+            ' AMBIL KONFIGURASI
+            ' ================================
+            'MessageBox.Show("STEP 3: Ambil konfigurasi")
+
+            Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+
+            'MessageBox.Show("baseURL = " & baseURL)
+
+
+            ' ================================
+            ' SUSUN ENDPOINT API
+            ' ================================
+            'MessageBox.Show("STEP 4: Susun URL")
+
+            If Not baseURL.EndsWith("/") Then baseURL &= "/"
+
+            Dim url As String = _
+                baseURL & _
+                "api/lumiera-luzelle/ic/preview" & _
+                "?no_transaksi=" & idTransaksi & _
+                "&id_tindakan=" & idTindakan
+
+            'MessageBox.Show("URL API:" & vbCrLf & url)
+
+
+            ' ================================
+            ' REQUEST KE LARAVEL
+            ' ================================
+            'MessageBox.Show("STEP 5: Kirim request ke Laravel")
+
+            Dim client As New WebClient()
+            client.Encoding = System.Text.Encoding.UTF8
+
+            'MessageBox.Show("STEP 6: DownloadString mulai")
+
+            Dim response As String = GetDataAPIRM(url)
+
+            'MessageBox.Show("STEP 7: RESPONSE DITERIMA")
+
+            'MessageBox.Show("RESPONSE RAW:" & vbCrLf & response)
+
+
+            ' ================================
+            ' PARSE JSON
+            ' ================================
+            'MessageBox.Show("STEP 8: Parse JSON")
+
+            Dim json = JObject.Parse(response)
+
+            'MessageBox.Show("STEP 9: JSON sukses diparse")
+
+
+            ' ================================
+            ' CEK RESPONSE
+            ' ================================
+            If json("status").ToString().ToLower() = "success" Then
+
+                'MessageBox.Show("STEP 10: Status SUCCESS")
+
+                Dim pdfUrl As String = json("url").ToString()
+
+                'MessageBox.Show("PDF URL:" & vbCrLf & pdfUrl)
+
+                Process.Start(pdfUrl)
+
             Else
-                hubunganPenanggungJawab = rowData("HubunganPenanggungJawab") & " saya"
+                'MessageBox.Show("STEP 10B: Status ERROR")
+
+                MessageBox.Show(json("message").ToString(), "Error dari API", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End If
 
-            ' Set Lokasi & Waktu
-            Dim waktuDariDatabase As DateTime = rowData("TglTransaksi")
 
-            Dim tanggal As String = waktuDariDatabase.ToString("dd-MM-yyyy")
-            Dim jam As String = waktuDariDatabase.ToString("HH:mm:ss")
-            Dim waktuInformedConsent As String = rowData("KeteranganLokasi") & ", tanggal " & tanggal & " pukul " & jam
+        Catch ex As WebException
 
-            ' Set Field Penyataan Pasien
-            Dim panelPernyataanPasien As XRPanel = CType(Report.Bands(BandKind.Detail).Controls("xrPanelPernyataan"), XRPanel)
-            Dim panelPersetujuanPasien As XRPanel = CType(Report.Bands(BandKind.Detail).Controls("xrPanelPersetujuan"), XRPanel)
-            Dim panelPenolakanPasien As XRPanel = CType(Report.Bands(BandKind.Detail).Controls("xrPanelPenolakan"), XRPanel)
+            'MessageBox.Show("STEP ERROR: WebException")
 
-            Dim stringPenyataanPasien As String = "Yang bertandatangan di bawah ini, saya, nama " & rowData("NamaPenanggungJawab") & ", umur " & rowData("UmurPenanggungJawab") & " tahun, " & jenisKelaminPenanggungJawab & ", alamat " & rowData("AlamatPenanggungJawab") & _
-                                                  " dengan ini menyatakan persetujuan untuk dilakukannya tindakan " & rowData("KeteranganTindakan") & _
-                                                  " terhadap " & hubunganPenanggungJawab & " bernama " & rowData("NamaPasien") & ", umur " & rowData("UmurPasien") & " tahun, " & jenisKelaminPasien & ", alamat " & rowData("AlamatPasien")
-            panelPernyataanPasien.Controls("xrLabelPernyataanPasien").Text = stringPenyataanPasien
-            panelPersetujuanPasien.Controls("xrLabelTanggalPersetujuanPasien").Text = waktuInformedConsent
-            panelPenolakanPasien.Controls("xrLabelTanggalPenolakanPasien").Text = waktuInformedConsent
+            MessageBox.Show(ex.Message, "WebException Message")
 
-            '# Set Signature Page 1
-            Dim xrTablePage1 As XRTable = CType(Report.Bands(BandKind.Detail).Controls("xrTableSignaturePage1"), XRTable)
+            If ex.Response IsNot Nothing Then
+                Dim sr As New IO.StreamReader(ex.Response.GetResponseStream())
+                Dim serverError As String = sr.ReadToEnd()
 
-            Dim rowDokterSignatureTablePage1 As XRTableRow = CType(xrTablePage1.Controls("xrTableRowDokterSignature"), XRTableRow)
-            Dim cellDokterSignatureTablePage1 As XRTableCell = CType(rowDokterSignatureTablePage1.Controls("xrTableCellDokterSignature"), XRTableCell)
-            Dim panelDokterSignatureTablePage1 As XRPanel = CType(cellDokterSignatureTablePage1.Controls("xrPanelDokterSignature"), XRPanel)
-
-            Dim rowPasienSignatureTablePage1 As XRTableRow = CType(xrTablePage1.Controls("xrTableRowPasienSignature"), XRTableRow)
-            Dim cellPasienSignatureTablePage1 As XRTableCell = CType(rowPasienSignatureTablePage1.Controls("xrTableCellPasienSignature"), XRTableCell)
-            Dim panelPasienSignatureTablePage1 As XRPanel = CType(cellPasienSignatureTablePage1.Controls("xrPanelPasienSignature"), XRPanel)
-
-            ' Signature Dokter
-            Dim pictureBoxDokterSignaturePage1 As XRPictureBox = CreateXRPictureBoxReportFromBase64(rowData("SignatureDokter1"), "DokterSignaturePage1", 5, 20, 125, 50)
-            panelDokterSignatureTablePage1.Controls.Add(pictureBoxDokterSignaturePage1)
-
-            ' Signature Pasien
-            Dim pictureBoxPasienSignaturePage1 As XRPictureBox = CreateXRPictureBoxReportFromBase64(rowData("SignaturePasien1"), "PasienSignaturePage1", 5, 20, 125, 50)
-            panelPasienSignatureTablePage1.Controls.Add(pictureBoxPasienSignaturePage1)
-
-            '# Set Signature Page 2
-            Dim panelSignaturePersetujuanDokter As XRPanel = CType(panelPersetujuanPasien.Controls("xrPanelSignaturePersetujuanDokter"), XRPanel)
-            Dim panelSignaturePersetujuanPasien As XRPanel = CType(panelPersetujuanPasien.Controls("xrPanelSignaturePersetujuanPasien"), XRPanel)
-            Dim panelSignaturePersetujuanPerawat As XRPanel = CType(panelPersetujuanPasien.Controls("xrPanelSignaturePersetujuanPerawat"), XRPanel)
-            Dim panelSignaturePersetujuanKeluarga As XRPanel = CType(panelPersetujuanPasien.Controls("xrPanelSignaturePersetujuanKeluarga"), XRPanel)
-
-            ' Signature Dokter
-            Dim pictureBoxSignaturePersetujuanDokter As XRPictureBox = CreateXRPictureBoxReportFromBase64(rowData("SignatureDokter2"), "SignaturePersetujuanDokter", 5, 20, 125, 50)
-            panelSignaturePersetujuanDokter.Controls.Add(pictureBoxSignaturePersetujuanDokter)
-            panelSignaturePersetujuanDokter.Controls("xrLabelSignaturePersetujuanDokter").Text = "( " & rowData("NamaDokter") & " )"
-
-            ' Signature Pasien
-            Dim pictureBoxSignaturePersetujuanPasien As XRPictureBox = CreateXRPictureBoxReportFromBase64(rowData("SignaturePasien2"), "SignaturePersetujuanPasien", 5, 20, 125, 50)
-            panelSignaturePersetujuanPasien.Controls.Add(pictureBoxSignaturePersetujuanPasien)
-            panelSignaturePersetujuanPasien.Controls("xrLabelSignaturePersetujuanPasien").Text = "( " & rowData("NamaPenanggungJawab") & " )"
-
-            ' Signature Perawat
-            Dim pictureBoxSignaturePersetujuanPerawat As XRPictureBox = CreateXRPictureBoxReportFromBase64(rowData("SignaturePerawat"), "SignaturePersetujuanPerawat", 5, 20, 125, 50)
-            panelSignaturePersetujuanPerawat.Controls.Add(pictureBoxSignaturePersetujuanPerawat)
-            panelSignaturePersetujuanPerawat.Controls("xrLabelSignaturePersetujuanPerawat").Text = "( " & rowData("NamaPerawat") & " )"
-
-            ' Signature Keluarga
-            If rowData("StatusSaksiPasien") = True Then
-                Dim pictureBoxSignaturePersetujuanKeluarga As XRPictureBox = CreateXRPictureBoxReportFromBase64(rowData("SignatureKeluarga"), "SignaturePersetujuanKeluarga", 5, 20, 125, 50)
-                panelSignaturePersetujuanKeluarga.Controls.Add(pictureBoxSignaturePersetujuanKeluarga)
-                panelSignaturePersetujuanKeluarga.Controls("xrLabelSignaturePersetujuanKeluarga").Text = "( " & rowData("NamaSaksiPasien") & " )"
+                MessageBox.Show("SERVER RESPONSE:" & vbCrLf & serverError, "Error Detail")
             End If
 
-            'Report.RunDesigner()
-            Report.ShowPreview()
-        Else
-            MsgBox("Data tidak ditemukan.", MsgBoxStyle.Critical, "Warning!")
-        End If
+
+        Catch ex As Exception
+            'MessageBox.Show("STEP ERROR: General Exception")
+            MessageBox.Show(ex.Message)
+        End Try
+
     End Sub
 
     Private Sub HapusPaketReguler(ByVal kodeVoucher As String, ByVal poliIdDetail As String, ByVal tindakanID As String)
@@ -8970,10 +9100,33 @@ Public Class FormRekamMedisDokter
             idTindakanDetail = idTindakanDetailObj.ToString()
 
             If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
+                Dim idTindakan As String = ReadSQLNIK("SELECT TindakanID FROM TransaksiPoliDetail WHERE TransPoliIDDetail = '" & idTindakanDetail & "'")
+
                 ' Soft delete hanya baris yang dipilih
                 WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
                          "WHERE TransPoliIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
 
+                Dim jsonParam As String = _
+                      "{" & _
+                      """no_transaksi"":""" & idTransaksi & """," & _
+                      """no_rm"":""" & idPasien & """," & _
+                      """id_tindakan"":""" & idTindakan & """" & _
+                      "}"
+
+                Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+
+                Dim urlWebService As String = baseURL & "api/lumiera-luzelle/persetujuan-treatment/delete"
+
+                Dim responseApi As String = InsertDataAPIRM(jsonParam, urlWebService)
+
+                If responseApi.ToLower().Contains("""success"":true") Then
+                    MsgBox("API DELETE PERSETUJUAN BERHASIL")
+
+                Else
+                    MsgBox("API DELETE PERSETUJUAN GAGAL: " & responseApi)
+                    MsgBox("Gagal menghapus persetujuan tindakan di server RM." & vbCrLf & "Silakan hubungi IT.", MsgBoxStyle.Exclamation, "Peringatan")
+
+                End If
             ElseIf jenisTransaksi = "GIGI" Then
                 WriteSQL("UPDATE TransaksiGigiDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
                          "WHERE TransGigiIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
@@ -9010,114 +9163,156 @@ Public Class FormRekamMedisDokter
         End If
     End Sub
 
-    Private Sub DataGridViewTindakan_CellContentClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles DataGridViewTindakan.CellContentClick
-        'Dim colName As String = DataGridViewTindakan.Columns(e.ColumnIndex).Name
+    'Private Sub DataGridViewTindakan_CellClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles DataGridViewTindakan.CellClick
+    '    'Dim colName As String = DataGridViewTindakan.Columns(e.ColumnIndex).Name
 
-        'If colName = "ButtonDetail" Then
-        '    MsgBox("Delete")
-        'ElseIf colName = "ButtonInformedConsent" Then
-        '    MsgBox("Informed Consent")
-        'End If
+    '    'If colName = "ButtonDetail" Then
+    '    '    MsgBox("Delete")
+    '    'ElseIf colName = "ButtonInformedConsent" Then
+    '    '    MsgBox("Informed Consent")
+    '    'End If
 
-        Dim dataGridView As DataGridView = DirectCast(sender, DataGridView)
+    '    If e.RowIndex < 0 Then Exit Sub
 
-        If e.RowIndex >= 0 Then
-            If dataGridView.Columns.Contains("ButtonDetail") Then
-                If e.ColumnIndex = dataGridView.Columns("ButtonDetail").Index Then
-                    If CheckingDeleteTindakan() = True Then
-                        Dim idTindakanDetailObj As Object = dataGridView.Rows(e.RowIndex).Cells("ColumnID").Value
-                        Dim namaTindakan As String = dataGridView.Rows(e.RowIndex).Cells("ColumnNamaTindakan").Value.ToString()
-                        Dim kodeVoucher As String = If(IsDBNull(dataGridView.Rows(e.RowIndex).Cells("ColumnKodeVoucher").Value), "", dataGridView.Rows(e.RowIndex).Cells("ColumnKodeVoucher").Value.ToString())
+    '    Dim dgv As DataGridView = DirectCast(sender, DataGridView)
+    '    Dim colName As String = dgv.Columns(e.ColumnIndex).Name
 
-                        Dim resultNonRacikan As DialogResult = MessageBox.Show("Apakah Anda yakin ingin menghapus tindakan " & namaTindakan & "?", "Validasi", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
-                        If resultNonRacikan = DialogResult.Yes Then
+    '    If colName = "ButtonDetail" Then
+    '        If CheckingDeleteTindakan() = True Then
+    '            Dim idTindakanDetailObj As Object = dgv.Rows(e.RowIndex).Cells("ColumnID").Value
+    '            Dim namaTindakan As String = dgv.Rows(e.RowIndex).Cells("ColumnNamaTindakan").Value.ToString()
+    '            Dim kodeVoucher As String = If(IsDBNull(dgv.Rows(e.RowIndex).Cells("ColumnKodeVoucher").Value), "", dgv.Rows(e.RowIndex).Cells("ColumnKodeVoucher").Value.ToString())
 
-                            'If Not IsDBNull(idTindakanDetailObj) AndAlso idTindakanDetailObj IsNot Nothing AndAlso idTindakanDetailObj.ToString() <> "" Then
-                            '    ' Jika ID ada → hapus dari TransaksiPoliDetail / TransaksiGigiDetail
-                            '    Dim idTindakanDetail As String = idTindakanDetailObj.ToString()
-                            '    If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
-                            '        WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() WHERE TransPoliIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
-                            '    ElseIf jenisTransaksi = "GIGI" Then
-                            '        WriteSQL("UPDATE TransaksiGigiDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() WHERE TransGigiIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
-                            '    End If
-                            'ElseIf kodeVoucher <> "" Then
-                            '    ' Jika ID NULL dan KodeVoucher ada → soft delete dari LogPenggunaanPaket dan tambah kuota
-                            '    WriteSQL("UPDATE LogPenggunaanPaket SET DeletedBy = 'Admin', DeletedDate = GETDATE() WHERE ID IN (" & _
-                            '            "SELECT TOP 1 ID FROM LogPenggunaanPaket WHERE KodeVoucher = '" & kodeVoucher & "' AND NoTransaksi = '" & idTransaksi & "' AND DeletedDate IS NULL ORDER BY CreatedDate DESC)", 4)
-                            '    WriteSQL("UPDATE TransaksiPaketTindakan SET Kuota = ISNULL(Kuota, 0) + 1 WHERE KodeVoucher = '" & kodeVoucher & "'", 4)
-                            '    WriteSQL("UPDATE TransaksiPoliDetail " & _
-                            '          "SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
-                            '          "WHERE TransPoliID IN (SELECT TransPoliID FROM TransaksiPoli WHERE NoUrut = '" & idTransaksi & "') " & _
-                            '          "AND KodeVoucher = '" & kodeVoucher & "' " & _
-                            '          "AND CONVERT(DATE, transaksitime) = CONVERT(DATE, GETDATE()) " & _
-                            '          "AND DeletedDate IS NULL", 4)
-                            'End If
+    '            Dim resultNonRacikan As DialogResult = MessageBox.Show("Apakah Anda yakin ingin menghapus tindakan " & namaTindakan & "?", "Validasi", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+    '            If resultNonRacikan = DialogResult.Yes Then
 
-                            'If Not IsDBNull(idTindakanDetailObj) AndAlso idTindakanDetailObj IsNot Nothing AndAlso idTindakanDetailObj.ToString() <> "" Then
-                            '    ' Jika ID ada → hapus dari TransaksiPoliDetail / TransaksiGigiDetail
-                            '    Dim idTindakanDetail As String = idTindakanDetailObj.ToString()
-                            '    If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
-                            '        WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
-                            '                 "WHERE TransPoliIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
-                            '    ElseIf jenisTransaksi = "GIGI" Then
-                            '        WriteSQL("UPDATE TransaksiGigiDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
-                            '                 "WHERE TransGigiIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
-                            '    End If
+    '                'If Not IsDBNull(idTindakanDetailObj) AndAlso idTindakanDetailObj IsNot Nothing AndAlso idTindakanDetailObj.ToString() <> "" Then
+    '                '    ' Jika ID ada → hapus dari TransaksiPoliDetail / TransaksiGigiDetail
+    '                '    Dim idTindakanDetail As String = idTindakanDetailObj.ToString()
+    '                '    If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
+    '                '        WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() WHERE TransPoliIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
+    '                '    ElseIf jenisTransaksi = "GIGI" Then
+    '                '        WriteSQL("UPDATE TransaksiGigiDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() WHERE TransGigiIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
+    '                '    End If
+    '                'ElseIf kodeVoucher <> "" Then
+    '                '    ' Jika ID NULL dan KodeVoucher ada → soft delete dari LogPenggunaanPaket dan tambah kuota
+    '                '    WriteSQL("UPDATE LogPenggunaanPaket SET DeletedBy = 'Admin', DeletedDate = GETDATE() WHERE ID IN (" & _
+    '                '            "SELECT TOP 1 ID FROM LogPenggunaanPaket WHERE KodeVoucher = '" & kodeVoucher & "' AND NoTransaksi = '" & idTransaksi & "' AND DeletedDate IS NULL ORDER BY CreatedDate DESC)", 4)
+    '                '    WriteSQL("UPDATE TransaksiPaketTindakan SET Kuota = ISNULL(Kuota, 0) + 1 WHERE KodeVoucher = '" & kodeVoucher & "'", 4)
+    '                '    WriteSQL("UPDATE TransaksiPoliDetail " & _
+    '                '          "SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
+    '                '          "WHERE TransPoliID IN (SELECT TransPoliID FROM TransaksiPoli WHERE NoUrut = '" & idTransaksi & "') " & _
+    '                '          "AND KodeVoucher = '" & kodeVoucher & "' " & _
+    '                '          "AND CONVERT(DATE, transaksitime) = CONVERT(DATE, GETDATE()) " & _
+    '                '          "AND DeletedDate IS NULL", 4)
+    '                'End If
 
-                            'ElseIf kodeVoucher <> "" Then
-                            '    ' Jika ID NULL dan KodeVoucher ada → soft delete dari LogPenggunaanPaket dan tambah kuota
-                            '    ' Ambil TindakanID yang digunakan
-                            '    Dim tindakanID As String = ReadSQLNIK("SELECT TOP 1 TindakanID FROM LogPenggunaanPaket WHERE KodeVoucher = '" & kodeVoucher & "' AND NoTransaksi = '" & idTransaksi & "' AND DeletedDate IS NULL ORDER BY CreatedDate DESC")
+    '                'If Not IsDBNull(idTindakanDetailObj) AndAlso idTindakanDetailObj IsNot Nothing AndAlso idTindakanDetailObj.ToString() <> "" Then
+    '                '    ' Jika ID ada → hapus dari TransaksiPoliDetail / TransaksiGigiDetail
+    '                '    Dim idTindakanDetail As String = idTindakanDetailObj.ToString()
+    '                '    If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
+    '                '        WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
+    '                '                 "WHERE TransPoliIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
+    '                '    ElseIf jenisTransaksi = "GIGI" Then
+    '                '        WriteSQL("UPDATE TransaksiGigiDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
+    '                '                 "WHERE TransGigiIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
+    '                '    End If
 
-                            '    ' Soft delete dari LogPenggunaanPaket
-                            '    WriteSQL("UPDATE LogPenggunaanPaket SET DeletedBy = 'Admin', DeletedDate = GETDATE() " & _
-                            '             "WHERE ID IN (" & _
-                            '             "SELECT TOP 1 ID FROM LogPenggunaanPaket " & _
-                            '             "WHERE KodeVoucher = '" & kodeVoucher & "' AND NoTransaksi = '" & idTransaksi & "' AND DeletedDate IS NULL " & _
-                            '             "ORDER BY CreatedDate DESC)", 4)
+    '                'ElseIf kodeVoucher <> "" Then
+    '                '    ' Jika ID NULL dan KodeVoucher ada → soft delete dari LogPenggunaanPaket dan tambah kuota
+    '                '    ' Ambil TindakanID yang digunakan
+    '                '    Dim tindakanID As String = ReadSQLNIK("SELECT TOP 1 TindakanID FROM LogPenggunaanPaket WHERE KodeVoucher = '" & kodeVoucher & "' AND NoTransaksi = '" & idTransaksi & "' AND DeletedDate IS NULL ORDER BY CreatedDate DESC")
 
-                            '    ' Tambahkan kuota kembali ke TransaksiPaketTindakanDetail jika TindakanID ditemukan
-                            '    If tindakanID <> "" Then
-                            '        WriteSQL("UPDATE TransaksiPaketTindakanDetail SET KuotaTindakan = ISNULL(KuotaTindakan, 0) + 1 " & _
-                            '                 "WHERE KodeVoucher = '" & kodeVoucher & "' AND TindakanID = '" & tindakanID & "'", 4)
-                            '    End If
+    '                '    ' Soft delete dari LogPenggunaanPaket
+    '                '    WriteSQL("UPDATE LogPenggunaanPaket SET DeletedBy = 'Admin', DeletedDate = GETDATE() " & _
+    '                '             "WHERE ID IN (" & _
+    '                '             "SELECT TOP 1 ID FROM LogPenggunaanPaket " & _
+    '                '             "WHERE KodeVoucher = '" & kodeVoucher & "' AND NoTransaksi = '" & idTransaksi & "' AND DeletedDate IS NULL " & _
+    '                '             "ORDER BY CreatedDate DESC)", 4)
 
-                            '    ' Hapus juga dari TransaksiPoliDetail berdasarkan KodeVoucher + Tanggal Hari Ini
-                            '    WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
-                            '             "WHERE TransPoliID IN (SELECT TransPoliID FROM TransaksiPoli WHERE NoUrut = '" & idTransaksi & "') " & _
-                            '             "AND KodeVoucher = '" & kodeVoucher & "' " & _
-                            '             "AND CONVERT(DATE, transaksitime) = CONVERT(DATE, GETDATE()) " & _
-                            '             "AND DeletedDate IS NULL", 4)
+    '                '    ' Tambahkan kuota kembali ke TransaksiPaketTindakanDetail jika TindakanID ditemukan
+    '                '    If tindakanID <> "" Then
+    '                '        WriteSQL("UPDATE TransaksiPaketTindakanDetail SET KuotaTindakan = ISNULL(KuotaTindakan, 0) + 1 " & _
+    '                '                 "WHERE KodeVoucher = '" & kodeVoucher & "' AND TindakanID = '" & tindakanID & "'", 4)
+    '                '    End If
 
-                            '    ' Cek apakah ini adalah paket reguler berdasarkan TindakanID = 0
-                            '    Dim isPaketReguler As Boolean = CBool(ReadSQLNIK("SELECT CASE WHEN EXISTS (" & _
-                            '        "SELECT 1 FROM TransaksiPoliDetail " & _
-                            '        "WHERE KodeVoucher = '" & kodeVoucher & "' " & _
-                            '        "AND CONVERT(DATE, transaksitime) = CONVERT(DATE, GETDATE()) " & _
-                            '        "AND DeletedDate IS NULL AND TindakanID = '0') THEN 1 ELSE 0 END"))
+    '                '    ' Hapus juga dari TransaksiPoliDetail berdasarkan KodeVoucher + Tanggal Hari Ini
+    '                '    WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
+    '                '             "WHERE TransPoliID IN (SELECT TransPoliID FROM TransaksiPoli WHERE NoUrut = '" & idTransaksi & "') " & _
+    '                '             "AND KodeVoucher = '" & kodeVoucher & "' " & _
+    '                '             "AND CONVERT(DATE, transaksitime) = CONVERT(DATE, GETDATE()) " & _
+    '                '             "AND DeletedDate IS NULL", 4)
 
-                            '    If isPaketReguler Then
-                            '        ' Tambahkan kuota kembali ke TransaksiPaketTindakan
-                            '        WriteSQL("UPDATE TransaksiPaketTindakan SET Kuota = ISNULL(Kuota, 0) + 1 WHERE KodeVoucher = '" & kodeVoucher & "'", 4)
-                            '    End If
+    '                '    ' Cek apakah ini adalah paket reguler berdasarkan TindakanID = 0
+    '                '    Dim isPaketReguler As Boolean = CBool(ReadSQLNIK("SELECT CASE WHEN EXISTS (" & _
+    '                '        "SELECT 1 FROM TransaksiPoliDetail " & _
+    '                '        "WHERE KodeVoucher = '" & kodeVoucher & "' " & _
+    '                '        "AND CONVERT(DATE, transaksitime) = CONVERT(DATE, GETDATE()) " & _
+    '                '        "AND DeletedDate IS NULL AND TindakanID = '0') THEN 1 ELSE 0 END"))
 
-                            HapusTindakanPaket(idTindakanDetailObj, namaTindakan, kodeVoucher)
-                        End If
-                        MsgBox("Tindakan : " & namaTindakan & " berhasil dihapus.", MsgBoxStyle.Information, "Success!")
-                    End If
+    '                '    If isPaketReguler Then
+    '                '        ' Tambahkan kuota kembali ke TransaksiPaketTindakan
+    '                '        WriteSQL("UPDATE TransaksiPaketTindakan SET Kuota = ISNULL(Kuota, 0) + 1 WHERE KodeVoucher = '" & kodeVoucher & "'", 4)
+    '                '    End If
 
-                        SaveDetailTindakan()
-                    End If
+    '                HapusTindakanPaket(idTindakanDetailObj, namaTindakan, kodeVoucher)
+    '            End If
+    '            MsgBox("Tindakan : " & namaTindakan & " berhasil dihapus.", MsgBoxStyle.Information, "Success!")
+    '        End If
 
-                    ' Refresh Grid
-                    LoadGridTindakanPoli()
+    '        SaveDetailTindakan()
+    '    End If
 
-                ElseIf e.ColumnIndex = dataGridView.Columns("ButtonInformedConsent").Index Then
-                    Dim idTindakan As String = dataGridView.Rows(e.RowIndex).Cells("ColumnTindakanID").Value.ToString()
-                    PreviewInformedConsent(idTransaksi, idTindakan)
+    '    ' Refresh Grid
+    '    LoadGridTindakanPoli()
+
+    '     ElseIf colName = "ButtonInformedConsent" Then
+
+    '    Dim idTindakan As String = dgv.Rows(e.RowIndex).Cells("ColumnTindakanID").Value.ToString()
+
+    '    PreviewInformedConsent(idTransaksi, idTindakan)
+    '    End If
+    'End Sub
+
+    Private Sub DataGridViewTindakan_CellClick(ByVal sender As Object, ByVal e As DataGridViewCellEventArgs) Handles DataGridViewTindakan.CellClick
+
+        If e.RowIndex < 0 Then Exit Sub
+
+        Dim dgv As DataGridView = DirectCast(sender, DataGridView)
+        Dim colName As String = dgv.Columns(e.ColumnIndex).Name
+
+
+        If colName = "ButtonDetail" Then
+            If CheckingDeleteTindakan() = True Then
+
+                Dim idTindakanDetailObj As Object = dgv.Rows(e.RowIndex).Cells("ColumnID").Value()
+
+                Dim namaTindakan As String = dgv.Rows(e.RowIndex).Cells("ColumnNamaTindakan").Value.ToString()
+
+                Dim kodeVoucher As String = If(IsDBNull(dgv.Rows(e.RowIndex).Cells("ColumnKodeVoucher").Value), "", dgv.Rows(e.RowIndex).Cells("ColumnKodeVoucher").Value.ToString())
+
+                Dim result As DialogResult = MessageBox.Show("Apakah Anda yakin ingin menghapus tindakan " & namaTindakan & "?", "Validasi", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+
+                If result = DialogResult.Yes Then
+                    HapusTindakanPaket(idTindakanDetailObj, namaTindakan, kodeVoucher)
+                    MsgBox("Tindakan berhasil dihapus.", MsgBoxStyle.Information)
                 End If
+
+                SaveDetailTindakan()
+                LoadGridTindakanPoli()
             End If
+
+
+        ElseIf colName = "ButtonInformedConsent" Then
+
+            Dim idTindakan As String = dgv.Rows(e.RowIndex).Cells("ColumnTindakanID").Value.ToString()
+
+            PreviewInformedConsent(idTransaksi, idTindakan)
+
+        End If
+
     End Sub
+
 
     Private Sub ButtonGenerateSuratKeteranganBerobat_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonGenerateSuratKeteranganBerobat.Click
         Try
