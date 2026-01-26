@@ -38,6 +38,12 @@ Partial Class FormPendaftaranAwal
         Me.ButtonFindPasien = New System.Windows.Forms.Button
         Me.ButtonClearData = New System.Windows.Forms.Button
         Me.PanelPasienInfo = New System.Windows.Forms.Panel
+        Me.PanelInformConsent = New System.Windows.Forms.Panel
+        Me.Panel1 = New System.Windows.Forms.Panel
+        Me.RadioButtonSetujuInformedConsent = New System.Windows.Forms.RadioButton
+        Me.RadioButtonTidakSetujuInformedConsent = New System.Windows.Forms.RadioButton
+        Me.ButtonInputInformedConsent = New System.Windows.Forms.Button
+        Me.Label55 = New System.Windows.Forms.Label
         Me.ComboBoxPenjamin = New System.Windows.Forms.ComboBox
         Me.Label19 = New System.Windows.Forms.Label
         Me.ComboBoxMarketing = New System.Windows.Forms.ComboBox
@@ -186,6 +192,8 @@ Partial Class FormPendaftaranAwal
         Me.SplitContainerPendaftaran.SuspendLayout()
         Me.Panel16.SuspendLayout()
         Me.PanelPasienInfo.SuspendLayout()
+        Me.PanelInformConsent.SuspendLayout()
+        Me.Panel1.SuspendLayout()
         Me.GroupBoxFotoPasien.SuspendLayout()
         CType(Me.PictureBoxFotoPasien, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.TabControlMenu1.SuspendLayout()
@@ -380,6 +388,7 @@ Partial Class FormPendaftaranAwal
         '
         Me.PanelPasienInfo.AutoScroll = True
         Me.PanelPasienInfo.BackColor = System.Drawing.Color.White
+        Me.PanelPasienInfo.Controls.Add(Me.PanelInformConsent)
         Me.PanelPasienInfo.Controls.Add(Me.ComboBoxPenjamin)
         Me.PanelPasienInfo.Controls.Add(Me.Label19)
         Me.PanelPasienInfo.Controls.Add(Me.ComboBoxMarketing)
@@ -452,6 +461,82 @@ Partial Class FormPendaftaranAwal
         Me.PanelPasienInfo.Name = "PanelPasienInfo"
         Me.PanelPasienInfo.Size = New System.Drawing.Size(1111, 560)
         Me.PanelPasienInfo.TabIndex = 6
+        '
+        'PanelInformConsent
+        '
+        Me.PanelInformConsent.Controls.Add(Me.Panel1)
+        Me.PanelInformConsent.Controls.Add(Me.ButtonInputInformedConsent)
+        Me.PanelInformConsent.Controls.Add(Me.Label55)
+        Me.PanelInformConsent.Location = New System.Drawing.Point(1173, 268)
+        Me.PanelInformConsent.Name = "PanelInformConsent"
+        Me.PanelInformConsent.Size = New System.Drawing.Size(200, 100)
+        Me.PanelInformConsent.TabIndex = 540
+        Me.PanelInformConsent.Visible = False
+        '
+        'Panel1
+        '
+        Me.Panel1.BackColor = System.Drawing.Color.Transparent
+        Me.Panel1.Controls.Add(Me.RadioButtonSetujuInformedConsent)
+        Me.Panel1.Controls.Add(Me.RadioButtonTidakSetujuInformedConsent)
+        Me.Panel1.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.Panel1.Location = New System.Drawing.Point(15, 34)
+        Me.Panel1.Name = "Panel1"
+        Me.Panel1.Size = New System.Drawing.Size(170, 25)
+        Me.Panel1.TabIndex = 449
+        '
+        'RadioButtonSetujuInformedConsent
+        '
+        Me.RadioButtonSetujuInformedConsent.AutoSize = True
+        Me.RadioButtonSetujuInformedConsent.Checked = True
+        Me.RadioButtonSetujuInformedConsent.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.RadioButtonSetujuInformedConsent.Location = New System.Drawing.Point(5, 3)
+        Me.RadioButtonSetujuInformedConsent.Name = "RadioButtonSetujuInformedConsent"
+        Me.RadioButtonSetujuInformedConsent.Size = New System.Drawing.Size(59, 19)
+        Me.RadioButtonSetujuInformedConsent.TabIndex = 245
+        Me.RadioButtonSetujuInformedConsent.TabStop = True
+        Me.RadioButtonSetujuInformedConsent.Text = "Setuju"
+        Me.RadioButtonSetujuInformedConsent.UseVisualStyleBackColor = True
+        '
+        'RadioButtonTidakSetujuInformedConsent
+        '
+        Me.RadioButtonTidakSetujuInformedConsent.AutoSize = True
+        Me.RadioButtonTidakSetujuInformedConsent.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.RadioButtonTidakSetujuInformedConsent.Location = New System.Drawing.Point(70, 3)
+        Me.RadioButtonTidakSetujuInformedConsent.Name = "RadioButtonTidakSetujuInformedConsent"
+        Me.RadioButtonTidakSetujuInformedConsent.Size = New System.Drawing.Size(91, 19)
+        Me.RadioButtonTidakSetujuInformedConsent.TabIndex = 246
+        Me.RadioButtonTidakSetujuInformedConsent.Text = "Tidak Setuju"
+        Me.RadioButtonTidakSetujuInformedConsent.UseVisualStyleBackColor = True
+        '
+        'ButtonInputInformedConsent
+        '
+        Me.ButtonInputInformedConsent.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonInputInformedConsent.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
+        Me.ButtonInputInformedConsent.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonInputInformedConsent.FlatAppearance.BorderSize = 0
+        Me.ButtonInputInformedConsent.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonInputInformedConsent.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.ButtonInputInformedConsent.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonInputInformedConsent.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.ButtonInputInformedConsent.ForeColor = System.Drawing.Color.White
+        Me.ButtonInputInformedConsent.Location = New System.Drawing.Point(15, 66)
+        Me.ButtonInputInformedConsent.Name = "ButtonInputInformedConsent"
+        Me.ButtonInputInformedConsent.RightToLeft = System.Windows.Forms.RightToLeft.Yes
+        Me.ButtonInputInformedConsent.Size = New System.Drawing.Size(170, 25)
+        Me.ButtonInputInformedConsent.TabIndex = 450
+        Me.ButtonInputInformedConsent.Text = "Input Informed Consent"
+        Me.ButtonInputInformedConsent.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.ButtonInputInformedConsent.UseVisualStyleBackColor = False
+        '
+        'Label55
+        '
+        Me.Label55.AutoSize = True
+        Me.Label55.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label55.Location = New System.Drawing.Point(14, 11)
+        Me.Label55.Name = "Label55"
+        Me.Label55.Size = New System.Drawing.Size(80, 17)
+        Me.Label55.TabIndex = 446
+        Me.Label55.Text = "Persetujuan"
         '
         'ComboBoxPenjamin
         '
@@ -1819,10 +1904,10 @@ Partial Class FormPendaftaranAwal
         '
         Me.TabPage2.BackColor = System.Drawing.Color.White
         Me.TabPage2.Controls.Add(Me.SplitContainerRiwayatLaboratorium)
-        Me.TabPage2.Location = New System.Drawing.Point(4, 27)
+        Me.TabPage2.Location = New System.Drawing.Point(4, 25)
         Me.TabPage2.Name = "TabPage2"
         Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage2.Size = New System.Drawing.Size(1117, 612)
+        Me.TabPage2.Size = New System.Drawing.Size(1117, 614)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Tab Menu 2"
         '
@@ -1849,7 +1934,7 @@ Partial Class FormPendaftaranAwal
         '
         Me.SplitContainerRiwayatLaboratorium.Panel2.AutoScroll = True
         Me.SplitContainerRiwayatLaboratorium.Panel2.Controls.Add(Me.SplitContainer5)
-        Me.SplitContainerRiwayatLaboratorium.Size = New System.Drawing.Size(1111, 606)
+        Me.SplitContainerRiwayatLaboratorium.Size = New System.Drawing.Size(1111, 608)
         Me.SplitContainerRiwayatLaboratorium.SplitterDistance = 85
         Me.SplitContainerRiwayatLaboratorium.SplitterWidth = 5
         Me.SplitContainerRiwayatLaboratorium.TabIndex = 463
@@ -1947,7 +2032,7 @@ Partial Class FormPendaftaranAwal
         'SplitContainer5.Panel2
         '
         Me.SplitContainer5.Panel2.Controls.Add(Me.DataGridViewAntrean)
-        Me.SplitContainer5.Size = New System.Drawing.Size(1111, 516)
+        Me.SplitContainer5.Size = New System.Drawing.Size(1111, 518)
         Me.SplitContainer5.SplitterDistance = 30
         Me.SplitContainer5.TabIndex = 0
         '
@@ -2036,7 +2121,7 @@ Partial Class FormPendaftaranAwal
         Me.DataGridViewAntrean.RowHeadersVisible = False
         Me.DataGridViewAntrean.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders
         Me.DataGridViewAntrean.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.DataGridViewAntrean.Size = New System.Drawing.Size(1111, 482)
+        Me.DataGridViewAntrean.Size = New System.Drawing.Size(1111, 484)
         Me.DataGridViewAntrean.TabIndex = 516
         '
         'TabPage3
@@ -2164,6 +2249,10 @@ Partial Class FormPendaftaranAwal
         Me.Panel16.ResumeLayout(False)
         Me.PanelPasienInfo.ResumeLayout(False)
         Me.PanelPasienInfo.PerformLayout()
+        Me.PanelInformConsent.ResumeLayout(False)
+        Me.PanelInformConsent.PerformLayout()
+        Me.Panel1.ResumeLayout(False)
+        Me.Panel1.PerformLayout()
         Me.GroupBoxFotoPasien.ResumeLayout(False)
         CType(Me.PictureBoxFotoPasien, System.ComponentModel.ISupportInitialize).EndInit()
         Me.TabControlMenu1.ResumeLayout(False)
@@ -2363,4 +2452,10 @@ Partial Class FormPendaftaranAwal
     Friend WithEvents Label19 As System.Windows.Forms.Label
     Friend WithEvents ComboBoxMarketing As System.Windows.Forms.ComboBox
     Friend WithEvents Label17 As System.Windows.Forms.Label
+    Friend WithEvents PanelInformConsent As System.Windows.Forms.Panel
+    Friend WithEvents Label55 As System.Windows.Forms.Label
+    Friend WithEvents Panel1 As System.Windows.Forms.Panel
+    Friend WithEvents RadioButtonSetujuInformedConsent As System.Windows.Forms.RadioButton
+    Friend WithEvents RadioButtonTidakSetujuInformedConsent As System.Windows.Forms.RadioButton
+    Friend WithEvents ButtonInputInformedConsent As System.Windows.Forms.Button
 End Class

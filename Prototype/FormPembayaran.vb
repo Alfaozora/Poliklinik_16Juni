@@ -1083,6 +1083,12 @@ Public Class FormPembayaran
                 '    Report.PageHeight = txtotalrow
                 'End If
 
+                Dim paketList As New List(Of Object)
+
+                Dim nama As String = ReadSQLNIK("SELECT Nama FROM MasterPasien WHERE NoRekamMedis = '" & _noRekamMedis & "'")
+                Dim noHp As String = ReadSQLNIK("SELECT NoHandphone FROM MasterPasien WHERE NoRekamMedis = '" & _noRekamMedis & "'")
+                Dim tglPembelian As String = Date.Now.ToString("yyyy-MM-dd HH:mm:ss")
+
                 ' Insert Transaksi Paket (Jika ada)
                 For Each rowTindakan As DataRow In tblTindakan.Rows
                     If rowTindakan("KodeVoucher").ToString() = "" And _jenisTindakan = "Paket" Then
@@ -1091,8 +1097,17 @@ Public Class FormPembayaran
                                  "VALUES('" & _noRekamMedis & "', '" & _nomorUrutTransaksi & "', '" & rowTindakan("PaketID") & "', '" & rowTindakan("Nama Paket") & "', '" & rowTindakan("Keterangan Paket") & "', '" & rowTindakan("Jenis Paket") & "', GETDATE(), DATEADD(DAY, " & rowTindakan("DurasiAktif") & ", GETDATE()), " & CDbl(rowTindakan("Harga Awal")) & ", " & _
                                  "" & CDbl(rowTindakan("Diskon")) & ", " & CDbl(rowTindakan("Harga Nett")) & ", '" & rowTindakan("Kuota") & "', '" & rowTindakan("DetailTindakan") & "', 'PAID', '" & voucherID & "', '" & penjaminTindakan & "', '" & userInput & "', GETDATE())", 4)
 
+                        Dim paket As New Dictionary(Of String, Object)
+                        paket.Add("id_paket", rowTindakan("PaketID").ToString())
+                        paket.Add("nama_paket", rowTindakan("Nama Paket").ToString())
+                        paket.Add("tgl_pembelian", tglPembelian)
+                        paket.Add("tgl_perawatan", Nothing)
+
+                        paketList.Add(paket)
+
                         ' Insert Tabel TransaksiPaketTindakanDetail
                         Dim tblPaketDetail As DataTable = ReadSQL("SELECT * FROM MasterPaketTindakanDetail WHERE PaketID = '" & rowTindakan("PaketID") & "'")
+
                         For Each rowPaketDetail As DataRow In tblPaketDetail.Rows
                             WriteSQL("INSERT INTO TransaksiPaketTindakanDetail(PaketID, KodeVoucher, TindakanID, NamaTindakan, JenisTindakan, BiayaTindakan, DiskonTindakan, NettBayar, Jumlah, GrandTotal, KuotaTindakan, CreatedBy, CreatedDate) " & _
                                      "VALUES('" & rowPaketDetail("PaketID").ToString() & "', '" & voucherID & "', '" & rowPaketDetail("TindakanID") & "', '" & rowPaketDetail("NamaTindakan") & "', '" & rowPaketDetail("JenisTindakan") & "', " & _
@@ -1112,6 +1127,30 @@ Public Class FormPembayaran
                         WriteSQL("UPDATE TransaksiPaketTindakan SET Kuota = Kuota - 1 WHERE PaketID = '" & rowTindakan("PaketID") & "' AND KodeVoucher = '" & rowTindakan("KodeVoucher").ToString() & "' AND DeletedDate IS NULL", 4)
                     End If
                 Next
+
+                If paketList.Count > 0 Then
+
+                    Dim payload As New Dictionary(Of String, Object)
+                    payload.Add("nama_pasien", nama)
+                    payload.Add("no_hp", noHp)
+                    payload.Add("no_transaksi", _nomorUrutTransaksi)
+                    payload.Add("no_rm", _noRekamMedis)
+                    payload.Add("packages", paketList)
+
+                    Dim jsonParam As String = JsonConvert.SerializeObject(payload)
+
+                    Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+                    Dim urlWebService As String = baseURL & "api/lumiera-luzelle/treatment-package"
+
+                    Dim responseApi As String = InsertDataAPIRM(jsonParam, urlWebService)
+
+                    If responseApi.ToLower().Contains("""success"":true") Then
+                        MsgBox("Paket berhasil terkirim ke API: " & _nomorUrutTransaksi)
+                    Else
+                        MsgBox("paket GAGAL dikirim ke API: " & responseApi)
+                    End If
+
+                End If
 
                 ' Set QR (Report)
                 'If statusQR = True Then
@@ -1206,23 +1245,7 @@ Public Class FormPembayaran
                               "AND NamaTindakan = '" & Trow("Tindakan").ToString().Replace("'", "''") & "' " & _
                               "AND JenisTindakan = '" & Trow("Jenis").ToString().Replace("'", "''") & "'", 4)
 
-                        ' === Setelah semua transaksi tersimpan ===
-                        If _kodeVoucher <> "" Then
-                            Try
-                                ' Update jumlah terpakai voucher
-                                Dim sqlUpdateVoucher As String = _
-                                    "UPDATE MasterVoucher " & _
-                                    "SET JumlahTerpakai = ISNULL(JumlahTerpakai, 0) + 1 " & _
-                                    "WHERE KodeVoucher = '" & _kodeVoucher.Replace("'", "''") & "'"
-
-                                WriteSQL(sqlUpdateVoucher, 4)
-
-                                ' Opsional: tampilkan notifikasi sukses
-                                MessageBox.Show("Voucher berhasil digunakan dan jumlah pemakaian diperbarui.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
-                            Catch ex As Exception
-                                MessageBox.Show("Gagal memperbarui jumlah pemakaian voucher: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                            End Try
-                        End If
+                        
 
                     End If
 
@@ -1261,6 +1284,23 @@ Public Class FormPembayaran
                 Next
 
                 WriteSQL("UPDATE TransaksiPoli SET TotalTagihan = TotalTagihan + " & CDbl(txtotalbruto) & ", TotalDisc = TotalDisc + " & CDbl(txtotaldisc) & ", Pembulatan = Pembulatan + " & CDbl(txtotalpembulatan) & ", NettBayar = NettBayar + " & CDbl(TextBoxTotalTagihan.Value) & ", TotalBayar = TotalBayar + " & CDbl(TextBoxTotalBayar.Value) & ", Pengembalian = Pengembalian + " & CDbl(TextBoxTotalKembali.Value) & ", ClosedBayar = '" & Format(DateAndTime.Now, "MM/dd/yyyy") & "', Status = 'CLOSED' WHERE TransPoliID = '" & _idTransaksi & "'", 4)
+
+
+                ' ================================
+                ' UPDATE JUMLAH TERPAKAI VOUCHER
+                ' ================================
+                If _kodeVoucher.Trim() <> "" Then
+                    Try
+                        Dim sqlUpdateVoucher As String = _
+                            "UPDATE MasterVoucher SET " & _
+                            "JumlahTerpakai = ISNULL(JumlahTerpakai, 0) + 1 " & _
+                            "WHERE KodeVoucher = '" & _kodeVoucher.Replace("'", "''") & "'"
+
+                        WriteSQL(sqlUpdateVoucher, 4)
+                    Catch ex As Exception
+                        MsgBox("Gagal update jumlah pemakaian voucher: " & ex.Message, MsgBoxStyle.Critical)
+                    End Try
+                End If
 
                 If TextBoxTotalKembali.Value > 0 Then
                     WriteSQL("UPDATE TransaksiPoliBayar SET Kembali = '" & CDbl(TextBoxTotalKembali.Value) & "' WHERE TransPoliID = '" & _idTransaksi & "' AND JenisBayar = 'TUNAI' ", 4)

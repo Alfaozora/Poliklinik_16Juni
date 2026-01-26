@@ -27,7 +27,6 @@ Public Class Dialog1
     Private Sub OK_Button_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OK_Button.Click
         ' Ambil nilai dari DateTimePicker saat tombol OK diklik
         TglMulaiBaru = dtReservasiUlang.Value
-        TglAkhirBaru = dtSelesaiUlang.Value
 
         Me.DialogResult = DialogResult.OK
         Me.Close()
@@ -41,6 +40,5 @@ Public Class Dialog1
     Private Sub Dialog1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         ' Inisialisasi jika perlu
         dtReservasiUlang.Value = DateTime.Now
-        dtSelesaiUlang.Value = DateTime.Now.AddMinutes(30)
     End Sub
 End Class

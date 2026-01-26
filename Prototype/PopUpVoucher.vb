@@ -25,7 +25,8 @@
                 "MV.NamaVoucher, " & _
                 "MV.Tipe, " & _
                 "MV.Nilai, " & _
-                "CONVERT(VARCHAR(10), MV.TanggalAkhir, 105) AS TanggalAkhir " & _
+                "CONVERT(VARCHAR(10), MV.TanggalAkhir, 105) AS TanggalAkhir, " & _
+                "MV.TipePemakaian " & _
                 "FROM TransaksiPoli TP " & _
                 "INNER JOIN TransaksiPoliDetail TPD ON TP.TransPoliID = TPD.TransPoliID " & _
                 "INNER JOIN MasterVoucher MV ON TPD.KodeVoucher = MV.KodeVoucher " & _
@@ -64,7 +65,8 @@
                 "MV.JumlahMaks, " & _
                 "MV.JumlahTerpakai, " & _
                 "MV.Status, " & _
-                "MV.KodeTindakan " & _
+                "MV.KodeTindakan, " & _
+                "MV.TipePemakaian " & _
             "FROM MasterVoucher MV " & _
             "WHERE MV.KodeVoucher = '" & kodeVoucher.Replace("'", "''") & "' " & _
             "AND (MV.DeletedBy IS NULL OR MV.DeletedBy = '') " & _
@@ -107,6 +109,7 @@
         dtDisplay.Columns.Add("Nama Tindakan")
         dtDisplay.Columns.Add("Berakhir Tanggal")
         dtDisplay.Columns.Add("KodeTindakan")
+        dtDisplay.Columns.Add("TipePemakaian")
 
         Dim tipe As String = row("Tipe").ToString().ToUpper()
         Dim nilai As Decimal = CDec(row("Nilai"))
@@ -135,7 +138,7 @@
             End If
         End If
 
-        dtDisplay.Rows.Add(row("KodeVoucher"), row("NamaVoucher"), tipe, nominal, namaTindakan, tglAkhirStr, row("KodeTindakan").ToString())
+        dtDisplay.Rows.Add(row("KodeVoucher"), row("NamaVoucher"), tipe, nominal, namaTindakan, tglAkhirStr, row("KodeTindakan").ToString(), row("TipePemakaian").ToString())
 
         DataGridVoucher.DataSource = dtDisplay
         DataGridVoucher.AllowUserToAddRows = False
@@ -203,6 +206,48 @@
     '    Me.Close()
     'End Sub
 
+    Private Function VoucherSudahDipakaiSekali(ByVal noRM As String, ByVal kodeVoucher As String) As Boolean
+        Dim sql As String = _
+            "SELECT COUNT(*) FROM TransaksiPoli TP " & _
+            "INNER JOIN TransaksiPoliDetail TPD ON TP.TransPoliID = TPD.TransPoliID " & _
+            "WHERE TP.IDInterner = '" & noRM.Replace("'", "''") & "' " & _
+            "AND TPD.KodeVoucher = '" & kodeVoucher.Replace("'", "''") & "'"
+
+        Dim dt As DataTable = ReadSQL(sql)
+        Return (dt.Rows.Count > 0 AndAlso CInt(dt.Rows(0)(0)) > 0)
+    End Function
+
+    Private Function VoucherSudahDipakaiHariIni(ByVal noRM As String, ByVal kodeVoucher As String) As Boolean
+        Dim sql As String = _
+            "SELECT COUNT(*) FROM TransaksiPoli TP " & _
+            "INNER JOIN TransaksiPoliDetail TPD ON TP.TransPoliID = TPD.TransPoliID " & _
+            "WHERE TP.IDInternet = '" & noRM.Replace("'", "''") & "' " & _
+            "AND TPD.KodeVoucher = '" & kodeVoucher.Replace("'", "''") & "' " & _
+            "AND CONVERT(date, TP.CreatedDate) = CONVERT(date, GETDATE())"
+
+        Dim dt As DataTable = ReadSQL(sql)
+        Return (dt.Rows.Count > 0 AndAlso CInt(dt.Rows(0)(0)) > 0)
+    End Function
+
+    Private Function VoucherKuotaHabis(ByVal kodeVoucher As String) As Boolean
+        Dim sql As String = _
+            "SELECT JumlahMaks, JumlahTerpakai FROM MasterVoucher " & _
+            "WHERE KodeVoucher = '" & kodeVoucher.Replace("'", "''") & "'"
+
+        Dim dt As DataTable = ReadSQL(sql)
+
+        If dt.Rows.Count = 0 Then Return True
+
+        Dim maks As Integer = CInt(dt.Rows(0)("JumlahMaks"))
+        Dim terpakai As Integer = CInt(dt.Rows(0)("JumlahTerpakai"))
+
+        If maks > 0 AndAlso terpakai >= maks Then
+            Return True
+        End If
+
+        Return False
+    End Function
+
     Private Sub ButtonSubmit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonSubmit.Click
         For Each row As DataGridViewRow In DataGridVoucher.Rows
             If Convert.ToBoolean(row.Cells("Pilih").Value) = True Then
@@ -212,27 +257,36 @@
 
                 Dim nilai As Decimal = CDec(row.Cells("Nominal").Value.ToString().Replace("Rp", "").Replace("%", "").Replace(",", "").Trim())
 
-                ' 🔑 AMBIL KODE TINDAKAN (CSV ID)
+                'AMBIL KODE TINDAKAN (CSV ID)
                 Dim kodeTindakan As String = ""
                 If DataGridVoucher.Columns.Contains("KodeTindakan") Then
                     kodeTindakan = row.Cells("KodeTindakan").Value.ToString()
                 End If
 
-                ' Voucher khusus tindakan jika KodeTindakan tidak kosong
+                'Voucher khusus tindakan jika KodeTindakan tidak kosong
                 Dim isTindakan As Boolean = (kodeTindakan.Trim() <> "")
 
-                ' 🟡 Validasi: cek apakah voucher sudah pernah digunakan pasien ini
-                Dim sudahDipakai As Boolean = False
-                For Each r As DataGridViewRow In DataGridRiwayat.Rows
-                    If r.Cells("KodeVoucher").Value.ToString().Trim().ToUpper() = kode.Trim().ToUpper() Then
-                        sudahDipakai = True
-                        Exit For
-                    End If
-                Next
+                'Ambil tipe pemakaian voucher
+                Dim tipePemakaian As String = row.Cells("TipePemakaian").Value.ToString().ToUpper()
 
-                If sudahDipakai Then
-                    MsgBox("Voucher ini sudah pernah digunakan oleh pasien ini dan tidak dapat digunakan lagi.", MsgBoxStyle.Exclamation, "Voucher Sudah Digunakan")
+                'cek kuota global
+                If VoucherKuotaHabis(kode) Then
+                    MsgBox("Kuota voucher sudah habis.", MsgBoxStyle.Exclamation)
                     Exit Sub
+                End If
+
+                'cek aturan pemakaian
+                If tipePemakaian = "ONCE" Then
+                    If VoucherSudahDipakaiSekali(NoRekamMedis, kode) Then
+                        MsgBox("Voucher ini hanya dapat digunakan sekali oleh pasien ini.", MsgBoxStyle.Exclamation)
+                        Exit Sub
+                    End If
+
+                ElseIf tipePemakaian = "DAILY" Then
+                    If VoucherSudahDipakaiHariIni(NoRekamMedis, kode) Then
+                        MsgBox("Voucher ini hanya dapat digunakan 1x per hari.", MsgBoxStyle.Exclamation)
+                        Exit Sub
+                    End If
                 End If
 
                 ' ✅ KIRIM KE FORM TUJUAN (KASIR / FORM TINDAKAN)

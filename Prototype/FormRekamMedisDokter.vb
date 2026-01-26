@@ -19,6 +19,7 @@ Imports DevExpress.XtraPrinting.Drawing
 Imports PoliKlinik_Net2.ShapeDrawingFunctions
 Imports System.Text
 Imports System.Globalization
+Imports System.Net
 
 Public Class FormRekamMedisDokter
     Public Class TindakanDetail
@@ -2133,6 +2134,21 @@ Public Class FormRekamMedisDokter
                     ")", 4)
 
 
+                Dim jsonParam As String = _
+                    "{" & _
+                    """nama"":""" & namaPasien.Replace("""", "'") & """," & _
+                    """no_rm"":""" & idPasien & """," & _
+                    """no_transaksi"":""" & idTransaksi & """," & _
+                    """tindakan"":""" & TextBoxNamaTindakan.Text.Replace("""", "'") & """," & _
+                    """id_tindakan"":""" & TextBoxTindakanID.Text & """" & _
+                    "}"
+
+                Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+
+                Dim urlWebService As String = baseURL & "api/lumiera-luzelle/persetujuan-treatment"
+
+                Dim responseApi As String = InsertDataAPIRM(jsonParam, urlWebService)
+
                 Dim dtReminder As DataTable = ReadSQL("SELECT Reminder, Hari FROM MasterTindakan WHERE TindakanID = '" & TextBoxTindakanID.Text & "'")
 
                 If dtReminder.Rows.Count > 0 AndAlso CBool(dtReminder.Rows(0)("Reminder")) = True Then
@@ -2142,19 +2158,29 @@ Public Class FormRekamMedisDokter
                         jumlahHari = CInt(hariStr)
                     End If
 
-                    ' Hitung tanggal reminder = hari ini + jumlah bulan
+                    ' Hitung tanggal reminder = hari ini + jumlah hari
                     Dim tglReminder As Date = Date.Today.AddDays(jumlahHari)
+                    Dim kdPoli As String = ReadSQLNIK( _
+                        "SELECT TOP 1 MPT.KodeBPJS " & _
+                        "FROM TransaksiDetail TD " & _
+                        "INNER JOIN MasterPoliTujuan MPT ON TD.JenisPoli = MPT.NamaPoli " & _
+                        "WHERE TD.NoUrut = '" & idTransaksi & "'")
 
                     ' Simpan ke LogReminderPasien
-                    WriteSQL("INSERT INTO LogReminderPasien (NamaPasien, NoHP, Keperluan, Tanggal, Status, CreatedBy, CreatedDate, JenisKelamin) " & _
-                             "VALUES ('" & namaPasien.Replace("'", "''") & "', " & _
-                             "'" & NoHp.Replace("'", "''") & "', " & _
-                             "'" & TextBoxNamaTindakan.Text & "', " & _
-                             "'" & tglReminder.ToString("yyyy-MM-dd 09:00") & "', " & _
-                             "'TERJADWAL', " & _
-                             "'" & userInput.Replace("'", "''") & "', " & _
-                             "GETDATE(), " & _
-                             "'" & jenisKelamin & "')", 4)
+                    WriteSQL("INSERT INTO LogReminderPasien " & _
+                          "(NamaPasien, NoHP, Keperluan, Tanggal, Status, CreatedBy, CreatedDate, JenisKelamin, NoRekamMedis,  KodePoli) " & _
+                          "VALUES (" & _
+                          "'" & namaPasien.Replace("'", "''") & "', " & _
+                          "'" & NoHp.Replace("'", "''") & "', " & _
+                          "'" & TextBoxNamaTindakan.Text.Replace("'", "''") & "', " & _
+                          "'" & tglReminder.ToString("yyyy-MM-dd 09:00") & "', " & _
+                          "'TERJADWAL', " & _
+                          "'" & userInput.Replace("'", "''") & "', " & _
+                          "GETDATE(), " & _
+                          "'" & jenisKelamin & "', " & _
+                          "'" & idPasien & "'," & _
+                          "'" & kdPoli & "'" & _
+                          ")", 4)
 
                     MsgBox("INSERT Reminder sukses untuk: " & namaPasien & vbCrLf & "Tanggal: " & tglReminder.ToString("yyyy-MM-dd"), MsgBoxStyle.Information)
                 End If
@@ -2247,104 +2273,199 @@ Public Class FormRekamMedisDokter
         Return True
     End Function
 
+    'OLD
+    'Function ValidasiSignatureInformedConsent() As Boolean
+    '    Dim kodeLokasi As String = ReadSQLNIK("select StrValue from MsConfig where ConfigName = 'NoPoli'")
+    '    Dim statusInformedConsent As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'SettingInformedConsent'")
+
+    '    ' Skip jika setting informed consent tidak aktif
+    '    If statusInformedConsent = "No" Then Return True
+
+    '    ' Skip jika tindakan tidak membutuhkan informed consent
+    '    If CheckBoxInformedConsent.Checked = False Then Return True
+
+    '    Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'web_service_klinik'")
+    '    Dim urlWebService As String = baseURL & "api/lumiera-luzelle/" & idTransaksi & "/" & TextBoxTindakanID.Text
+    '    Dim response As String = "[" & GetDataAPI(urlWebService) & "]"
+
+    '    Dim jsonObject() = Newtonsoft.Json.JsonConvert.DeserializeObject(Of InformedConsent())(response)
+
+    '    For Each rowData As InformedConsent In jsonObject
+    '        If rowData.response.message <> "Transaksi berhasil" Then
+    '            MsgBox(rowData.response.message, MsgBoxStyle.Exclamation, "Warning!")
+    '            Return False
+    '        Else
+    '            ' Insert Informed Consent
+    '            Dim query As String = "INSERT INTO InformedConsent (NoTransaksi, NoRekamMedis, TglTransaksi, JenisPoli, KeteranganLokasi, NoNIK, NamaPasien, UmurPasien, JenisKelaminPasien, AlamatPasien, NamaDokter, NamaPerawat, KeteranganDiagnosis, DasarDiagnosis, TindakanID, KeteranganTindakan, IndikasiTindakan, TataCara, TujuanTindakan, Risiko, Komplikasi, Prognosis, AlternatifTindakan, BiayaTindakan, NamaPenanggungJawab, UmurPenanggungJawab, JenisKelaminPenanggungJawab, HubunganPenanggungJawab, AlamatPenanggungJawab, StatusSaksiPasien, NamaSaksiPasien, HubunganSaksiPasien, StatusPersetujuan, StatusTransaksi, SignatureDokter1, SignatureDokter2, SignaturePerawat, SignaturePasien1, SignaturePasien2, SignatureKeluarga, CreatedBy, CreatedDate) " & _
+    '                                  "VALUES (@NoTransaksi, @NoRekamMedis, @TglTransaksi, @JenisPoli, @KeteranganLokasi, @NoNIK, @NamaPasien, @UmurPasien, @JenisKelaminPasien, @AlamatPasien, @NamaDokter, @NamaPerawat, @KeteranganDiagnosis, @DasarDiagnosis, @TindakanID, @KeteranganTindakan, @IndikasiTindakan, @TataCara, @TujuanTindakan, @Risiko, @Komplikasi, @Prognosis, @AlternatifTindakan, @BiayaTindakan, @NamaPenanggungJawab, @UmurPenanggungJawab, @JenisKelaminPenanggungJawab, @HubunganPenanggungJawab, @AlamatPenanggungJawab, @StatusSaksiPasien, @NamaSaksiPasien, @HubunganSaksiPasien, @StatusPersetujuan, @StatusTransaksi, @SignatureDokter1, @SignatureDokter2, @SignaturePerawat, @SignaturePasien1, @SignaturePasien2, @SignatureKeluarga, @CreatedBy, GETDATE())"
+
+    '            ' Memanggil fungsi WriteParameterizedSQL untuk eksekusi query
+    '            WriteParameterizedLokalSQL(query, 4, _
+    '                New SqlParameter("@NoTransaksi", rowData.response.data.no_transaksi), _
+    '                New SqlParameter("@NoRekamMedis", rowData.response.data.no_rekam_medis), _
+    '                New SqlParameter("@TglTransaksi", rowData.response.data.tgl_transaksi), _
+    '                New SqlParameter("@JenisPoli", rowData.response.data.jenis_poli), _
+    '                New SqlParameter("@KeteranganLokasi", rowData.response.data.ket_lokasi), _
+    '                New SqlParameter("@NoNIK", rowData.response.data.no_nik), _
+    '                New SqlParameter("@NamaPasien", rowData.response.data.nama_pasien), _
+    '                New SqlParameter("@UmurPasien", rowData.response.data.umur_pasien), _
+    '                New SqlParameter("@JenisKelaminPasien", rowData.response.data.jenis_kelamin_pasien), _
+    '                New SqlParameter("@AlamatPasien", rowData.response.data.alamat_pasien), _
+    '                New SqlParameter("@NamaDokter", rowData.response.data.nama_dokter), _
+    '                New SqlParameter("@NamaPerawat", rowData.response.data.nama_perawat), _
+    '                New SqlParameter("@KeteranganDiagnosis", rowData.response.data.ket_diagnosis), _
+    '                New SqlParameter("@DasarDiagnosis", rowData.response.data.dasar_diagnosis), _
+    '                New SqlParameter("@TindakanID", rowData.response.data.id_tindakan), _
+    '                New SqlParameter("@KeteranganTindakan", rowData.response.data.ket_tindakan), _
+    '                New SqlParameter("@IndikasiTindakan", rowData.response.data.indikasi_tindakan), _
+    '                New SqlParameter("@TataCara", rowData.response.data.tata_cara), _
+    '                New SqlParameter("@TujuanTindakan", rowData.response.data.tujuan_tindakan), _
+    '                New SqlParameter("@Risiko", rowData.response.data.risiko), _
+    '                New SqlParameter("@Komplikasi", rowData.response.data.komplikasi), _
+    '                New SqlParameter("@Prognosis", rowData.response.data.prognosis), _
+    '                New SqlParameter("@AlternatifTindakan", rowData.response.data.alternatif_tindakan), _
+    '                New SqlParameter("@BiayaTindakan", rowData.response.data.biaya_tindakan), _
+    '                New SqlParameter("@NamaPenanggungJawab", rowData.response.data.nama_penanggung_jawab), _
+    '                New SqlParameter("@UmurPenanggungJawab", rowData.response.data.umur_penanggung_jawab), _
+    '                New SqlParameter("@JenisKelaminPenanggungJawab", rowData.response.data.jenis_kelamin_penanggung_jawab), _
+    '                New SqlParameter("@HubunganPenanggungJawab", rowData.response.data.hubungan_penanggung_jawab), _
+    '                New SqlParameter("@AlamatPenanggungJawab", rowData.response.data.alamat_penanggung_jawab), _
+    '                New SqlParameter("@StatusSaksiPasien", rowData.response.data.status_saksi_pasien), _
+    '                New SqlParameter("@NamaSaksiPasien", rowData.response.data.nama_saksi_pasien), _
+    '                New SqlParameter("@HubunganSaksiPasien", rowData.response.data.hubungan_saksi_pasien), _
+    '                New SqlParameter("@StatusPersetujuan", rowData.response.data.status_persetujuan), _
+    '                New SqlParameter("@StatusTransaksi", rowData.response.data.status_transaksi), _
+    '                New SqlParameter("@SignatureDokter1", rowData.response.data.signed_dokter_1), _
+    '                New SqlParameter("@SignatureDokter2", rowData.response.data.signed_dokter_2), _
+    '                New SqlParameter("@SignaturePerawat", rowData.response.data.signed_perawat), _
+    '                New SqlParameter("@SignaturePasien1", rowData.response.data.signed_pasien_1), _
+    '                New SqlParameter("@SignaturePasien2", rowData.response.data.signed_pasien_2), _
+    '                New SqlParameter("@SignatureKeluarga", rowData.response.data.signed_keluarga), _
+    '                New SqlParameter("@CreatedBy", userInput))
+    '        End If
+
+    '        'MsgBox(rowData.response.message)
+    '        'MsgBox(rowData.response.data.nama_pasien)
+    '    Next
+
+    '    ' ============================================
+
+    '    '' Deserialize JSON response
+    '    'Dim jsonObject As JObject = JObject.Parse(response)
+
+    '    '' Set Response
+    '    'Dim responseObj As JObject = jsonObject("response")
+    '    'Dim responseMessage As String = responseObj("message").ToString()
+
+    '    '' Set MetaData
+    '    'Dim metaDataObj As JObject = jsonObject("metaData")
+    '    'Dim codeMetaData As Integer = Convert.ToInt32(metaDataObj("code").ToString)
+
+    '    'If responseMessage <> "Transaksi berhasil" Then
+    '    '    MsgBox(responseMessage, MsgBoxStyle.Exclamation, "Warning!")
+    '    '    Return False
+    '    'Else
+    '    '    Dim responseData As String = responseObj("data").ToString()
+
+    '    '    ' Insert Informed Consent
+
+    '    'End If
+
+    '    Return True
+    'End Function
+
     Function ValidasiSignatureInformedConsent() As Boolean
-        Dim kodeLokasi As String = ReadSQLNIK("select StrValue from MsConfig where ConfigName = 'NoPoli'")
+
         Dim statusInformedConsent As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'SettingInformedConsent'")
 
-        ' Skip jika setting informed consent tidak aktif
+        ' Skip jika fitur tidak aktif
         If statusInformedConsent = "No" Then Return True
 
-        ' Skip jika tindakan tidak membutuhkan informed consent
+        ' Skip jika tindakan tidak membutuhkan IC
         If CheckBoxInformedConsent.Checked = False Then Return True
 
-        Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'web_service_klinik'")
-        Dim urlWebService As String = baseURL & "api/informed_consent/no_transaksi/" & idTransaksi & "/id_tindakan/" & TextBoxTindakanID.Text & "/kode_lokasi/" & kodeLokasi
-        Dim response As String = "[" & GetDataAPI(urlWebService) & "]"
+        Try
+            Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
 
-        Dim jsonObject() = Newtonsoft.Json.JsonConvert.DeserializeObject(Of InformedConsent())(response)
+            Dim urlWebService As String = baseURL & "api/lumiera-luzelle/" & idTransaksi & "/" & TextBoxTindakanID.Text
 
-        For Each rowData As InformedConsent In jsonObject
-            If rowData.response.message <> "Transaksi berhasil" Then
-                MsgBox(rowData.response.message, MsgBoxStyle.Exclamation, "Warning!")
+            Dim response As String = GetDataAPIRM(urlWebService)
+
+            Dim json As JObject = JObject.Parse(response)
+
+            ' ===============================
+            ' VALIDASI RESPONSE
+            ' ===============================
+            If json("status").ToString() <> "success" Then
+                MsgBox(json("message").ToString(), MsgBoxStyle.Exclamation, "Warning")
                 Return False
-            Else
-                ' Insert Informed Consent
-                Dim query As String = "INSERT INTO InformedConsent (NoTransaksi, NoRekamMedis, TglTransaksi, JenisPoli, KeteranganLokasi, NoNIK, NamaPasien, UmurPasien, JenisKelaminPasien, AlamatPasien, NamaDokter, NamaPerawat, KeteranganDiagnosis, DasarDiagnosis, TindakanID, KeteranganTindakan, IndikasiTindakan, TataCara, TujuanTindakan, Risiko, Komplikasi, Prognosis, AlternatifTindakan, BiayaTindakan, NamaPenanggungJawab, UmurPenanggungJawab, JenisKelaminPenanggungJawab, HubunganPenanggungJawab, AlamatPenanggungJawab, StatusSaksiPasien, NamaSaksiPasien, HubunganSaksiPasien, StatusPersetujuan, StatusTransaksi, SignatureDokter1, SignatureDokter2, SignaturePerawat, SignaturePasien1, SignaturePasien2, SignatureKeluarga, CreatedBy, CreatedDate) " & _
-                                      "VALUES (@NoTransaksi, @NoRekamMedis, @TglTransaksi, @JenisPoli, @KeteranganLokasi, @NoNIK, @NamaPasien, @UmurPasien, @JenisKelaminPasien, @AlamatPasien, @NamaDokter, @NamaPerawat, @KeteranganDiagnosis, @DasarDiagnosis, @TindakanID, @KeteranganTindakan, @IndikasiTindakan, @TataCara, @TujuanTindakan, @Risiko, @Komplikasi, @Prognosis, @AlternatifTindakan, @BiayaTindakan, @NamaPenanggungJawab, @UmurPenanggungJawab, @JenisKelaminPenanggungJawab, @HubunganPenanggungJawab, @AlamatPenanggungJawab, @StatusSaksiPasien, @NamaSaksiPasien, @HubunganSaksiPasien, @StatusPersetujuan, @StatusTransaksi, @SignatureDokter1, @SignatureDokter2, @SignaturePerawat, @SignaturePasien1, @SignaturePasien2, @SignatureKeluarga, @CreatedBy, GETDATE())"
-
-                ' Memanggil fungsi WriteParameterizedSQL untuk eksekusi query
-                WriteParameterizedLokalSQL(query, 4, _
-                    New SqlParameter("@NoTransaksi", rowData.response.data.no_transaksi), _
-                    New SqlParameter("@NoRekamMedis", rowData.response.data.no_rekam_medis), _
-                    New SqlParameter("@TglTransaksi", rowData.response.data.tgl_transaksi), _
-                    New SqlParameter("@JenisPoli", rowData.response.data.jenis_poli), _
-                    New SqlParameter("@KeteranganLokasi", rowData.response.data.ket_lokasi), _
-                    New SqlParameter("@NoNIK", rowData.response.data.no_nik), _
-                    New SqlParameter("@NamaPasien", rowData.response.data.nama_pasien), _
-                    New SqlParameter("@UmurPasien", rowData.response.data.umur_pasien), _
-                    New SqlParameter("@JenisKelaminPasien", rowData.response.data.jenis_kelamin_pasien), _
-                    New SqlParameter("@AlamatPasien", rowData.response.data.alamat_pasien), _
-                    New SqlParameter("@NamaDokter", rowData.response.data.nama_dokter), _
-                    New SqlParameter("@NamaPerawat", rowData.response.data.nama_perawat), _
-                    New SqlParameter("@KeteranganDiagnosis", rowData.response.data.ket_diagnosis), _
-                    New SqlParameter("@DasarDiagnosis", rowData.response.data.dasar_diagnosis), _
-                    New SqlParameter("@TindakanID", rowData.response.data.id_tindakan), _
-                    New SqlParameter("@KeteranganTindakan", rowData.response.data.ket_tindakan), _
-                    New SqlParameter("@IndikasiTindakan", rowData.response.data.indikasi_tindakan), _
-                    New SqlParameter("@TataCara", rowData.response.data.tata_cara), _
-                    New SqlParameter("@TujuanTindakan", rowData.response.data.tujuan_tindakan), _
-                    New SqlParameter("@Risiko", rowData.response.data.risiko), _
-                    New SqlParameter("@Komplikasi", rowData.response.data.komplikasi), _
-                    New SqlParameter("@Prognosis", rowData.response.data.prognosis), _
-                    New SqlParameter("@AlternatifTindakan", rowData.response.data.alternatif_tindakan), _
-                    New SqlParameter("@BiayaTindakan", rowData.response.data.biaya_tindakan), _
-                    New SqlParameter("@NamaPenanggungJawab", rowData.response.data.nama_penanggung_jawab), _
-                    New SqlParameter("@UmurPenanggungJawab", rowData.response.data.umur_penanggung_jawab), _
-                    New SqlParameter("@JenisKelaminPenanggungJawab", rowData.response.data.jenis_kelamin_penanggung_jawab), _
-                    New SqlParameter("@HubunganPenanggungJawab", rowData.response.data.hubungan_penanggung_jawab), _
-                    New SqlParameter("@AlamatPenanggungJawab", rowData.response.data.alamat_penanggung_jawab), _
-                    New SqlParameter("@StatusSaksiPasien", rowData.response.data.status_saksi_pasien), _
-                    New SqlParameter("@NamaSaksiPasien", rowData.response.data.nama_saksi_pasien), _
-                    New SqlParameter("@HubunganSaksiPasien", rowData.response.data.hubungan_saksi_pasien), _
-                    New SqlParameter("@StatusPersetujuan", rowData.response.data.status_persetujuan), _
-                    New SqlParameter("@StatusTransaksi", rowData.response.data.status_transaksi), _
-                    New SqlParameter("@SignatureDokter1", rowData.response.data.signed_dokter_1), _
-                    New SqlParameter("@SignatureDokter2", rowData.response.data.signed_dokter_2), _
-                    New SqlParameter("@SignaturePerawat", rowData.response.data.signed_perawat), _
-                    New SqlParameter("@SignaturePasien1", rowData.response.data.signed_pasien_1), _
-                    New SqlParameter("@SignaturePasien2", rowData.response.data.signed_pasien_2), _
-                    New SqlParameter("@SignatureKeluarga", rowData.response.data.signed_keluarga), _
-                    New SqlParameter("@CreatedBy", userInput))
             End If
 
-            'MsgBox(rowData.response.message)
-            'MsgBox(rowData.response.data.nama_pasien)
-        Next
+            Dim data As JObject = json("data")
 
-        ' ============================================
+            ' ===============================
+            ' INSERT KE DATABASE LOKAL
+            ' ===============================
+            Dim query As String = _
+                "INSERT INTO InformedConsent " & _
+                "(NoTransaksi, NoRekamMedis, TglTransaksi, NoNIK, NamaPasien, UmurPasien, " & _
+                "JenisKelaminPasien, AlamatPasien, NamaDokter, NamaPerawat, " & _
+                "KeteranganDiagnosis, DasarDiagnosis, TindakanID, KeteranganTindakan, " & _
+                "IndikasiTindakan, TataCara, TujuanTindakan, Risiko, Komplikasi, Prognosis, " & _
+                "AlternatifTindakan, BiayaTindakan, NamaPenanggungJawab, UmurPenanggungJawab, " & _
+                "JenisKelaminPenanggungJawab, HubunganPenanggungJawab, AlamatPenanggungJawab, " & _
+                "StatusPersetujuan, StatusTransaksi, SignatureDokter1, SignaturePerawat, SignaturePasien1, " & _
+                "CreatedBy, CreatedDate) " & _
+                "VALUES " & _
+                "(@NoTransaksi,@NoRekamMedis,@Tgl,@NoNIK,@Nama,@Umur,@Sex,@Alamat," & _
+                "@Dokter,@Perawat,@Diagnosis,@Dasar,@TindakanID,@KetTindakan," & _
+                "@Indikasi,@TataCara,@Tujuan,@Risiko,@Komplikasi,@Prognosis," & _
+                "@Alternatif,@Biaya,@PJ,@UmurPJ,@SexPJ,@HubunganPJ,@AlamatPJ," & _
+                "@StatusPersetujuan,@StatusTransaksi,@TTDDokter,@TTDPerawat,@TTDPasien," & _
+                "@User,GETDATE())"
 
-        '' Deserialize JSON response
-        'Dim jsonObject As JObject = JObject.Parse(response)
+            WriteParameterizedLokalSQL(query, 4, _
+                New SqlParameter("@NoTransaksi", data("no_transaksi").Value(Of String)()), _
+                New SqlParameter("@NoRekamMedis", data("no_rm").Value(Of String)()), _
+                New SqlParameter("@Tgl", Date.Parse(data("tgl").Value(Of String)())), _
+                New SqlParameter("@NoNIK", data("no_nik").Value(Of String)()), _
+                New SqlParameter("@Nama", data("nama").Value(Of String)()), _
+                New SqlParameter("@Umur", data("umur").Value(Of Integer)()), _
+                New SqlParameter("@Sex", data("sex").Value(Of String)()), _
+                New SqlParameter("@Alamat", data("alamat").Value(Of String)()), _
+                New SqlParameter("@Dokter", data("dokter").Value(Of String)()), _
+                New SqlParameter("@Perawat", data("perawat").Value(Of String)()), _
+                New SqlParameter("@Diagnosis", data("ket_diagnosis").Value(Of String)()), _
+                New SqlParameter("@Dasar", data("dasar_diagnosis").Value(Of String)()), _
+                New SqlParameter("@TindakanID", data("id_tindakan").Value(Of String)()), _
+                New SqlParameter("@KetTindakan", data("ket_tindakan").Value(Of String)()), _
+                New SqlParameter("@Indikasi", data("indikasi_tindakan").Value(Of String)()), _
+                New SqlParameter("@TataCara", data("tata_cara").Value(Of String)()), _
+                New SqlParameter("@Tujuan", data("tujuan_tindakan").Value(Of String)()), _
+                New SqlParameter("@Risiko", data("risiko").Value(Of String)()), _
+                New SqlParameter("@Komplikasi", data("komplikasi").Value(Of String)()), _
+                New SqlParameter("@Prognosis", data("prognosis").Value(Of String)()), _
+                New SqlParameter("@Alternatif", data("alternatif_tindakan").Value(Of String)()), _
+                New SqlParameter("@Biaya", data("biaya_tindakan").Value(Of Decimal)()), _
+                New SqlParameter("@PJ", data("nama_penanggung_jawab").Value(Of String)()), _
+                New SqlParameter("@UmurPJ", data("umur_penanggung_jawab").Value(Of Integer)()), _
+                New SqlParameter("@SexPJ", data("sex_penanggung_jawab").Value(Of String)()), _
+                New SqlParameter("@HubunganPJ", data("hubungan_penanggung_jawab").Value(Of String)()), _
+                New SqlParameter("@AlamatPJ", data("alamat_penanggung_jawab").Value(Of String)()), _
+                New SqlParameter("@StatusPersetujuan", data("status_persetujuan").Value(Of Boolean)()), _
+                New SqlParameter("@StatusTransaksi", data("status_transaksi").Value(Of String)()), _
+                New SqlParameter("@TTDDokter", data("ttd_dokter").Value(Of String)()), _
+                New SqlParameter("@TTDPerawat", data("ttd_perawat").Value(Of String)()), _
+                New SqlParameter("@TTDPasien", data("ttd_pasien").Value(Of String)()), _
+                New SqlParameter("@User", userInput))
 
-        '' Set Response
-        'Dim responseObj As JObject = jsonObject("response")
-        'Dim responseMessage As String = responseObj("message").ToString()
+            Return True
 
-        '' Set MetaData
-        'Dim metaDataObj As JObject = jsonObject("metaData")
-        'Dim codeMetaData As Integer = Convert.ToInt32(metaDataObj("code").ToString)
+        Catch ex As Exception
+            MsgBox("Gagal validasi informed consent:" & vbCrLf & ex.Message, MsgBoxStyle.Critical, "ERROR")
+            Return False
+        End Try
 
-        'If responseMessage <> "Transaksi berhasil" Then
-        '    MsgBox(responseMessage, MsgBoxStyle.Exclamation, "Warning!")
-        '    Return False
-        'Else
-        '    Dim responseData As String = responseObj("data").ToString()
-
-        '    ' Insert Informed Consent
-
-        'End If
-
-        Return True
     End Function
 
     Private Sub SaveMedikSubjektif()
@@ -2439,9 +2560,144 @@ Public Class FormRekamMedisDokter
         End Try
     End Sub
 
+    Function ApiCekPasien(ByVal noRM As String) As Boolean
+        Try
+
+            Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+
+            If Not baseURL.EndsWith("/") Then baseURL &= "/"
+
+            Dim url As String = baseURL & "api/pasien/cek?NoRekamMedis=" & noRM
+
+            Dim client As New WebClient()
+            client.Headers.Add("X-API-KEY", "M1tR4M3D1c@rECaH4Y42025")
+
+            Dim response As String = client.DownloadString(url)
+            Dim json As JObject = JObject.Parse(response)
+
+            Dim status As String = json("status").ToString().ToLower()
+
+            Return status = "success"
+
+        Catch ex As WebException
+            Return False
+        End Try
+    End Function
+
+    Sub ApiInsertPasien(ByVal noRM As String, ByVal nama As String, ByVal tglLahir As Date, ByVal jenisKelamin As String)
+
+        Dim baseUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+
+        If Not baseUrl.EndsWith("/") Then baseUrl &= "/"
+
+        Dim json As String = _
+            "{" & _
+            """NoRekamMedis"":""" & noRM & """," & _
+            """Nama"":""" & nama & """," & _
+            """TglLahir"":""" & Format(tglLahir, "yyyy-MM-dd") & """," & _
+            """JenisKelamin"":""" & jenisKelamin & """" & _
+            "}"
+
+        InsertDataAPIRM(json, baseUrl & "api/pasien/store")
+
+    End Sub
+
+    Private Sub SendToApiPemFisik(ByVal noTransaksi As String, ByVal noRM As String, ByVal keadaanUmum As String, ByVal sistole As Double, ByVal diastole As Double, ByVal heartRate As Double, ByVal suhu As Double, ByVal Saturasi As Double, ByVal tinggi As Double, ByVal berat As Double, ByVal lingkarPerut As Double, ByVal imt As Double, ByVal KeteranganIMT As String, ByVal nafas As Double)
+        Try
+            Dim client As New Net.WebClient()
+
+            Dim json As String = "{" & _
+                 """NoRM"":""" & noRM & """," & _
+                 """NoTransaksi"":""" & noTransaksi & """," & _
+                 """KeadaanUmum"":""" & keadaanUmum & """," & _
+                 """Sistole"":""" & sistole & """," & _
+                 """Diastole"":""" & diastole & """," & _
+                 """HeartRate"":""" & heartRate & """," & _
+                 """Suhu"":""" & suhu & """," & _
+                 """Saturasi"":""" & Saturasi & """," & _
+                 """Tinggi"":""" & tinggi & """," & _
+                 """Berat"":""" & berat & """," & _
+                 """LingkarPerut"":""" & lingkarPerut & """," & _
+                 """IMT"":""" & imt & """," & _
+                 """KeteranganIMT"":""" & KeteranganIMT & """," & _
+                 """Nafas"":""" & nafas & """" & _
+             "}"
+
+            Dim baseUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+            Dim urlWebService As String = baseUrl & "api/statistikVital/save"
+            Dim response As String = InsertDataAPIRM(json, urlWebService)
+
+            ' --- Parse JSON response ---
+            Dim result As JObject = JObject.Parse(response)
+
+            Dim status As String = result("status").ToString()
+            Dim message As String = result("message").ToString()
+
+            Dim insertedId As String = ""
+            Dim data As JObject = TryCast(result("data"), JObject)
+            If data IsNot Nothing AndAlso data("id") IsNot Nothing Then
+                insertedId = data("id").ToString()
+            End If
+
+            ' --- Tampilkan hasil ---
+            If status = "success" Then
+                MsgBox("Data berhasil dikirim ke API ERM." & vbCrLf & _
+                       "Pesan: " & message & vbCrLf & _
+                       "Dengan ID: " & insertedId)
+            Else
+                MsgBox("API mengembalikan status gagal: " & status & vbCrLf & message)
+            End If
+
+        Catch ex As Exception
+            MsgBox("Gagal kirim ke API: " & ex.Message)
+        End Try
+    End Sub
+
     Private Sub SavePemeriksaanFisik()
         Try
             Dim parameterUpdate As String = ""
+            Dim parameterUpdateInbody As String = ""
+            Dim dtPasien As DataTable = ReadSQL("SELECT Nama, JenisKelamin, TglLahir FROM MasterPasien WHERE NoRekamMedis = '" & idPasien & "'")
+
+            If dtPasien.Rows.Count = 0 Then
+                MsgBox("Data pasien tidak ditemukan")
+                Exit Sub
+            End If
+
+            Dim nama As String = dtPasien.Rows(0)("Nama").ToString()
+            Dim jenisKelamin As String = dtPasien.Rows(0)("JenisKelamin").ToString()
+            Dim genderInbody As String = ""
+
+            Select Case jenisKelamin.ToUpper()
+                Case "L"
+                    genderInbody = "M"
+                Case "P"
+                    genderInbody = "F"
+                Case Else
+                    genderInbody = ""
+            End Select
+            Dim tglLahir As Date = CDate(dtPasien.Rows(0)("TglLahir"))
+            Dim umur As Integer = DateDiff(DateInterval.Year, tglLahir, Date.Now)
+
+            Dim tglLahirStr As String = tglLahir.ToString("yyyyMMdd")
+            Dim orderDateStr As String = Date.Now.ToString("yyyyMMdd")
+
+            Dim noTransaksi As String = idTransaksi
+            Dim noRM As String = idPasien
+            Dim keadaanUmum As String = GetKeadaanUmum("Medik")
+            Dim sistole As Double = Val(TextBoxSistoleMedik.Text)
+            Dim diastole As Double = Val(TextBoxDiastoleMedik.Text)
+            Dim heartRate As Double = Val(TextBoxDetakNadiMedik.Text)
+            Dim suhu As Double = Val(TextBoxSuhuMedik.Text)
+            Dim saturasi As Double = Val(TextBoxSaturasiMedik.Text)
+            Dim tinggi As Double = Val(TextBoxTinggiBadanMedik.Text)
+            Dim berat As Double = Val(TextBoxBeratBadanMedik.Text)
+            Dim lingkarPerut As Double = Val(TextBoxLingkarPerutMedik.Text)
+            Dim imt As Double = Val(TextBoxIndeksMedik.Text)
+            Dim keteranganIMT As String = TextBoxIndeksKeteranganMedik.Text
+            Dim nafas As Double = Val(TextBoxNafasMedik.Text)
+
+            Dim statusAPI As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'status_ws_RM'")
 
             If CheckInputPemeriksaanFisik() = True Then
                 If CheckSQL("SELECT * FROM TransaksiDetailFisik WHERE NoTransaksi = '" & idTransaksi & "'") = False Then
@@ -2449,6 +2705,19 @@ Public Class FormRekamMedisDokter
                     WriteSQL("INSERT INTO TransaksiDetailFisik (NoTransaksi, KeadaanUmum, Kesadaran, SkalaNyeri, Sistole, Diastole, HeartRate, RespiratoryRate, Suhu, Saturasi, Tinggi, Berat, LingkarPerut, IMT, KeteranganIMT, CreatedBy, CreatedDate) " & _
                              "VALUES('" & idTransaksi & "', '" & GetKeadaanUmum("Medik") & "', '" & GetKesadaran("Medik") & "', '" & TrackBarSkalaNyeriMedik.Value.ToString() & "', '" & TextBoxSistoleMedik.Text & "', '" & TextBoxDiastoleMedik.Text & "', '" & TextBoxDetakNadiMedik.Text & "', " & _
                                     "'" & TextBoxNafasMedik.Text & "', '" & TextBoxSuhuMedik.Text & "', '" & TextBoxSaturasiMedik.Text & "', '" & TextBoxTinggiBadanMedik.Text & "', '" & TextBoxBeratBadanMedik.Text & "', '" & TextBoxLingkarPerutMedik.Text & "', '" & TextBoxIndeksMedik.Text & "', '" & TextBoxIndeksKeteranganMedik.Text & "', '" & userInput & "', GETDATE())", 4)
+
+                    WriteSQL( _
+                         "INSERT INTO Inbody_User_Info " & _
+                         "(USER_ID, USER_NAME, USER_GENDER, USER_BIRTHDAY, USER_AGE, USER_HEIGHT, ORDER_DATE) " & _
+                         "VALUES (" & _
+                         "'" & idTransaksi & "', " & _
+                         "'" & nama & "', " & _
+                         "'" & genderInbody & "', " & _
+                         "'" & tglLahirStr & "', " & _
+                         umur & ", " & _
+                         "'" & TextBoxTinggiBadanMedik.Text & "', " & _
+                         "'" & orderDateStr & "'" & _
+                         ")", 4)
 
                     ' Update status transaksi menjadi > Sudah dilakukan TTV
                     If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
@@ -2478,7 +2747,21 @@ Public Class FormRekamMedisDokter
                                       "UpdatedBy = '" & userInput & "'," & _
                                       "UpdatedDate = GETDATE()"
 
+                    parameterUpdateInbody = "USER_HEIGHT = '" & TextBoxTinggiBadanMedik.Text & "'"
+
                     WriteSQL("UPDATE TransaksiDetailFisik SET " & parameterUpdate & " WHERE NoTransaksi = '" & idTransaksi & "'", 4)
+
+                    WriteSQL("UPDATE Inbody_User_Info SET " & parameterUpdateInbody & " WHERE USER_ID = '" & idTransaksi & "'", 4)
+
+                    If statusAPI IsNot Nothing AndAlso statusAPI = "Yes" Then
+                        If ApiCekPasien(noRM) = False Then
+
+                            ApiInsertPasien(noRM, nama, tglLahir, jenisKelamin)
+
+                        End If
+
+                        SendToApiPemFisik(noTransaksi, noRM, keadaanUmum, sistole, diastole, heartRate, suhu, saturasi, tinggi, berat, lingkarPerut, imt, keteranganIMT, nafas)
+                    End If
                 End If
 
                 If statusBPJS = True AndAlso CheckBridgingPcareActive() = True Then SaveKunjunganBPJS() ' Save PCare BPJS
@@ -8539,111 +8822,226 @@ Public Class FormRekamMedisDokter
         End If
     End Sub
 
-    Private Sub PreviewInformedConsent(ByRef _idTransaksi As String, ByRef _idTindakan As String)
-        Dim tblsInformedConsent As DataTable = ReadSQL("SELECT * FROM InformedConsent WHERE NoTransaksi = '" & _idTransaksi & "' AND TindakanID = '" & _idTindakan & "'")
+    'Private Sub PreviewInformedConsent(ByRef _idTransaksi As String, ByRef _idTindakan As String)
+    '    Dim tblsInformedConsent As DataTable = ReadSQL("SELECT * FROM InformedConsent WHERE NoTransaksi = '" & _idTransaksi & "' AND TindakanID = '" & _idTindakan & "'")
 
-        If tblsInformedConsent.Rows.Count > 0 Then
-            Dim rowData As DataRow = tblsInformedConsent.Rows(0)
+    '    If tblsInformedConsent.Rows.Count > 0 Then
+    '        Dim rowData As DataRow = tblsInformedConsent.Rows(0)
 
-            Report = New XtraReport
-            Report = XtraReport.FromFile(Application.StartupPath + "\Reports\Klinik\RekamMedis\ReportInformedConsent.repx", True)
-            Report.DataSource = tblsInformedConsent
+    '        Report = New XtraReport
+    '        Report = XtraReport.FromFile(Application.StartupPath + "\Reports\Klinik\RekamMedis\ReportInformedConsent.repx", True)
+    '        Report.DataSource = tblsInformedConsent
 
-            ' Set Jenis Kelamin Penanggung Jawab
-            Dim jenisKelaminPenanggungJawab As String = ""
-            If rowData("JenisKelaminPenanggungJawab").ToString = "L" Then
-                jenisKelaminPenanggungJawab = "Laki-laki"
-            ElseIf rowData("JenisKelaminPenanggungJawab").ToString = "P" Then
-                jenisKelaminPenanggungJawab = "Perempuan"
+    '        ' Set Jenis Kelamin Penanggung Jawab
+    '        Dim jenisKelaminPenanggungJawab As String = ""
+    '        If rowData("JenisKelaminPenanggungJawab").ToString = "L" Then
+    '            jenisKelaminPenanggungJawab = "Laki-laki"
+    '        ElseIf rowData("JenisKelaminPenanggungJawab").ToString = "P" Then
+    '            jenisKelaminPenanggungJawab = "Perempuan"
+    '        End If
+
+    '        ' Set Jenis Kelamin Pasien
+    '        Dim jenisKelaminPasien As String = ""
+    '        If rowData("JenisKelaminPasien").ToString = "L" Then
+    '            jenisKelaminPasien = "Laki-laki"
+    '        ElseIf rowData("JenisKelaminPasien").ToString = "P" Then
+    '            jenisKelaminPasien = "Perempuan"
+    '        End If
+
+    '        ' Set Hubungan Penanggung Jawab
+    '        Dim hubunganPenanggungJawab As String = ""
+    '        If rowData("HubunganPenanggungJawab") = "Pasien Sendiri" Then
+    '            hubunganPenanggungJawab = "saya"
+    '        Else
+    '            hubunganPenanggungJawab = rowData("HubunganPenanggungJawab") & " saya"
+    '        End If
+
+    '        ' Set Lokasi & Waktu
+    '        Dim waktuDariDatabase As DateTime = rowData("TglTransaksi")
+
+    '        Dim tanggal As String = waktuDariDatabase.ToString("dd-MM-yyyy")
+    '        Dim jam As String = waktuDariDatabase.ToString("HH:mm:ss")
+    '        Dim waktuInformedConsent As String = rowData("KeteranganLokasi") & ", tanggal " & tanggal & " pukul " & jam
+
+    '        ' Set Field Penyataan Pasien
+    '        Dim panelPernyataanPasien As XRPanel = CType(Report.Bands(BandKind.Detail).Controls("xrPanelPernyataan"), XRPanel)
+    '        Dim panelPersetujuanPasien As XRPanel = CType(Report.Bands(BandKind.Detail).Controls("xrPanelPersetujuan"), XRPanel)
+    '        Dim panelPenolakanPasien As XRPanel = CType(Report.Bands(BandKind.Detail).Controls("xrPanelPenolakan"), XRPanel)
+
+    '        Dim stringPenyataanPasien As String = "Yang bertandatangan di bawah ini, saya, nama " & rowData("NamaPenanggungJawab") & ", umur " & rowData("UmurPenanggungJawab") & " tahun, " & jenisKelaminPenanggungJawab & ", alamat " & rowData("AlamatPenanggungJawab") & _
+    '                                              " dengan ini menyatakan persetujuan untuk dilakukannya tindakan " & rowData("KeteranganTindakan") & _
+    '                                              " terhadap " & hubunganPenanggungJawab & " bernama " & rowData("NamaPasien") & ", umur " & rowData("UmurPasien") & " tahun, " & jenisKelaminPasien & ", alamat " & rowData("AlamatPasien")
+    '        panelPernyataanPasien.Controls("xrLabelPernyataanPasien").Text = stringPenyataanPasien
+    '        panelPersetujuanPasien.Controls("xrLabelTanggalPersetujuanPasien").Text = waktuInformedConsent
+    '        panelPenolakanPasien.Controls("xrLabelTanggalPenolakanPasien").Text = waktuInformedConsent
+
+    '        '# Set Signature Page 1
+    '        Dim xrTablePage1 As XRTable = CType(Report.Bands(BandKind.Detail).Controls("xrTableSignaturePage1"), XRTable)
+
+    '        Dim rowDokterSignatureTablePage1 As XRTableRow = CType(xrTablePage1.Controls("xrTableRowDokterSignature"), XRTableRow)
+    '        Dim cellDokterSignatureTablePage1 As XRTableCell = CType(rowDokterSignatureTablePage1.Controls("xrTableCellDokterSignature"), XRTableCell)
+    '        Dim panelDokterSignatureTablePage1 As XRPanel = CType(cellDokterSignatureTablePage1.Controls("xrPanelDokterSignature"), XRPanel)
+
+    '        Dim rowPasienSignatureTablePage1 As XRTableRow = CType(xrTablePage1.Controls("xrTableRowPasienSignature"), XRTableRow)
+    '        Dim cellPasienSignatureTablePage1 As XRTableCell = CType(rowPasienSignatureTablePage1.Controls("xrTableCellPasienSignature"), XRTableCell)
+    '        Dim panelPasienSignatureTablePage1 As XRPanel = CType(cellPasienSignatureTablePage1.Controls("xrPanelPasienSignature"), XRPanel)
+
+    '        ' Signature Dokter
+    '        Dim pictureBoxDokterSignaturePage1 As XRPictureBox = CreateXRPictureBoxReportFromBase64(rowData("SignatureDokter1"), "DokterSignaturePage1", 5, 20, 125, 50)
+    '        panelDokterSignatureTablePage1.Controls.Add(pictureBoxDokterSignaturePage1)
+
+    '        ' Signature Pasien
+    '        Dim pictureBoxPasienSignaturePage1 As XRPictureBox = CreateXRPictureBoxReportFromBase64(rowData("SignaturePasien1"), "PasienSignaturePage1", 5, 20, 125, 50)
+    '        panelPasienSignatureTablePage1.Controls.Add(pictureBoxPasienSignaturePage1)
+
+    '        '# Set Signature Page 2
+    '        Dim panelSignaturePersetujuanDokter As XRPanel = CType(panelPersetujuanPasien.Controls("xrPanelSignaturePersetujuanDokter"), XRPanel)
+    '        Dim panelSignaturePersetujuanPasien As XRPanel = CType(panelPersetujuanPasien.Controls("xrPanelSignaturePersetujuanPasien"), XRPanel)
+    '        Dim panelSignaturePersetujuanPerawat As XRPanel = CType(panelPersetujuanPasien.Controls("xrPanelSignaturePersetujuanPerawat"), XRPanel)
+    '        Dim panelSignaturePersetujuanKeluarga As XRPanel = CType(panelPersetujuanPasien.Controls("xrPanelSignaturePersetujuanKeluarga"), XRPanel)
+
+    '        ' Signature Dokter
+    '        Dim pictureBoxSignaturePersetujuanDokter As XRPictureBox = CreateXRPictureBoxReportFromBase64(rowData("SignatureDokter2"), "SignaturePersetujuanDokter", 5, 20, 125, 50)
+    '        panelSignaturePersetujuanDokter.Controls.Add(pictureBoxSignaturePersetujuanDokter)
+    '        panelSignaturePersetujuanDokter.Controls("xrLabelSignaturePersetujuanDokter").Text = "( " & rowData("NamaDokter") & " )"
+
+    '        ' Signature Pasien
+    '        Dim pictureBoxSignaturePersetujuanPasien As XRPictureBox = CreateXRPictureBoxReportFromBase64(rowData("SignaturePasien2"), "SignaturePersetujuanPasien", 5, 20, 125, 50)
+    '        panelSignaturePersetujuanPasien.Controls.Add(pictureBoxSignaturePersetujuanPasien)
+    '        panelSignaturePersetujuanPasien.Controls("xrLabelSignaturePersetujuanPasien").Text = "( " & rowData("NamaPenanggungJawab") & " )"
+
+    '        ' Signature Perawat
+    '        Dim pictureBoxSignaturePersetujuanPerawat As XRPictureBox = CreateXRPictureBoxReportFromBase64(rowData("SignaturePerawat"), "SignaturePersetujuanPerawat", 5, 20, 125, 50)
+    '        panelSignaturePersetujuanPerawat.Controls.Add(pictureBoxSignaturePersetujuanPerawat)
+    '        panelSignaturePersetujuanPerawat.Controls("xrLabelSignaturePersetujuanPerawat").Text = "( " & rowData("NamaPerawat") & " )"
+
+    '        ' Signature Keluarga
+    '        If rowData("StatusSaksiPasien") = True Then
+    '            Dim pictureBoxSignaturePersetujuanKeluarga As XRPictureBox = CreateXRPictureBoxReportFromBase64(rowData("SignatureKeluarga"), "SignaturePersetujuanKeluarga", 5, 20, 125, 50)
+    '            panelSignaturePersetujuanKeluarga.Controls.Add(pictureBoxSignaturePersetujuanKeluarga)
+    '            panelSignaturePersetujuanKeluarga.Controls("xrLabelSignaturePersetujuanKeluarga").Text = "( " & rowData("NamaSaksiPasien") & " )"
+    '        End If
+
+    '        'Report.RunDesigner()
+    '        Report.ShowPreview()
+    '    Else
+    '        MsgBox("Data tidak ditemukan.", MsgBoxStyle.Critical, "Warning!")
+    '    End If
+    'End Sub
+
+    Private Sub PreviewInformedConsent(ByRef idTransaksi As String, ByRef idTindakan As String)
+
+        Try
+            'MessageBox.Show("STEP 1: Masuk fungsi PreviewInformedConsent")
+
+            ' ================================
+            ' VALIDASI DATA
+            ' ================================
+            'MessageBox.Show("STEP 2: Validasi parameter")
+
+            If String.IsNullOrEmpty(idTransaksi) Then
+                'MessageBox.Show("STOP: idTransaksi kosong")
+                Exit Sub
             End If
 
-            ' Set Jenis Kelamin Pasien
-            Dim jenisKelaminPasien As String = ""
-            If rowData("JenisKelaminPasien").ToString = "L" Then
-                jenisKelaminPasien = "Laki-laki"
-            ElseIf rowData("JenisKelaminPasien").ToString = "P" Then
-                jenisKelaminPasien = "Perempuan"
+            If String.IsNullOrEmpty(idTindakan) Then
+                'MessageBox.Show("STOP: idTindakan kosong")
+                Exit Sub
             End If
 
-            ' Set Hubungan Penanggung Jawab
-            Dim hubunganPenanggungJawab As String = ""
-            If rowData("HubunganPenanggungJawab") = "Pasien Sendiri" Then
-                hubunganPenanggungJawab = "saya"
+
+            ' ================================
+            ' AMBIL KONFIGURASI
+            ' ================================
+            'MessageBox.Show("STEP 3: Ambil konfigurasi")
+
+            Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+
+            'MessageBox.Show("baseURL = " & baseURL)
+
+
+            ' ================================
+            ' SUSUN ENDPOINT API
+            ' ================================
+            'MessageBox.Show("STEP 4: Susun URL")
+
+            If Not baseURL.EndsWith("/") Then baseURL &= "/"
+
+            Dim url As String = _
+                baseURL & _
+                "api/lumiera-luzelle/ic/preview" & _
+                "?no_transaksi=" & idTransaksi & _
+                "&id_tindakan=" & idTindakan
+
+            'MessageBox.Show("URL API:" & vbCrLf & url)
+
+
+            ' ================================
+            ' REQUEST KE LARAVEL
+            ' ================================
+            'MessageBox.Show("STEP 5: Kirim request ke Laravel")
+
+            Dim client As New WebClient()
+            client.Encoding = System.Text.Encoding.UTF8
+
+            'MessageBox.Show("STEP 6: DownloadString mulai")
+
+            Dim response As String = GetDataAPIRM(url)
+
+            'MessageBox.Show("STEP 7: RESPONSE DITERIMA")
+
+            'MessageBox.Show("RESPONSE RAW:" & vbCrLf & response)
+
+
+            ' ================================
+            ' PARSE JSON
+            ' ================================
+            'MessageBox.Show("STEP 8: Parse JSON")
+
+            Dim json = JObject.Parse(response)
+
+            'MessageBox.Show("STEP 9: JSON sukses diparse")
+
+
+            ' ================================
+            ' CEK RESPONSE
+            ' ================================
+            If json("status").ToString().ToLower() = "success" Then
+
+                'MessageBox.Show("STEP 10: Status SUCCESS")
+
+                Dim pdfUrl As String = json("url").ToString()
+
+                'MessageBox.Show("PDF URL:" & vbCrLf & pdfUrl)
+
+                Process.Start(pdfUrl)
+
             Else
-                hubunganPenanggungJawab = rowData("HubunganPenanggungJawab") & " saya"
+                'MessageBox.Show("STEP 10B: Status ERROR")
+
+                MessageBox.Show(json("message").ToString(), "Error dari API", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End If
 
-            ' Set Lokasi & Waktu
-            Dim waktuDariDatabase As DateTime = rowData("TglTransaksi")
 
-            Dim tanggal As String = waktuDariDatabase.ToString("dd-MM-yyyy")
-            Dim jam As String = waktuDariDatabase.ToString("HH:mm:ss")
-            Dim waktuInformedConsent As String = rowData("KeteranganLokasi") & ", tanggal " & tanggal & " pukul " & jam
+        Catch ex As WebException
 
-            ' Set Field Penyataan Pasien
-            Dim panelPernyataanPasien As XRPanel = CType(Report.Bands(BandKind.Detail).Controls("xrPanelPernyataan"), XRPanel)
-            Dim panelPersetujuanPasien As XRPanel = CType(Report.Bands(BandKind.Detail).Controls("xrPanelPersetujuan"), XRPanel)
-            Dim panelPenolakanPasien As XRPanel = CType(Report.Bands(BandKind.Detail).Controls("xrPanelPenolakan"), XRPanel)
+            'MessageBox.Show("STEP ERROR: WebException")
 
-            Dim stringPenyataanPasien As String = "Yang bertandatangan di bawah ini, saya, nama " & rowData("NamaPenanggungJawab") & ", umur " & rowData("UmurPenanggungJawab") & " tahun, " & jenisKelaminPenanggungJawab & ", alamat " & rowData("AlamatPenanggungJawab") & _
-                                                  " dengan ini menyatakan persetujuan untuk dilakukannya tindakan " & rowData("KeteranganTindakan") & _
-                                                  " terhadap " & hubunganPenanggungJawab & " bernama " & rowData("NamaPasien") & ", umur " & rowData("UmurPasien") & " tahun, " & jenisKelaminPasien & ", alamat " & rowData("AlamatPasien")
-            panelPernyataanPasien.Controls("xrLabelPernyataanPasien").Text = stringPenyataanPasien
-            panelPersetujuanPasien.Controls("xrLabelTanggalPersetujuanPasien").Text = waktuInformedConsent
-            panelPenolakanPasien.Controls("xrLabelTanggalPenolakanPasien").Text = waktuInformedConsent
+            MessageBox.Show(ex.Message, "WebException Message")
 
-            '# Set Signature Page 1
-            Dim xrTablePage1 As XRTable = CType(Report.Bands(BandKind.Detail).Controls("xrTableSignaturePage1"), XRTable)
+            If ex.Response IsNot Nothing Then
+                Dim sr As New IO.StreamReader(ex.Response.GetResponseStream())
+                Dim serverError As String = sr.ReadToEnd()
 
-            Dim rowDokterSignatureTablePage1 As XRTableRow = CType(xrTablePage1.Controls("xrTableRowDokterSignature"), XRTableRow)
-            Dim cellDokterSignatureTablePage1 As XRTableCell = CType(rowDokterSignatureTablePage1.Controls("xrTableCellDokterSignature"), XRTableCell)
-            Dim panelDokterSignatureTablePage1 As XRPanel = CType(cellDokterSignatureTablePage1.Controls("xrPanelDokterSignature"), XRPanel)
-
-            Dim rowPasienSignatureTablePage1 As XRTableRow = CType(xrTablePage1.Controls("xrTableRowPasienSignature"), XRTableRow)
-            Dim cellPasienSignatureTablePage1 As XRTableCell = CType(rowPasienSignatureTablePage1.Controls("xrTableCellPasienSignature"), XRTableCell)
-            Dim panelPasienSignatureTablePage1 As XRPanel = CType(cellPasienSignatureTablePage1.Controls("xrPanelPasienSignature"), XRPanel)
-
-            ' Signature Dokter
-            Dim pictureBoxDokterSignaturePage1 As XRPictureBox = CreateXRPictureBoxReportFromBase64(rowData("SignatureDokter1"), "DokterSignaturePage1", 5, 20, 125, 50)
-            panelDokterSignatureTablePage1.Controls.Add(pictureBoxDokterSignaturePage1)
-
-            ' Signature Pasien
-            Dim pictureBoxPasienSignaturePage1 As XRPictureBox = CreateXRPictureBoxReportFromBase64(rowData("SignaturePasien1"), "PasienSignaturePage1", 5, 20, 125, 50)
-            panelPasienSignatureTablePage1.Controls.Add(pictureBoxPasienSignaturePage1)
-
-            '# Set Signature Page 2
-            Dim panelSignaturePersetujuanDokter As XRPanel = CType(panelPersetujuanPasien.Controls("xrPanelSignaturePersetujuanDokter"), XRPanel)
-            Dim panelSignaturePersetujuanPasien As XRPanel = CType(panelPersetujuanPasien.Controls("xrPanelSignaturePersetujuanPasien"), XRPanel)
-            Dim panelSignaturePersetujuanPerawat As XRPanel = CType(panelPersetujuanPasien.Controls("xrPanelSignaturePersetujuanPerawat"), XRPanel)
-            Dim panelSignaturePersetujuanKeluarga As XRPanel = CType(panelPersetujuanPasien.Controls("xrPanelSignaturePersetujuanKeluarga"), XRPanel)
-
-            ' Signature Dokter
-            Dim pictureBoxSignaturePersetujuanDokter As XRPictureBox = CreateXRPictureBoxReportFromBase64(rowData("SignatureDokter2"), "SignaturePersetujuanDokter", 5, 20, 125, 50)
-            panelSignaturePersetujuanDokter.Controls.Add(pictureBoxSignaturePersetujuanDokter)
-            panelSignaturePersetujuanDokter.Controls("xrLabelSignaturePersetujuanDokter").Text = "( " & rowData("NamaDokter") & " )"
-
-            ' Signature Pasien
-            Dim pictureBoxSignaturePersetujuanPasien As XRPictureBox = CreateXRPictureBoxReportFromBase64(rowData("SignaturePasien2"), "SignaturePersetujuanPasien", 5, 20, 125, 50)
-            panelSignaturePersetujuanPasien.Controls.Add(pictureBoxSignaturePersetujuanPasien)
-            panelSignaturePersetujuanPasien.Controls("xrLabelSignaturePersetujuanPasien").Text = "( " & rowData("NamaPenanggungJawab") & " )"
-
-            ' Signature Perawat
-            Dim pictureBoxSignaturePersetujuanPerawat As XRPictureBox = CreateXRPictureBoxReportFromBase64(rowData("SignaturePerawat"), "SignaturePersetujuanPerawat", 5, 20, 125, 50)
-            panelSignaturePersetujuanPerawat.Controls.Add(pictureBoxSignaturePersetujuanPerawat)
-            panelSignaturePersetujuanPerawat.Controls("xrLabelSignaturePersetujuanPerawat").Text = "( " & rowData("NamaPerawat") & " )"
-
-            ' Signature Keluarga
-            If rowData("StatusSaksiPasien") = True Then
-                Dim pictureBoxSignaturePersetujuanKeluarga As XRPictureBox = CreateXRPictureBoxReportFromBase64(rowData("SignatureKeluarga"), "SignaturePersetujuanKeluarga", 5, 20, 125, 50)
-                panelSignaturePersetujuanKeluarga.Controls.Add(pictureBoxSignaturePersetujuanKeluarga)
-                panelSignaturePersetujuanKeluarga.Controls("xrLabelSignaturePersetujuanKeluarga").Text = "( " & rowData("NamaSaksiPasien") & " )"
+                MessageBox.Show("SERVER RESPONSE:" & vbCrLf & serverError, "Error Detail")
             End If
 
-            'Report.RunDesigner()
-            Report.ShowPreview()
-        Else
-            MsgBox("Data tidak ditemukan.", MsgBoxStyle.Critical, "Warning!")
-        End If
+
+        Catch ex As Exception
+            'MessageBox.Show("STEP ERROR: General Exception")
+            MessageBox.Show(ex.Message)
+        End Try
+
     End Sub
 
     Private Sub HapusPaketReguler(ByVal kodeVoucher As String, ByVal poliIdDetail As String, ByVal tindakanID As String)
@@ -8702,10 +9100,33 @@ Public Class FormRekamMedisDokter
             idTindakanDetail = idTindakanDetailObj.ToString()
 
             If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
+                Dim idTindakan As String = ReadSQLNIK("SELECT TindakanID FROM TransaksiPoliDetail WHERE TransPoliIDDetail = '" & idTindakanDetail & "'")
+
                 ' Soft delete hanya baris yang dipilih
                 WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
                          "WHERE TransPoliIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
 
+                Dim jsonParam As String = _
+                      "{" & _
+                      """no_transaksi"":""" & idTransaksi & """," & _
+                      """no_rm"":""" & idPasien & """," & _
+                      """id_tindakan"":""" & idTindakan & """" & _
+                      "}"
+
+                Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+
+                Dim urlWebService As String = baseURL & "api/lumiera-luzelle/persetujuan-treatment/delete"
+
+                Dim responseApi As String = InsertDataAPIRM(jsonParam, urlWebService)
+
+                If responseApi.ToLower().Contains("""success"":true") Then
+                    MsgBox("API DELETE PERSETUJUAN BERHASIL")
+
+                Else
+                    MsgBox("API DELETE PERSETUJUAN GAGAL: " & responseApi)
+                    MsgBox("Gagal menghapus persetujuan tindakan di server RM." & vbCrLf & "Silakan hubungi IT.", MsgBoxStyle.Exclamation, "Peringatan")
+
+                End If
             ElseIf jenisTransaksi = "GIGI" Then
                 WriteSQL("UPDATE TransaksiGigiDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
                          "WHERE TransGigiIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
@@ -8742,114 +9163,156 @@ Public Class FormRekamMedisDokter
         End If
     End Sub
 
-    Private Sub DataGridViewTindakan_CellContentClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles DataGridViewTindakan.CellContentClick
-        'Dim colName As String = DataGridViewTindakan.Columns(e.ColumnIndex).Name
+    'Private Sub DataGridViewTindakan_CellClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles DataGridViewTindakan.CellClick
+    '    'Dim colName As String = DataGridViewTindakan.Columns(e.ColumnIndex).Name
 
-        'If colName = "ButtonDetail" Then
-        '    MsgBox("Delete")
-        'ElseIf colName = "ButtonInformedConsent" Then
-        '    MsgBox("Informed Consent")
-        'End If
+    '    'If colName = "ButtonDetail" Then
+    '    '    MsgBox("Delete")
+    '    'ElseIf colName = "ButtonInformedConsent" Then
+    '    '    MsgBox("Informed Consent")
+    '    'End If
 
-        Dim dataGridView As DataGridView = DirectCast(sender, DataGridView)
+    '    If e.RowIndex < 0 Then Exit Sub
 
-        If e.RowIndex >= 0 Then
-            If dataGridView.Columns.Contains("ButtonDetail") Then
-                If e.ColumnIndex = dataGridView.Columns("ButtonDetail").Index Then
-                    If CheckingDeleteTindakan() = True Then
-                        Dim idTindakanDetailObj As Object = dataGridView.Rows(e.RowIndex).Cells("ColumnID").Value
-                        Dim namaTindakan As String = dataGridView.Rows(e.RowIndex).Cells("ColumnNamaTindakan").Value.ToString()
-                        Dim kodeVoucher As String = If(IsDBNull(dataGridView.Rows(e.RowIndex).Cells("ColumnKodeVoucher").Value), "", dataGridView.Rows(e.RowIndex).Cells("ColumnKodeVoucher").Value.ToString())
+    '    Dim dgv As DataGridView = DirectCast(sender, DataGridView)
+    '    Dim colName As String = dgv.Columns(e.ColumnIndex).Name
 
-                        Dim resultNonRacikan As DialogResult = MessageBox.Show("Apakah Anda yakin ingin menghapus tindakan " & namaTindakan & "?", "Validasi", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
-                        If resultNonRacikan = DialogResult.Yes Then
+    '    If colName = "ButtonDetail" Then
+    '        If CheckingDeleteTindakan() = True Then
+    '            Dim idTindakanDetailObj As Object = dgv.Rows(e.RowIndex).Cells("ColumnID").Value
+    '            Dim namaTindakan As String = dgv.Rows(e.RowIndex).Cells("ColumnNamaTindakan").Value.ToString()
+    '            Dim kodeVoucher As String = If(IsDBNull(dgv.Rows(e.RowIndex).Cells("ColumnKodeVoucher").Value), "", dgv.Rows(e.RowIndex).Cells("ColumnKodeVoucher").Value.ToString())
 
-                            'If Not IsDBNull(idTindakanDetailObj) AndAlso idTindakanDetailObj IsNot Nothing AndAlso idTindakanDetailObj.ToString() <> "" Then
-                            '    ' Jika ID ada → hapus dari TransaksiPoliDetail / TransaksiGigiDetail
-                            '    Dim idTindakanDetail As String = idTindakanDetailObj.ToString()
-                            '    If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
-                            '        WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() WHERE TransPoliIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
-                            '    ElseIf jenisTransaksi = "GIGI" Then
-                            '        WriteSQL("UPDATE TransaksiGigiDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() WHERE TransGigiIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
-                            '    End If
-                            'ElseIf kodeVoucher <> "" Then
-                            '    ' Jika ID NULL dan KodeVoucher ada → soft delete dari LogPenggunaanPaket dan tambah kuota
-                            '    WriteSQL("UPDATE LogPenggunaanPaket SET DeletedBy = 'Admin', DeletedDate = GETDATE() WHERE ID IN (" & _
-                            '            "SELECT TOP 1 ID FROM LogPenggunaanPaket WHERE KodeVoucher = '" & kodeVoucher & "' AND NoTransaksi = '" & idTransaksi & "' AND DeletedDate IS NULL ORDER BY CreatedDate DESC)", 4)
-                            '    WriteSQL("UPDATE TransaksiPaketTindakan SET Kuota = ISNULL(Kuota, 0) + 1 WHERE KodeVoucher = '" & kodeVoucher & "'", 4)
-                            '    WriteSQL("UPDATE TransaksiPoliDetail " & _
-                            '          "SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
-                            '          "WHERE TransPoliID IN (SELECT TransPoliID FROM TransaksiPoli WHERE NoUrut = '" & idTransaksi & "') " & _
-                            '          "AND KodeVoucher = '" & kodeVoucher & "' " & _
-                            '          "AND CONVERT(DATE, transaksitime) = CONVERT(DATE, GETDATE()) " & _
-                            '          "AND DeletedDate IS NULL", 4)
-                            'End If
+    '            Dim resultNonRacikan As DialogResult = MessageBox.Show("Apakah Anda yakin ingin menghapus tindakan " & namaTindakan & "?", "Validasi", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+    '            If resultNonRacikan = DialogResult.Yes Then
 
-                            'If Not IsDBNull(idTindakanDetailObj) AndAlso idTindakanDetailObj IsNot Nothing AndAlso idTindakanDetailObj.ToString() <> "" Then
-                            '    ' Jika ID ada → hapus dari TransaksiPoliDetail / TransaksiGigiDetail
-                            '    Dim idTindakanDetail As String = idTindakanDetailObj.ToString()
-                            '    If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
-                            '        WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
-                            '                 "WHERE TransPoliIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
-                            '    ElseIf jenisTransaksi = "GIGI" Then
-                            '        WriteSQL("UPDATE TransaksiGigiDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
-                            '                 "WHERE TransGigiIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
-                            '    End If
+    '                'If Not IsDBNull(idTindakanDetailObj) AndAlso idTindakanDetailObj IsNot Nothing AndAlso idTindakanDetailObj.ToString() <> "" Then
+    '                '    ' Jika ID ada → hapus dari TransaksiPoliDetail / TransaksiGigiDetail
+    '                '    Dim idTindakanDetail As String = idTindakanDetailObj.ToString()
+    '                '    If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
+    '                '        WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() WHERE TransPoliIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
+    '                '    ElseIf jenisTransaksi = "GIGI" Then
+    '                '        WriteSQL("UPDATE TransaksiGigiDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() WHERE TransGigiIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
+    '                '    End If
+    '                'ElseIf kodeVoucher <> "" Then
+    '                '    ' Jika ID NULL dan KodeVoucher ada → soft delete dari LogPenggunaanPaket dan tambah kuota
+    '                '    WriteSQL("UPDATE LogPenggunaanPaket SET DeletedBy = 'Admin', DeletedDate = GETDATE() WHERE ID IN (" & _
+    '                '            "SELECT TOP 1 ID FROM LogPenggunaanPaket WHERE KodeVoucher = '" & kodeVoucher & "' AND NoTransaksi = '" & idTransaksi & "' AND DeletedDate IS NULL ORDER BY CreatedDate DESC)", 4)
+    '                '    WriteSQL("UPDATE TransaksiPaketTindakan SET Kuota = ISNULL(Kuota, 0) + 1 WHERE KodeVoucher = '" & kodeVoucher & "'", 4)
+    '                '    WriteSQL("UPDATE TransaksiPoliDetail " & _
+    '                '          "SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
+    '                '          "WHERE TransPoliID IN (SELECT TransPoliID FROM TransaksiPoli WHERE NoUrut = '" & idTransaksi & "') " & _
+    '                '          "AND KodeVoucher = '" & kodeVoucher & "' " & _
+    '                '          "AND CONVERT(DATE, transaksitime) = CONVERT(DATE, GETDATE()) " & _
+    '                '          "AND DeletedDate IS NULL", 4)
+    '                'End If
 
-                            'ElseIf kodeVoucher <> "" Then
-                            '    ' Jika ID NULL dan KodeVoucher ada → soft delete dari LogPenggunaanPaket dan tambah kuota
-                            '    ' Ambil TindakanID yang digunakan
-                            '    Dim tindakanID As String = ReadSQLNIK("SELECT TOP 1 TindakanID FROM LogPenggunaanPaket WHERE KodeVoucher = '" & kodeVoucher & "' AND NoTransaksi = '" & idTransaksi & "' AND DeletedDate IS NULL ORDER BY CreatedDate DESC")
+    '                'If Not IsDBNull(idTindakanDetailObj) AndAlso idTindakanDetailObj IsNot Nothing AndAlso idTindakanDetailObj.ToString() <> "" Then
+    '                '    ' Jika ID ada → hapus dari TransaksiPoliDetail / TransaksiGigiDetail
+    '                '    Dim idTindakanDetail As String = idTindakanDetailObj.ToString()
+    '                '    If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
+    '                '        WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
+    '                '                 "WHERE TransPoliIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
+    '                '    ElseIf jenisTransaksi = "GIGI" Then
+    '                '        WriteSQL("UPDATE TransaksiGigiDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
+    '                '                 "WHERE TransGigiIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
+    '                '    End If
 
-                            '    ' Soft delete dari LogPenggunaanPaket
-                            '    WriteSQL("UPDATE LogPenggunaanPaket SET DeletedBy = 'Admin', DeletedDate = GETDATE() " & _
-                            '             "WHERE ID IN (" & _
-                            '             "SELECT TOP 1 ID FROM LogPenggunaanPaket " & _
-                            '             "WHERE KodeVoucher = '" & kodeVoucher & "' AND NoTransaksi = '" & idTransaksi & "' AND DeletedDate IS NULL " & _
-                            '             "ORDER BY CreatedDate DESC)", 4)
+    '                'ElseIf kodeVoucher <> "" Then
+    '                '    ' Jika ID NULL dan KodeVoucher ada → soft delete dari LogPenggunaanPaket dan tambah kuota
+    '                '    ' Ambil TindakanID yang digunakan
+    '                '    Dim tindakanID As String = ReadSQLNIK("SELECT TOP 1 TindakanID FROM LogPenggunaanPaket WHERE KodeVoucher = '" & kodeVoucher & "' AND NoTransaksi = '" & idTransaksi & "' AND DeletedDate IS NULL ORDER BY CreatedDate DESC")
 
-                            '    ' Tambahkan kuota kembali ke TransaksiPaketTindakanDetail jika TindakanID ditemukan
-                            '    If tindakanID <> "" Then
-                            '        WriteSQL("UPDATE TransaksiPaketTindakanDetail SET KuotaTindakan = ISNULL(KuotaTindakan, 0) + 1 " & _
-                            '                 "WHERE KodeVoucher = '" & kodeVoucher & "' AND TindakanID = '" & tindakanID & "'", 4)
-                            '    End If
+    '                '    ' Soft delete dari LogPenggunaanPaket
+    '                '    WriteSQL("UPDATE LogPenggunaanPaket SET DeletedBy = 'Admin', DeletedDate = GETDATE() " & _
+    '                '             "WHERE ID IN (" & _
+    '                '             "SELECT TOP 1 ID FROM LogPenggunaanPaket " & _
+    '                '             "WHERE KodeVoucher = '" & kodeVoucher & "' AND NoTransaksi = '" & idTransaksi & "' AND DeletedDate IS NULL " & _
+    '                '             "ORDER BY CreatedDate DESC)", 4)
 
-                            '    ' Hapus juga dari TransaksiPoliDetail berdasarkan KodeVoucher + Tanggal Hari Ini
-                            '    WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
-                            '             "WHERE TransPoliID IN (SELECT TransPoliID FROM TransaksiPoli WHERE NoUrut = '" & idTransaksi & "') " & _
-                            '             "AND KodeVoucher = '" & kodeVoucher & "' " & _
-                            '             "AND CONVERT(DATE, transaksitime) = CONVERT(DATE, GETDATE()) " & _
-                            '             "AND DeletedDate IS NULL", 4)
+    '                '    ' Tambahkan kuota kembali ke TransaksiPaketTindakanDetail jika TindakanID ditemukan
+    '                '    If tindakanID <> "" Then
+    '                '        WriteSQL("UPDATE TransaksiPaketTindakanDetail SET KuotaTindakan = ISNULL(KuotaTindakan, 0) + 1 " & _
+    '                '                 "WHERE KodeVoucher = '" & kodeVoucher & "' AND TindakanID = '" & tindakanID & "'", 4)
+    '                '    End If
 
-                            '    ' Cek apakah ini adalah paket reguler berdasarkan TindakanID = 0
-                            '    Dim isPaketReguler As Boolean = CBool(ReadSQLNIK("SELECT CASE WHEN EXISTS (" & _
-                            '        "SELECT 1 FROM TransaksiPoliDetail " & _
-                            '        "WHERE KodeVoucher = '" & kodeVoucher & "' " & _
-                            '        "AND CONVERT(DATE, transaksitime) = CONVERT(DATE, GETDATE()) " & _
-                            '        "AND DeletedDate IS NULL AND TindakanID = '0') THEN 1 ELSE 0 END"))
+    '                '    ' Hapus juga dari TransaksiPoliDetail berdasarkan KodeVoucher + Tanggal Hari Ini
+    '                '    WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
+    '                '             "WHERE TransPoliID IN (SELECT TransPoliID FROM TransaksiPoli WHERE NoUrut = '" & idTransaksi & "') " & _
+    '                '             "AND KodeVoucher = '" & kodeVoucher & "' " & _
+    '                '             "AND CONVERT(DATE, transaksitime) = CONVERT(DATE, GETDATE()) " & _
+    '                '             "AND DeletedDate IS NULL", 4)
 
-                            '    If isPaketReguler Then
-                            '        ' Tambahkan kuota kembali ke TransaksiPaketTindakan
-                            '        WriteSQL("UPDATE TransaksiPaketTindakan SET Kuota = ISNULL(Kuota, 0) + 1 WHERE KodeVoucher = '" & kodeVoucher & "'", 4)
-                            '    End If
+    '                '    ' Cek apakah ini adalah paket reguler berdasarkan TindakanID = 0
+    '                '    Dim isPaketReguler As Boolean = CBool(ReadSQLNIK("SELECT CASE WHEN EXISTS (" & _
+    '                '        "SELECT 1 FROM TransaksiPoliDetail " & _
+    '                '        "WHERE KodeVoucher = '" & kodeVoucher & "' " & _
+    '                '        "AND CONVERT(DATE, transaksitime) = CONVERT(DATE, GETDATE()) " & _
+    '                '        "AND DeletedDate IS NULL AND TindakanID = '0') THEN 1 ELSE 0 END"))
 
-                            HapusTindakanPaket(idTindakanDetailObj, namaTindakan, kodeVoucher)
-                        End If
-                        MsgBox("Tindakan : " & namaTindakan & " berhasil dihapus.", MsgBoxStyle.Information, "Success!")
-                    End If
+    '                '    If isPaketReguler Then
+    '                '        ' Tambahkan kuota kembali ke TransaksiPaketTindakan
+    '                '        WriteSQL("UPDATE TransaksiPaketTindakan SET Kuota = ISNULL(Kuota, 0) + 1 WHERE KodeVoucher = '" & kodeVoucher & "'", 4)
+    '                '    End If
 
-                        SaveDetailTindakan()
-                    End If
+    '                HapusTindakanPaket(idTindakanDetailObj, namaTindakan, kodeVoucher)
+    '            End If
+    '            MsgBox("Tindakan : " & namaTindakan & " berhasil dihapus.", MsgBoxStyle.Information, "Success!")
+    '        End If
 
-                    ' Refresh Grid
-                    LoadGridTindakanPoli()
+    '        SaveDetailTindakan()
+    '    End If
 
-                ElseIf e.ColumnIndex = dataGridView.Columns("ButtonInformedConsent").Index Then
-                    Dim idTindakan As String = dataGridView.Rows(e.RowIndex).Cells("ColumnTindakanID").Value.ToString()
-                    PreviewInformedConsent(idTransaksi, idTindakan)
+    '    ' Refresh Grid
+    '    LoadGridTindakanPoli()
+
+    '     ElseIf colName = "ButtonInformedConsent" Then
+
+    '    Dim idTindakan As String = dgv.Rows(e.RowIndex).Cells("ColumnTindakanID").Value.ToString()
+
+    '    PreviewInformedConsent(idTransaksi, idTindakan)
+    '    End If
+    'End Sub
+
+    Private Sub DataGridViewTindakan_CellClick(ByVal sender As Object, ByVal e As DataGridViewCellEventArgs) Handles DataGridViewTindakan.CellClick
+
+        If e.RowIndex < 0 Then Exit Sub
+
+        Dim dgv As DataGridView = DirectCast(sender, DataGridView)
+        Dim colName As String = dgv.Columns(e.ColumnIndex).Name
+
+
+        If colName = "ButtonDetail" Then
+            If CheckingDeleteTindakan() = True Then
+
+                Dim idTindakanDetailObj As Object = dgv.Rows(e.RowIndex).Cells("ColumnID").Value()
+
+                Dim namaTindakan As String = dgv.Rows(e.RowIndex).Cells("ColumnNamaTindakan").Value.ToString()
+
+                Dim kodeVoucher As String = If(IsDBNull(dgv.Rows(e.RowIndex).Cells("ColumnKodeVoucher").Value), "", dgv.Rows(e.RowIndex).Cells("ColumnKodeVoucher").Value.ToString())
+
+                Dim result As DialogResult = MessageBox.Show("Apakah Anda yakin ingin menghapus tindakan " & namaTindakan & "?", "Validasi", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+
+                If result = DialogResult.Yes Then
+                    HapusTindakanPaket(idTindakanDetailObj, namaTindakan, kodeVoucher)
+                    MsgBox("Tindakan berhasil dihapus.", MsgBoxStyle.Information)
                 End If
+
+                SaveDetailTindakan()
+                LoadGridTindakanPoli()
             End If
+
+
+        ElseIf colName = "ButtonInformedConsent" Then
+
+            Dim idTindakan As String = dgv.Rows(e.RowIndex).Cells("ColumnTindakanID").Value.ToString()
+
+            PreviewInformedConsent(idTransaksi, idTindakan)
+
+        End If
+
     End Sub
+
 
     Private Sub ButtonGenerateSuratKeteranganBerobat_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonGenerateSuratKeteranganBerobat.Click
         Try
@@ -10029,19 +10492,35 @@ Public Class FormRekamMedisDokter
                         ' Get Nomor Surat
                         Dim nomorSurat As String = GenerateNomorSurat("SURAT KETERANGAN KONTROL")
 
-                        ' Insert data ke SuratKeteranganKontrol
-                        WriteSQL("INSERT INTO SuratKeteranganKontrol (NoTransaksi, NoRekamMedis, NoSurat, TanggalSurat, DokterID, DokterNama, Diagnosa, Tanggal, CreatedBy, CreatedDate) " & _
-                                "VALUES ('" & idTransaksi & "', '" & idPasien & "', '" & nomorSurat & "', GETDATE(), '" & rowData("KodeDokter") & "', '" & rowData("NamaDokter") & "', '" & diagnosa & "', '" & Format(tgl, "yyyy-MM-dd") & "', '" & userInput & "', GETDATE())", 4)
+                        ' Tanggal kontrol
+                        Dim tglKontrol As DateTime = DateTimePickerTanggalKontrol.Value.Date
 
-                        WriteSQL("INSERT INTO LogReminderPasien (NamaPasien, NoHP, Keperluan, Tanggal, Status, CreatedBy, CreatedDate, JenisKelamin) " & _
-                           "VALUES ('" & namaPasien & "', " & _
-                                  "'" & NoHp & "', " & _
-                                  "'Kontrol Kembali Ke Faskes', " & _
-                                  "'" & tgl.ToString("yyyy-MM-dd 09:00") & "', " & _
+                        ' Reminder H-6 jam 09:00 WIB
+                        Dim tglReminder As DateTime = tglKontrol.AddDays(-6).AddHours(9)
+                        Dim kdPoli As String = ReadSQLNIK( _
+                           "SELECT TOP 1 MPT.KodeBPJS " & _
+                           "FROM TransaksiDetail TD " & _
+                           "INNER JOIN MasterPoliTujuan MPT ON TD.JenisPoli = MPT.NamaPoli " & _
+                           "WHERE TD.NoUrut = '" & idTransaksi & "'")
+
+                        If CheckSQL("SELECT 1 FROM LogReminderPasien WHERE NoRekamMedis='" & idPasien & "' AND Tanggal='" & tglReminder.ToString("yyyy-MM-dd HH:mm") & "'") = False Then
+
+                            'Simpan ke LogReminderPasien
+                            WriteSQL("INSERT INTO LogReminderPasien " & _
+                                  "(NamaPasien, NoHP, Keperluan, Tanggal, Status, CreatedBy, CreatedDate, JenisKelamin, NoRekamMedis,  KodePoli) " & _
+                                  "VALUES (" & _
+                                  "'" & namaPasien.Replace("'", "''") & "', " & _
+                                  "'" & NoHp.Replace("'", "''") & "', " & _
+                                  "'" & TextBoxNamaTindakan.Text.Replace("'", "''") & "', " & _
+                                  "'" & tglReminder.ToString("yyyy-MM-dd 09:00") & "', " & _
                                   "'TERJADWAL', " & _
-                                  "'" & userInput & "', " & _
+                                  "'" & userInput.Replace("'", "''") & "', " & _
                                   "GETDATE(), " & _
-                                  "'" & jenisKelamin & "')", 4)
+                                  "'" & jenisKelamin & "', " & _
+                                  "'" & idPasien & "'," & _
+                                  "'" & kdPoli & "'" & _
+                                  ")", 4)
+                        End If
 
                         ' Set Nomor Surat
                         TextBoxNoSuratKeteranganKontrol.Text = nomorSurat

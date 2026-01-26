@@ -1258,11 +1258,25 @@ Public Class FormPendaftaranAwal
                         ' DELETE
                         WriteSQL("UPDATE TransaksiPoli SET TotalTagihan = " & CDbl(TextBoxTotalBruto.Text) & ", TotalDisc = " & CDbl(TextBoxTotalDiskon.Text) & ", Pembulatan = " & CDbl(TextBoxTotalPembulatan.Text) & ", NettBayar = " & CDbl(TextBoxTotalBayar.Text) & ", TotalBayar = " & CDbl(TextBoxTotalNett.Text) & ", Pengembalian = " & CDbl(0) & " WHERE TransPoliID='" & idTransaksi & "'", 4)
 
+                        Dim usageList As New List(Of Object)
+
+                        Dim nama As String = ReadSQLNIK("SELECT Nama FROM MasterPasien WHERE NoRekamMedis = '" & TextBoxRM.Text & "'")
+                        Dim noHp As String = ReadSQLNIK("SELECT NoHandphone FROM MasterPasien WHERE NoRekamMedis = '" & TextBoxRM.Text & "'")
+                        Dim tglPerawatan As String = Date.Now.ToString("yyyy-MM-ddTHH:mm:ss")
+
                         ' Generate Kode Voucher (Jika Pembelian Baru)
                         For Each rowTindakan As DataRow In tblTindakan.Rows
                             ' Insert Tabel LogPenggunaanPaket
                             WriteSQL("INSERT INTO LogPenggunaanPaket(NoRekamMedis, NoTransaksi, PaketID, TindakanID, JenisPaket, TanggalTransaksi, KodeVoucher, CreatedBy, CreatedDate) " & _
                                      "VALUES('" & TextBoxRM.Text & "', '" & nomorUrutTransaksi & "', '" & rowTindakan("PaketID") & "', '" & rowTindakan("TindakanID") & "', '" & rowTindakan("Jenis Paket") & "', GETDATE(), '" & rowTindakan("KodeVoucher") & "', '" & userInput & "', GETDATE())", 4)
+
+                            Dim usage As New Dictionary(Of String, Object)
+                            usage.Add("id_paket", rowTindakan("PaketID").ToString())
+                            usage.Add("nama_paket", rowTindakan("Nama Paket").ToString())
+                            usage.Add("tgl_pembelian", Nothing)
+                            usage.Add("tgl_perawatan", tglPerawatan)
+
+                            usageList.Add(usage)
 
                             ' Update Sisa Kuota Paket
                             If rowTindakan("Jenis Paket").ToString() = "Paket Reguler" Then
@@ -1271,6 +1285,30 @@ Public Class FormPendaftaranAwal
                                 WriteSQL("UPDATE TransaksiPaketTindakanDetail SET KuotaTindakan = KuotaTindakan - 1 WHERE PaketID = '" & rowTindakan("PaketID") & "' AND TindakanID = '" & rowTindakan("TindakanID").ToString() & "' AND KodeVoucher = '" & rowTindakan("KodeVoucher") & "'", 4)
                             End If
                         Next
+
+                        If usageList.Count > 0 Then
+
+                            Dim payload As New Dictionary(Of String, Object)
+                            payload.Add("nama_pasien", nama)
+                            payload.Add("no_hp", noHp)
+                            payload.Add("no_transaksi", nomorUrutTransaksi)
+                            payload.Add("no_rm", TextBoxRM.Text)
+                            payload.Add("packages", usageList)
+
+                            Dim jsonParam As String = JsonConvert.SerializeObject(payload)
+
+                            Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+                            Dim urlWebService As String = baseURL & "api/lumiera-luzelle/treatment-package"
+
+                            Dim responseApi As String = InsertDataAPIRM(jsonParam, urlWebService)
+
+                            If responseApi.ToLower().Contains("""success"":true") Then
+                                MsgBox("Pemotongan paket berhasil dikirim ke API")
+                            Else
+                                MsgBox("Pemotongan paket GAGAL dikirim ke API: " & responseApi)
+                            End If
+
+                        End If
 
                         ' Insert / Update Detail Waktu Transaksi (WaktuSelesaiPendaftaran)
                         SetDetailWaktuTransaksi(nomorUrutTransaksi, "WaktuSelesaiPendaftaran", userInput)
@@ -2482,4 +2520,15 @@ Public Class FormPendaftaranAwal
             End If
         End If
     End Sub
+
+    'Private Sub ButtonInputInformedConsent_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonInputInformedConsent.Click
+    '    Try
+    '        Dim statusPersetujuan As Boolean = RadioButtonSetujuInformedConsent.Checked
+
+    '        FormInputInformedConsent.SetForm("RekamMedisPerencanaanTindakan", tblsRekamMedis, TextBoxTindakanID.Text, statusPersetujuan, jenisTransaksi)
+    '        FormInputInformedConsent.ShowDialog()
+    '    Catch ex As Exception
+    '        MsgBox(ex.Message, MsgBoxStyle.Critical, "Warning!")
+    '    End Try
+    'End Sub
 End Class
