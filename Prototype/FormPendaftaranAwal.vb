@@ -1588,6 +1588,8 @@ Public Class FormPendaftaranAwal
     Private Sub ButtonClearTindakan_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonClearTindakan.Click
         If GridControlTindakanPoli.MainView Is GridViewPaketPoli Then ClearGridDataPaket()
         If GridControlTindakanPoli.MainView Is GridViewTindakanPoli Then ClearGridDataTindakan()
+        NeedInformedConsent = False
+        PanelInformConsent.Visible = False
     End Sub
 
     Private Sub RadioButtonKunjunganSakit_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RadioButtonKunjunganSakit.CheckedChanged, RadioButtonkunjunganSehat.CheckedChanged
@@ -2174,14 +2176,28 @@ Public Class FormPendaftaranAwal
         FindMultiple.Query(queryString, " ORDER BY NamaPaket", "FindPemeriksaanPendaftaranPaket", 0)
     End Sub
 
+    Private NeedInformedConsent As Boolean = False
+
     Public Sub LoadTindakanPaket(ByRef rowPaket() As DataRow)
         If ValidasiTambahPaketTindakan(rowPaket) = True Then
             Dim tblTindakan As DataTable = GridControlTindakanPoli.DataSource
             tblTindakan.AcceptChanges()
+
+            NeedInformedConsent = False
+            PanelInformConsent.Visible = False
+
             If rowPaket.Count > 0 Then
                 For i As Integer = 0 To rowPaket.Length - 1
                     Dim tblPaket As DataTable = ReadSQL("SELECT * FROM MasterPaketTindakan WHERE PaketID = '" & rowPaket(i)("PaketID").ToString() & "'")
                     For Each Trow As DataRow In tblPaket.Rows
+
+                        If Not IsDBNull(Trow("StatusInformedConsent")) Then
+                            If CBool(Trow("StatusInformedConsent")) = True Then
+                                NeedInformedConsent = True
+                                PanelInformConsent.Visible = True
+                            End If
+                        End If
+
                         Dim Tnew As DataRow = tblTindakan.NewRow
                         Tnew("PaketID") = Trow("PaketID")
                         Tnew("Nama Paket") = Trow("NamaPaket")
