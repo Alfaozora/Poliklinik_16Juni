@@ -330,6 +330,7 @@ Public Class MasterTindakanKlinik
 
     Private Sub SimpanDataPaket()
         Dim reffID As String = ""
+        Dim statusInformedConsent As Boolean = False
 
         ' Get JSON Data Grid
         Dim jsonDataGrid As String = GenerateJsonFromGridControl(GridControlTindakan)
@@ -349,10 +350,13 @@ Public Class MasterTindakanKlinik
             jenisPaket = RadioButtonPaketPerTindakan.Text
         End If
 
+        ' Set Status Informed Consent
+        If CheckBoxICPaket.Checked = True Then statusInformedConsent = True
+
         If TextBoxReffID.Text = "" Then ' Insert Paket
             ' Save ke tabel MasterPaketTindakan
-            WriteSQL("INSERT INTO MasterPaketTindakan (NamaPaket, KeteranganPaket, JenisPaket, HargaAwal, DiskonNominal, HargaNett, Kuota, MaksimalBHP, DetailTindakan, TanggalMulai, TanggalBerakhir, DurasiAktif, CreatedBy, CreatedDate, PoliTujuan) " & _
-                     "VALUES('" & TextBoxNamaPaket.Text & "', '" & TextBoxKeteranganPaket.Text & "', '" & jenisPaket & "', " & CDbl(TextBoxHargaAwal.Text) & ", " & CDbl(TextBoxTotalDiskon.Text) & ", " & CDbl(TextBoxHargaNett.Text) & ", " & CDbl(TextBoxKuotaPaket.Text) & ", " & CDbl(TextBoxMaksimalBHP_Paket.Text) & ", '" & jsonDataGrid & "', '" & Format(TglAwalPaket.Value, "MM/dd/yyyy") & "', '" & Format(TglAkhirPaket.Value, "MM/dd/yyyy") & "', " & CDbl(TextBoxDurasiAktifPaket.Text) & ", '" & userInput & "', GETDATE(), '" & poliGabung & "')", 4)
+            WriteSQL("INSERT INTO MasterPaketTindakan (NamaPaket, KeteranganPaket, JenisPaket, HargaAwal, DiskonNominal, HargaNett, Kuota, MaksimalBHP, DetailTindakan, TanggalMulai, TanggalBerakhir, DurasiAktif, CreatedBy, CreatedDate, PoliTujuan, StatusInformedConsent, TindakanInformedConsent) " & _
+                     "VALUES('" & TextBoxNamaPaket.Text & "', '" & TextBoxKeteranganPaket.Text & "', '" & jenisPaket & "', " & CDbl(TextBoxHargaAwal.Text) & ", " & CDbl(TextBoxTotalDiskon.Text) & ", " & CDbl(TextBoxHargaNett.Text) & ", " & CDbl(TextBoxKuotaPaket.Text) & ", " & CDbl(TextBoxMaksimalBHP_Paket.Text) & ", '" & jsonDataGrid & "', '" & Format(TglAwalPaket.Value, "MM/dd/yyyy") & "', '" & Format(TglAkhirPaket.Value, "MM/dd/yyyy") & "', " & CDbl(TextBoxDurasiAktifPaket.Text) & ", '" & userInput & "', GETDATE(), '" & poliGabung & "', '" & statusInformedConsent & "', '" & ComboBoxICPaket.Text & "')", 4)
 
             ' Get Reff ID
             reffID = ReadSQLNIK("SELECT TOP(1) PaketID FROM MasterPaketTindakan WHERE NamaPaket = '" & TextBoxNamaPaket.Text & "' ORDER BY CreatedDate DESC")
@@ -378,6 +382,8 @@ Public Class MasterTindakanKlinik
                               "DurasiAktif = " & CDbl(TextBoxDurasiAktifPaket.Text) & "," & _
                               "UpdatedBy = '" & userInput & "'," & _
                               "PoliTujuan = '" & poliGabung & "'," & _
+                              "StatusInformedConsent = '" & statusInformedConsent & "'," & _
+                              "TindakanInformedConsent = '" & ComboBoxICPaket.Text & "'," & _
                               "UpdatedDate = GETDATE()"
 
             WriteSQL("UPDATE MasterPaketTindakan SET " & parameterUpdate & " WHERE PaketID = '" & reffID & "'", 4)
@@ -432,6 +438,11 @@ Public Class MasterTindakanKlinik
             CheckedListBoxPoli2.SetItemChecked(i, False)
         Next
         CheckedListBoxPoli2.Enabled = True
+
+        InsertNewItemComboSQL("SELECT DISTINCT NamaTindakan FROM Klinik_MasterTindakanInformedConsent", ComboBoxICPaket)
+
+        ComboBoxICPaket.SelectedIndex = -1
+        ComboBoxICPaket.Enabled = False
 
         RadioButtonPaketReguler.Checked = True
         RadioButtonPaketReguler.Enabled = True
@@ -518,6 +529,11 @@ Public Class MasterTindakanKlinik
                 End If
             Next
         End If
+
+        ' Set Informed Consent Paket
+        If Convert.ToInt32(rowPaket("StatusInformedConsent")) = 1 Then CheckBoxICPaket.Checked = True
+        If Convert.ToInt32(rowPaket("StatusInformedConsent")) = 0 Then CheckBoxICPaket.Checked = False
+        If IsDBNull(rowPaket("TindakanInformedConsent")) = False Then ComboBoxICPaket.Text = rowPaket("TindakanInformedConsent")
 
         ' Set Jenis Paket
         If rowPaket("JenisPaket").ToString() = "Paket Reguler" Then
@@ -690,6 +706,7 @@ Public Class MasterTindakanKlinik
         TextBoxTindakanID.Text = rowTindakan("TindakanID").ToString
         TextBoxNamaTindakan.Text = rowTindakan("NamaTindakan").ToString
         ComboBoxGroupJenisTindakan.Text = rowTindakan("JenisTindakan").ToString
+        ComboBoxKategori.Text = rowTindakan("Kategori").ToString
         If rowTindakan("JenisDokter").ToString = "Dokter" Then RadioButtonPelaksanaDokter.Checked = True
         If rowTindakan("JenisDokter").ToString = "Perawat" Then RadioButtonPelaksanaPerawat.Checked = True
         TextBoxBiayaTindakan.Text = Splitmoney(rowTindakan("BiayaTindakan"))
@@ -781,6 +798,7 @@ Public Class MasterTindakanKlinik
 
         ComboBoxGroupJenisTindakan.SelectedIndex = -1
         ComboBoxInformedConsent.SelectedIndex = -1
+        ComboBoxKategori.SelectedIndex = -1
         ComboBoxInformedConsent.Enabled = False
     End Sub
 
@@ -865,12 +883,14 @@ Public Class MasterTindakanKlinik
             statusFeeKonsultasi = True
         End If
 
+        Dim kategori As String = ComboBoxKategori.SelectedItem.ToString()
+
         If TextBoxTindakanID.Text = "" Then
             ' Insert Data Baru 
             If RadioButtonPoliUmum.Checked = True Then
-                WriteSQL("INSERT INTO MasterTindakan ([NamaTindakan], [JenisTindakan], [BiayaTindakan], [JenisDokter], [CreatedDate], [CreatedBy], [StatusFeeTindakan], [StatusBHP], [StatusPersentaseFee], [StatusNominalFee], [PersentaseFeePerusahaan], [PersentaseFeeKaryawan], [FeePerTindakan], [FeeDokter], [FeePerawat], [StatusFeeKonsultasi], [MaksimalBHP], [StatusInformedConsent], [TindakanInformedConsent], [Hari], [Reminder], [PoliTujuan]) " & _
+                WriteSQL("INSERT INTO MasterTindakan ([NamaTindakan], [JenisTindakan], [BiayaTindakan], [JenisDokter], [CreatedDate], [CreatedBy], [StatusFeeTindakan], [StatusBHP], [StatusPersentaseFee], [StatusNominalFee], [PersentaseFeePerusahaan], [PersentaseFeeKaryawan], [FeePerTindakan], [FeeDokter], [FeePerawat], [StatusFeeKonsultasi], [MaksimalBHP], [StatusInformedConsent], [TindakanInformedConsent], [Hari], [Reminder], [PoliTujuan], [Kategori]) " & _
                          "VALUES('" & TextBoxNamaTindakan.Text & "','" & ComboBoxGroupJenisTindakan.Text & "'," & CInt(TextBoxBiayaTindakan.Text) & ", '" & jenisPelaksana & "', GETDATE(), '" & userInput & "', '" & statusFee & "', '" & statusBHP & "', '" & statusPersentase & "', " & _
-                         "'" & statusNominal & "', '" & CDbl(TextBoxPersentaseFeePerusahaan.Text) & "', '" & CDbl(TextBoxPersentaseFeeKaryawan.Text) & "', '" & CDbl(TextBoxNominalFee.Text) & "', '" & CDbl(TextBoxFeeDokterTambahan.Text) & "', '" & CDbl(TextBoxFeePerawatTambahan.Text) & "', '" & statusFeeKonsultasi & "', '" & CDbl(TextBoxMaksimalBHP_Tindakan.Text) & "', '" & statusInformedConsent & "', '" & ComboBoxInformedConsent.Text & "', '" & hari & "', " & statusReminder & ", '" & poliGabung & "')", 4)
+                         "'" & statusNominal & "', '" & CDbl(TextBoxPersentaseFeePerusahaan.Text) & "', '" & CDbl(TextBoxPersentaseFeeKaryawan.Text) & "', '" & CDbl(TextBoxNominalFee.Text) & "', '" & CDbl(TextBoxFeeDokterTambahan.Text) & "', '" & CDbl(TextBoxFeePerawatTambahan.Text) & "', '" & statusFeeKonsultasi & "', '" & CDbl(TextBoxMaksimalBHP_Tindakan.Text) & "', '" & statusInformedConsent & "', '" & ComboBoxInformedConsent.Text & "', '" & hari & "', " & statusReminder & ", '" & poliGabung & "', '" & kategori & "')", 4)
             ElseIf RadioButtonPoliGigi.Checked = True Then
                 WriteSQL("INSERT INTO MasterTindakanGigi ([NamaTindakan], [JenisTindakan], [BiayaTindakan], [JenisDokter], [CreatedDate], [CreatedBy], [StatusFeeTindakan], [StatusBHP], [StatusPersentaseFee], [StatusNominalFee], [PersentaseFeePerusahaan], [PersentaseFeeKaryawan], [FeePerTindakan], [FeeDokter], [FeePerawat], [StatusFeeKonsultasi], [MaksimalBHP], [StatusInformedConsent], [TindakanInformedConsent], [Hari], [Reminder], [PoliTujuan]) " & _
                      "VALUES('" & TextBoxNamaTindakan.Text & "', '" & ComboBoxGroupJenisTindakan.Text & "', " & CInt(TextBoxBiayaTindakan.Text) & ", '" & jenisPelaksana & "', GETDATE(), '" & userInput & "', '" & statusFee & "', '" & statusBHP & "', '" & statusPersentase & "', " & _
@@ -902,6 +922,7 @@ Public Class MasterTindakanKlinik
                               "Reminder = '" & statusReminder & "'," & _
                               "PoliTujuan = '" & poliGabung & "'," & _
                               "UpdatedBy = '" & userInput & "'," & _
+                              "Kategori = '" & kategori & "'," & _
                               "UpdatedDate = GETDATE()"
 
             ' Insert Data Baru 
@@ -927,6 +948,13 @@ Public Class MasterTindakanKlinik
             End If
         End If
 
+        If ComboBoxKategori.SelectedIndex = -1 Then
+            MsgBox("Silakan pilih kategori terlebih dahulu!", _
+                   MsgBoxStyle.Exclamation, "Peringatan")
+            ComboBoxKategori.Focus()
+            Exit Function
+        End If
+
         ' Validasi Nama Poli
         If RadioButtonPoliUmum.Checked = True AndAlso CheckedListBoxPoli.CheckedItems.Count = 0 Then
             MsgBox("Silakan pilih minimal satu poli.", MsgBoxStyle.Exclamation, "Warning")
@@ -939,6 +967,13 @@ Public Class MasterTindakanKlinik
         ' Validasi informed consent
         If CheckBoxInformedConsent.Checked = True Then
             If ComboBoxInformedConsent.FindStringExact(ComboBoxInformedConsent.Text) < 0 Then
+                MsgBox("Pilih kelompok informed consent terlebih dahulu.", MsgBoxStyle.Exclamation, "Warning!") : Return False
+            End If
+        End If
+
+        ' Validasi informed consent paket
+        If CheckBoxICPaket.Checked = True Then
+            If ComboBoxICPaket.FindStringExact(ComboBoxICPaket.Text) < 0 Then
                 MsgBox("Pilih kelompok informed consent terlebih dahulu.", MsgBoxStyle.Exclamation, "Warning!") : Return False
             End If
         End If
@@ -1037,6 +1072,16 @@ Public Class MasterTindakanKlinik
         ElseIf CheckBoxInformedConsent.CheckState = CheckState.Unchecked Then
             ComboBoxInformedConsent.SelectedIndex = -1
             ComboBoxInformedConsent.Enabled = False
+        End If
+    End Sub
+
+    Private Sub CheckBoxICPaket_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckBoxICPaket.CheckedChanged
+        If CheckBoxICPaket.CheckState = CheckState.Checked Then
+            ComboBoxICPaket.SelectedIndex = -1
+            ComboBoxICPaket.Enabled = True
+        ElseIf CheckBoxICPaket.CheckState = CheckState.Unchecked Then
+            ComboBoxICPaket.SelectedIndex = -1
+            ComboBoxICPaket.Enabled = False
         End If
     End Sub
 

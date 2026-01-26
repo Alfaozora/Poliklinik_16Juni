@@ -41,6 +41,8 @@ Partial Class MasterTindakanKlinik
         Me.ButtonExportMasterTindakan = New System.Windows.Forms.Button
         Me.SplitContainer3 = New System.Windows.Forms.SplitContainer
         Me.PanelMasterTindakan = New System.Windows.Forms.Panel
+        Me.ComboBoxKategori = New System.Windows.Forms.ComboBox
+        Me.Label34 = New System.Windows.Forms.Label
         Me.CheckedListBoxPoli = New System.Windows.Forms.CheckedListBox
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
         Me.Label33 = New System.Windows.Forms.Label
@@ -162,6 +164,9 @@ Partial Class MasterTindakanKlinik
         Me.TextBoxReffID = New System.Windows.Forms.TextBox
         Me.GridControlTindakan = New DevExpress.XtraGrid.GridControl
         Me.GridViewTindakan = New DevExpress.XtraGrid.Views.Grid.GridView
+        Me.Label35 = New System.Windows.Forms.Label
+        Me.ComboBoxICPaket = New System.Windows.Forms.ComboBox
+        Me.CheckBoxICPaket = New System.Windows.Forms.CheckBox
         Me.PanelTop.SuspendLayout()
         Me.PanelMasterTindakanKlinik.SuspendLayout()
         Me.SplitContainer1.Panel1.SuspendLayout()
@@ -466,6 +471,8 @@ Partial Class MasterTindakanKlinik
         'PanelMasterTindakan
         '
         Me.PanelMasterTindakan.AutoScroll = True
+        Me.PanelMasterTindakan.Controls.Add(Me.ComboBoxKategori)
+        Me.PanelMasterTindakan.Controls.Add(Me.Label34)
         Me.PanelMasterTindakan.Controls.Add(Me.CheckedListBoxPoli)
         Me.PanelMasterTindakan.Controls.Add(Me.GroupBox1)
         Me.PanelMasterTindakan.Controls.Add(Me.Panel5)
@@ -497,6 +504,26 @@ Partial Class MasterTindakanKlinik
         Me.PanelMasterTindakan.Name = "PanelMasterTindakan"
         Me.PanelMasterTindakan.Size = New System.Drawing.Size(757, 500)
         Me.PanelMasterTindakan.TabIndex = 563
+        '
+        'ComboBoxKategori
+        '
+        Me.ComboBoxKategori.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ComboBoxKategori.FormattingEnabled = True
+        Me.ComboBoxKategori.Items.AddRange(New Object() {"Face", "Hair", "Body", "IV"})
+        Me.ComboBoxKategori.Location = New System.Drawing.Point(537, 259)
+        Me.ComboBoxKategori.Name = "ComboBoxKategori"
+        Me.ComboBoxKategori.Size = New System.Drawing.Size(174, 25)
+        Me.ComboBoxKategori.TabIndex = 576
+        '
+        'Label34
+        '
+        Me.Label34.AutoSize = True
+        Me.Label34.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label34.Location = New System.Drawing.Point(534, 238)
+        Me.Label34.Name = "Label34"
+        Me.Label34.Size = New System.Drawing.Size(59, 17)
+        Me.Label34.TabIndex = 575
+        Me.Label34.Text = "Kategori"
         '
         'CheckedListBoxPoli
         '
@@ -1500,6 +1527,9 @@ Partial Class MasterTindakanKlinik
         'SplitContainerMasterPaket.Panel1
         '
         Me.SplitContainerMasterPaket.Panel1.BackColor = System.Drawing.Color.White
+        Me.SplitContainerMasterPaket.Panel1.Controls.Add(Me.ComboBoxICPaket)
+        Me.SplitContainerMasterPaket.Panel1.Controls.Add(Me.CheckBoxICPaket)
+        Me.SplitContainerMasterPaket.Panel1.Controls.Add(Me.Label35)
         Me.SplitContainerMasterPaket.Panel1.Controls.Add(Me.CheckedListBoxPoli2)
         Me.SplitContainerMasterPaket.Panel1.Controls.Add(Me.TextBox15)
         Me.SplitContainerMasterPaket.Panel1.Controls.Add(Me.Label2)
@@ -1540,7 +1570,7 @@ Partial Class MasterTindakanKlinik
         Me.SplitContainerMasterPaket.Panel2.AutoScroll = True
         Me.SplitContainerMasterPaket.Panel2.Controls.Add(Me.GridControlTindakan)
         Me.SplitContainerMasterPaket.Size = New System.Drawing.Size(757, 581)
-        Me.SplitContainerMasterPaket.SplitterDistance = 350
+        Me.SplitContainerMasterPaket.SplitterDistance = 380
         Me.SplitContainerMasterPaket.SplitterWidth = 1
         Me.SplitContainerMasterPaket.TabIndex = 462
         '
@@ -1558,7 +1588,7 @@ Partial Class MasterTindakanKlinik
         Me.TextBox15.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
         Me.TextBox15.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.TextBox15.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.TextBox15.Location = New System.Drawing.Point(159, 198)
+        Me.TextBox15.Location = New System.Drawing.Point(159, 232)
         Me.TextBox15.Name = "TextBox15"
         Me.TextBox15.Size = New System.Drawing.Size(35, 23)
         Me.TextBox15.TabIndex = 576
@@ -1569,7 +1599,7 @@ Partial Class MasterTindakanKlinik
         '
         Me.Label2.AutoSize = True
         Me.Label2.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label2.Location = New System.Drawing.Point(28, 198)
+        Me.Label2.Location = New System.Drawing.Point(28, 232)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(95, 17)
         Me.Label2.TabIndex = 575
@@ -1580,7 +1610,7 @@ Partial Class MasterTindakanKlinik
         Me.TextBoxMaksimalBHP_Paket.BackColor = System.Drawing.Color.White
         Me.TextBoxMaksimalBHP_Paket.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.TextBoxMaksimalBHP_Paket.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxMaksimalBHP_Paket.Location = New System.Drawing.Point(196, 198)
+        Me.TextBoxMaksimalBHP_Paket.Location = New System.Drawing.Point(196, 232)
         Me.TextBoxMaksimalBHP_Paket.Name = "TextBoxMaksimalBHP_Paket"
         Me.TextBoxMaksimalBHP_Paket.Size = New System.Drawing.Size(129, 23)
         Me.TextBoxMaksimalBHP_Paket.TabIndex = 574
@@ -1634,7 +1664,7 @@ Partial Class MasterTindakanKlinik
         Me.TextBox3.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
         Me.TextBox3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.TextBox3.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.TextBox3.Location = New System.Drawing.Point(159, 285)
+        Me.TextBox3.Location = New System.Drawing.Point(159, 319)
         Me.TextBox3.Name = "TextBox3"
         Me.TextBox3.Size = New System.Drawing.Size(35, 23)
         Me.TextBox3.TabIndex = 557
@@ -1645,7 +1675,7 @@ Partial Class MasterTindakanKlinik
         '
         Me.Label8.AutoSize = True
         Me.Label8.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label8.Location = New System.Drawing.Point(28, 285)
+        Me.Label8.Location = New System.Drawing.Point(28, 319)
         Me.Label8.Name = "Label8"
         Me.Label8.Size = New System.Drawing.Size(76, 17)
         Me.Label8.TabIndex = 556
@@ -1656,7 +1686,7 @@ Partial Class MasterTindakanKlinik
         Me.TextBoxHargaNett.BackColor = System.Drawing.Color.White
         Me.TextBoxHargaNett.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.TextBoxHargaNett.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxHargaNett.Location = New System.Drawing.Point(196, 285)
+        Me.TextBoxHargaNett.Location = New System.Drawing.Point(196, 319)
         Me.TextBoxHargaNett.Name = "TextBoxHargaNett"
         Me.TextBoxHargaNett.Size = New System.Drawing.Size(129, 23)
         Me.TextBoxHargaNett.TabIndex = 555
@@ -1666,7 +1696,7 @@ Partial Class MasterTindakanKlinik
         Me.TextBox1.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
         Me.TextBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.TextBox1.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.TextBox1.Location = New System.Drawing.Point(159, 256)
+        Me.TextBox1.Location = New System.Drawing.Point(159, 290)
         Me.TextBox1.Name = "TextBox1"
         Me.TextBox1.Size = New System.Drawing.Size(35, 23)
         Me.TextBox1.TabIndex = 554
@@ -1677,7 +1707,7 @@ Partial Class MasterTindakanKlinik
         '
         Me.Label7.AutoSize = True
         Me.Label7.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label7.Location = New System.Drawing.Point(28, 256)
+        Me.Label7.Location = New System.Drawing.Point(28, 290)
         Me.Label7.Name = "Label7"
         Me.Label7.Size = New System.Drawing.Size(49, 17)
         Me.Label7.TabIndex = 553
@@ -1688,7 +1718,7 @@ Partial Class MasterTindakanKlinik
         Me.TextBoxTotalDiskon.BackColor = System.Drawing.Color.White
         Me.TextBoxTotalDiskon.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.TextBoxTotalDiskon.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxTotalDiskon.Location = New System.Drawing.Point(196, 256)
+        Me.TextBoxTotalDiskon.Location = New System.Drawing.Point(196, 290)
         Me.TextBoxTotalDiskon.Name = "TextBoxTotalDiskon"
         Me.TextBoxTotalDiskon.Size = New System.Drawing.Size(129, 23)
         Me.TextBoxTotalDiskon.TabIndex = 552
@@ -1704,7 +1734,7 @@ Partial Class MasterTindakanKlinik
         Me.ButtonHapusDetailTindakan.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonHapusDetailTindakan.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold)
         Me.ButtonHapusDetailTindakan.ForeColor = System.Drawing.Color.White
-        Me.ButtonHapusDetailTindakan.Location = New System.Drawing.Point(159, 314)
+        Me.ButtonHapusDetailTindakan.Location = New System.Drawing.Point(159, 348)
         Me.ButtonHapusDetailTindakan.Name = "ButtonHapusDetailTindakan"
         Me.ButtonHapusDetailTindakan.RightToLeft = System.Windows.Forms.RightToLeft.Yes
         Me.ButtonHapusDetailTindakan.Size = New System.Drawing.Size(166, 25)
@@ -1718,7 +1748,7 @@ Partial Class MasterTindakanKlinik
         Me.TextBox12.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
         Me.TextBox12.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.TextBox12.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.TextBox12.Location = New System.Drawing.Point(159, 227)
+        Me.TextBox12.Location = New System.Drawing.Point(159, 261)
         Me.TextBox12.Name = "TextBox12"
         Me.TextBox12.Size = New System.Drawing.Size(35, 23)
         Me.TextBox12.TabIndex = 549
@@ -1753,7 +1783,7 @@ Partial Class MasterTindakanKlinik
         Me.ButtonDetailTindakanPaket.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonDetailTindakanPaket.Font = New System.Drawing.Font("Segoe UI", 9.0!)
         Me.ButtonDetailTindakanPaket.ForeColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
-        Me.ButtonDetailTindakanPaket.Location = New System.Drawing.Point(331, 314)
+        Me.ButtonDetailTindakanPaket.Location = New System.Drawing.Point(331, 348)
         Me.ButtonDetailTindakanPaket.Name = "ButtonDetailTindakanPaket"
         Me.ButtonDetailTindakanPaket.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.ButtonDetailTindakanPaket.Size = New System.Drawing.Size(155, 25)
@@ -1795,7 +1825,7 @@ Partial Class MasterTindakanKlinik
         Me.ButtonKalkulasiPaket.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonKalkulasiPaket.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
         Me.ButtonKalkulasiPaket.ForeColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(254, Byte), Integer))
-        Me.ButtonKalkulasiPaket.Location = New System.Drawing.Point(331, 283)
+        Me.ButtonKalkulasiPaket.Location = New System.Drawing.Point(331, 317)
         Me.ButtonKalkulasiPaket.Name = "ButtonKalkulasiPaket"
         Me.ButtonKalkulasiPaket.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.ButtonKalkulasiPaket.Size = New System.Drawing.Size(155, 25)
@@ -1870,7 +1900,7 @@ Partial Class MasterTindakanKlinik
         '
         Me.Label1.AutoSize = True
         Me.Label1.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label1.Location = New System.Drawing.Point(28, 227)
+        Me.Label1.Location = New System.Drawing.Point(28, 261)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(78, 17)
         Me.Label1.TabIndex = 535
@@ -1881,7 +1911,7 @@ Partial Class MasterTindakanKlinik
         Me.TextBoxHargaAwal.BackColor = System.Drawing.Color.White
         Me.TextBoxHargaAwal.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.TextBoxHargaAwal.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxHargaAwal.Location = New System.Drawing.Point(196, 227)
+        Me.TextBoxHargaAwal.Location = New System.Drawing.Point(196, 261)
         Me.TextBoxHargaAwal.Name = "TextBoxHargaAwal"
         Me.TextBoxHargaAwal.Size = New System.Drawing.Size(129, 23)
         Me.TextBoxHargaAwal.TabIndex = 534
@@ -1968,7 +1998,7 @@ Partial Class MasterTindakanKlinik
         Me.GridControlTindakan.Location = New System.Drawing.Point(0, 0)
         Me.GridControlTindakan.MainView = Me.GridViewTindakan
         Me.GridControlTindakan.Name = "GridControlTindakan"
-        Me.GridControlTindakan.Size = New System.Drawing.Size(757, 230)
+        Me.GridControlTindakan.Size = New System.Drawing.Size(757, 200)
         Me.GridControlTindakan.TabIndex = 186
         Me.GridControlTindakan.ViewCollection.AddRange(New DevExpress.XtraGrid.Views.Base.BaseView() {Me.GridViewTindakan})
         '
@@ -1980,6 +2010,37 @@ Partial Class MasterTindakanKlinik
         Me.GridViewTindakan.OptionsView.ShowGroupPanel = False
         Me.GridViewTindakan.OptionsView.ShowIndicator = False
         Me.GridViewTindakan.PaintStyleName = "Skin"
+        '
+        'Label35
+        '
+        Me.Label35.AutoSize = True
+        Me.Label35.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label35.Location = New System.Drawing.Point(28, 202)
+        Me.Label35.Name = "Label35"
+        Me.Label35.Size = New System.Drawing.Size(118, 17)
+        Me.Label35.TabIndex = 578
+        Me.Label35.Text = "Informed Consent"
+        '
+        'ComboBoxICPaket
+        '
+        Me.ComboBoxICPaket.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBoxICPaket.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ComboBoxICPaket.FormattingEnabled = True
+        Me.ComboBoxICPaket.Location = New System.Drawing.Point(203, 199)
+        Me.ComboBoxICPaket.Name = "ComboBoxICPaket"
+        Me.ComboBoxICPaket.Size = New System.Drawing.Size(283, 25)
+        Me.ComboBoxICPaket.TabIndex = 580
+        '
+        'CheckBoxICPaket
+        '
+        Me.CheckBoxICPaket.AutoSize = True
+        Me.CheckBoxICPaket.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.CheckBoxICPaket.Location = New System.Drawing.Point(159, 203)
+        Me.CheckBoxICPaket.Name = "CheckBoxICPaket"
+        Me.CheckBoxICPaket.Size = New System.Drawing.Size(38, 19)
+        Me.CheckBoxICPaket.TabIndex = 579
+        Me.CheckBoxICPaket.Text = "Ya"
+        Me.CheckBoxICPaket.UseVisualStyleBackColor = True
         '
         'MasterTindakanKlinik
         '
@@ -2189,4 +2250,9 @@ Partial Class MasterTindakanKlinik
     Friend WithEvents CheckBoxReminder As System.Windows.Forms.CheckBox
     Friend WithEvents CheckedListBoxPoli As System.Windows.Forms.CheckedListBox
     Friend WithEvents CheckedListBoxPoli2 As System.Windows.Forms.CheckedListBox
+    Friend WithEvents ComboBoxKategori As System.Windows.Forms.ComboBox
+    Friend WithEvents Label34 As System.Windows.Forms.Label
+    Friend WithEvents ComboBoxICPaket As System.Windows.Forms.ComboBox
+    Friend WithEvents CheckBoxICPaket As System.Windows.Forms.CheckBox
+    Friend WithEvents Label35 As System.Windows.Forms.Label
 End Class
