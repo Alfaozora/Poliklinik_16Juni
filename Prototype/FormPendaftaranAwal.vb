@@ -916,6 +916,13 @@ Public Class FormPendaftaranAwal
                     End If
                 ElseIf GridControlTindakanPoli.MainView Is GridViewPaketPoli Then
                     If KalkulasiPaketTindakan() = True Then
+                        Dim idTindakan As String = SelectedPaketID
+                        Dim NoRM As String = TextBoxRM.Text
+
+                        If ValidasiInformedConsentPaket(NoRM, idTindakan, userInput) = False Then
+                            Exit Sub
+                        End If
+
                         If CDbl(TextBoxTotalBayar.Text) = 0 And RadioButtonKunjunganSakit.Checked = True Then
                             SimpanPenggunaanPaket()
                         Else
@@ -1588,6 +1595,8 @@ Public Class FormPendaftaranAwal
     Private Sub ButtonClearTindakan_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonClearTindakan.Click
         If GridControlTindakanPoli.MainView Is GridViewPaketPoli Then ClearGridDataPaket()
         If GridControlTindakanPoli.MainView Is GridViewTindakanPoli Then ClearGridDataTindakan()
+        NeedInformedConsent = False
+        PanelInformConsent.Visible = False
     End Sub
 
     Private Sub RadioButtonKunjunganSakit_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RadioButtonKunjunganSakit.CheckedChanged, RadioButtonkunjunganSehat.CheckedChanged
@@ -2174,14 +2183,31 @@ Public Class FormPendaftaranAwal
         FindMultiple.Query(queryString, " ORDER BY NamaPaket", "FindPemeriksaanPendaftaranPaket", 0)
     End Sub
 
+    Private NeedInformedConsent As Boolean = False
+    Private SelectedPaketID As String = ""
+
     Public Sub LoadTindakanPaket(ByRef rowPaket() As DataRow)
         If ValidasiTambahPaketTindakan(rowPaket) = True Then
             Dim tblTindakan As DataTable = GridControlTindakanPoli.DataSource
             tblTindakan.AcceptChanges()
+
+            NeedInformedConsent = False
+            PanelInformConsent.Visible = False
+
             If rowPaket.Count > 0 Then
                 For i As Integer = 0 To rowPaket.Length - 1
                     Dim tblPaket As DataTable = ReadSQL("SELECT * FROM MasterPaketTindakan WHERE PaketID = '" & rowPaket(i)("PaketID").ToString() & "'")
                     For Each Trow As DataRow In tblPaket.Rows
+
+                        If Not IsDBNull(Trow("StatusInformedConsent")) Then
+                            If CBool(Trow("StatusInformedConsent")) = True Then
+                                NeedInformedConsent = True
+                                PanelInformConsent.Visible = True
+                            End If
+                        End If
+
+                        SelectedPaketID = Trow("PaketID").ToString()
+
                         Dim Tnew As DataRow = tblTindakan.NewRow
                         Tnew("PaketID") = Trow("PaketID")
                         Tnew("Nama Paket") = Trow("NamaPaket")
@@ -2521,14 +2547,18 @@ Public Class FormPendaftaranAwal
         End If
     End Sub
 
-    'Private Sub ButtonInputInformedConsent_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonInputInformedConsent.Click
-    '    Try
-    '        Dim statusPersetujuan As Boolean = RadioButtonSetujuInformedConsent.Checked
+    Private Sub ButtonInputInformedConsent_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonInputInformedConsent.Click
+        Try
+            Dim statusPersetujuan As Boolean = RadioButtonSetujuInformedConsent.Checked
+            Dim tblsRekamMedis As String = TextBoxRM.Text
+            Dim namaDokter As String = ComboBoxPilihanDokter.Text
+            Dim namaPerawat As String = ComboBoxPilihanPerawat.Text
+            Dim poli As String = ComboBoxPoliTujuan.Text
 
-    '        FormInputInformedConsent.SetForm("RekamMedisPerencanaanTindakan", tblsRekamMedis, TextBoxTindakanID.Text, statusPersetujuan, jenisTransaksi)
-    '        FormInputInformedConsent.ShowDialog()
-    '    Catch ex As Exception
-    '        MsgBox(ex.Message, MsgBoxStyle.Critical, "Warning!")
-    '    End Try
-    'End Sub
+            FormICPaket.SetFormPaket("InformConsentPaketTindakan", TextBoxRM.Text, SelectedPaketID, statusPersetujuan, poli, namaDokter, namaPerawat)
+            FormICPaket.ShowDialog()
+        Catch ex As Exception
+            MsgBox(ex.Message, MsgBoxStyle.Critical, "Warning!")
+        End Try
+    End Sub
 End Class

@@ -2387,7 +2387,7 @@ Public Class FormRekamMedisDokter
         Try
             Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
 
-            Dim urlWebService As String = baseURL & "api/lumiera-luzelle/" & idTransaksi & "/" & TextBoxTindakanID.Text
+            Dim urlWebService As String = baseURL & "api/lumiera-luzelle/ic/tindakan/" & idTransaksi & "/" & TextBoxTindakanID.Text
 
             Dim response As String = GetDataAPIRM(urlWebService)
 
@@ -2641,9 +2641,9 @@ Public Class FormRekamMedisDokter
 
             ' --- Tampilkan hasil ---
             If status = "success" Then
-                MsgBox("Data berhasil dikirim ke API ERM." & vbCrLf & _
-                       "Pesan: " & message & vbCrLf & _
-                       "Dengan ID: " & insertedId)
+                'MsgBox("Data berhasil dikirim ke API ERM." & vbCrLf & _
+                '       "Pesan: " & message & vbCrLf & _
+                '       "Dengan ID: " & insertedId)
             Else
                 MsgBox("API mengembalikan status gagal: " & status & vbCrLf & message)
             End If
@@ -2652,6 +2652,60 @@ Public Class FormRekamMedisDokter
             MsgBox("Gagal kirim ke API: " & ex.Message)
         End Try
     End Sub
+
+    Private Sub SendToApiInbody(ByVal nama As String, ByVal genderInbody As String, ByVal tglLahirStr As String, ByVal umur As String, ByVal tinggiUserInbody As String, ByVal orderDateStr As String)
+        Try
+            Dim USER_ID As String = idPasien
+            Dim USER_NAME As String = nama
+            Dim USER_GENDER As String = genderInbody
+            Dim USER_BIRTHDAY As String = tglLahirStr
+            Dim USER_AGE As Integer = umur
+            Dim USER_HEIGHT As Integer = tinggiUserInbody
+            Dim ORDER_DATE As String = orderDateStr
+
+
+            Dim json As String = _
+                "{" & _
+                """USER_ID"":""" & USER_ID & """," & _
+                """USER_NAME"":""" & USER_NAME & """," & _
+                """USER_GENDER"":""" & USER_GENDER & """," & _
+                """USER_BIRTHDAY"":""" & USER_BIRTHDAY & """," & _
+                """USER_AGE"":" & USER_AGE & "," & _
+                """USER_HEIGHT"":" & USER_HEIGHT & "," & _
+                """ORDER_DATE"":""" & ORDER_DATE & """" & _
+                "}"
+
+            Dim baseUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+
+            Dim urlWebService As String = baseUrl & "api/lumiera-luzelle/inbody/create"
+
+            Dim response As String = InsertDataAPIRM(json, urlWebService)
+
+            Dim result As JObject = JObject.Parse(response)
+
+            Dim isResult As Boolean = CBool(result("IsResult"))
+            Dim errorMsg As String = result("ErrorMsg").ToString()
+
+            If isResult = True Then
+
+                Dim info As JArray = CType(result("INBODY_USER_INFO"), JArray)
+
+                Dim uid As String = info(0)("USER_ID").ToString()
+                Dim orderDate As String = info(0)("ORDER_DATE").ToString()
+
+                MsgBox("Data Inbody berhasil dikirim." & vbCrLf & _
+                    "USER_ID : " & uid & vbCrLf & _
+                    "ORDER_DATE : " & orderDate, MsgBoxStyle.Information)
+
+            Else
+                MsgBox("Gagal kirim data Inbody." & vbCrLf & errorMsg, MsgBoxStyle.Critical)
+            End If
+
+        Catch ex As Exception
+            MsgBox("Gagal kirim ke API Inbody: " & ex.Message)
+        End Try
+    End Sub
+
 
     Private Sub SavePemeriksaanFisik()
         Try
@@ -2706,18 +2760,36 @@ Public Class FormRekamMedisDokter
                              "VALUES('" & idTransaksi & "', '" & GetKeadaanUmum("Medik") & "', '" & GetKesadaran("Medik") & "', '" & TrackBarSkalaNyeriMedik.Value.ToString() & "', '" & TextBoxSistoleMedik.Text & "', '" & TextBoxDiastoleMedik.Text & "', '" & TextBoxDetakNadiMedik.Text & "', " & _
                                     "'" & TextBoxNafasMedik.Text & "', '" & TextBoxSuhuMedik.Text & "', '" & TextBoxSaturasiMedik.Text & "', '" & TextBoxTinggiBadanMedik.Text & "', '" & TextBoxBeratBadanMedik.Text & "', '" & TextBoxLingkarPerutMedik.Text & "', '" & TextBoxIndeksMedik.Text & "', '" & TextBoxIndeksKeteranganMedik.Text & "', '" & userInput & "', GETDATE())", 4)
 
-                    WriteSQL( _
-                         "INSERT INTO Inbody_User_Info " & _
-                         "(USER_ID, USER_NAME, USER_GENDER, USER_BIRTHDAY, USER_AGE, USER_HEIGHT, ORDER_DATE) " & _
-                         "VALUES (" & _
-                         "'" & idTransaksi & "', " & _
-                         "'" & nama & "', " & _
-                         "'" & genderInbody & "', " & _
-                         "'" & tglLahirStr & "', " & _
-                         umur & ", " & _
-                         "'" & TextBoxTinggiBadanMedik.Text & "', " & _
-                         "'" & orderDateStr & "'" & _
-                         ")", 4)
+                    Dim tinggiUserInbody As String = TextBoxTinggiBadanMedik.Text
+
+                    Dim result As DialogResult
+
+                    result = MessageBox.Show( _
+                        "Apakah data akan dikirim ke mesin Inbody?" & vbCrLf & vbCrLf & _
+                        "Nama : " & nama & vbCrLf & _
+                        "Jenis Kelamin : " & genderInbody & vbCrLf & _
+                        "Tanggal Lahir : " & tglLahirStr & vbCrLf & _
+                        "Umur : " & umur & vbCrLf & _
+                        "Tinggi Badan : " & tinggiUserInbody & " cm" & vbCrLf & _
+                        "Tanggal Order : " & orderDateStr, "Konfirmasi Kirim Data Inbody", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+
+                    If result = DialogResult.Yes Then
+                        SendToApiInbody(nama, genderInbody, tglLahirStr, umur, tinggiUserInbody, orderDateStr)
+                    End If
+
+
+                    'WriteSQL( _
+                    '     "INSERT INTO Inbody_User_Info " & _
+                    '     "(USER_ID, USER_NAME, USER_GENDER, USER_BIRTHDAY, USER_AGE, USER_HEIGHT, ORDER_DATE) " & _
+                    '     "VALUES (" & _
+                    '     "'" & idTransaksi & "', " & _
+                    '     "'" & nama & "', " & _
+                    '     "'" & genderInbody & "', " & _
+                    '     "'" & tglLahirStr & "', " & _
+                    '     umur & ", " & _
+                    '     "'" & TextBoxTinggiBadanMedik.Text & "', " & _
+                    '     "'" & orderDateStr & "'" & _
+                    '     ")", 4)
 
                     ' Update status transaksi menjadi > Sudah dilakukan TTV
                     If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
@@ -2751,7 +2823,24 @@ Public Class FormRekamMedisDokter
 
                     WriteSQL("UPDATE TransaksiDetailFisik SET " & parameterUpdate & " WHERE NoTransaksi = '" & idTransaksi & "'", 4)
 
-                    WriteSQL("UPDATE Inbody_User_Info SET " & parameterUpdateInbody & " WHERE USER_ID = '" & idTransaksi & "'", 4)
+                    'WriteSQL("UPDATE Inbody_User_Info SET " & parameterUpdateInbody & " WHERE USER_ID = '" & idTransaksi & "'", 4)
+
+                    Dim tinggiUserInbody As String = TextBoxTinggiBadanMedik.Text
+
+                    Dim result As DialogResult
+
+                    result = MessageBox.Show( _
+                        "Apakah data akan dikirim ke mesin Inbody?" & vbCrLf & vbCrLf & _
+                        "Nama : " & nama & vbCrLf & _
+                        "Jenis Kelamin : " & genderInbody & vbCrLf & _
+                        "Tanggal Lahir : " & tglLahirStr & vbCrLf & _
+                        "Umur : " & umur & vbCrLf & _
+                        "Tinggi Badan : " & tinggiUserInbody & " cm" & vbCrLf & _
+                        "Tanggal Order : " & orderDateStr, "Konfirmasi Kirim Data Inbody", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+
+                    If result = DialogResult.Yes Then
+                        SendToApiInbody(nama, genderInbody, tglLahirStr, umur, tinggiUserInbody, orderDateStr)
+                    End If
 
                     If statusAPI IsNot Nothing AndAlso statusAPI = "Yes" Then
                         If ApiCekPasien(noRM) = False Then

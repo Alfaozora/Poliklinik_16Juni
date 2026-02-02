@@ -498,6 +498,12 @@
     <Compile Include="Prototype\FormBandingGambar.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Prototype\FormICPaket.Designer.vb">
+      <DependentUpon>FormICPaket.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormICPaket.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Prototype\FormInputInformedConsent.Designer.vb">
       <DependentUpon>FormInputInformedConsent.vb</DependentUpon>
     </Compile>
@@ -827,6 +833,7 @@
     <Compile Include="Prototype\KYC.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Prototype\ModuleInformedConsent.vb" />
     <Compile Include="Prototype\PCareModule.vb" />
     <Compile Include="Prototype\PopUpVoucher.Designer.vb">
       <DependentUpon>PopUpVoucher.vb</DependentUpon>
@@ -1480,6 +1487,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormBandingGambar.resx">
       <DependentUpon>FormBandingGambar.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormICPaket.resx">
+      <DependentUpon>FormICPaket.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormInputInformedConsent.resx">
       <DependentUpon>FormInputInformedConsent.vb</DependentUpon>
