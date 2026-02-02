@@ -916,6 +916,13 @@ Public Class FormPendaftaranAwal
                     End If
                 ElseIf GridControlTindakanPoli.MainView Is GridViewPaketPoli Then
                     If KalkulasiPaketTindakan() = True Then
+                        Dim idTindakan As String = SelectedPaketID
+                        Dim NoRM As String = TextBoxRM.Text
+
+                        If ValidasiInformedConsentPaket(NoRM, idTindakan, userInput) = False Then
+                            Exit Sub
+                        End If
+
                         If CDbl(TextBoxTotalBayar.Text) = 0 And RadioButtonKunjunganSakit.Checked = True Then
                             SimpanPenggunaanPaket()
                         Else
@@ -2177,6 +2184,7 @@ Public Class FormPendaftaranAwal
     End Sub
 
     Private NeedInformedConsent As Boolean = False
+    Private SelectedPaketID As String = ""
 
     Public Sub LoadTindakanPaket(ByRef rowPaket() As DataRow)
         If ValidasiTambahPaketTindakan(rowPaket) = True Then
@@ -2197,6 +2205,8 @@ Public Class FormPendaftaranAwal
                                 PanelInformConsent.Visible = True
                             End If
                         End If
+
+                        SelectedPaketID = Trow("PaketID").ToString()
 
                         Dim Tnew As DataRow = tblTindakan.NewRow
                         Tnew("PaketID") = Trow("PaketID")
@@ -2537,14 +2547,18 @@ Public Class FormPendaftaranAwal
         End If
     End Sub
 
-    'Private Sub ButtonInputInformedConsent_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonInputInformedConsent.Click
-    '    Try
-    '        Dim statusPersetujuan As Boolean = RadioButtonSetujuInformedConsent.Checked
+    Private Sub ButtonInputInformedConsent_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonInputInformedConsent.Click
+        Try
+            Dim statusPersetujuan As Boolean = RadioButtonSetujuInformedConsent.Checked
+            Dim tblsRekamMedis As String = TextBoxRM.Text
+            Dim namaDokter As String = ComboBoxPilihanDokter.Text
+            Dim namaPerawat As String = ComboBoxPilihanPerawat.Text
+            Dim poli As String = ComboBoxPoliTujuan.Text
 
-    '        FormInputInformedConsent.SetForm("RekamMedisPerencanaanTindakan", tblsRekamMedis, TextBoxTindakanID.Text, statusPersetujuan, jenisTransaksi)
-    '        FormInputInformedConsent.ShowDialog()
-    '    Catch ex As Exception
-    '        MsgBox(ex.Message, MsgBoxStyle.Critical, "Warning!")
-    '    End Try
-    'End Sub
+            FormICPaket.SetFormPaket("InformConsentPaketTindakan", TextBoxRM.Text, SelectedPaketID, statusPersetujuan, poli, namaDokter, namaPerawat)
+            FormICPaket.ShowDialog()
+        Catch ex As Exception
+            MsgBox(ex.Message, MsgBoxStyle.Critical, "Warning!")
+        End Try
+    End Sub
 End Class

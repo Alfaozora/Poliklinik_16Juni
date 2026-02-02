@@ -3323,41 +3323,64 @@ Module Test
         End Try
     End Sub
 
-    Public Function InsertDataAPIRM(ByVal parameter As String, ByVal uri As String) As String
-        Dim bytearr() As Byte = Encoding.UTF8.GetBytes(parameter)
+    'Public Function InsertDataAPIRM(ByVal jsonString As String, ByVal url As String) As String
+    '    Try
+    '        Using client As New System.Net.WebClient()
+
+    '            client.Encoding = Encoding.UTF8
+    '            client.Headers.Add("Content-Type", "application/json")
+    '            client.Headers.Add("Accept", "application/json")
+    '            client.Headers.Add("X-API-KEY", "M1tR4M3D1c@rECaH4Y42025")
+
+    '            ' 🔥 INI PENTING
+    '            ServicePointManager.Expect100Continue = False
+
+    '            Dim response As String = client.UploadString(url, "POST", jsonString)
+
+    '            Return response
+    '        End Using
+
+    '    Catch ex As WebException
+    '        If ex.Response IsNot Nothing Then
+    '            Using sr As New StreamReader(ex.Response.GetResponseStream())
+    '                Return sr.ReadToEnd()
+    '            End Using
+    '        End If
+
+    '        Return "{""metaData"":{""code"":500},""message"":""" & ex.Message & """}"
+    '    End Try
+    'End Function
+
+    Public Function InsertDataAPIRM(ByVal json As String, ByVal url As String) As String
         Try
-            Dim webreq As HttpWebRequest = WebRequest.Create(uri)
-            webreq.Accept = "application/json"
-            webreq.Method = "POST"
-            webreq.ContentType = "application/json"
-            webreq.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
-            webreq.Headers.Add("X-API-KEY", "M1tR4M3D1c@rECaH4Y42025")
-            webreq.ContentLength = bytearr.Length
+            ServicePointManager.Expect100Continue = True
+            ServicePointManager.SecurityProtocol = CType(3072, SecurityProtocolType)
 
-            Using dataStream As Stream = webreq.GetRequestStream()
-                dataStream.Write(bytearr, 0, bytearr.Length)
-            End Using
+            Dim client As New Net.WebClient()
+            client.Encoding = Encoding.UTF8
 
-            Dim res As WebResponse = webreq.GetResponse()
-            Using stream As Stream = res.GetResponseStream()
-                Using streamReader As New StreamReader(stream)
-                    Return streamReader.ReadToEnd()
-                End Using
-            End Using
+            client.Headers.Clear()
+            client.Headers.Add("Content-Type", "application/json")
+            client.Headers.Add("Accept", "application/json")
+            client.Headers.Add("X-API-KEY", "M1tR4M3D1c@rECaH4Y42025")
+
+            client.Headers.Add("User-Agent", "PostmanRuntime/7.36.0")
+
+            Dim response As String = client.UploadString(url, "POST", json)
+
+            Return response
 
         Catch ex As WebException
             If ex.Response IsNot Nothing Then
-                Using responseStream As Stream = ex.Response.GetResponseStream()
-                    Using reader As New StreamReader(responseStream)
-                        Return reader.ReadToEnd() ' <-- jangan bungkus pakai [ ]
-                    End Using
+                Using sr As New StreamReader(ex.Response.GetResponseStream())
+                    Return sr.ReadToEnd()
                 End Using
-            Else
-                ' Buat JSON error agar tetap bisa di-parse
-                Return "{""status"":""error"",""message"":""" & ex.Message & """}"
             End If
+
+            Return "{""metaData"":{""code"":500},""message"":""" & ex.Message & """}"
         End Try
     End Function
+
 
     Public Function GetDataAPIRM(ByVal uri As String) As String
         Try

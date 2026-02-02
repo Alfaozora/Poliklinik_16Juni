@@ -365,6 +365,10 @@ Public Class Find
                     MasterGroupTestLab.LoadPaketID(Grdrow(0).ToString)
                 Case "FindPaketTindakanKlinik"
                     MasterTindakanKlinik.LoadDetailPaket(Grdrow("PaketID").ToString)
+                Case "FindMasterAlat"
+                    MasterTindakanKlinik.LoadDetailAlat(Grdrow("AlatID").ToString)
+                Case "FindMasterAlatTindakan"
+                    MasterTindakanKlinik.LoadDetailAlatTindakan(Grdrow("AlatID").ToString)
                 Case "FindInvoiceLab"
                     FormInvoiceLab.LoadPasien(Grdrow("RekapID").ToString)
                 Case "FindRefundLab"
