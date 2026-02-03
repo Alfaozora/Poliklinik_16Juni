@@ -654,6 +654,48 @@ Module Test
         End Try
     End Sub
 
+    Public Class DBTransaction
+
+        Private Conn As SqlConnection
+        Private Tran As SqlTransaction
+        Private Cmd As SqlCommand
+
+        Public Sub BeginTransaction()
+            Conn = New SqlConnection(PusatSQL.Con.ConnectionString)
+            Conn.Open()
+            Tran = Conn.BeginTransaction()
+        End Sub
+
+        Public Sub Execute(ByVal sql As String)
+            Cmd = New SqlCommand(sql, Conn, Tran)
+            Cmd.ExecuteNonQuery()
+        End Sub
+
+        Public Sub Commit()
+            Tran.Commit()
+            Conn.Close()
+        End Sub
+
+        Public Sub Rollback()
+            Tran.Rollback()
+            Conn.Close()
+        End Sub
+
+    End Class
+
+    Public Function ReadSQLScalar(ByVal sql As String) As Object
+        Dim result As Object = Nothing
+
+        Using con As New SqlConnection(PusatSQL.Con.ConnectionString)
+            Using cmd As New SqlCommand(sql, con)
+                con.Open()
+                result = cmd.ExecuteScalar()
+            End Using
+        End Using
+
+        Return result
+    End Function
+
     Public Sub WriteSQL(ByVal Txt As String, ByRef Txtype As Integer)
         Dim Dbsql As New DBSQLConn
         Dim Dbsql2 As New DBSQLConn

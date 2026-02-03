@@ -43,6 +43,7 @@ Partial Class MasterTindakanKlinik
         Me.SplitContainer3 = New System.Windows.Forms.SplitContainer
         Me.PanelMasterTindakan = New System.Windows.Forms.Panel
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
+        Me.Label41 = New System.Windows.Forms.Label
         Me.ButtonCariAlatTindakan = New System.Windows.Forms.Button
         Me.NumericShootPerTindakan = New System.Windows.Forms.NumericUpDown
         Me.TextBoxNamaAlatTindakan = New System.Windows.Forms.TextBox
@@ -560,6 +561,7 @@ Partial Class MasterTindakanKlinik
         '
         'GroupBox2
         '
+        Me.GroupBox2.Controls.Add(Me.Label41)
         Me.GroupBox2.Controls.Add(Me.ButtonCariAlatTindakan)
         Me.GroupBox2.Controls.Add(Me.NumericShootPerTindakan)
         Me.GroupBox2.Controls.Add(Me.TextBoxNamaAlatTindakan)
@@ -571,6 +573,16 @@ Partial Class MasterTindakanKlinik
         Me.GroupBox2.TabIndex = 578
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Pakai Alat ?"
+        '
+        'Label41
+        '
+        Me.Label41.AutoSize = True
+        Me.Label41.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label41.Location = New System.Drawing.Point(79, 88)
+        Me.Label41.Name = "Label41"
+        Me.Label41.Size = New System.Drawing.Size(78, 17)
+        Me.Label41.TabIndex = 582
+        Me.Label41.Text = "Kali / Shoot"
         '
         'ButtonCariAlatTindakan
         '
@@ -597,7 +609,7 @@ Partial Class MasterTindakanKlinik
         Me.NumericShootPerTindakan.Location = New System.Drawing.Point(15, 86)
         Me.NumericShootPerTindakan.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.NumericShootPerTindakan.Name = "NumericShootPerTindakan"
-        Me.NumericShootPerTindakan.Size = New System.Drawing.Size(153, 23)
+        Me.NumericShootPerTindakan.Size = New System.Drawing.Size(58, 23)
         Me.NumericShootPerTindakan.TabIndex = 580
         Me.NumericShootPerTindakan.Value = New Decimal(New Integer() {1, 0, 0, 0})
         '
@@ -2748,4 +2760,5 @@ Partial Class MasterTindakanKlinik
     Friend WithEvents TextBoxNamaAlatTindakan As System.Windows.Forms.TextBox
     Friend WithEvents TextBoxAlatIdTindakan As System.Windows.Forms.TextBox
     Friend WithEvents ButtonCariAlatTindakan As System.Windows.Forms.Button
+    Friend WithEvents Label41 As System.Windows.Forms.Label
 End Class
