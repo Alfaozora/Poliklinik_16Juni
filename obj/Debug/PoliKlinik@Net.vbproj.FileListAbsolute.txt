@@ -3259,3 +3259,4 @@ C:\Users\admin\Documents\GitHub\Poliklinik_16Juni\obj\Debug\PoliKlinik_Net2.Dial
 C:\Users\admin\Documents\GitHub\Poliklinik_16Juni\obj\Debug\PoliKlinik_Net2.WhatsAppSetting.resources
 C:\Users\admin\Documents\GitHub\Poliklinik_16Juni\obj\Debug\PoliKlinik_Net2.ToggleSwitch.resources
 C:\Users\admin\Documents\GitHub\Poliklinik_16Juni\obj\Debug\PoliKlinik_Net2.FormICPaket.resources
+C:\Users\admin\Documents\GitHub\Poliklinik_16Juni\obj\Debug\PoliKlinik_Net2.FormPenerimaanBarang.resources
