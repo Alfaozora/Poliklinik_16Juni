@@ -50,6 +50,7 @@ Public Class FormPenerimaanBarang
 
             For Each item As JObject In dataArray
 
+                Dim trmerm As String = item("id").ToString()
                 Dim kodeAset As String = item("kode_aset").ToString()
                 Dim namaAset As String = item("nama_aset").ToString()
                 Dim jumlah As Integer = CInt(item("jumlah"))
@@ -75,12 +76,14 @@ Public Class FormPenerimaanBarang
                 ' Insert ke staging
                 WriteSQL( _
                     "INSERT INTO TempApiKuotaAlat " & _
-                    "(KodeAset, NamaAset, Jumlah, AlatID, CreatedBy) VALUES (" & _
+                    "(KodeAset, NamaAset, Jumlah, AlatID, CreatedBy, Trmerm) VALUES (" & _
                     "'" & kodeAset & "'," & _
                     "'" & namaAset.Replace("'", "''") & "'," & _
                     jumlah & "," & _
                     alatIDValue & "," & _
-                    "'" & userInput & "')", 4)
+                    "'" & userInput & "'," & _
+                    "'" & trmerm & "'" & _
+                    ")", 4)
 
             Next
 
@@ -103,6 +106,7 @@ Public Class FormPenerimaanBarang
              "KodeAset, " & _
              "NamaAset, " & _
              "Jumlah, " & _
+             "Trmerm, " & _
              "CASE WHEN AlatID IS NULL THEN 'TIDAK DITEMUKAN' ELSE 'COCOK' END AS StatusMapping, " & _
              "CASE WHEN AlatID IS NULL THEN 0 ELSE 1 END AS IsMapped " & _
              "FROM TempApiKuotaAlat " & _
@@ -144,6 +148,7 @@ Public Class FormPenerimaanBarang
         DataGridViewBarang.Columns("NamaAset").ReadOnly = True
         DataGridViewBarang.Columns("Jumlah").ReadOnly = True
         DataGridViewBarang.Columns("StatusMapping").ReadOnly = True
+        DataGridViewBarang.Columns("Trmerm").Visible = True
 
         ' Alignment
         DataGridViewBarang.Columns("Jumlah").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
@@ -337,6 +342,48 @@ Public Class FormPenerimaanBarang
             Next
 
             dbTran.Commit()
+
+            Dim dtTrmerm As DataTable = ReadSQL( _
+                "SELECT DISTINCT Trmerm " & _
+                "FROM TempApiKuotaAlat " & _
+                "WHERE IsSelected = 1 " & _
+                "AND CreatedBy = '" & userInput & "'")
+
+            For Each r As DataRow In dtTrmerm.Rows
+
+                Dim trmerm As String = r("Trmerm").ToString()
+                If trmerm = "" Then Continue For
+
+                Try
+                    Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+
+                    If Not baseURL.EndsWith("/") Then baseURL &= "/"
+
+                    Dim url As String = baseURL & "api/lumiera-luzelle/approve-kuota"
+
+                    Dim jsonParam As String = "{""trmerm"":""" & trmerm & """}"
+
+                    Dim client As New WebClient()
+                    client.Headers.Add("Content-Type", "application/json")
+                    client.Headers.Add("X-API-KEY", "M1tR4M3D1c@rECaH4Y42025")
+
+                    Dim response As String = client.UploadString(url, "POST", jsonParam)
+
+                    WriteSQL( _
+                            "UPDATE TempApiKuotaAlat SET IsApprovedGudang = 1 " & _
+                            "WHERE Trmerm = '" & trmerm & "'", 4)
+
+                    ' Optional: cek respon
+                    If Not response.ToLower().Contains("success") Then
+                        MsgBox("Approve gudang gagal untuk ID: " & trmerm, MsgBoxStyle.Exclamation)
+                    End If
+
+                Catch ex As Exception
+                    MsgBox("Gagal mengirim approve ke gudang (" & trmerm & "): " & ex.Message, MsgBoxStyle.Exclamation)
+                End Try
+
+            Next
+
 
             MsgBox("Top up kuota berhasil diproses.", MsgBoxStyle.Information)
 
