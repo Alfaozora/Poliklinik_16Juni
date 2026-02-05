@@ -1333,7 +1333,7 @@ Public Class MasterTindakanKlinik
     End Sub
 
     Private Sub HitungKuotaSisa()
-        Dim kuotaTotal As Integer = CInt(NumericKuotaTotal.Value)
+        Dim kuotaTotal As Integer = CInt(NumericKuotaAwal.Value)
         Dim kuotaTerpakai As Integer = 0
 
         Integer.TryParse(TextBoxKuotaTerpakai.Text, kuotaTerpakai)
@@ -1341,7 +1341,7 @@ Public Class MasterTindakanKlinik
         TextBoxKuotaSisa.Text = (kuotaTotal - kuotaTerpakai).ToString()
     End Sub
 
-    Private Sub NumericKuotaTotal_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles NumericKuotaTotal.ValueChanged
+    Private Sub NumericKuotaTotal_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles NumericKuotaAwal.ValueChanged
         HitungKuotaSisa()
     End Sub
 
@@ -1354,7 +1354,7 @@ Public Class MasterTindakanKlinik
         TextBoxNamaAlat.Text = ""
 
         ' Reset kuota
-        NumericKuotaTotal.Value = 1
+        NumericKuotaAwal.Value = 1
         TextBoxKuotaTerpakai.Text = "0"
         TextBoxKuotaSisa.Text = "0"
 
@@ -1381,7 +1381,7 @@ Public Class MasterTindakanKlinik
         TextBoxKodeAlat.Text = row.Cells("KodeAlat").Value.ToString()
         TextBoxNamaAlat.Text = row.Cells("NamaAlat").Value.ToString()
 
-        NumericKuotaTotal.Value = CInt(row.Cells("KuotaTotal").Value)
+        NumericKuotaAwal.Value = CInt(row.Cells("KuotaTotal").Value)
         TextBoxKuotaTerpakai.Text = row.Cells("KuotaTerpakai").Value.ToString()
         TextBoxKuotaSisa.Text = row.Cells("KuotaSisa").Value.ToString()
 
@@ -1404,6 +1404,7 @@ Public Class MasterTindakanKlinik
 
             .Columns("KodeAlat").HeaderText = "Kode"
             .Columns("NamaAlat").HeaderText = "Nama Alat"
+            .Columns("KuotaAwal").HeaderText = "Kuota Awal"
             .Columns("KuotaTotal").HeaderText = "Kuota Total"
             .Columns("KuotaTerpakai").HeaderText = "Terpakai"
             .Columns("KuotaSisa").HeaderText = "Sisa"
@@ -1435,7 +1436,7 @@ Public Class MasterTindakanKlinik
 
         Dim sql As String = ""
         sql = "SELECT " & _
-              "AlatID, KodeAlat, NamaAlat, KuotaTotal, KuotaTerpakai, " & _
+              "AlatID, KodeAlat, NamaAlat, KuotaAwal, KuotaTotal, KuotaTerpakai, " & _
               "(KuotaTotal - KuotaTerpakai) AS KuotaSisa, IsAktif " & _
               "FROM MasterAlat "
 
@@ -1459,15 +1460,19 @@ Public Class MasterTindakanKlinik
 
         Dim statusAktif As Integer = If(CheckBoxAlatAktif.Checked = True, 1, 0)
 
+        Dim kuotaAwal As Integer = CInt(NumericKuotaAwal.Value)
+
         WriteSQL("INSERT INTO MasterAlat " & _
-                 "(KodeAlat, NamaAlat, KuotaTotal, KuotaTerpakai, IsAktif, CreatedAt, CreatedBy) " & _
-                 "VALUES " & _
-                 "('" & TextBoxKodeAlat.Text & "', " & _
+                 "(KodeAlat, NamaAlat, KuotaTotal, KuotaTerpakai, IsAktif, CreatedAt, CreatedBy, KuotaAwal) " & _
+                 "VALUES (" & _
+                 "'" & TextBoxKodeAlat.Text & "', " & _
                  "'" & TextBoxNamaAlat.Text & "', " & _
-                 CInt(NumericKuotaTotal.Value) & ", " & _
+                 kuotaAwal & ", " & _
                  "0, " & _
                  statusAktif & ", " & _
-                 "GETDATE(), '" & userInput & "')", 4)
+                 "GETDATE(), '" & userInput & "', " & _
+                 kuotaAwal & ")", 4)
+
 
         MsgBox("Berhasil menyimpan data alat.", MsgBoxStyle.Information, "Success!")
 
@@ -1479,21 +1484,35 @@ Public Class MasterTindakanKlinik
 
         ' Ambil kuota terpakai lama
         Dim kuotaTerpakai As Integer = CInt(TextBoxKuotaTerpakai.Text)
+        Dim kuotaAwalBaru As Integer = CInt(NumericKuotaAwal.Value)
 
         ' Validasi kuota
-        If NumericKuotaTotal.Value < kuotaTerpakai Then
-            MsgBox("Kuota total tidak boleh lebih kecil dari kuota terpakai.", _
+        If kuotaAwalBaru < kuotaTerpakai Then
+            MsgBox("Kuota awal tidak boleh lebih kecil dari kuota terpakai.", _
                    MsgBoxStyle.Critical, "Validasi")
             Exit Sub
         End If
 
         Dim parameterUpdate As String = ""
-        parameterUpdate = "KodeAlat = '" & TextBoxKodeAlat.Text & "', " & _
-                          "NamaAlat = '" & TextBoxNamaAlat.Text & "', " & _
-                          "KuotaTotal = " & CInt(NumericKuotaTotal.Value) & ", " & _
+        parameterUpdate = "KodeAlat = '" & TextBoxKodeAlat.Text.Replace("'", "''") & "', " & _
+                          "NamaAlat = '" & TextBoxNamaAlat.Text.Replace("'", "''") & "', " & _
                           "IsAktif = " & statusAktif & ", " & _
                           "UpdatedAt = GETDATE(), " & _
                           "UpdatedBy = '" & userInput & "'"
+
+        ' Jika belum ada pemakaian → boleh ubah kuota awal
+        If kuotaTerpakai = 0 Then
+            parameterUpdate &= ", KuotaAwal = " & kuotaAwalBaru & _
+                               ", KuotaTotal = " & kuotaAwalBaru
+        Else
+            ' Sudah ada pemakaian → blok perubahan kuota awal
+            If kuotaAwalBaru <> CInt(NumericKuotaAwal.Text) Then
+                MsgBox("Kuota awal tidak dapat diubah karena sudah ada pemakaian." & vbCrLf & _
+                       "Gunakan fitur Top Up untuk menambah kuota.", _
+                       MsgBoxStyle.Exclamation, "Peringatan")
+                Exit Sub
+            End If
+        End If
 
         WriteSQL("UPDATE MasterAlat SET " & _
                  parameterUpdate & _
@@ -1502,6 +1521,7 @@ Public Class MasterTindakanKlinik
         MsgBox("Berhasil mengubah data alat.", MsgBoxStyle.Information, "Success!")
 
     End Sub
+
 
     Private Sub ButtonSimpanAlat_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonSimpanAlat.Click
         If TextBoxKodeAlat.Text = "" Or TextBoxNamaAlat.Text = "" Then
@@ -1525,7 +1545,7 @@ Public Class MasterTindakanKlinik
 
     Private Sub ButtonCariAlat_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCariAlat.Click
         Find.Show()
-        Find.Query("SELECT AlatID, KodeAlat, NamaAlat, KuotaTotal, KuotaTerpakai, IsAktif FROM MasterAlat ", "ORDER BY CreatedAt DESC", "FindMasterAlat", 2)
+        Find.Query("SELECT AlatID, KodeAlat, NamaAlat, KuotaAwal, KuotaTotal, KuotaTerpakai, IsAktif FROM MasterAlat ", "ORDER BY CreatedAt DESC", "FindMasterAlat", 2)
     End Sub
 
     Public Sub LoadDetailAlat(ByRef AlatID As String)
@@ -1542,19 +1562,41 @@ Public Class MasterTindakanKlinik
 
         Dim row As DataRow = dt.Rows(0)
 
+        ' Ambil nilai dengan aman
+        Dim kuotaAwal As Integer = 0
+        Dim kuotaTotal As Integer = 0
+        Dim kuotaTerpakai As Integer = 0
+
+        If Not IsDBNull(row("KuotaAwal")) Then
+            kuotaAwal = CInt(row("KuotaAwal"))
+        End If
+
+        If Not IsDBNull(row("KuotaTotal")) Then
+            kuotaTotal = CInt(row("KuotaTotal"))
+        End If
+
+        If Not IsDBNull(row("KuotaTerpakai")) Then
+            kuotaTerpakai = CInt(row("KuotaTerpakai"))
+        End If
+
+        Dim kuotaSisa As Integer = kuotaTotal - kuotaTerpakai
+
         ' Isi form
         TextBoxAlatID.Text = row("AlatID").ToString()
         TextBoxKodeAlat.Text = row("KodeAlat").ToString()
         TextBoxNamaAlat.Text = row("NamaAlat").ToString()
 
-        NumericKuotaTotal.Value = CInt(row("KuotaTotal"))
-        TextBoxKuotaTerpakai.Text = row("KuotaTerpakai").ToString()
-        TextBoxKuotaSisa.Text = (CInt(row("KuotaTotal")) - CInt(row("KuotaTerpakai"))).ToString()
+        NumericKuotaAwal.Value = kuotaAwal
+        TextBoxKuotaTotal.Text = kuotaTotal.ToString()
+        TextBoxKuotaTerpakai.Text = kuotaTerpakai.ToString()
+        TextBoxKuotaSisa.Text = kuotaSisa.ToString()
 
         CheckBoxAlatAktif.Checked = (row("IsAktif") = True)
 
         LoadGridMasterAlat(AlatID)
+
     End Sub
+
 
     Private Sub CheckBoxPakaiAlat_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckBoxPakaiAlat.CheckedChanged
         If CheckBoxPakaiAlat.Checked Then

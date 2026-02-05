@@ -179,7 +179,7 @@ Partial Class MasterTindakanKlinik
         Me.SplitContainer4 = New System.Windows.Forms.SplitContainer
         Me.Label40 = New System.Windows.Forms.Label
         Me.TextBoxKodeAlat = New System.Windows.Forms.TextBox
-        Me.NumericKuotaTotal = New System.Windows.Forms.NumericUpDown
+        Me.NumericKuotaAwal = New System.Windows.Forms.NumericUpDown
         Me.Label38 = New System.Windows.Forms.Label
         Me.TextBoxKuotaSisa = New System.Windows.Forms.TextBox
         Me.Label37 = New System.Windows.Forms.Label
@@ -198,6 +198,8 @@ Partial Class MasterTindakanKlinik
         Me.Button4 = New System.Windows.Forms.Button
         Me.NavBarItem3 = New DevExpress.XtraNavBar.NavBarItem
         Me.NavBarItem4 = New DevExpress.XtraNavBar.NavBarItem
+        Me.Label42 = New System.Windows.Forms.Label
+        Me.TextBoxKuotaTotal = New System.Windows.Forms.TextBox
         Me.PanelTop.SuspendLayout()
         Me.PanelMasterTindakanKlinik.SuspendLayout()
         Me.SplitContainer1.Panel1.SuspendLayout()
@@ -243,7 +245,7 @@ Partial Class MasterTindakanKlinik
         Me.SplitContainer4.Panel1.SuspendLayout()
         Me.SplitContainer4.Panel2.SuspendLayout()
         Me.SplitContainer4.SuspendLayout()
-        CType(Me.NumericKuotaTotal, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.NumericKuotaAwal, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DataGridViewAlat, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.Panel9.SuspendLayout()
         Me.SuspendLayout()
@@ -2205,9 +2207,11 @@ Partial Class MasterTindakanKlinik
         '
         'SplitContainer4.Panel1
         '
+        Me.SplitContainer4.Panel1.Controls.Add(Me.Label42)
+        Me.SplitContainer4.Panel1.Controls.Add(Me.TextBoxKuotaTotal)
         Me.SplitContainer4.Panel1.Controls.Add(Me.Label40)
         Me.SplitContainer4.Panel1.Controls.Add(Me.TextBoxKodeAlat)
-        Me.SplitContainer4.Panel1.Controls.Add(Me.NumericKuotaTotal)
+        Me.SplitContainer4.Panel1.Controls.Add(Me.NumericKuotaAwal)
         Me.SplitContainer4.Panel1.Controls.Add(Me.Label38)
         Me.SplitContainer4.Panel1.Controls.Add(Me.TextBoxKuotaSisa)
         Me.SplitContainer4.Panel1.Controls.Add(Me.Label37)
@@ -2249,21 +2253,21 @@ Partial Class MasterTindakanKlinik
         Me.TextBoxKodeAlat.Size = New System.Drawing.Size(207, 23)
         Me.TextBoxKodeAlat.TabIndex = 614
         '
-        'NumericKuotaTotal
+        'NumericKuotaAwal
         '
-        Me.NumericKuotaTotal.Location = New System.Drawing.Point(194, 107)
-        Me.NumericKuotaTotal.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
-        Me.NumericKuotaTotal.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
-        Me.NumericKuotaTotal.Name = "NumericKuotaTotal"
-        Me.NumericKuotaTotal.Size = New System.Drawing.Size(77, 23)
-        Me.NumericKuotaTotal.TabIndex = 612
-        Me.NumericKuotaTotal.Value = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.NumericKuotaAwal.Location = New System.Drawing.Point(194, 107)
+        Me.NumericKuotaAwal.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
+        Me.NumericKuotaAwal.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.NumericKuotaAwal.Name = "NumericKuotaAwal"
+        Me.NumericKuotaAwal.Size = New System.Drawing.Size(77, 23)
+        Me.NumericKuotaAwal.TabIndex = 612
+        Me.NumericKuotaAwal.Value = New Decimal(New Integer() {1, 0, 0, 0})
         '
         'Label38
         '
         Me.Label38.AutoSize = True
         Me.Label38.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label38.Location = New System.Drawing.Point(28, 165)
+        Me.Label38.Location = New System.Drawing.Point(28, 196)
         Me.Label38.Name = "Label38"
         Me.Label38.Size = New System.Drawing.Size(71, 17)
         Me.Label38.TabIndex = 610
@@ -2275,7 +2279,7 @@ Partial Class MasterTindakanKlinik
         Me.TextBoxKuotaSisa.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.TextBoxKuotaSisa.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.TextBoxKuotaSisa.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxKuotaSisa.Location = New System.Drawing.Point(194, 165)
+        Me.TextBoxKuotaSisa.Location = New System.Drawing.Point(194, 196)
         Me.TextBoxKuotaSisa.Name = "TextBoxKuotaSisa"
         Me.TextBoxKuotaSisa.ReadOnly = True
         Me.TextBoxKuotaSisa.Size = New System.Drawing.Size(77, 23)
@@ -2285,7 +2289,7 @@ Partial Class MasterTindakanKlinik
         '
         Me.Label37.AutoSize = True
         Me.Label37.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label37.Location = New System.Drawing.Point(27, 136)
+        Me.Label37.Location = New System.Drawing.Point(27, 167)
         Me.Label37.Name = "Label37"
         Me.Label37.Size = New System.Drawing.Size(98, 17)
         Me.Label37.TabIndex = 608
@@ -2297,7 +2301,7 @@ Partial Class MasterTindakanKlinik
         Me.TextBoxKuotaTerpakai.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.TextBoxKuotaTerpakai.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.TextBoxKuotaTerpakai.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxKuotaTerpakai.Location = New System.Drawing.Point(194, 136)
+        Me.TextBoxKuotaTerpakai.Location = New System.Drawing.Point(194, 167)
         Me.TextBoxKuotaTerpakai.Name = "TextBoxKuotaTerpakai"
         Me.TextBoxKuotaTerpakai.ReadOnly = True
         Me.TextBoxKuotaTerpakai.Size = New System.Drawing.Size(77, 23)
@@ -2311,7 +2315,7 @@ Partial Class MasterTindakanKlinik
         Me.Label36.Name = "Label36"
         Me.Label36.Size = New System.Drawing.Size(77, 17)
         Me.Label36.TabIndex = 607
-        Me.Label36.Text = "Kuota Total"
+        Me.Label36.Text = "Kuota Awal"
         '
         'CheckBoxAlatAktif
         '
@@ -2505,6 +2509,28 @@ Partial Class MasterTindakanKlinik
         Me.NavBarItem4.Name = "NavBarItem4"
         Me.NavBarItem4.SmallImage = CType(resources.GetObject("NavBarItem4.SmallImage"), System.Drawing.Image)
         '
+        'Label42
+        '
+        Me.Label42.AutoSize = True
+        Me.Label42.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label42.Location = New System.Drawing.Point(28, 136)
+        Me.Label42.Name = "Label42"
+        Me.Label42.Size = New System.Drawing.Size(77, 17)
+        Me.Label42.TabIndex = 615
+        Me.Label42.Text = "Kuota Total"
+        '
+        'TextBoxKuotaTotal
+        '
+        Me.TextBoxKuotaTotal.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
+        Me.TextBoxKuotaTotal.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxKuotaTotal.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
+        Me.TextBoxKuotaTotal.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxKuotaTotal.Location = New System.Drawing.Point(194, 136)
+        Me.TextBoxKuotaTotal.Name = "TextBoxKuotaTotal"
+        Me.TextBoxKuotaTotal.ReadOnly = True
+        Me.TextBoxKuotaTotal.Size = New System.Drawing.Size(77, 23)
+        Me.TextBoxKuotaTotal.TabIndex = 616
+        '
         'MasterTindakanKlinik
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -2580,7 +2606,7 @@ Partial Class MasterTindakanKlinik
         Me.SplitContainer4.Panel1.PerformLayout()
         Me.SplitContainer4.Panel2.ResumeLayout(False)
         Me.SplitContainer4.ResumeLayout(False)
-        CType(Me.NumericKuotaTotal, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.NumericKuotaAwal, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DataGridViewAlat, System.ComponentModel.ISupportInitialize).EndInit()
         Me.Panel9.ResumeLayout(False)
         Me.ResumeLayout(False)
@@ -2739,7 +2765,7 @@ Partial Class MasterTindakanKlinik
     Friend WithEvents SplitContainer4 As System.Windows.Forms.SplitContainer
     Friend WithEvents Label40 As System.Windows.Forms.Label
     Friend WithEvents TextBoxKodeAlat As System.Windows.Forms.TextBox
-    Friend WithEvents NumericKuotaTotal As System.Windows.Forms.NumericUpDown
+    Friend WithEvents NumericKuotaAwal As System.Windows.Forms.NumericUpDown
     Friend WithEvents Label38 As System.Windows.Forms.Label
     Friend WithEvents TextBoxKuotaSisa As System.Windows.Forms.TextBox
     Friend WithEvents Label37 As System.Windows.Forms.Label
@@ -2761,4 +2787,6 @@ Partial Class MasterTindakanKlinik
     Friend WithEvents TextBoxAlatIdTindakan As System.Windows.Forms.TextBox
     Friend WithEvents ButtonCariAlatTindakan As System.Windows.Forms.Button
     Friend WithEvents Label41 As System.Windows.Forms.Label
+    Friend WithEvents Label42 As System.Windows.Forms.Label
+    Friend WithEvents TextBoxKuotaTotal As System.Windows.Forms.TextBox
 End Class
