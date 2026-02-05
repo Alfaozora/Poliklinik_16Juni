@@ -2116,8 +2116,8 @@ Public Class FormRekamMedisDokter
 
             If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
                 ' Insert ke tabel TransaksiPoliDetail
-                WriteSQL( _
-                    "INSERT INTO TransaksiPoliDetail(" & _
+                Dim sqlInsertDetail As String = _
+                    "INSERT INTO TransaksiPoliDetail (" & _
                     "TransPoliID, TindakanID, NamaTindakan, JenisTindakan, " & _
                     "BiayaTindakan, DiscTindakan, DiscPersenTindakan, NettBayar, KodeVoucher, " & _
                     "Penjamin, GroupBayar, StatusPembayaran, CreatedBy, CreatedDate) VALUES (" & _
@@ -2131,8 +2131,18 @@ Public Class FormRekamMedisDokter
                     nettBayar & ", " & _
                     "'" & voucherKode.Replace("'", "''") & "', " & _
                     "'" & penjaminTindakan & "', '', 'PENDING', '" & userInput & "', GETDATE()" & _
-                    ")", 4)
+                    "); SELECT SCOPE_IDENTITY();"
 
+                Dim transPoliIDDetail As Integer = CInt(ReadSQLScalar(sqlInsertDetail))
+
+                If TextBoxTindakanID.Text <> "" Then
+
+                    Dim tindakanID As Integer = CInt(TextBoxTindakanID.Text)
+                    Dim qtyTindakan As Integer = 1
+
+                    ProsesPemotonganKuotaAlat(transPoliIDDetail.ToString(), tindakanID.ToString(), qtyTindakan)
+
+                End If
 
                 Dim jsonParam As String = _
                     "{" & _
@@ -9195,6 +9205,8 @@ Public Class FormRekamMedisDokter
                 WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
                          "WHERE TransPoliIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
 
+                VoidPemakaianAlatByDetail(idTindakanDetail)
+
                 Dim jsonParam As String = _
                       "{" & _
                       """no_transaksi"":""" & idTransaksi & """," & _
@@ -12743,5 +12755,108 @@ Public Class FormRekamMedisDokter
         f.NoRekamMedis = idPasien
         AddHandler f.VoucherDipilih, AddressOf ProsesVoucherTindakan
         f.ShowDialog()
+    End Sub
+
+    Private Function GetKuotaSisaAlat(ByVal alatID As String) As Integer
+
+        Dim sql As String = "SELECT KuotaTotal - KuotaTerpakai AS KuotaSisa " & _
+            "FROM MasterAlat WHERE AlatID = " & alatID
+
+        Dim dt As DataTable = ReadSQL(sql)
+
+        If dt.Rows.Count = 0 Then Return 0
+
+        Return CInt(dt.Rows(0)("KuotaSisa"))
+
+    End Function
+
+    Private Function GetDataAlatTindakan(ByVal tindakanID As String) As DataTable
+
+        Dim sql As String = "SELECT AlatID, ShootPerTindakan " & _
+            "FROM MasterTindakan " & _
+            "WHERE TindakanID = " & tindakanID & " AND AlatID IS NOT NULL"
+
+        Return ReadSQL(sql)
+
+    End Function
+
+    Private Sub ProsesPemotonganKuotaAlat(ByVal transPoliIDDetail As String, ByVal tindakanID As String, ByVal qtyTindakan As Integer)
+
+        Dim dtAlat As DataTable = GetDataAlatTindakan(tindakanID)
+
+        ' Tindakan tidak pakai alat
+        If dtAlat.Rows.Count = 0 Then Exit Sub
+
+        Dim alatID As String = dtAlat.Rows(0)("AlatID").ToString()
+        Dim shootPerTindakan As Integer = CInt(dtAlat.Rows(0)("ShootPerTindakan"))
+
+        Dim totalShoot As Integer = shootPerTindakan * qtyTindakan
+
+        'Cek kuota
+        Dim kuotaSisa As Integer = GetKuotaSisaAlat(alatID)
+
+        If kuotaSisa < totalShoot Then
+            MsgBox("Kuota alat tidak mencukupi." & vbCrLf & _
+                   "Sisa: " & kuotaSisa & ", Dibutuhkan: " & totalShoot, MsgBoxStyle.Critical)
+            Exit Sub
+        End If
+
+        'TRANSACTION SQL
+        Dim dbTran As New DBTransaction
+
+        Try
+            dbTran.BeginTransaction()
+
+            dbTran.Execute( _
+                "INSERT INTO LogPemakaianAlat " & _
+                "(TransaksiDetailID, AlatID, ShootDipakai, TglPemakaian, UserInput) VALUES (" & _
+                transPoliIDDetail & "," & alatID & "," & totalShoot & ",GETDATE(),'" & userInput & "')")
+
+            dbTran.Execute( _
+                "UPDATE MasterAlat SET " & _
+                "KuotaTerpakai = KuotaTerpakai + " & totalShoot & " " & _
+                "WHERE AlatID = " & alatID)
+
+            dbTran.Commit()
+
+        Catch ex As Exception
+            dbTran.Rollback()
+            MsgBox("Gagal potong kuota alat : " & ex.Message, MsgBoxStyle.Critical)
+        End Try
+
+    End Sub
+
+    Private Sub VoidPemakaianAlatByDetail(ByVal transPoliIDDetail As String)
+
+        Dim dbTran As New DBTransaction
+
+        Try
+            dbTran.BeginTransaction()
+
+            'Balikin kuota alat (berdasarkan log)
+            dbTran.Execute( _
+                "UPDATE MA SET " & _
+                "MA.KuotaTerpakai = MA.KuotaTerpakai - LPA.ShootDipakai " & _
+                "FROM MasterAlat MA " & _
+                "INNER JOIN LogPemakaianAlat LPA ON MA.AlatID = LPA.AlatID " & _
+                "WHERE LPA.TransaksiDetailID = " & transPoliIDDetail & " " & _
+                "AND LPA.IsVoid = 0")
+
+            'Void log pemakaian alat
+            dbTran.Execute( _
+                "UPDATE LogPemakaianAlat SET " & _
+                "IsVoid = 1, " & _
+                "VoidAt = GETDATE(), " & _
+                "VoidBy = '" & userInput & "' " & _
+                "WHERE TransaksiDetailID = " & transPoliIDDetail & " " & _
+                "AND IsVoid = 0")
+
+            dbTran.Commit()
+
+        Catch ex As Exception
+            dbTran.Rollback()
+            MsgBox("Gagal rollback kuota alat : " & ex.Message, MsgBoxStyle.Critical)
+        End Try
+
     End Sub
 End Class

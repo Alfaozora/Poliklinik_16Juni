@@ -1575,4 +1575,9 @@ Public Class PoliKlinik
         WhatsAppSetting.Show()
         WhatsAppSetting.Focus()
     End Sub
+
+    Private Sub PersetujuanPenerimaanBarangToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PersetujuanPenerimaanBarangToolStripMenuItem.Click
+        FormPenerimaanBarang.Show()
+        FormPenerimaanBarang.Focus()
+    End Sub
 End Class
