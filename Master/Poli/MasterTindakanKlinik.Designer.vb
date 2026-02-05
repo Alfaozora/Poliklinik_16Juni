@@ -177,6 +177,8 @@ Partial Class MasterTindakanKlinik
         Me.GridViewTindakan = New DevExpress.XtraGrid.Views.Grid.GridView
         Me.TabPageMasterAlat = New System.Windows.Forms.TabPage
         Me.SplitContainer4 = New System.Windows.Forms.SplitContainer
+        Me.Label42 = New System.Windows.Forms.Label
+        Me.TextBoxKuotaTotal = New System.Windows.Forms.TextBox
         Me.Label40 = New System.Windows.Forms.Label
         Me.TextBoxKodeAlat = New System.Windows.Forms.TextBox
         Me.NumericKuotaAwal = New System.Windows.Forms.NumericUpDown
@@ -198,8 +200,13 @@ Partial Class MasterTindakanKlinik
         Me.Button4 = New System.Windows.Forms.Button
         Me.NavBarItem3 = New DevExpress.XtraNavBar.NavBarItem
         Me.NavBarItem4 = New DevExpress.XtraNavBar.NavBarItem
-        Me.Label42 = New System.Windows.Forms.Label
-        Me.TextBoxKuotaTotal = New System.Windows.Forms.TextBox
+        Me.GroupBox3 = New System.Windows.Forms.GroupBox
+        Me.Label44 = New System.Windows.Forms.Label
+        Me.dtAkhir = New System.Windows.Forms.DateTimePicker
+        Me.dtAwal = New System.Windows.Forms.DateTimePicker
+        Me.Label45 = New System.Windows.Forms.Label
+        Me.Label46 = New System.Windows.Forms.Label
+        Me.ButtonCetakRiwayat = New System.Windows.Forms.Button
         Me.PanelTop.SuspendLayout()
         Me.PanelMasterTindakanKlinik.SuspendLayout()
         Me.SplitContainer1.Panel1.SuspendLayout()
@@ -248,6 +255,7 @@ Partial Class MasterTindakanKlinik
         CType(Me.NumericKuotaAwal, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DataGridViewAlat, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.Panel9.SuspendLayout()
+        Me.GroupBox3.SuspendLayout()
         Me.SuspendLayout()
         '
         'PanelTop
@@ -2207,6 +2215,7 @@ Partial Class MasterTindakanKlinik
         '
         'SplitContainer4.Panel1
         '
+        Me.SplitContainer4.Panel1.Controls.Add(Me.GroupBox3)
         Me.SplitContainer4.Panel1.Controls.Add(Me.Label42)
         Me.SplitContainer4.Panel1.Controls.Add(Me.TextBoxKuotaTotal)
         Me.SplitContainer4.Panel1.Controls.Add(Me.Label40)
@@ -2231,6 +2240,28 @@ Partial Class MasterTindakanKlinik
         Me.SplitContainer4.SplitterDistance = 250
         Me.SplitContainer4.SplitterWidth = 1
         Me.SplitContainer4.TabIndex = 2
+        '
+        'Label42
+        '
+        Me.Label42.AutoSize = True
+        Me.Label42.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label42.Location = New System.Drawing.Point(28, 136)
+        Me.Label42.Name = "Label42"
+        Me.Label42.Size = New System.Drawing.Size(77, 17)
+        Me.Label42.TabIndex = 615
+        Me.Label42.Text = "Kuota Total"
+        '
+        'TextBoxKuotaTotal
+        '
+        Me.TextBoxKuotaTotal.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
+        Me.TextBoxKuotaTotal.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxKuotaTotal.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
+        Me.TextBoxKuotaTotal.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxKuotaTotal.Location = New System.Drawing.Point(194, 136)
+        Me.TextBoxKuotaTotal.Name = "TextBoxKuotaTotal"
+        Me.TextBoxKuotaTotal.ReadOnly = True
+        Me.TextBoxKuotaTotal.Size = New System.Drawing.Size(77, 23)
+        Me.TextBoxKuotaTotal.TabIndex = 616
         '
         'Label40
         '
@@ -2509,27 +2540,95 @@ Partial Class MasterTindakanKlinik
         Me.NavBarItem4.Name = "NavBarItem4"
         Me.NavBarItem4.SmallImage = CType(resources.GetObject("NavBarItem4.SmallImage"), System.Drawing.Image)
         '
-        'Label42
+        'GroupBox3
         '
-        Me.Label42.AutoSize = True
-        Me.Label42.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label42.Location = New System.Drawing.Point(28, 136)
-        Me.Label42.Name = "Label42"
-        Me.Label42.Size = New System.Drawing.Size(77, 17)
-        Me.Label42.TabIndex = 615
-        Me.Label42.Text = "Kuota Total"
+        Me.GroupBox3.Controls.Add(Me.ButtonCetakRiwayat)
+        Me.GroupBox3.Controls.Add(Me.Label46)
+        Me.GroupBox3.Controls.Add(Me.Label45)
+        Me.GroupBox3.Controls.Add(Me.Label44)
+        Me.GroupBox3.Controls.Add(Me.dtAkhir)
+        Me.GroupBox3.Controls.Add(Me.dtAwal)
+        Me.GroupBox3.Location = New System.Drawing.Point(420, 14)
+        Me.GroupBox3.Name = "GroupBox3"
+        Me.GroupBox3.Size = New System.Drawing.Size(301, 113)
+        Me.GroupBox3.TabIndex = 617
+        Me.GroupBox3.TabStop = False
+        Me.GroupBox3.Text = "Riwayat Penggunaan Alat"
         '
-        'TextBoxKuotaTotal
+        'Label44
         '
-        Me.TextBoxKuotaTotal.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
-        Me.TextBoxKuotaTotal.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBoxKuotaTotal.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
-        Me.TextBoxKuotaTotal.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxKuotaTotal.Location = New System.Drawing.Point(194, 136)
-        Me.TextBoxKuotaTotal.Name = "TextBoxKuotaTotal"
-        Me.TextBoxKuotaTotal.ReadOnly = True
-        Me.TextBoxKuotaTotal.Size = New System.Drawing.Size(77, 23)
-        Me.TextBoxKuotaTotal.TabIndex = 616
+        Me.Label44.AutoSize = True
+        Me.Label44.BackColor = System.Drawing.Color.Transparent
+        Me.Label44.Font = New System.Drawing.Font("Segoe UI", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label44.Location = New System.Drawing.Point(138, 48)
+        Me.Label44.Name = "Label44"
+        Me.Label44.Size = New System.Drawing.Size(23, 13)
+        Me.Label44.TabIndex = 455
+        Me.Label44.Text = "s/d"
+        '
+        'dtAkhir
+        '
+        Me.dtAkhir.CalendarFont = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.dtAkhir.CustomFormat = "dd-MMM-yyyy"
+        Me.dtAkhir.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.dtAkhir.Format = System.Windows.Forms.DateTimePickerFormat.Custom
+        Me.dtAkhir.Location = New System.Drawing.Point(167, 43)
+        Me.dtAkhir.Name = "dtAkhir"
+        Me.dtAkhir.Size = New System.Drawing.Size(125, 25)
+        Me.dtAkhir.TabIndex = 454
+        '
+        'dtAwal
+        '
+        Me.dtAwal.CalendarFont = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.dtAwal.CustomFormat = "dd-MMM-yyyy"
+        Me.dtAwal.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.dtAwal.Format = System.Windows.Forms.DateTimePickerFormat.Custom
+        Me.dtAwal.Location = New System.Drawing.Point(7, 43)
+        Me.dtAwal.Name = "dtAwal"
+        Me.dtAwal.Size = New System.Drawing.Size(125, 25)
+        Me.dtAwal.TabIndex = 453
+        '
+        'Label45
+        '
+        Me.Label45.AutoSize = True
+        Me.Label45.BackColor = System.Drawing.Color.Transparent
+        Me.Label45.Font = New System.Drawing.Font("Segoe UI", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label45.Location = New System.Drawing.Point(6, 27)
+        Me.Label45.Name = "Label45"
+        Me.Label45.Size = New System.Drawing.Size(18, 13)
+        Me.Label45.TabIndex = 456
+        Me.Label45.Text = "To"
+        '
+        'Label46
+        '
+        Me.Label46.AutoSize = True
+        Me.Label46.BackColor = System.Drawing.Color.Transparent
+        Me.Label46.Font = New System.Drawing.Font("Segoe UI", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label46.Location = New System.Drawing.Point(164, 27)
+        Me.Label46.Name = "Label46"
+        Me.Label46.Size = New System.Drawing.Size(33, 13)
+        Me.Label46.TabIndex = 457
+        Me.Label46.Text = "From"
+        '
+        'ButtonCetakRiwayat
+        '
+        Me.ButtonCetakRiwayat.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonCetakRiwayat.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+        Me.ButtonCetakRiwayat.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonCetakRiwayat.FlatAppearance.BorderSize = 0
+        Me.ButtonCetakRiwayat.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonCetakRiwayat.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.ButtonCetakRiwayat.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonCetakRiwayat.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.ButtonCetakRiwayat.ForeColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(254, Byte), Integer))
+        Me.ButtonCetakRiwayat.Location = New System.Drawing.Point(232, 78)
+        Me.ButtonCetakRiwayat.Name = "ButtonCetakRiwayat"
+        Me.ButtonCetakRiwayat.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.ButtonCetakRiwayat.Size = New System.Drawing.Size(60, 25)
+        Me.ButtonCetakRiwayat.TabIndex = 604
+        Me.ButtonCetakRiwayat.Text = " Cetak"
+        Me.ButtonCetakRiwayat.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.ButtonCetakRiwayat.UseVisualStyleBackColor = False
         '
         'MasterTindakanKlinik
         '
@@ -2609,6 +2708,8 @@ Partial Class MasterTindakanKlinik
         CType(Me.NumericKuotaAwal, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DataGridViewAlat, System.ComponentModel.ISupportInitialize).EndInit()
         Me.Panel9.ResumeLayout(False)
+        Me.GroupBox3.ResumeLayout(False)
+        Me.GroupBox3.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -2789,4 +2890,11 @@ Partial Class MasterTindakanKlinik
     Friend WithEvents Label41 As System.Windows.Forms.Label
     Friend WithEvents Label42 As System.Windows.Forms.Label
     Friend WithEvents TextBoxKuotaTotal As System.Windows.Forms.TextBox
+    Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox
+    Friend WithEvents Label44 As System.Windows.Forms.Label
+    Friend WithEvents dtAkhir As System.Windows.Forms.DateTimePicker
+    Friend WithEvents dtAwal As System.Windows.Forms.DateTimePicker
+    Friend WithEvents ButtonCetakRiwayat As System.Windows.Forms.Button
+    Friend WithEvents Label46 As System.Windows.Forms.Label
+    Friend WithEvents Label45 As System.Windows.Forms.Label
 End Class

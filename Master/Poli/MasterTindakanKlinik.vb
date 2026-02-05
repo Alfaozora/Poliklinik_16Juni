@@ -1631,4 +1631,136 @@ Public Class MasterTindakanKlinik
         Find.Show()
         Find.Query("SELECT AlatID, KodeAlat, NamaAlat, KuotaTotal, KuotaTerpakai, IsAktif FROM MasterAlat ", "ORDER BY CreatedAt DESC", "FindMasterAlatTindakan", 2)
     End Sub
+
+    Private Sub ButtonCetakRiwayat_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCetakRiwayat.Click
+        If TextBoxAlatId.Text.Trim() = "" Then
+            MsgBox("Pilih alat terlebih dahulu.", MsgBoxStyle.Exclamation)
+            Exit Sub
+        End If
+
+        Dim alatID As String = TextBoxAlatId.Text.Trim()
+        Dim tglAwal As Date = dtAwal.Value
+        Dim tglAkhir As Date = dtAkhir.Value
+        Dim namaAlat As String = TextBoxNamaAlat.Text
+        Dim stringTglTransaksiAwal As String = tglAwal.Day & " " & BulanIndonesia(tglAwal.Month) & " " & tglAwal.Year
+        Dim stringTglTransaksiAkhir As String = tglAkhir.Day & " " & BulanIndonesia(tglAkhir.Month) & " " & tglAkhir.Year
+
+        Dim sql As String = ""
+        sql = "DECLARE @AlatID INT = " & alatID & " " & _
+              "DECLARE @TglAwal DATETIME = '" & tglAwal & "' " & _
+              "DECLARE @TglAkhir DATETIME = '" & tglAkhir & "' " & _
+              " ;WITH Ledger AS ( " & _
+              " SELECT " & _
+              " MA.CreatedAt AS Tanggal, " & _
+              " 'SALDO AWAL' AS JenisTransaksi, " & _
+              " 'Kuota awal alat' AS Keterangan, " & _
+              " CAST(MA.KuotaAwal AS INT) AS Debet, " & _
+              " CAST(0 AS INT) AS Kredit " & _
+              " FROM MasterAlat MA " & _
+              " WHERE MA.AlatID = @AlatID " & _
+              " UNION ALL " & _
+              " SELECT " & _
+              " LTA.CreatedAt, " & _
+              " 'TOP UP', " & _
+              " ISNULL(LTA.Keterangan, 'Top up kuota alat'), " & _
+              " LTA.JumlahTopUp, " & _
+              " 0 " & _
+              " FROM LogTopUpAlat LTA " & _
+              " WHERE LTA.AlatID = @AlatID " & _
+              " AND LTA.CreatedAt BETWEEN @TglAwal AND @TglAkhir " & _
+              " UNION ALL " & _
+              " SELECT " & _
+              " LPA.TglPemakaian, " & _
+              " 'PEMAKAIAN', " & _
+              " TPD.NamaTindakan + ' - ' + MP.Nama, " & _
+              " 0, " & _
+              " LPA.ShootDipakai " & _
+              " FROM LogPemakaianAlat LPA " & _
+              " INNER JOIN TransaksiPoliDetail TPD " & _
+              " ON LPA.TransaksiDetailID = TPD.TransPoliIDDetail " & _
+              " INNER JOIN TransaksiPoli TP " & _
+              " ON TPD.TransPoliID = TP.TransPoliID " & _
+              " INNER JOIN MasterPasien MP " & _
+              " ON TP.IDInternet = MP.NoRekamMedis " & _
+              " WHERE LPA.AlatID = @AlatID " & _
+              " AND LPA.IsVoid = 0 " & _
+              " AND LPA.TglPemakaian BETWEEN @TglAwal AND @TglAkhir " & _
+              " ) " & _
+              " SELECT " & _
+              " L1.Tanggal, " & _
+              " L1.JenisTransaksi, " & _
+              " L1.Keterangan, " & _
+              " L1.Debet, " & _
+              " L1.Kredit, " & _
+              " ( " & _
+              "   SELECT SUM(L2.Debet - L2.Kredit) " & _
+              "   FROM Ledger L2 " & _
+              "   WHERE L2.Tanggal < L1.Tanggal " & _
+              "   OR (L2.Tanggal = L1.Tanggal AND L2.JenisTransaksi <= L1.JenisTransaksi) " & _
+              " ) AS Saldo " & _
+              " FROM Ledger L1 " & _
+              " ORDER BY L1.Tanggal, " & _
+              " CASE " & _
+              "   WHEN L1.JenisTransaksi = 'SALDO AWAL' THEN 0 " & _
+              "   WHEN L1.JenisTransaksi = 'TOP UP' THEN 1 " & _
+              "   ELSE 2 " & _
+              " END "
+
+        Dim dt As DataTable = ReadSQL(sql)
+
+        Dim sqlSummary As String = ""
+        sqlSummary = "SELECT " & _
+                     "MA.KuotaAwal, " & _
+                     "ISNULL(SUM(LTA.JumlahTopUp),0) AS TotalTopUp, " & _
+                     "ISNULL(SUM(LPA.ShootDipakai),0) AS TotalPemakaian, " & _
+                     "(MA.KuotaAwal " & _
+                     " + ISNULL(SUM(LTA.JumlahTopUp),0) " & _
+                     " - ISNULL(SUM(LPA.ShootDipakai),0)) AS SaldoAkhir " & _
+                     "FROM MasterAlat MA " & _
+                     "LEFT JOIN LogTopUpAlat LTA ON MA.AlatID = LTA.AlatID " & _
+                     "LEFT JOIN LogPemakaianAlat LPA " & _
+                     "ON MA.AlatID = LPA.AlatID AND LPA.IsVoid = 0 " & _
+                     "WHERE MA.AlatID = " & alatID & " " & _
+                     "GROUP BY MA.KuotaAwal"
+
+        Dim dtSummary As DataTable = ReadSQL(sqlSummary)
+
+        Dim kuotaAwal As Integer = 0
+        Dim totalTopUp As Integer = 0
+        Dim totalPakai As Integer = 0
+        Dim saldoAkhir As Integer = 0
+
+        If dtSummary.Rows.Count > 0 Then
+            kuotaAwal = CInt(dtSummary.Rows(0)("KuotaAwal"))
+            totalTopUp = CInt(dtSummary.Rows(0)("TotalTopUp"))
+            totalPakai = CInt(dtSummary.Rows(0)("TotalPemakaian"))
+            saldoAkhir = CInt(dtSummary.Rows(0)("SaldoAkhir"))
+        End If
+
+        If dt.Rows.Count = 0 Then
+            MsgBox("Tidak ada data riwayat alat.", MsgBoxStyle.Information)
+            Exit Sub
+        End If
+
+        ' Load report dari file
+        Dim report As New DevExpress.XtraReports.UI.XtraReport
+        report = XtraReport.FromFile(Application.StartupPath + "\reports\RiwayatTransaksiAlat.repx", True)
+        report.Bands.Item(BandKind.ReportHeader).Controls("lblNamaAlat").Text = namaAlat
+        report.Bands.Item(BandKind.ReportHeader).Controls("lblKodeAlat").Text = TextBoxKodeAlat.Text
+        Dim gh As GroupHeaderBand = CType(report.Bands("GroupHeader3"), GroupHeaderBand)
+
+        gh.Controls("saldoAwal").Text = Format(kuotaAwal, "#,##0")
+        gh.Controls("totalTopUp").Text = Format(totalTopUp, "#,##0")
+        gh.Controls("totalPemakaian").Text = Format(totalPakai, "#,##0")
+        gh.Controls("saldoAkhir").Text = Format(saldoAkhir, "#,##0")
+
+
+        report.Bands.Item(BandKind.PageFooter).Controls("lblprinted").Text = Format(DateAndTime.Now, "dd-MMM-yyyy HH:mm:ss") & " By " & userInput
+        report.Bands.Item(BandKind.ReportHeader).Controls("lbltanggal").Text = stringTglTransaksiAwal & " - " & stringTglTransaksiAkhir
+
+        report.DataSource = dt
+
+        'report.RunDesigner()
+        report.ShowPreview()
+    End Sub
 End Class
