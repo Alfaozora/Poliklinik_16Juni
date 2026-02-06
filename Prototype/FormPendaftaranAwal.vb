@@ -919,14 +919,20 @@ Public Class FormPendaftaranAwal
                         Dim idTindakan As String = SelectedPaketID
                         Dim NoRM As String = TextBoxRM.Text
 
-                        If ValidasiInformedConsentPaket(NoRM, idTindakan, userInput) = False Then
-                            Exit Sub
-                        End If
-
                         If CDbl(TextBoxTotalBayar.Text) = 0 And RadioButtonKunjunganSakit.Checked = True Then
+                            ' =========================
+                            ' PEMAKAIAN PAKET → wajib IC
+                            ' =========================
+                            If ValidasiInformedConsentPaket(NoRM, idTindakan, userInput) = False Then
+                                Exit Sub
+                            End If
+
                             SimpanPenggunaanPaket()
                         Else
                             ' Validasi Akses Ke Pembayaran
+                            ' =========================
+                            ' PEMBELIAN PAKET → tidak perlu IC
+                            ' =========================
                             If ValidasiAccess(Me.Name, "AksesPembayaranInvoice") = True Then
                                 SimpanPendaftaran()
                             End If
@@ -1270,6 +1276,7 @@ Public Class FormPendaftaranAwal
                         Dim nama As String = ReadSQLNIK("SELECT Nama FROM MasterPasien WHERE NoRekamMedis = '" & TextBoxRM.Text & "'")
                         Dim noHp As String = ReadSQLNIK("SELECT NoHandphone FROM MasterPasien WHERE NoRekamMedis = '" & TextBoxRM.Text & "'")
                         Dim tglPerawatan As String = Date.Now.ToString("yyyy-MM-ddTHH:mm:ss")
+                        Dim isPembelianBaru As Boolean = False
 
                         ' Generate Kode Voucher (Jika Pembelian Baru)
                         For Each rowTindakan As DataRow In tblTindakan.Rows
@@ -1278,10 +1285,30 @@ Public Class FormPendaftaranAwal
                                      "VALUES('" & TextBoxRM.Text & "', '" & nomorUrutTransaksi & "', '" & rowTindakan("PaketID") & "', '" & rowTindakan("TindakanID") & "', '" & rowTindakan("Jenis Paket") & "', GETDATE(), '" & rowTindakan("KodeVoucher") & "', '" & userInput & "', GETDATE())", 4)
 
                             Dim usage As New Dictionary(Of String, Object)
+
+                            Dim listTindakanApi As List(Of String) = GetListTindakanDariPaket(rowTindakan("PaketID").ToString())
+
+                            Dim qty As Integer = 1
+                            If rowTindakan.Table.Columns.Contains("Qty") Then
+                                qty = Convert.ToInt32(rowTindakan("Qty"))
+                            End If
+
                             usage.Add("id_paket", rowTindakan("PaketID").ToString())
-                            usage.Add("nama_paket", rowTindakan("Nama Paket").ToString())
-                            usage.Add("tgl_pembelian", Nothing)
-                            usage.Add("tgl_perawatan", tglPerawatan)
+                            usage.Add("tindakan", listTindakanApi)
+
+                            If isPembelianBaru = True Then
+                                ' ambil kuota awal
+                                Dim qtyTotal As Integer = GetKuotaAwalPaket(rowTindakan("PaketID").ToString(), rowTindakan("KodeVoucher").ToString())
+
+                                usage.Add("qty", 0)
+                                usage.Add("qty_total", qtyTotal)
+                                usage.Add("tgl_pembelian", Date.Now.ToString("yyyy-MM-ddTHH:mm:ss"))
+                                usage.Add("tgl_perawatan", Nothing)
+                            Else
+                                usage.Add("qty", qty)
+                                usage.Add("tgl_pembelian", Nothing)
+                                usage.Add("tgl_perawatan", tglPerawatan)
+                            End If
 
                             usageList.Add(usage)
 
@@ -1303,6 +1330,8 @@ Public Class FormPendaftaranAwal
                             payload.Add("packages", usageList)
 
                             Dim jsonParam As String = JsonConvert.SerializeObject(payload)
+
+                            MsgBox(jsonParam)
 
                             Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
                             Dim urlWebService As String = baseURL & "api/lumiera-luzelle/treatment-package"
@@ -1339,6 +1368,63 @@ Public Class FormPendaftaranAwal
             End If
         End If
     End Sub
+
+    Public Class DetailTindakanItem
+        Public TindakanID As Integer
+        Public NamaTindakan As String
+        Public JenisTindakan As String
+        Public BiayaTindakan As Decimal
+        Public DiskonTindakan As Decimal
+        Public NettBayar As Decimal
+        Public KuotaTindakan As Decimal
+        Public GrandTotal As Decimal
+    End Class
+
+    Private Function GetKuotaAwalPaket(ByVal paketID As String, ByVal kodeVoucher As String) As Integer
+        Dim sql As String = "SELECT Kuota FROM TransaksiPaketTindakan " & _
+                            "WHERE PaketID = '" & paketID & "' " & _
+                            "AND KodeVoucher = '" & kodeVoucher & "' " & _
+                            "AND DeletedDate IS NULL"
+
+        Dim hasil As String = ReadSQLNIK(sql)
+
+        If hasil = "" Then
+            Return 1
+        End If
+
+        Return Convert.ToInt32(hasil)
+    End Function
+
+
+    Private Function GetListTindakanDariPaket(ByVal paketID As String) As List(Of String)
+        Dim hasil As New List(Of String)
+
+        Dim dt As DataTable = ReadSQL("SELECT DetailTindakan FROM MasterPaketTindakan WHERE PaketID = '" & paketID & "'")
+
+        If dt.Rows.Count > 0 Then
+            Dim row As DataRow = dt.Rows(0)
+
+            If Not IsDBNull(row("DetailTindakan")) Then
+                Dim jsonDetail As String = row("DetailTindakan").ToString()
+
+                If jsonDetail <> "" Then
+                    Try
+                        Dim serializer As New System.Web.Script.Serialization.JavaScriptSerializer()
+                        Dim listTindakan As List(Of DetailTindakanItem) = serializer.Deserialize(Of List(Of DetailTindakanItem))(jsonDetail)
+
+                        If listTindakan IsNot Nothing Then
+                            For Each t As DetailTindakanItem In listTindakan
+                                hasil.Add(t.NamaTindakan)
+                            Next
+                        End If
+                    Catch ex As Exception
+                    End Try
+                End If
+            End If
+        End If
+
+        Return hasil
+    End Function
 
     Function ValidasiPenggunaanPaket() As Boolean
         '' Set data master poli tujuan
@@ -2191,20 +2277,10 @@ Public Class FormPendaftaranAwal
             Dim tblTindakan As DataTable = GridControlTindakanPoli.DataSource
             tblTindakan.AcceptChanges()
 
-            NeedInformedConsent = False
-            PanelInformConsent.Visible = False
-
             If rowPaket.Count > 0 Then
                 For i As Integer = 0 To rowPaket.Length - 1
                     Dim tblPaket As DataTable = ReadSQL("SELECT * FROM MasterPaketTindakan WHERE PaketID = '" & rowPaket(i)("PaketID").ToString() & "'")
                     For Each Trow As DataRow In tblPaket.Rows
-
-                        If Not IsDBNull(Trow("StatusInformedConsent")) Then
-                            If CBool(Trow("StatusInformedConsent")) = True Then
-                                NeedInformedConsent = True
-                                PanelInformConsent.Visible = True
-                            End If
-                        End If
 
                         SelectedPaketID = Trow("PaketID").ToString()
 
@@ -2255,12 +2331,34 @@ Public Class FormPendaftaranAwal
         'End If
 
         If ValidasiTambahPaketTindakan(rowPaket) = True Then
+
+            NeedInformedConsent = False
+            PanelInformConsent.Visible = False
+
             If GridControlTindakanPoli.MainView IsNot GridViewPaketPoli Then ClearGridDataPaket()
 
             Dim tblTindakan As DataTable = GridControlTindakanPoli.DataSource
             tblTindakan.AcceptChanges()
+
             If rowPaket.Count > 0 Then
                 For i As Integer = 0 To rowPaket.Length - 1
+                    Dim tblPaket As DataTable = ReadSQL("SELECT * FROM MasterPaketTindakan WHERE PaketID = '" & rowPaket(i)("PaketID").ToString() & "'")
+
+                    If tblPaket IsNot Nothing AndAlso tblPaket.Rows.Count > 0 Then
+                        Dim Trow As DataRow = tblPaket.Rows(0)
+
+                        SelectedPaketID = Trow("PaketID").ToString()
+
+                        If tblPaket.Columns.Contains("StatusInformedConsent") Then
+                            If Not IsDBNull(Trow("StatusInformedConsent")) Then
+                                If CBool(Trow("StatusInformedConsent")) = True Then
+                                    NeedInformedConsent = True
+                                    PanelInformConsent.Visible = True
+                                End If
+                            End If
+                        End If
+                    End If
+
                     Dim jenisTindakan As String = ""
                     If rowPaket(i)("TindakanID").ToString() = "0" Then
                         jenisTindakan = "Paket"

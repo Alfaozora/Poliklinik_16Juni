@@ -1710,18 +1710,34 @@ Public Class MasterTindakanKlinik
 
         Dim sqlSummary As String = ""
         sqlSummary = "SELECT " & _
-                     "MA.KuotaAwal, " & _
-                     "ISNULL(SUM(LTA.JumlahTopUp),0) AS TotalTopUp, " & _
-                     "ISNULL(SUM(LPA.ShootDipakai),0) AS TotalPemakaian, " & _
-                     "(MA.KuotaAwal " & _
-                     " + ISNULL(SUM(LTA.JumlahTopUp),0) " & _
-                     " - ISNULL(SUM(LPA.ShootDipakai),0)) AS SaldoAkhir " & _
-                     "FROM MasterAlat MA " & _
-                     "LEFT JOIN LogTopUpAlat LTA ON MA.AlatID = LTA.AlatID " & _
-                     "LEFT JOIN LogPemakaianAlat LPA " & _
-                     "ON MA.AlatID = LPA.AlatID AND LPA.IsVoid = 0 " & _
-                     "WHERE MA.AlatID = " & alatID & " " & _
-                     "GROUP BY MA.KuotaAwal"
+             "MA.KuotaAwal, " & _
+             "ISNULL(( " & _
+             "    SELECT SUM(JumlahTopUp) " & _
+             "    FROM LogTopUpAlat " & _
+             "    WHERE AlatID = MA.AlatID " & _
+             "),0) AS TotalTopUp, " & _
+             "ISNULL(( " & _
+             "    SELECT SUM(ShootDipakai) " & _
+             "    FROM LogPemakaianAlat " & _
+             "    WHERE AlatID = MA.AlatID " & _
+             "    AND IsVoid = 0 " & _
+             "),0) AS TotalPemakaian, " & _
+             "( " & _
+             "    MA.KuotaAwal " & _
+             "    + ISNULL(( " & _
+             "        SELECT SUM(JumlahTopUp) " & _
+             "        FROM LogTopUpAlat " & _
+             "        WHERE AlatID = MA.AlatID " & _
+             "    ),0) " & _
+             "    - ISNULL(( " & _
+             "        SELECT SUM(ShootDipakai) " & _
+             "        FROM LogPemakaianAlat " & _
+             "        WHERE AlatID = MA.AlatID " & _
+             "        AND IsVoid = 0 " & _
+             "    ),0) " & _
+             ") AS SaldoAkhir " & _
+             "FROM MasterAlat MA " & _
+             "WHERE MA.AlatID = " & alatID
 
         Dim dtSummary As DataTable = ReadSQL(sqlSummary)
 

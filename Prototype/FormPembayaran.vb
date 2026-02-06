@@ -875,6 +875,38 @@ Public Class FormPembayaran
         ComboBoxJenisEDC.SelectedIndex = -1
     End Sub
 
+    Public Class DetailTindakanItem
+        Public TindakanID As Integer
+        Public NamaTindakan As String
+        Public JenisTindakan As String
+        Public BiayaTindakan As Decimal
+        Public DiskonTindakan As Decimal
+        Public NettBayar As Decimal
+        Public KuotaTindakan As Decimal
+        Public GrandTotal As Decimal
+    End Class
+
+
+    Private Function GetListTindakanDariJSON(ByVal jsonDetail As String) As List(Of String)
+        Dim hasil As New List(Of String)
+
+        If jsonDetail <> "" Then
+            Try
+                Dim serializer As New System.Web.Script.Serialization.JavaScriptSerializer()
+                Dim listTindakan As List(Of DetailTindakanItem) = serializer.Deserialize(Of List(Of DetailTindakanItem))(jsonDetail)
+
+                If listTindakan IsNot Nothing Then
+                    For Each t As DetailTindakanItem In listTindakan
+                        hasil.Add(t.NamaTindakan)
+                    Next
+                End If
+            Catch ex As Exception
+            End Try
+        End If
+
+        Return hasil
+    End Function
+
     Private Sub SaveDataPembayaran()
         '# Variabel Umum
         Dim NewHeader As DataTable = CreateTable()
@@ -1098,8 +1130,14 @@ Public Class FormPembayaran
                                  "" & CDbl(rowTindakan("Diskon")) & ", " & CDbl(rowTindakan("Harga Nett")) & ", '" & rowTindakan("Kuota") & "', '" & rowTindakan("DetailTindakan") & "', 'PAID', '" & voucherID & "', '" & penjaminTindakan & "', '" & userInput & "', GETDATE())", 4)
 
                         Dim paket As New Dictionary(Of String, Object)
+
+                        Dim qtyTotal As Integer = Convert.ToInt32(rowTindakan("Kuota"))
+                        Dim listTindakanApi As List(Of String) = GetListTindakanDariJSON(rowTindakan("DetailTindakan").ToString())
+
                         paket.Add("id_paket", rowTindakan("PaketID").ToString())
-                        paket.Add("nama_paket", rowTindakan("Nama Paket").ToString())
+                        paket.Add("tindakan", listTindakanApi)
+                        paket.Add("qty", 0)
+                        paket.Add("qty_total", qtyTotal)
                         paket.Add("tgl_pembelian", tglPembelian)
                         paket.Add("tgl_perawatan", Nothing)
 

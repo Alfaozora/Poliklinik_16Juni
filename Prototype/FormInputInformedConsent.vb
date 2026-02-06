@@ -195,7 +195,7 @@ Public Class FormInputInformedConsent
             If ValidasiPostInformedConsent() = True Then
                 Dim Trow As DataRow = tblsRekamMedis.Rows(0)
                 Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
-                Dim urlWebService As String = baseURL & "api/lumiera-luzelle/ic"
+                Dim urlWebService As String = "https://mmc-online.mitramedicare.com/" & "api/lumiera-luzelle/ic"
                 Dim parameter As String = ""
                 Dim uri_message As String = ""
 
