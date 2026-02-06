@@ -1284,9 +1284,37 @@ Public Class FormPendaftaranAwal
                             WriteSQL("INSERT INTO LogPenggunaanPaket(NoRekamMedis, NoTransaksi, PaketID, TindakanID, JenisPaket, TanggalTransaksi, KodeVoucher, CreatedBy, CreatedDate) " & _
                                      "VALUES('" & TextBoxRM.Text & "', '" & nomorUrutTransaksi & "', '" & rowTindakan("PaketID") & "', '" & rowTindakan("TindakanID") & "', '" & rowTindakan("Jenis Paket") & "', GETDATE(), '" & rowTindakan("KodeVoucher") & "', '" & userInput & "', GETDATE())", 4)
 
-                            Dim usage As New Dictionary(Of String, Object)
+                            Dim namaPasien As String = nama
+                            Dim idPasien As String = TextBoxRM.Text
+                            Dim idTransaksiTindakan As String = nomorUrutTransaksi
 
+                            Dim namaTindakan As String = ""
                             Dim listTindakanApi As List(Of String) = GetListTindakanDariPaket(rowTindakan("PaketID").ToString())
+
+                            If listTindakanApi.Count > 0 Then
+                                namaTindakan = listTindakanApi(0)
+                            End If
+
+                            Dim jsonConsent As String = _
+                                "{" & _
+                                """nama"":""" & namaPasien.Replace("""", "'") & """," & _
+                                """no_rm"":""" & idPasien & """," & _
+                                """no_transaksi"":""" & idTransaksiTindakan & """," & _
+                                """tindakan"":""" & namaTindakan.Replace("""", "'") & """," & _
+                                """id_tindakan"":""" & rowTindakan("TindakanID").ToString() & """" & _
+                                "}"
+
+                            Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+                            Dim urlConsent As String = baseURL & "api/lumiera-luzelle/persetujuan-treatment"
+
+                            Dim responseConsent As String = InsertDataAPIRM(jsonConsent, urlConsent)
+
+                            If Not responseConsent.ToLower().Contains("success") Then
+                                MsgBox("Gagal kirim informed consent: " & responseConsent)
+                            End If
+
+                            '----------------------------------------------------------------------------
+                            Dim usage As New Dictionary(Of String, Object)
 
                             Dim qty As Integer = 1
                             If rowTindakan.Table.Columns.Contains("Qty") Then
@@ -1330,8 +1358,6 @@ Public Class FormPendaftaranAwal
                             payload.Add("packages", usageList)
 
                             Dim jsonParam As String = JsonConvert.SerializeObject(payload)
-
-                            MsgBox(jsonParam)
 
                             Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
                             Dim urlWebService As String = baseURL & "api/lumiera-luzelle/treatment-package"

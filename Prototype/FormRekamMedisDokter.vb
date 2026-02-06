@@ -2835,23 +2835,6 @@ Public Class FormRekamMedisDokter
 
                     'WriteSQL("UPDATE Inbody_User_Info SET " & parameterUpdateInbody & " WHERE USER_ID = '" & idTransaksi & "'", 4)
 
-                    Dim tinggiUserInbody As String = TextBoxTinggiBadanMedik.Text
-
-                    Dim result As DialogResult
-
-                    result = MessageBox.Show( _
-                        "Apakah data akan dikirim ke mesin Inbody?" & vbCrLf & vbCrLf & _
-                        "Nama : " & nama & vbCrLf & _
-                        "Jenis Kelamin : " & genderInbody & vbCrLf & _
-                        "Tanggal Lahir : " & tglLahirStr & vbCrLf & _
-                        "Umur : " & umur & vbCrLf & _
-                        "Tinggi Badan : " & tinggiUserInbody & " cm" & vbCrLf & _
-                        "Tanggal Order : " & orderDateStr, "Konfirmasi Kirim Data Inbody", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
-
-                    If result = DialogResult.Yes Then
-                        SendToApiInbody(nama, genderInbody, tglLahirStr, umur, tinggiUserInbody, orderDateStr)
-                    End If
-
                     If statusAPI IsNot Nothing AndAlso statusAPI = "Yes" Then
                         If ApiCekPasien(noRM) = False Then
 
@@ -2860,6 +2843,23 @@ Public Class FormRekamMedisDokter
                         End If
 
                         SendToApiPemFisik(noTransaksi, noRM, keadaanUmum, sistole, diastole, heartRate, suhu, saturasi, tinggi, berat, lingkarPerut, imt, keteranganIMT, nafas)
+
+                        Dim tinggiUserInbody As String = TextBoxTinggiBadanMedik.Text
+
+                        Dim result As DialogResult
+
+                        result = MessageBox.Show( _
+                            "Apakah data akan dikirim ke mesin Inbody?" & vbCrLf & vbCrLf & _
+                            "Nama : " & nama & vbCrLf & _
+                            "Jenis Kelamin : " & genderInbody & vbCrLf & _
+                            "Tanggal Lahir : " & tglLahirStr & vbCrLf & _
+                            "Umur : " & umur & vbCrLf & _
+                            "Tinggi Badan : " & tinggiUserInbody & " cm" & vbCrLf & _
+                            "Tanggal Order : " & orderDateStr, "Konfirmasi Kirim Data Inbody", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
+
+                        If result = DialogResult.Yes Then
+                            SendToApiInbody(nama, genderInbody, tglLahirStr, umur, tinggiUserInbody, orderDateStr)
+                        End If
                     End If
                 End If
 
@@ -12472,6 +12472,47 @@ Public Class FormRekamMedisDokter
         Report.ShowPreview()
     End Sub
 
+    Public Class DetailTindakanItem
+        Public TindakanID As Integer
+        Public NamaTindakan As String
+        Public JenisTindakan As String
+        Public BiayaTindakan As Decimal
+        Public DiskonTindakan As Decimal
+        Public NettBayar As Decimal
+        Public KuotaTindakan As Decimal
+        Public GrandTotal As Decimal
+    End Class
+
+    Private Function GetListTindakanDariPaket(ByVal paketID As String) As List(Of String)
+        Dim hasil As New List(Of String)
+
+        Dim dt As DataTable = ReadSQL("SELECT DetailTindakan FROM MasterPaketTindakan WHERE PaketID = '" & paketID & "'")
+
+        If dt.Rows.Count > 0 Then
+            Dim row As DataRow = dt.Rows(0)
+
+            If Not IsDBNull(row("DetailTindakan")) Then
+                Dim jsonDetail As String = row("DetailTindakan").ToString()
+
+                If jsonDetail <> "" Then
+                    Try
+                        Dim serializer As New System.Web.Script.Serialization.JavaScriptSerializer()
+                        Dim listTindakan As List(Of DetailTindakanItem) = serializer.Deserialize(Of List(Of DetailTindakanItem))(jsonDetail)
+
+                        If listTindakan IsNot Nothing Then
+                            For Each t As DetailTindakanItem In listTindakan
+                                hasil.Add(t.NamaTindakan)
+                            Next
+                        End If
+                    Catch ex As Exception
+                    End Try
+                End If
+            End If
+        End If
+
+        Return hasil
+    End Function
+
     Public Function SubmitPotongPaket(ByRef rowPaket() As DataRow) As DataTable
         Dim tblTindakan As New DataTable
         tblTindakan.Columns.Add("PaketID", GetType(String))
@@ -12551,10 +12592,59 @@ Public Class FormRekamMedisDokter
             WriteSQL("INSERT INTO TransaksiPoliBayarAwal (TransJenis, TransPoliID, JenisBayar, NoJenisBayar, JumlahBayar, admin, transaksitime, mesin, kartu) " & _
                  "VALUES('POLI', '" & transPoliId & "', 'VOUCHER', '-', '" & CDbl(totalTagihan) & "', '" & userInput & "', GETDATE(), '', '')", 4)
 
+            Dim usageList As New List(Of Object)
+
+            Dim namaPasien As String = ReadSQLNIK("SELECT Nama FROM MasterPasien WHERE NoRekamMedis = '" & idPasien & "'")
+            Dim noHp As String = ReadSQLNIK("SELECT NoHandphone FROM MasterPasien WHERE NoRekamMedis = '" & idPasien & "'")
+            Dim tglPerawatan As String = Date.Now.ToString("yyyy-MM-ddTHH:mm:ss")
+
             ' Proses tiap tindakan
             For Each rowTindakan As DataRow In tblTindakan.Rows
                 WriteSQL("INSERT INTO LogPenggunaanPaket(NoRekamMedis, NoTransaksi, PaketID, TindakanID, JenisPaket, TanggalTransaksi, KodeVoucher, CreatedBy, CreatedDate) " & _
                      "VALUES('" & idPasien & "', '" & idTransaksi & "', '" & rowTindakan("PaketID") & "', '" & rowTindakan("TindakanID") & "', '" & rowTindakan("Jenis Paket") & "', GETDATE(), '" & rowTindakan("KodeVoucher") & "', '" & userInput & "', GETDATE())", 4)
+
+                ' ================================
+                ' KIRIM API INFORMED CONSENT
+                ' ================================
+                Dim listTindakanApi As List(Of String) = GetListTindakanDariPaket(rowTindakan("PaketID").ToString())
+
+                Dim namaTindakan As String = ""
+                If listTindakanApi.Count > 0 Then
+                    namaTindakan = listTindakanApi(0)
+                End If
+
+                Dim jsonConsent As String = _
+                    "{" & _
+                    """nama"":""" & namaPasien.Replace("""", "'") & """," & _
+                    """no_rm"":""" & idPasien & """," & _
+                    """no_transaksi"":""" & idTransaksi & """," & _
+                    """tindakan"":""" & namaTindakan.Replace("""", "'") & """," & _
+                    """id_tindakan"":""" & rowTindakan("TindakanID").ToString() & """" & _
+                    "}"
+
+                Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+                Dim urlConsent As String = baseURL & "api/lumiera-luzelle/persetujuan-treatment"
+
+                Dim responseConsent As String = InsertDataAPIRM(jsonConsent, urlConsent)
+
+                If responseConsent.ToLower().Contains("success") Then
+                    MsgBox("Persetujuan untuk tindakan '" & namaTindakan & "' berhasil disimpan.", MsgBoxStyle.Information, "Informasi")
+                Else
+                    MsgBox("Persetujuan untuk tindakan '" & namaTindakan & "' gagal disimpan." & vbCrLf & _
+                    "Silakan ulangi proses atau hubungi admin.", MsgBoxStyle.Critical, "Peringatan")
+                End If
+
+                ' ================================
+                ' DATA UNTUK API PEMAKAIAN PAKET
+                ' ================================
+                Dim usage As New Dictionary(Of String, Object)
+                usage.Add("id_paket", rowTindakan("PaketID").ToString())
+                usage.Add("tindakan", listTindakanApi)
+                usage.Add("qty", 1)
+                usage.Add("tgl_pembelian", Nothing)
+                usage.Add("tgl_perawatan", tglPerawatan)
+
+                usageList.Add(usage)
 
                 If rowTindakan("Jenis Paket").ToString() = "Paket Reguler" Then
                     WriteSQL("UPDATE TransaksiPaketTindakan SET Kuota = Kuota - 1 WHERE PaketID = '" & rowTindakan("PaketID") & "' AND KodeVoucher = '" & rowTindakan("KodeVoucher") & "' AND DeletedDate IS NULL", 4)
@@ -12562,6 +12652,28 @@ Public Class FormRekamMedisDokter
                     WriteSQL("UPDATE TransaksiPaketTindakanDetail SET KuotaTindakan = KuotaTindakan - 1 WHERE PaketID = '" & rowTindakan("PaketID") & "' AND TindakanID = '" & rowTindakan("TindakanID") & "' AND KodeVoucher = '" & rowTindakan("KodeVoucher") & "'", 4)
                 End If
             Next
+
+            If usageList.Count > 0 Then
+
+                Dim payload As New Dictionary(Of String, Object)
+                payload.Add("nama_pasien", namaPasien)
+                payload.Add("no_hp", noHp)
+                payload.Add("no_transaksi", idTransaksi)
+                payload.Add("no_rm", idPasien)
+                payload.Add("packages", usageList)
+
+                Dim jsonParam As String = JsonConvert.SerializeObject(payload)
+
+                Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+                Dim urlWebService As String = baseURL & "api/lumiera-luzelle/treatment-package"
+
+                Dim responseApi As String = InsertDataAPIRM(jsonParam, urlWebService)
+
+                If Not responseApi.ToLower().Contains("success") Then
+                    MsgBox("Pemotongan paket gagal dikirim ke API: " & responseApi)
+                End If
+
+            End If
 
             ' Ambil TindakanID dari rowPaket agar hanya tindakan yang dipilih yang disimpan
             Dim tindakanDipilih As New HashSet(Of String)
