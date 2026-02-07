@@ -21,6 +21,8 @@ Imports System.Text
 Imports System.Globalization
 Imports System.Net
 Imports System.Windows.Forms
+Imports System.Web.Script.Serialization
+
 
 Public Class FormICPaket
     Public NamaForm As String
@@ -369,17 +371,55 @@ Public Class FormICPaket
         SetComboBoxSelectedIndex(ComboBoxAlternatif)
     End Sub
 
+    Public Class DetailTindakanItem
+        Public TindakanID As Integer
+        Public NamaTindakan As String
+        Public JenisTindakan As String
+        Public BiayaTindakan As Decimal
+        Public DiskonTindakan As Decimal
+        Public NettBayar As Decimal
+        Public KuotaTindakan As Decimal
+        Public GrandTotal As Decimal
+    End Class
+
+
     Private Sub LoadInformedConsentPaket()
 
         ' ===================================
         ' AMBIL NAMA PAKET
         ' ===================================
-        Dim dtPaket As DataTable = ReadSQL("Select NamaPaket, HargaNett FROM MasterPaketTindakan WHERE PaketID = '" & SelectedPaketID & "'")
+        Dim dtPaket As DataTable = ReadSQL("Select NamaPaket, HargaNett, DetailTindakan FROM MasterPaketTindakan WHERE PaketID = '" & SelectedPaketID & "'")
 
         If dtPaket.Rows.Count > 0 Then
-            TextBoxNamaTindakan.Text = dtPaket.Rows(0)("NamaPaket").ToString()
-            TextBoxBiayaTindakan.Text = Format(CDec(dtPaket.Rows(0)("HargaNett")), "#,##0")
+
+            Dim row As DataRow = dtPaket.Rows(0)
+            Dim jsonDetail As String = ""
+
+            If Not IsDBNull(row("DetailTindakan")) Then
+                jsonDetail = row("DetailTindakan").ToString()
+            End If
+
+            If jsonDetail <> "" Then
+                Try
+                    Dim serializer As New System.Web.Script.Serialization.JavaScriptSerializer()
+                    Dim listTindakan As List(Of DetailTindakanItem) = serializer.Deserialize(Of List(Of DetailTindakanItem))(jsonDetail)
+
+                    If listTindakan IsNot Nothing AndAlso listTindakan.Count > 0 Then
+                        TextBoxNamaTindakan.Text = listTindakan(0).NamaTindakan
+                    Else
+                        TextBoxNamaTindakan.Text = row("NamaPaket").ToString()
+                    End If
+                Catch ex As Exception
+                    ' fallback jika JSON error
+                    TextBoxNamaTindakan.Text = row("NamaPaket").ToString()
+                End Try
+            Else
+                TextBoxNamaTindakan.Text = row("NamaPaket").ToString()
+            End If
+
+            TextBoxBiayaTindakan.Text = Format(CDec(row("HargaNett")), "#,##0")
             TextBoxDiagnosa.Text = "General examination and investigation of persons without complaint and reported diagnosis (Z00)"
+
         Else
             TextBoxNamaTindakan.Text = ""
             TextBoxBiayaTindakan.Text = ""

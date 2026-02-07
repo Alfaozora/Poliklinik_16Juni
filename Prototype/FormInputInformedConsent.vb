@@ -194,8 +194,7 @@ Public Class FormInputInformedConsent
         Try
             If ValidasiPostInformedConsent() = True Then
                 Dim Trow As DataRow = tblsRekamMedis.Rows(0)
-                Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
-                Dim urlWebService As String = baseURL & "api/lumiera-luzelle/ic"
+                Dim urlWebService As String = "https://mmc-online.mitramedicare.com/api/lumiera-luzelle/ic"
                 Dim parameter As String = ""
                 Dim uri_message As String = ""
 
@@ -260,20 +259,26 @@ Public Class FormInputInformedConsent
 
                 Dim jsonObj As JObject = JObject.Parse(response)
 
-                If jsonObj("metaData") Is Nothing OrElse jsonObj("response") Is Nothing Then
-                    MsgBox("Response API tidak sesuai format:" & vbCrLf & vbCrLf & response, MsgBoxStyle.Critical, "API ERROR")
-                    Exit Sub
+                Dim metaDataMessage As String = ""
+                If jsonObj("metaData") IsNot Nothing Then
+                    If jsonObj("metaData")("message") IsNot Nothing Then
+                        metaDataMessage = jsonObj("metaData")("message").ToString()
+                    End If
                 End If
 
-                Dim metaDataMessage As String = jsonObj("metaData")("message").ToString()
+                Dim responseMessage As String = "Berhasil disimpan." & vbCrLf & vbCrLf & "Silahkan menuju web Inform Consent untuk tanda tangan pasien."
 
-                Dim responseMessage As String = jsonObj("response")("message").ToString()
+                If jsonObj("response") IsNot Nothing Then
+                    If jsonObj("response")("message") IsNot Nothing Then
+                        responseMessage = jsonObj("response")("message").ToString()
+                    End If
+                End If
 
                 If metaDataMessage = "TRANSACTION_COMPLETE" Then
                     MsgBox(responseMessage, MsgBoxStyle.Information, "Success!")
                     Me.Close()
                 Else
-                    MsgBox(responseMessage, MsgBoxStyle.Critical, "Warning!")
+                    MsgBox(response, MsgBoxStyle.Critical, "Warning!")
                 End If
             End If
         Catch ex As Exception
