@@ -5517,6 +5517,27 @@ Public Class FormRekamMedisDokter
         'Next
     End Sub
 
+    Private Function GetFirstTindakanIDFromPaket(ByVal paketID As String) As String
+        Try
+            Dim dt As DataTable = ReadSQL("SELECT DetailTindakan FROM MasterPaketTindakan WHERE PaketID = '" & paketID & "'")
+
+            If dt.Rows.Count > 0 Then
+                Dim jsonText As String = dt.Rows(0)("DetailTindakan").ToString()
+
+                If jsonText <> "" Then
+                    Dim listTindakan As List(Of TindakanDetail) = JsonConvert.DeserializeObject(Of List(Of TindakanDetail))(jsonText)
+
+                    If listTindakan IsNot Nothing AndAlso listTindakan.Count > 0 Then
+                        Return listTindakan(0).TindakanID
+                    End If
+                End If
+            End If
+        Catch
+        End Try
+
+        Return ""
+    End Function
+
     Private Sub ButtonInformedConsentInput_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonInputInformedConsent.Click
         Try
             If ValidasiDataTindakanPoli() = True Then
@@ -12528,6 +12549,47 @@ Public Class FormRekamMedisDokter
 
 
         Try
+            If rowPaket IsNot Nothing AndAlso rowPaket.Length > 0 Then
+                For Each row As DataRow In rowPaket
+                    Dim idPaket As String = row("PaketID").ToString()
+
+                    If Not ValidasiInformedConsentPaket(idPasien, idPaket, userInput) Then
+
+                        Dim jawab As DialogResult = MsgBox( _
+                            "Informed Consent belum ditandatangani." & vbCrLf & _
+                            "Apakah ingin mengisi Informed Consent sekarang?", _
+                            MsgBoxStyle.YesNo + MsgBoxStyle.Question, _
+                            "Konfirmasi")
+
+                        If jawab = DialogResult.Yes Then
+                            Try
+                                Dim statusPersetujuan As Boolean = True
+                                Dim tindakanID As String = row("TindakanID").ToString()
+
+                                If tindakanID = "" Or tindakanID = "0" Then
+                                    tindakanID = GetFirstTindakanIDFromPaket(row("PaketID").ToString())
+                                End If
+
+
+                                FormInputInformedConsent.SetForm( _
+                                    "RekamMedisPerencanaanTindakan", _
+                                    tblsRekamMedis, _
+                                    tindakanID, _
+                                    statusPersetujuan, _
+                                    jenisTransaksi)
+
+                                FormInputInformedConsent.ShowDialog()
+
+                            Catch ex As Exception
+                                MsgBox(ex.Message, MsgBoxStyle.Critical, "Warning!")
+                            End Try
+                        End If
+
+                        Return Nothing
+                    End If
+                Next
+            End If
+
             Dim totalTagihan As Decimal = 0
             Dim identitasPaket As String = ""
             Dim listPaketID As New HashSet(Of String)
@@ -12567,7 +12629,7 @@ Public Class FormRekamMedisDokter
 
             Dim hargaNettPaket As Decimal = 0
             Dim kuotaPaket As Integer = 1
-           
+
             If tblPaket IsNot Nothing AndAlso tblPaket.Rows.Count > 0 Then
                 Dim paket As DataRow = tblPaket.Rows(0)
                 If Not IsDBNull(paket("HargaNett")) Then
