@@ -4452,6 +4452,7 @@ Public Class FormRekamMedisDokter
                 queryUnion1 = "SELECT DISTINCT " & _
                     "NULL AS ID, " & _
                     "LPP.TindakanID, " & _
+                    "LPP.PaketID, " & _
                     "TPTD.NamaTindakan, " & _
                     "TPT.JenisPaket AS JenisTindakan, " & _
                     "TPBA.admin AS CreatedBy, " & _
@@ -4475,6 +4476,7 @@ Public Class FormRekamMedisDokter
                 queryUnion2 = "SELECT DISTINCT " & _
                     "TPD.TransPoliIDDetail AS ID, " & _
                     "TPD.TindakanID, " & _
+                    "TPD.PaketID, " & _
                     "TPTD.NamaTindakan, " & _
                     "TPT.JenisPaket AS JenisTindakan, " & _
                     "TPBA.admin AS CreatedBy, " & _
@@ -4495,7 +4497,7 @@ Public Class FormRekamMedisDokter
 
             ' Tindakan langsung dari TransaksiPoliDetail
             queryUnion3 = "SELECT DISTINCT " & _
-                "TPD.TransPoliIDDetail AS ID, TPD.TindakanID, " & _
+                "TPD.TransPoliIDDetail AS ID, TPD.TindakanID, TPD.PaketID, " & _
                 "ISNULL(TPTD.NamaTindakan, TPD.NamaTindakan) AS NamaTindakan, " & _
                 "TPD.JenisTindakan, TPD.CreatedBy, TPD.CreatedDate, " & _
                 "TPD.StatusPembayaran, TPD.Penjamin, LPP.KodeVoucher, NULL AS Kuota " & _
@@ -4534,7 +4536,7 @@ Public Class FormRekamMedisDokter
             CreateDataGridViewTindakan()
 
             For Each Trow As DataRow In Tbls.Rows
-                DataGridViewTindakan.Rows.Add(New String() {"" & Trow("ID") & "", "" & Trow("TindakanID") & "", "" & Trow("NamaTindakan") & "", "" & Trow("JenisTindakan") & "", "" & Trow("Penjamin") & "", "" & Trow("CreatedBy") & "", "" & Format(Trow("CreatedDate"), "yyyy-MM-dd HH:mm:ss") & "", "" & Trow("StatusPembayaran") & "", "" & Trow("Kuota") & "", "" & Trow("KodeVoucher") & ""})
+                DataGridViewTindakan.Rows.Add(New String() {"" & Trow("ID") & "", "" & Trow("TindakanID") & "", "" & Trow("PaketID") & "", "" & Trow("NamaTindakan") & "", "" & Trow("JenisTindakan") & "", "" & Trow("Penjamin") & "", "" & Trow("CreatedBy") & "", "" & Format(Trow("CreatedDate"), "yyyy-MM-dd HH:mm:ss") & "", "" & Trow("StatusPembayaran") & "", "" & Trow("Kuota") & "", "" & Trow("KodeVoucher") & ""})
             Next
 
             DataGridViewTindakan.CurrentCell = Nothing
@@ -6950,6 +6952,7 @@ Public Class FormRekamMedisDokter
         ' Add columns
         DataGridViewTindakan.Columns.Add("ColumnID", "ID")
         DataGridViewTindakan.Columns.Add("ColumnTindakanID", "TindakanID")
+        DataGridViewTindakan.Columns.Add("ColumnPaketID", "PaketID")
         DataGridViewTindakan.Columns.Add("ColumnNamaTindakan", "NamaTindakan")
         DataGridViewTindakan.Columns.Add("ColumnJenisTindakan", "JenisTindakan")
         DataGridViewTindakan.Columns.Add("ColumnPenjaminTindakan", "PenjaminTindakan")
@@ -6978,6 +6981,7 @@ Public Class FormRekamMedisDokter
         ' Sembunyikan kolom
         DataGridViewTindakan.Columns("ColumnID").Visible = False
         DataGridViewTindakan.Columns("ColumnTindakanID").Visible = False
+        DataGridViewTindakan.Columns("ColumnPaketID").Visible = False
         DataGridViewTindakan.Columns("ColumnKodeVoucher").Visible = False
     End Sub
 
@@ -9418,6 +9422,29 @@ Public Class FormRekamMedisDokter
     '    End If
     'End Sub
 
+    Function GetIDTindakanAtauPaket(ByVal dgv As DataGridView, ByVal rowIndex As Integer) As String
+        Dim tindakanObj As Object = dgv.Rows(rowIndex).Cells("ColumnTindakanID").Value
+        Dim paketObj As Object = dgv.Rows(rowIndex).Cells("ColumnPaketID").Value
+
+        ' Jika PaketID ada dan bukan 0 → pakai PaketID
+        If Not IsDBNull(paketObj) AndAlso paketObj IsNot Nothing Then
+            Dim paketID As String = paketObj.ToString().Trim()
+            If paketID <> "" AndAlso paketID <> "0" Then
+                Return paketID
+            End If
+        End If
+
+        ' Jika tidak ada paket → pakai TindakanID
+        If Not IsDBNull(tindakanObj) AndAlso tindakanObj IsNot Nothing Then
+            Dim tindakanID As String = tindakanObj.ToString().Trim()
+            If tindakanID <> "" Then
+                Return tindakanID
+            End If
+        End If
+
+        Return ""
+    End Function
+
     Private Sub DataGridViewTindakan_CellClick(ByVal sender As Object, ByVal e As DataGridViewCellEventArgs) Handles DataGridViewTindakan.CellClick
 
         If e.RowIndex < 0 Then Exit Sub
@@ -9449,9 +9476,13 @@ Public Class FormRekamMedisDokter
 
         ElseIf colName = "ButtonInformedConsent" Then
 
-            Dim idTindakan As String = dgv.Rows(e.RowIndex).Cells("ColumnTindakanID").Value.ToString()
+            Dim idTindakan As String = GetIDTindakanAtauPaket(dgv, e.RowIndex)
 
-            PreviewInformedConsent(idTransaksi, idTindakan)
+            If idTindakan <> "" Then
+                PreviewInformedConsent(idTransaksi, idTindakan)
+            Else
+                MsgBox("ID tindakan tidak ditemukan.", MsgBoxStyle.Exclamation)
+            End If
 
         End If
 
