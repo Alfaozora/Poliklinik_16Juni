@@ -2770,8 +2770,15 @@ Public Class FormRekamMedisDokter
                              "VALUES('" & idTransaksi & "', '" & GetKeadaanUmum("Medik") & "', '" & GetKesadaran("Medik") & "', '" & TrackBarSkalaNyeriMedik.Value.ToString() & "', '" & TextBoxSistoleMedik.Text & "', '" & TextBoxDiastoleMedik.Text & "', '" & TextBoxDetakNadiMedik.Text & "', " & _
                                     "'" & TextBoxNafasMedik.Text & "', '" & TextBoxSuhuMedik.Text & "', '" & TextBoxSaturasiMedik.Text & "', '" & TextBoxTinggiBadanMedik.Text & "', '" & TextBoxBeratBadanMedik.Text & "', '" & TextBoxLingkarPerutMedik.Text & "', '" & TextBoxIndeksMedik.Text & "', '" & TextBoxIndeksKeteranganMedik.Text & "', '" & userInput & "', GETDATE())", 4)
 
-                    Dim tinggiUserInbody As String = TextBoxTinggiBadanMedik.Text
+                    If statusAPI IsNot Nothing AndAlso statusAPI = "Yes" Then
+                        If ApiCekPasien(noRM) = False Then
+                            ApiInsertPasien(noRM, nama, tglLahir, jenisKelamin)
+                        End If
 
+                        SendToApiPemFisik(noTransaksi, noRM, keadaanUmum, sistole, diastole, heartRate, suhu, saturasi, tinggi, berat, lingkarPerut, imt, keteranganIMT, nafas)
+                    End If
+
+                    Dim tinggiUserInbody As String = TextBoxTinggiBadanMedik.Text
                     Dim result As DialogResult
 
                     result = MessageBox.Show( _
@@ -9220,7 +9227,7 @@ Public Class FormRekamMedisDokter
             idTindakanDetail = idTindakanDetailObj.ToString()
 
             If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
-                Dim idTindakan As String = ReadSQLNIK("SELECT TindakanID FROM TransaksiPoliDetail WHERE TransPoliIDDetail = '" & idTindakanDetail & "'")
+                Dim idTindakan As String = ReadSQLNIK("SELECT PaketID FROM TransaksiPoliDetail WHERE TransPoliIDDetail = '" & idTindakanDetail & "'")
 
                 ' Soft delete hanya baris yang dipilih
                 WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
@@ -9236,18 +9243,33 @@ Public Class FormRekamMedisDokter
                       "}"
 
                 Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
-
                 Dim urlWebService As String = baseURL & "api/lumiera-luzelle/persetujuan-treatment/delete"
-
                 Dim responseApi As String = InsertDataAPIRM(jsonParam, urlWebService)
 
                 If responseApi.ToLower().Contains("""success"":true") Then
-                    MsgBox("API DELETE PERSETUJUAN BERHASIL")
+                    MsgBox("Delete Persetujuan Tindakan Berhasil")
 
                 Else
-                    MsgBox("API DELETE PERSETUJUAN GAGAL: " & responseApi)
-                    MsgBox("Gagal menghapus persetujuan tindakan di server RM." & vbCrLf & "Silakan hubungi IT.", MsgBoxStyle.Exclamation, "Peringatan")
+                    MsgBox("Delete Persetujuan Tindakan Gagal: " & responseApi)
+                    MsgBox("Gagal menghapus persetujuan tindakan di server online." & vbCrLf & "Silakan hubungi IT.", MsgBoxStyle.Exclamation, "Peringatan")
+                End If
 
+                Dim jsonParamPaket As String = _
+                      "{" & _
+                      """no_transaksi"":""" & idTransaksi & """," & _
+                      """no_rm"":""" & idPasien & """," & _
+                      """id_paket"":""" & idTindakan & """" & _
+                      "}"
+
+                Dim urlWebServiceHapusPaket As String = baseURL & "api/lumiera-luzelle/treatment-package/delete"
+                Dim responseApiHapusPaket As String = InsertDataAPIRM(jsonParamPaket, urlWebServiceHapusPaket)
+
+                If responseApiHapusPaket.ToLower().Contains("""success"":true") Then
+                    MsgBox("Delete Penggunaan Paket Berhasil")
+
+                Else
+                    MsgBox("Delete Penggunaan Paket Gagal: " & responseApiHapusPaket)
+                    MsgBox("Gagal menghapus paket tindakan di server online." & vbCrLf & "Silakan hubungi IT.", MsgBoxStyle.Exclamation, "Peringatan")
                 End If
             ElseIf jenisTransaksi = "GIGI" Then
                 WriteSQL("UPDATE TransaksiGigiDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
@@ -12681,7 +12703,7 @@ Public Class FormRekamMedisDokter
                     """no_rm"":""" & idPasien & """," & _
                     """no_transaksi"":""" & idTransaksi & """," & _
                     """tindakan"":""" & namaTindakan.Replace("""", "'") & """," & _
-                    """id_tindakan"":""" & rowTindakan("TindakanID").ToString() & """" & _
+                    """id_tindakan"":""" & rowTindakan("PaketID").ToString() & """" & _
                     "}"
 
                 Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
