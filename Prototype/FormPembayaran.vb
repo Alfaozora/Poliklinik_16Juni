@@ -907,6 +907,35 @@ Public Class FormPembayaran
         Return hasil
     End Function
 
+    Private Function JsonToDataTable(ByVal json As String) As DataTable
+        Dim dt As New DataTable
+
+        Try
+            Dim arr = Newtonsoft.Json.Linq.JArray.Parse(json)
+
+            If arr.Count > 0 Then
+                ' buat kolom dari properti JSON
+                For Each prop In arr(0).Children(Of Newtonsoft.Json.Linq.JProperty)()
+                    dt.Columns.Add(prop.Name)
+                Next
+            End If
+
+            ' isi baris
+            For Each item In arr
+                Dim row As DataRow = dt.NewRow()
+                For Each prop In item.Children(Of Newtonsoft.Json.Linq.JProperty)()
+                    row(prop.Name) = prop.Value.ToString()
+                Next
+                dt.Rows.Add(row)
+            Next
+
+        Catch ex As Exception
+            MsgBox("Gagal parsing DetailTindakan: " & ex.Message)
+        End Try
+
+        Return dt
+    End Function
+
     Private Sub SaveDataPembayaran()
         '# Variabel Umum
         Dim NewHeader As DataTable = CreateTable()
@@ -1129,19 +1158,56 @@ Public Class FormPembayaran
                                  "VALUES('" & _noRekamMedis & "', '" & _nomorUrutTransaksi & "', '" & rowTindakan("PaketID") & "', '" & rowTindakan("Nama Paket") & "', '" & rowTindakan("Keterangan Paket") & "', '" & rowTindakan("Jenis Paket") & "', GETDATE(), DATEADD(DAY, " & rowTindakan("DurasiAktif") & ", GETDATE()), " & CDbl(rowTindakan("Harga Awal")) & ", " & _
                                  "" & CDbl(rowTindakan("Diskon")) & ", " & CDbl(rowTindakan("Harga Nett")) & ", '" & rowTindakan("Kuota") & "', '" & rowTindakan("DetailTindakan") & "', 'PAID', '" & voucherID & "', '" & penjaminTindakan & "', '" & userInput & "', GETDATE())", 4)
 
-                        Dim paket As New Dictionary(Of String, Object)
+                        Dim jenisPaket As String = rowTindakan("Jenis Paket").ToString()
 
-                        Dim qtyTotal As Integer = Convert.ToInt32(rowTindakan("Kuota"))
-                        Dim listTindakanApi As List(Of String) = GetListTindakanDariJSON(rowTindakan("DetailTindakan").ToString())
+                        If jenisPaket = "Paket Reguler" Then
 
-                        paket.Add("id_paket", rowTindakan("PaketID").ToString())
-                        paket.Add("tindakan", listTindakanApi)
-                        paket.Add("qty", 0)
-                        paket.Add("qty_total", qtyTotal)
-                        paket.Add("tgl_pembelian", tglPembelian)
-                        paket.Add("tgl_perawatan", Nothing)
+                            Dim paket As New Dictionary(Of String, Object)
 
-                        paketList.Add(paket)
+                            Dim qtyTotal As Integer = Convert.ToInt32(rowTindakan("Kuota"))
+                            Dim listTindakanApi As List(Of String) = GetListTindakanDariJSON(rowTindakan("DetailTindakan").ToString())
+
+                            paket.Add("id_paket", rowTindakan("PaketID").ToString())
+                            paket.Add("kode_voucher", voucherID)
+                            paket.Add("tindakan", listTindakanApi)
+                            paket.Add("qty", 0)
+                            paket.Add("qty_total", qtyTotal)
+                            paket.Add("tgl_pembelian", tglPembelian)
+                            paket.Add("tgl_perawatan", Nothing)
+
+                            paketList.Add(paket)
+
+                        ElseIf jenisPaket = "Paket Per-Tindakan" Then
+
+                            Dim detailJson As String = rowTindakan("DetailTindakan").ToString()
+
+                            If detailJson <> "" Then
+                                Dim dtTindakan As DataTable = JsonToDataTable(detailJson)
+
+                                For Each rowDetail As DataRow In dtTindakan.Rows
+
+                                    Dim paket As New Dictionary(Of String, Object)
+
+                                    Dim namaTindakan As String = rowDetail("NamaTindakan").ToString()
+                                    Dim kuotaTindakan As Integer = Convert.ToInt32(rowDetail("KuotaTindakan"))
+
+                                    Dim listTindakanApi As New List(Of String)
+                                    listTindakanApi.Add(namaTindakan)
+
+                                    paket.Add("id_paket", rowTindakan("PaketID").ToString())
+                                    paket.Add("kode_voucher", voucherID)
+                                    paket.Add("tindakan", listTindakanApi)
+                                    paket.Add("qty", 0)
+                                    paket.Add("qty_total", kuotaTindakan)
+                                    paket.Add("tgl_pembelian", tglPembelian)
+                                    paket.Add("tgl_perawatan", Nothing)
+
+                                    paketList.Add(paket)
+
+                                Next
+                            End If
+
+                        End If
 
                         ' Insert Tabel TransaksiPaketTindakanDetail
                         Dim tblPaketDetail As DataTable = ReadSQL("SELECT * FROM MasterPaketTindakanDetail WHERE PaketID = '" & rowTindakan("PaketID") & "'")

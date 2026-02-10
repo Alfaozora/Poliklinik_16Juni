@@ -12587,6 +12587,55 @@ Public Class FormRekamMedisDokter
         Return hasil
     End Function
 
+    Private Function JsonToDataTable(ByVal json As String) As DataTable
+        Dim dt As New DataTable
+
+        Try
+            Dim arr = Newtonsoft.Json.Linq.JArray.Parse(json)
+
+            If arr.Count > 0 Then
+                ' buat kolom dari properti JSON
+                For Each prop In arr(0).Children(Of Newtonsoft.Json.Linq.JProperty)()
+                    dt.Columns.Add(prop.Name)
+                Next
+            End If
+
+            ' isi baris
+            For Each item In arr
+                Dim row As DataRow = dt.NewRow()
+                For Each prop In item.Children(Of Newtonsoft.Json.Linq.JProperty)()
+                    row(prop.Name) = prop.Value.ToString()
+                Next
+                dt.Rows.Add(row)
+            Next
+
+        Catch ex As Exception
+            MsgBox("Gagal parsing DetailTindakan: " & ex.Message)
+        End Try
+
+        Return dt
+    End Function
+
+    Function GetNamaTindakanDariDetailPaket(ByVal paketID As String, ByVal tindakanID As String) As String
+        Dim namaTindakan As String = ""
+
+        Dim detailJson As String = ReadSQLNIK( _
+            "SELECT DetailTindakan FROM MasterPaketTindakan WHERE PaketID = '" & paketID & "'")
+
+        If detailJson <> "" Then
+            Dim dt As DataTable = JsonToDataTable(detailJson)
+
+            For Each row As DataRow In dt.Rows
+                If row("TindakanID").ToString() = tindakanID Then
+                    namaTindakan = row("NamaTindakan").ToString()
+                    Exit For
+                End If
+            Next
+        End If
+
+        Return namaTindakan
+    End Function
+
     Public Function SubmitPotongPaket(ByRef rowPaket() As DataRow) As DataTable
         Dim tblTindakan As New DataTable
         tblTindakan.Columns.Add("PaketID", GetType(String))
@@ -12721,11 +12770,20 @@ Public Class FormRekamMedisDokter
                 ' ================================
                 ' KIRIM API INFORMED CONSENT
                 ' ================================
-                Dim listTindakanApi As List(Of String) = GetListTindakanDariPaket(rowTindakan("PaketID").ToString())
-
                 Dim namaTindakan As String = ""
-                If listTindakanApi.Count > 0 Then
-                    namaTindakan = listTindakanApi(0)
+                Dim listTindakanApi As New List(Of String)
+
+                Dim jenisPaket As String = rowTindakan("Jenis Paket").ToString()
+
+                If jenisPaket = "Paket Reguler" Then
+                    listTindakanApi = GetListTindakanDariPaket(rowTindakan("PaketID").ToString())
+                    If listTindakanApi.Count > 0 Then
+                        namaTindakan = listTindakanApi(0)
+                    End If
+                ElseIf jenisPaket = "Paket Per-Tindakan" Then
+                    Dim tindakanID As String = rowTindakan("TindakanID").ToString()
+                    namaTindakan = GetNamaTindakanDariDetailPaket(rowTindakan("PaketID").ToString(), tindakanID)
+                    listTindakanApi.Add(namaTindakan)
                 End If
 
                 Dim jsonConsent As String = _
@@ -12734,7 +12792,7 @@ Public Class FormRekamMedisDokter
                     """no_rm"":""" & idPasien & """," & _
                     """no_transaksi"":""" & idTransaksi & """," & _
                     """tindakan"":""" & namaTindakan.Replace("""", "'") & """," & _
-                    """id_tindakan"":""" & rowTindakan("PaketID").ToString() & """" & _
+                    """id_tindakan"":""" & rowTindakan("TindakanID").ToString() & """" & _
                     "}"
 
                 Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
@@ -12754,8 +12812,10 @@ Public Class FormRekamMedisDokter
                 ' ================================
                 Dim usage As New Dictionary(Of String, Object)
                 usage.Add("id_paket", rowTindakan("PaketID").ToString())
+                usage.Add("kode_voucher", rowTindakan("KodeVoucher").ToString())
                 usage.Add("tindakan", listTindakanApi)
                 usage.Add("qty", 1)
+                usage.Add("qty_total", Nothing)
                 usage.Add("tgl_pembelian", Nothing)
                 usage.Add("tgl_perawatan", tglPerawatan)
 

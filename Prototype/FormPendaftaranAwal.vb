@@ -1187,6 +1187,26 @@ Public Class FormPendaftaranAwal
         End If
     End Sub
 
+    Function GetNamaTindakanDariDetailPaket(ByVal paketID As String, ByVal tindakanID As String) As String
+        Dim namaTindakan As String = ""
+
+        Dim detailJson As String = ReadSQLNIK( _
+            "SELECT DetailTindakan FROM MasterPaketTindakan WHERE PaketID = '" & paketID & "'")
+
+        If detailJson <> "" Then
+            Dim dt As DataTable = JsonToDataTable(detailJson)
+
+            For Each row As DataRow In dt.Rows
+                If row("TindakanID").ToString() = tindakanID Then
+                    namaTindakan = row("NamaTindakan").ToString()
+                    Exit For
+                End If
+            Next
+        End If
+
+        Return namaTindakan
+    End Function
+
     Public Sub SimpanPenggunaanPaket()
         If ValidasiInputPendaftaran() = True Then
             Dim idTransaksi As String = ""
@@ -1289,10 +1309,19 @@ Public Class FormPendaftaranAwal
                             Dim idTransaksiTindakan As String = nomorUrutTransaksi
 
                             Dim namaTindakan As String = ""
-                            Dim listTindakanApi As List(Of String) = GetListTindakanDariPaket(rowTindakan("PaketID").ToString())
+                            Dim listTindakanApi As New List(Of String)
 
-                            If listTindakanApi.Count > 0 Then
-                                namaTindakan = listTindakanApi(0)
+                            Dim jenisPaket As String = rowTindakan("Jenis Paket").ToString()
+
+                            If jenisPaket = "Paket Reguler" Then
+                                listTindakanApi = GetListTindakanDariPaket(rowTindakan("PaketID").ToString())
+                                If listTindakanApi.Count > 0 Then
+                                    namaTindakan = listTindakanApi(0)
+                                End If
+                            ElseIf jenisPaket = "Paket Per-Tindakan" Then
+                                Dim tindakanID As String = rowTindakan("TindakanID").ToString()
+                                namaTindakan = GetNamaTindakanDariDetailPaket(rowTindakan("PaketID").ToString(), tindakanID)
+                                listTindakanApi.Add(namaTindakan)
                             End If
 
                             Dim jsonConsent As String = _
@@ -1322,6 +1351,7 @@ Public Class FormPendaftaranAwal
                             End If
 
                             usage.Add("id_paket", rowTindakan("PaketID").ToString())
+                            usage.Add("kode_voucher", rowTindakan("KodeVoucher").ToString())
                             usage.Add("tindakan", listTindakanApi)
 
                             If isPembelianBaru = True Then
@@ -1334,6 +1364,7 @@ Public Class FormPendaftaranAwal
                                 usage.Add("tgl_perawatan", Nothing)
                             Else
                                 usage.Add("qty", qty)
+                                usage.Add("qty_total", Nothing)
                                 usage.Add("tgl_pembelian", Nothing)
                                 usage.Add("tgl_perawatan", tglPerawatan)
                             End If
@@ -2334,6 +2365,35 @@ Public Class FormPendaftaranAwal
         End If
     End Sub
 
+    Private Function JsonToDataTable(ByVal json As String) As DataTable
+        Dim dt As New DataTable
+
+        Try
+            Dim arr = Newtonsoft.Json.Linq.JArray.Parse(json)
+
+            If arr.Count > 0 Then
+                ' buat kolom dari properti JSON
+                For Each prop In arr(0).Children(Of Newtonsoft.Json.Linq.JProperty)()
+                    dt.Columns.Add(prop.Name)
+                Next
+            End If
+
+            ' isi baris
+            For Each item In arr
+                Dim row As DataRow = dt.NewRow()
+                For Each prop In item.Children(Of Newtonsoft.Json.Linq.JProperty)()
+                    row(prop.Name) = prop.Value.ToString()
+                Next
+                dt.Rows.Add(row)
+            Next
+
+        Catch ex As Exception
+            MsgBox("Gagal parsing DetailTindakan: " & ex.Message)
+        End Try
+
+        Return dt
+    End Function
+
     Public Sub LoadTindakanPaketQR(ByRef rowPaket() As DataRow)
         'If ValidasiTambahPaketTindakan(rowPaket) = True Then
         '    Dim tblTindakan As DataTable = GridControlTindakanPoli.DataSource
@@ -2375,52 +2435,86 @@ Public Class FormPendaftaranAwal
 
                         SelectedPaketID = Trow("PaketID").ToString()
 
-                        If tblPaket.Columns.Contains("StatusInformedConsent") Then
-                            If Not IsDBNull(Trow("StatusInformedConsent")) Then
-                                If CBool(Trow("StatusInformedConsent")) = True Then
-                                    NeedInformedConsent = True
-                                    PanelInformConsent.Visible = True
+                        Dim jenisPaket As String = Trow("JenisPaket").ToString()
+
+                        If jenisPaket = "Paket Per-Tindakan" Then
+
+                            Dim detailJson As String = ""
+
+                            If Not IsDBNull(Trow("DetailTindakan")) Then
+                                detailJson = Trow("DetailTindakan").ToString()
+                            End If
+
+                            If detailJson <> "" Then
+                                Dim dtTindakan As DataTable = JsonToDataTable(detailJson)
+
+                                For Each rowT As DataRow In dtTindakan.Rows
+                                    Dim tindakanID As String = rowT("TindakanID").ToString()
+
+                                    Dim statusConsent As Object = ReadSQLNIK( _
+                                        "SELECT StatusInformedConsent FROM MasterTindakan " & _
+                                        "WHERE TindakanID = '" & tindakanID & "'")
+
+                                    If statusConsent IsNot Nothing AndAlso _
+                                       Not IsDBNull(statusConsent) AndAlso _
+                                       CBool(statusConsent) = True Then
+
+                                        NeedInformedConsent = True
+                                        PanelInformConsent.Visible = True
+                                        Exit For
+                                    End If
+                                Next
+                            End If
+
+                        Else
+                            ' Paket biasa (bukan per-tindakan)
+                            If tblPaket.Columns.Contains("StatusInformedConsent") Then
+                                If Not IsDBNull(Trow("StatusInformedConsent")) Then
+                                    If CBool(Trow("StatusInformedConsent")) = True Then
+                                        NeedInformedConsent = True
+                                        PanelInformConsent.Visible = True
+                                    End If
                                 End If
                             End If
                         End If
+
+                        Dim jenisTindakan As String = ""
+                        If rowPaket(i)("TindakanID").ToString() = "0" Then
+                            jenisTindakan = "Paket"
+                        Else
+                            jenisTindakan = rowPaket(i)("Keterangan Paket")
+                        End If
+
+                        'Dim Tnew As DataRow = tblTindakan.NewRow
+                        'Tnew("PaketID") = rowPaket(i)("PaketID")
+                        'Tnew("TindakanID") = rowPaket(i)("TindakanID")
+                        'Tnew("Tindakan") = rowPaket(i)("Nama Paket")
+                        'Tnew("Jenis") = jenisTindakan
+                        'Tnew("Biaya Tindakan") = rowPaket(i)("Harga Nett")
+                        'Tnew("DiscTindakan") = 100
+                        'Tnew("DiscNilai") = rowPaket(i)("Harga Nett")
+                        'Tnew("NettBayar") = 0
+
+                        'Tnew("KodeVoucher") = rowPaket(i)("KodeVoucher")
+                        'Tnew("Klasifikasi") = rowPaket(i)("Jenis Paket")
+                        'Tnew("Penjamin") = rowPaket(i)("Penjamin")
+                        'tblTindakan.Rows.Add(Tnew)
+
+                        Dim Tnew As DataRow = tblTindakan.NewRow
+                        Tnew("PaketID") = rowPaket(i)("PaketID")
+                        Tnew("TindakanID") = rowPaket(i)("TindakanID")
+                        Tnew("Nama Paket") = rowPaket(i)("Nama Paket")
+                        Tnew("Keterangan Paket") = rowPaket(i)("Keterangan Paket")
+
+                        Tnew("Penjamin") = rowPaket(i)("Penjamin")
+                        Tnew("Harga Awal") = rowPaket(i)("Harga Nett")
+                        Tnew("Diskon") = rowPaket(i)("Harga Nett")
+                        Tnew("Harga Nett") = 0
+
+                        Tnew("KodeVoucher") = rowPaket(i)("KodeVoucher")
+                        Tnew("Jenis Paket") = rowPaket(i)("Jenis Paket")
+                        tblTindakan.Rows.Add(Tnew)
                     End If
-
-                    Dim jenisTindakan As String = ""
-                    If rowPaket(i)("TindakanID").ToString() = "0" Then
-                        jenisTindakan = "Paket"
-                    Else
-                        jenisTindakan = rowPaket(i)("Keterangan Paket")
-                    End If
-
-                    'Dim Tnew As DataRow = tblTindakan.NewRow
-                    'Tnew("PaketID") = rowPaket(i)("PaketID")
-                    'Tnew("TindakanID") = rowPaket(i)("TindakanID")
-                    'Tnew("Tindakan") = rowPaket(i)("Nama Paket")
-                    'Tnew("Jenis") = jenisTindakan
-                    'Tnew("Biaya Tindakan") = rowPaket(i)("Harga Nett")
-                    'Tnew("DiscTindakan") = 100
-                    'Tnew("DiscNilai") = rowPaket(i)("Harga Nett")
-                    'Tnew("NettBayar") = 0
-
-                    'Tnew("KodeVoucher") = rowPaket(i)("KodeVoucher")
-                    'Tnew("Klasifikasi") = rowPaket(i)("Jenis Paket")
-                    'Tnew("Penjamin") = rowPaket(i)("Penjamin")
-                    'tblTindakan.Rows.Add(Tnew)
-
-                    Dim Tnew As DataRow = tblTindakan.NewRow
-                    Tnew("PaketID") = rowPaket(i)("PaketID")
-                    Tnew("TindakanID") = rowPaket(i)("TindakanID")
-                    Tnew("Nama Paket") = rowPaket(i)("Nama Paket")
-                    Tnew("Keterangan Paket") = rowPaket(i)("Keterangan Paket")
-
-                    Tnew("Penjamin") = rowPaket(i)("Penjamin")
-                    Tnew("Harga Awal") = rowPaket(i)("Harga Nett")
-                    Tnew("Diskon") = rowPaket(i)("Harga Nett")
-                    Tnew("Harga Nett") = 0
-
-                    Tnew("KodeVoucher") = rowPaket(i)("KodeVoucher")
-                    Tnew("Jenis Paket") = rowPaket(i)("Jenis Paket")
-                    tblTindakan.Rows.Add(Tnew)
                 Next
                 tblTindakan.AcceptChanges()
 
