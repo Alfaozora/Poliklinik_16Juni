@@ -998,7 +998,34 @@ Public Class FormRekamMedisDokter
         End If
     End Sub
 
+    Private Sub LoadTanggalInbody()
+        Try
+            Dim baseUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM' ")
+            Dim url As String = baseUrl & "api/lumiera-luzelle/inbody/check/" & idPasien
+
+            Dim response As String = GetDataAPIRM(url)
+
+            Dim json As Object = Newtonsoft.Json.JsonConvert.DeserializeObject(response)
+
+            ComboBoxTanggalInbody.Items.Clear()
+
+            If json("status") = True Then
+                For Each tgl As String In json("dates")
+                    ComboBoxTanggalInbody.Items.Add(tgl)
+                Next
+
+                If ComboBoxTanggalInbody.Items.Count > 0 Then
+                    ComboBoxTanggalInbody.SelectedIndex = 0
+                End If
+            End If
+
+        Catch ex As Exception
+            MessageBox.Show("Gagal mengambil data Inbody: " & ex.Message)
+        End Try
+    End Sub
+
     Private Sub LoadPemeriksaanFisik()
+        LoadTanggalInbody()
         Dim tblsFisik As DataTable = ReadSQL("SELECT * FROM TransaksiDetailFisik WHERE NoTransaksi = '" & idTransaksi & "'")
 
         If tblsFisik.Rows.Count > 0 Then
@@ -2665,7 +2692,7 @@ Public Class FormRekamMedisDokter
 
     Private Sub SendToApiInbody(ByVal nama As String, ByVal genderInbody As String, ByVal tglLahirStr As String, ByVal umur As String, ByVal tinggiUserInbody As String, ByVal orderDateStr As String)
         Try
-            Dim USER_ID As String = idPasien
+            Dim USER_ID As String = idPasien.ToLower()
             Dim USER_NAME As String = nama
             Dim USER_GENDER As String = genderInbody
             Dim USER_BIRTHDAY As String = tglLahirStr
@@ -9202,7 +9229,7 @@ Public Class FormRekamMedisDokter
     '    WriteSQL(query, 4)
     'End Sub
 
-    Private Sub HapusPaketPerTindakan(ByVal kodeVoucher As String, ByVal tindakanID As String)
+    Private Sub HapusPaketPerTindakan(ByVal kodeVoucher As String, ByVal tindakanID As String, ByVal idTindakanDetail As String)
         ' Soft delete 1 tindakan dari TransaksiPoliDetail
         WriteSQL("WITH CTE AS (" & _
                  "SELECT TOP 1 * FROM TransaksiPoliDetail " & _
@@ -9211,6 +9238,50 @@ Public Class FormRekamMedisDokter
                  "AND DeletedDate IS NULL " & _
                  "ORDER BY TransaksiTime DESC) " & _
                  "UPDATE CTE SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE()", 4)
+
+        Dim idPaket As String = ReadSQLNIK("SELECT PaketID FROM TransaksiPoliDetail WHERE TindakanID = '" & tindakanID & "'")
+        Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+
+        Dim jsonParamPaket As String = _
+              "{" & _
+              """no_transaksi"":""" & idTransaksi & """," & _
+              """no_rm"":""" & idPasien & """," & _
+              """id_paket"":""" & idPaket & """" & _
+              "}"
+        'MsgBox(jsonParamPaket)
+
+        Dim urlWebServiceHapusPaket As String = baseURL & "api/lumiera-luzelle/treatment-package/delete"
+        Dim responseApiHapusPaket As String = InsertDataAPIRM(jsonParamPaket, urlWebServiceHapusPaket)
+
+        '---------------------------------------------------------------------------------------------------------
+
+        If responseApiHapusPaket.ToLower().Contains("""success"":true") Then
+            MsgBox("Delete Penggunaan Paket Berhasil")
+
+        Else
+            MsgBox("Delete Penggunaan Paket Gagal: " & responseApiHapusPaket)
+            MsgBox("Gagal menghapus paket tindakan di server online." & vbCrLf & "Silakan hubungi IT.", MsgBoxStyle.Exclamation, "Peringatan")
+        End If
+
+        Dim jsonParam As String = _
+                      "{" & _
+                      """no_transaksi"":""" & idTransaksi & """," & _
+                      """no_rm"":""" & idPasien & """," & _
+                      """id_tindakan"":""" & tindakanID & """," & _
+                      """id_paket"":""" & idPaket & """" & _
+                      "}"
+        'MsgBox(jsonParam)
+        Dim urlWebService As String = baseURL & "api/lumiera-luzelle/persetujuan-treatment/delete"
+        Dim responseApi As String = InsertDataAPIRM(jsonParam, urlWebService)
+
+        If responseApi.ToLower().Contains("""success"":true") Then
+            MsgBox("Delete Persetujuan Tindakan Berhasil")
+
+        Else
+            MsgBox("Delete Persetujuan Tindakan Gagal: " & responseApi)
+            MsgBox("Gagal menghapus persetujuan tindakan di server online." & vbCrLf & "Silakan hubungi IT.", MsgBoxStyle.Exclamation, "Peringatan")
+        End If
+
 
         ' Tambahkan kembali kuota tindakan
         WriteSQL("UPDATE TransaksiPaketTindakanDetail SET KuotaTindakan = ISNULL(KuotaTindakan, 0) + 1 " & _
@@ -9303,10 +9374,9 @@ Public Class FormRekamMedisDokter
             Dim isPaketReguler As Boolean = CBool(ReadSQLNIK(queryCek))
 
             If isPaketReguler Then
-                ' kirim idTindakanDetail juga
                 HapusPaketReguler(kodeVoucher, idTindakanDetail, tindakanID)
             ElseIf tindakanID <> "" Then
-                HapusPaketPerTindakan(kodeVoucher, tindakanID)
+                HapusPaketPerTindakan(kodeVoucher, tindakanID, idTindakanDetail)
             End If
         End If
     End Sub
@@ -13145,5 +13215,37 @@ Public Class FormRekamMedisDokter
             MsgBox("Gagal rollback kuota alat : " & ex.Message, MsgBoxStyle.Critical)
         End Try
 
+    End Sub
+
+    Private Sub ButtonCekHasilInbody_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCekHasilInbody.Click
+        Try
+            If ComboBoxTanggalInbody.SelectedItem Is Nothing Then
+                MessageBox.Show("Pilih tanggal hasil Inbody terlebih dahulu.")
+                Exit Sub
+            End If
+
+            ' Ambil tanggal dari combobox
+            Dim tanggal As String = ComboBoxTanggalInbody.SelectedItem.ToString()
+            Dim tanggalApi As String = tanggal.Replace("-", "") ' 2026-02-18 → 20260218
+
+            Dim baseUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM' ")
+            Dim url As String = baseUrl & "api/lumiera-luzelle/inbody/result/" & idPasien & "/" & tanggalApi
+
+            ' Ambil response API
+            Dim response As String = GetDataAPIRM(url)
+            Dim json As Object = Newtonsoft.Json.JsonConvert.DeserializeObject(response)
+
+            If json("status") = True Then
+                Dim imageUrl As String = json("INBODY_IMAGE").ToString
+
+                ' Buka di browser default
+                Process.Start(imageUrl)
+            Else
+                MessageBox.Show("Hasil Inbody tidak ditemukan.")
+            End If
+
+        Catch ex As Exception
+            MessageBox.Show("Gagal membuka hasil Inbody: " & ex.Message)
+        End Try
     End Sub
 End Class
