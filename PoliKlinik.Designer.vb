@@ -66,6 +66,7 @@ Partial Class PoliKlinik
         Me.LaporanToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.RekapPendapatanToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.ReservasiDanReminderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.PersetujuanPenerimaanBarangToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.LabToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.TransaksiLabToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
         Me.PenggunaanStockToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -272,7 +273,6 @@ Partial Class PoliKlinik
         Me.TimerShutdown = New System.Windows.Forms.Timer(Me.components)
         Me.TimerKirimReminderWA = New System.Windows.Forms.Timer(Me.components)
         Me.TimerBirthday = New System.Windows.Forms.Timer(Me.components)
-        Me.PersetujuanPenerimaanBarangToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip.SuspendLayout()
         Me.StatusStrip.SuspendLayout()
         Me.SuspendLayout()
@@ -580,6 +580,13 @@ Partial Class PoliKlinik
         Me.ReservasiDanReminderToolStripMenuItem.Size = New System.Drawing.Size(263, 22)
         Me.ReservasiDanReminderToolStripMenuItem.Tag = "0311"
         Me.ReservasiDanReminderToolStripMenuItem.Text = "Reservasi dan Reminder"
+        '
+        'PersetujuanPenerimaanBarangToolStripMenuItem
+        '
+        Me.PersetujuanPenerimaanBarangToolStripMenuItem.Name = "PersetujuanPenerimaanBarangToolStripMenuItem"
+        Me.PersetujuanPenerimaanBarangToolStripMenuItem.Size = New System.Drawing.Size(263, 22)
+        Me.PersetujuanPenerimaanBarangToolStripMenuItem.Tag = "0312"
+        Me.PersetujuanPenerimaanBarangToolStripMenuItem.Text = "Persetujuan Penerimaan Barang"
         '
         'LabToolStripMenuItem
         '
@@ -1991,15 +1998,7 @@ Partial Class PoliKlinik
         '
         'TimerBirthday
         '
-        Me.TimerBirthday.Enabled = True
         Me.TimerBirthday.Interval = 300000
-        '
-        'PersetujuanPenerimaanBarangToolStripMenuItem
-        '
-        Me.PersetujuanPenerimaanBarangToolStripMenuItem.Name = "PersetujuanPenerimaanBarangToolStripMenuItem"
-        Me.PersetujuanPenerimaanBarangToolStripMenuItem.Size = New System.Drawing.Size(263, 22)
-        Me.PersetujuanPenerimaanBarangToolStripMenuItem.Tag = "0312"
-        Me.PersetujuanPenerimaanBarangToolStripMenuItem.Text = "Persetujuan Penerimaan Barang"
         '
         'PoliKlinik
         '

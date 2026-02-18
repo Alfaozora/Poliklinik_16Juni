@@ -1,3 +1,10 @@
+Verison : 2.0.0.56 (21 Februari 2026)
+# [New Feature] Penambahan API Untuk integrasi dengan Alat InBody
+# [New Feature] Penambahan API Untuk integrasi dengan Informed Consent
+# [New Feature] Penambahan API Untuk integrasi dengan Kirim Alat
+# [New Feature] Penambahan Master Alat
+# [Bug Fix] Memperbaiki Bug saat menampilkan Rekap Pendapatan Klinik
+
 Version : 2.0.0.55 (29 Desember 2025)
 # [New Feature] Penambahan Master Voucher dan penerapan voucher
 # [New Feature] Penambahan Fitur Ucapan Selamat Ulang Tahun kepada Pasien
