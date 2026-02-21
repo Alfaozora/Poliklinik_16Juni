@@ -1162,20 +1162,37 @@ Public Class FormPembayaran
 
                         If jenisPaket = "Paket Reguler" Then
 
-                            Dim paket As New Dictionary(Of String, Object)
+                            Dim detailJson As String = rowTindakan("DetailTindakan").ToString()
 
-                            Dim qtyTotal As Integer = Convert.ToInt32(rowTindakan("Kuota"))
-                            Dim listTindakanApi As List(Of String) = GetListTindakanDariJSON(rowTindakan("DetailTindakan").ToString())
+                            If detailJson <> "" Then
 
-                            paket.Add("id_paket", rowTindakan("PaketID").ToString())
-                            paket.Add("kode_voucher", voucherID)
-                            paket.Add("tindakan", listTindakanApi)
-                            paket.Add("qty", 0)
-                            paket.Add("qty_total", qtyTotal)
-                            paket.Add("tgl_pembelian", tglPembelian)
-                            paket.Add("tgl_perawatan", Nothing)
+                                Dim dtTindakan As DataTable = JsonToDataTable(detailJson)
 
-                            paketList.Add(paket)
+                                For Each rowDetail As DataRow In dtTindakan.Rows
+
+                                    Dim paket As New Dictionary(Of String, Object)
+
+                                    Dim tindakanID As String = rowDetail("TindakanID").ToString()
+                                    Dim namaTindakan As String = rowDetail("NamaTindakan").ToString()
+                                    Dim kuotaTindakan As Integer = Convert.ToInt32(rowDetail("KuotaTindakan"))
+
+                                    Dim listTindakanApi As New List(Of String)
+                                    listTindakanApi.Add(namaTindakan)
+
+                                    paket.Add("id_paket", rowTindakan("PaketID").ToString())
+                                    paket.Add("kode_voucher", voucherID)
+                                    paket.Add("id_tindakan", tindakanID)   ' 🔥 WAJIB
+                                    paket.Add("tindakan", listTindakanApi)
+                                    paket.Add("qty", 0)
+                                    paket.Add("qty_total", kuotaTindakan)
+                                    paket.Add("tgl_pembelian", tglPembelian)
+                                    paket.Add("tgl_perawatan", Nothing)
+
+                                    paketList.Add(paket)
+
+                                Next
+
+                            End If
 
                         ElseIf jenisPaket = "Paket Per-Tindakan" Then
 
@@ -1189,6 +1206,7 @@ Public Class FormPembayaran
                                     Dim paket As New Dictionary(Of String, Object)
 
                                     Dim namaTindakan As String = rowDetail("NamaTindakan").ToString()
+                                    Dim tindakanID As String = rowDetail("TindakanID").ToString()
                                     Dim kuotaTindakan As Integer = Convert.ToInt32(rowDetail("KuotaTindakan"))
 
                                     Dim listTindakanApi As New List(Of String)
@@ -1196,6 +1214,7 @@ Public Class FormPembayaran
 
                                     paket.Add("id_paket", rowTindakan("PaketID").ToString())
                                     paket.Add("kode_voucher", voucherID)
+                                    paket.Add("id_tindakan", tindakanID)
                                     paket.Add("tindakan", listTindakanApi)
                                     paket.Add("qty", 0)
                                     paket.Add("qty_total", kuotaTindakan)

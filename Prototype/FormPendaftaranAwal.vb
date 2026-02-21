@@ -923,9 +923,9 @@ Public Class FormPendaftaranAwal
                             ' =========================
                             ' PEMAKAIAN PAKET → wajib IC
                             ' =========================
-                            If ValidasiInformedConsentPaket(NoRM, idTindakan, userInput) = False Then
-                                Exit Sub
-                            End If
+                            'If ValidasiInformedConsentPaket(NoRM, idTindakan, idTransaksi, userInput) = False Then
+                            '    Exit Sub
+                            'End If
 
                             SimpanPenggunaanPaket()
                         Else
@@ -1310,16 +1310,18 @@ Public Class FormPendaftaranAwal
 
                             Dim namaTindakan As String = ""
                             Dim listTindakanApi As New List(Of String)
+                            Dim tindakanID As String = ""
 
                             Dim jenisPaket As String = rowTindakan("Jenis Paket").ToString()
 
                             If jenisPaket = "Paket Reguler" Then
+                                tindakanID = rowTindakan("TindakanID").ToString()
                                 listTindakanApi = GetListTindakanDariPaket(rowTindakan("PaketID").ToString())
                                 If listTindakanApi.Count > 0 Then
                                     namaTindakan = listTindakanApi(0)
                                 End If
                             ElseIf jenisPaket = "Paket Per-Tindakan" Then
-                                Dim tindakanID As String = rowTindakan("TindakanID").ToString()
+                                tindakanID = rowTindakan("TindakanID").ToString()
                                 namaTindakan = GetNamaTindakanDariDetailPaket(rowTindakan("PaketID").ToString(), tindakanID)
                                 listTindakanApi.Add(namaTindakan)
                             End If
@@ -1352,6 +1354,7 @@ Public Class FormPendaftaranAwal
 
                             usage.Add("id_paket", rowTindakan("PaketID").ToString())
                             usage.Add("kode_voucher", rowTindakan("KodeVoucher").ToString())
+                            usage.Add("id_tindakan", tindakanID)
                             usage.Add("tindakan", listTindakanApi)
 
                             If isPembelianBaru = True Then

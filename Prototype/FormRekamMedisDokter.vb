@@ -12725,7 +12725,7 @@ Public Class FormRekamMedisDokter
                 For Each row As DataRow In rowPaket
                     Dim idPaket As String = row("PaketID").ToString()
 
-                    If Not ValidasiInformedConsentPaket(idPasien, idPaket, userInput) Then
+                    If Not ValidasiInformedConsentPaket(idPasien, idPaket, idTransaksi, userInput) Then
 
                         Dim jawab As DialogResult = MsgBox( _
                             "Informed Consent belum ditandatangani." & vbCrLf & _
@@ -12842,16 +12842,18 @@ Public Class FormRekamMedisDokter
                 ' ================================
                 Dim namaTindakan As String = ""
                 Dim listTindakanApi As New List(Of String)
+                Dim tindakanID As String = ""
 
                 Dim jenisPaket As String = rowTindakan("Jenis Paket").ToString()
 
                 If jenisPaket = "Paket Reguler" Then
+                    tindakanID = rowTindakan("TindakanID").ToString()
                     listTindakanApi = GetListTindakanDariPaket(rowTindakan("PaketID").ToString())
                     If listTindakanApi.Count > 0 Then
                         namaTindakan = listTindakanApi(0)
                     End If
                 ElseIf jenisPaket = "Paket Per-Tindakan" Then
-                    Dim tindakanID As String = rowTindakan("TindakanID").ToString()
+                    tindakanID = rowTindakan("TindakanID").ToString()
                     namaTindakan = GetNamaTindakanDariDetailPaket(rowTindakan("PaketID").ToString(), tindakanID)
                     listTindakanApi.Add(namaTindakan)
                 End If
@@ -12880,9 +12882,11 @@ Public Class FormRekamMedisDokter
                 ' ================================
                 ' DATA UNTUK API PEMAKAIAN PAKET
                 ' ================================
+
                 Dim usage As New Dictionary(Of String, Object)
                 usage.Add("id_paket", rowTindakan("PaketID").ToString())
                 usage.Add("kode_voucher", rowTindakan("KodeVoucher").ToString())
+                usage.Add("id_tindakan", tindakanID)
                 usage.Add("tindakan", listTindakanApi)
                 usage.Add("qty", 1)
                 usage.Add("qty_total", Nothing)

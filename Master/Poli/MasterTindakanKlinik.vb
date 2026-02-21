@@ -1206,9 +1206,9 @@ Public Class MasterTindakanKlinik
         Dim queryStringTindakan As String = ""
 
         If RadioButtonPoliUmum.Checked = True Then
-            queryStringTindakan = "SELECT TindakanID, NamaTindakan, JenisTindakan, BiayaTindakan, JenisDokter AS 'Pelaksana', StatusFeeTindakan, FeeDokter, FeePerawat, StatusBHP, MaksimalBHP, PersentaseFeePerusahaan, PersentaseFeeKaryawan, StatusPersentaseFee, StatusNominalFee, FeePerTindakan, StatusFeeKonsultasi, TindakanInformedConsent, Hari, Reminder, PoliTujuan FROM MasterTindakan WHERE Closed = 0"
+            queryStringTindakan = "SELECT TindakanID, NamaTindakan, JenisTindakan, BiayaTindakan, JenisDokter AS 'Pelaksana', StatusFeeTindakan, FeeDokter, FeePerawat, StatusBHP, MaksimalBHP, PersentaseFeePerusahaan, PersentaseFeeKaryawan, StatusPersentaseFee, StatusNominalFee, FeePerTindakan, StatusFeeKonsultasi, TindakanInformedConsent, Hari, Reminder, PoliTujuan, Kategori FROM MasterTindakan WHERE Closed = 0"
         ElseIf RadioButtonPoliGigi.Checked = True Then
-            queryStringTindakan = "SELECT TindakanID, NamaTindakan, JenisTindakan, BiayaTindakan, JenisDokter AS 'Pelaksana', StatusFeeTindakan, FeeDokter, FeePerawat, StatusBHP, MaksimalBHP, PersentaseFeePerusahaan, PersentaseFeeKaryawan, StatusPersentaseFee, StatusNominalFee, FeePerTindakan, StatusFeeKonsultasi, TindakanInformedConsent, Hari, Reminder, PoliTujuan FROM MasterTindakanGigi WHERE Closed = 0"
+            queryStringTindakan = "SELECT TindakanID, NamaTindakan, JenisTindakan, BiayaTindakan, JenisDokter AS 'Pelaksana', StatusFeeTindakan, FeeDokter, FeePerawat, StatusBHP, MaksimalBHP, PersentaseFeePerusahaan, PersentaseFeeKaryawan, StatusPersentaseFee, StatusNominalFee, FeePerTindakan, StatusFeeKonsultasi, TindakanInformedConsent, Hari, Reminder, PoliTujuan, Kategori FROM MasterTindakanGigi WHERE Closed = 0"
         End If
 
         Dim tblTindakan As DataTable = ReadSQL(queryStringTindakan)
