@@ -9302,7 +9302,18 @@ Public Class FormRekamMedisDokter
             idTindakanDetail = idTindakanDetailObj.ToString()
 
             If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
-                Dim idTindakan As String = ReadSQLNIK("SELECT PaketID FROM TransaksiPoliDetail WHERE TransPoliIDDetail = '" & idTindakanDetail & "'")
+                Dim tblDetail As DataTable = ReadSQL( _
+                    "SELECT TindakanID, ISNULL(PaketID,0) AS PaketID " & _
+                    "FROM TransaksiPoliDetail " & _
+                    "WHERE TransPoliIDDetail = '" & idTindakanDetail & "'")
+
+                If tblDetail.Rows.Count = 0 Then
+                    MsgBox("Data tindakan tidak ditemukan")
+                    Exit Sub
+                End If
+
+                Dim idTindakan As String = tblDetail.Rows(0)("TindakanID").ToString()
+                Dim paketID As String = tblDetail.Rows(0)("PaketID").ToString().Trim()
 
                 ' Soft delete hanya baris yang dipilih
                 WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
@@ -9317,8 +9328,11 @@ Public Class FormRekamMedisDokter
                       """id_tindakan"":""" & idTindakan & """" & _
                       "}"
 
+                'MsgBox(jsonParam)
+
                 Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
                 Dim urlWebService As String = baseURL & "api/lumiera-luzelle/persetujuan-treatment/delete"
+
                 Dim responseApi As String = InsertDataAPIRM(jsonParam, urlWebService)
 
                 If responseApi.ToLower().Contains("""success"":true") Then
@@ -9329,22 +9343,25 @@ Public Class FormRekamMedisDokter
                     MsgBox("Gagal menghapus persetujuan tindakan di server online." & vbCrLf & "Silakan hubungi IT.", MsgBoxStyle.Exclamation, "Peringatan")
                 End If
 
-                Dim jsonParamPaket As String = _
-                      "{" & _
-                      """no_transaksi"":""" & idTransaksi & """," & _
-                      """no_rm"":""" & idPasien & """," & _
-                      """id_paket"":""" & idTindakan & """" & _
-                      "}"
+                If Not String.IsNullOrEmpty(paketID) Then
+                    Dim jsonParamPaket As String = _
+                        "{" & _
+                        """no_transaksi"":""" & idTransaksi & """," & _
+                        """no_rm"":""" & idPasien & """," & _
+                        """id_paket"":""" & paketID & """" & _
+                        "}"
 
-                Dim urlWebServiceHapusPaket As String = baseURL & "api/lumiera-luzelle/treatment-package/delete"
-                Dim responseApiHapusPaket As String = InsertDataAPIRM(jsonParamPaket, urlWebServiceHapusPaket)
+                    Dim urlWebServiceHapusPaket As String = baseURL & "api/lumiera-luzelle/treatment-package/delete"
 
-                If responseApiHapusPaket.ToLower().Contains("""success"":true") Then
-                    MsgBox("Delete Penggunaan Paket Berhasil")
+                    Dim responseApiHapusPaket As String = InsertDataAPIRM(jsonParamPaket, urlWebServiceHapusPaket)
 
+                    If responseApiHapusPaket.ToLower().Contains("""success"":true") Then
+                        MsgBox("Delete Penggunaan Paket Berhasil")
+                    Else
+                        MsgBox("Delete Penggunaan Paket Gagal: " & responseApiHapusPaket)
+                    End If
                 Else
-                    MsgBox("Delete Penggunaan Paket Gagal: " & responseApiHapusPaket)
-                    MsgBox("Gagal menghapus paket tindakan di server online." & vbCrLf & "Silakan hubungi IT.", MsgBoxStyle.Exclamation, "Peringatan")
+                    'MsgBox("Tindakan bukan paket, skip delete paket API")
                 End If
             ElseIf jenisTransaksi = "GIGI" Then
                 WriteSQL("UPDATE TransaksiGigiDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
@@ -12706,7 +12723,25 @@ Public Class FormRekamMedisDokter
         Return namaTindakan
     End Function
 
-    Public Function SubmitPotongPaket(ByRef rowPaket() As DataRow) As DataTable
+    Private Function GetDetailTindakanLog(ByVal kodeVoucher As String) As DataTable
+
+        Dim tbl As DataTable = ReadSQL( _
+            "SELECT TOP 1 DetailTindakan " & _
+            "FROM TransaksiPaketTindakan " & _
+            "WHERE KodeVoucher = '" & kodeVoucher & "' " & _
+            "ORDER BY CreatedDate DESC")
+
+        If tbl.Rows.Count = 0 Then Return Nothing
+
+        Dim jsonDetail As String = tbl.Rows(0)("DetailTindakan").ToString()
+
+        If String.IsNullOrEmpty(jsonDetail) Then Return Nothing
+
+        Return JsonToDataTable(jsonDetail)
+
+    End Function
+
+    Public Function SubmitPotongPaket(ByRef rowPaket() As DataRow, ByVal kodeVoucher As String) As DataTable
         Dim tblTindakan As New DataTable
         tblTindakan.Columns.Add("PaketID", GetType(String))
         tblTindakan.Columns.Add("TindakanID", GetType(String))
@@ -12725,7 +12760,7 @@ Public Class FormRekamMedisDokter
                 For Each row As DataRow In rowPaket
                     Dim idPaket As String = row("PaketID").ToString()
 
-                    If Not ValidasiInformedConsentPaket(idPasien, idPaket, idTransaksi, userInput) Then
+                    If Not ValidasiInformedConsentPaket(idPasien, idPaket, kodeVoucher, userInput) Then
 
                         Dim jawab As DialogResult = MsgBox( _
                             "Informed Consent belum ditandatangani." & vbCrLf & _
@@ -12743,14 +12778,18 @@ Public Class FormRekamMedisDokter
                                 End If
 
 
-                                FormInputInformedConsent.SetForm( _
+                                Dim frmIC As New FormInputInformedConsent
+
+                                frmIC.KodeVoucher = kodeVoucher
+
+                                frmIC.SetForm( _
                                     "RekamMedisPerencanaanTindakan", _
                                     tblsRekamMedis, _
                                     tindakanID, _
                                     statusPersetujuan, _
                                     jenisTransaksi)
 
-                                FormInputInformedConsent.ShowDialog()
+                                frmIC.ShowDialog()
 
                             Catch ex As Exception
                                 MsgBox(ex.Message, MsgBoxStyle.Critical, "Warning!")
@@ -12840,60 +12879,108 @@ Public Class FormRekamMedisDokter
                 ' ================================
                 ' KIRIM API INFORMED CONSENT
                 ' ================================
-                Dim namaTindakan As String = ""
-                Dim listTindakanApi As New List(Of String)
-                Dim tindakanID As String = ""
+                'Dim namaTindakan As String = ""
+                'Dim listTindakanApi As New List(Of String)
+                'Dim tindakanID As String = ""
 
                 Dim jenisPaket As String = rowTindakan("Jenis Paket").ToString()
 
-                If jenisPaket = "Paket Reguler" Then
-                    tindakanID = rowTindakan("TindakanID").ToString()
-                    listTindakanApi = GetListTindakanDariPaket(rowTindakan("PaketID").ToString())
-                    If listTindakanApi.Count > 0 Then
-                        namaTindakan = listTindakanApi(0)
-                    End If
-                ElseIf jenisPaket = "Paket Per-Tindakan" Then
-                    tindakanID = rowTindakan("TindakanID").ToString()
-                    namaTindakan = GetNamaTindakanDariDetailPaket(rowTindakan("PaketID").ToString(), tindakanID)
-                    listTindakanApi.Add(namaTindakan)
-                End If
-
-                Dim jsonConsent As String = _
-                    "{" & _
-                    """nama"":""" & namaPasien.Replace("""", "'") & """," & _
-                    """no_rm"":""" & idPasien & """," & _
-                    """no_transaksi"":""" & idTransaksi & """," & _
-                    """tindakan"":""" & namaTindakan.Replace("""", "'") & """," & _
-                    """id_tindakan"":""" & rowTindakan("TindakanID").ToString() & """" & _
-                    "}"
-
                 Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+
                 Dim urlConsent As String = baseURL & "api/lumiera-luzelle/persetujuan-treatment"
 
-                Dim responseConsent As String = InsertDataAPIRM(jsonConsent, urlConsent)
+                Dim listConsent As New List(Of Dictionary(Of String, String))
 
-                If responseConsent.ToLower().Contains("success") Then
-                    MsgBox("Persetujuan untuk tindakan '" & namaTindakan & "' berhasil disimpan.", MsgBoxStyle.Information, "Informasi")
-                Else
-                    MsgBox("Persetujuan untuk tindakan '" & namaTindakan & "' gagal disimpan." & vbCrLf & _
-                    "Silakan ulangi proses atau hubungi admin.", MsgBoxStyle.Critical, "Peringatan")
+                If jenisPaket = "Paket Reguler" Then
+                    Dim dtDetail As DataTable = GetDetailTindakanLog(rowTindakan("KodeVoucher").ToString())
+
+                    If Not dtDetail Is Nothing Then
+
+                        For Each r As DataRow In dtDetail.Rows
+
+                            Dim item As New Dictionary(Of String, String)
+
+                            item.Add("id_tindakan", r("TindakanID").ToString())
+                            item.Add("nama_tindakan", r("NamaTindakan").ToString())
+
+                            listConsent.Add(item)
+
+                        Next
+
+                    End If
+                ElseIf jenisPaket = "Paket Per-Tindakan" Then
+
+                    Dim tindakanID As String = rowTindakan("TindakanID").ToString()
+                    Dim namaTindakan As String = GetNamaTindakanDariDetailPaket(rowTindakan("PaketID").ToString(), tindakanID)
+
+                    Dim item As New Dictionary(Of String, String)
+
+                    item.Add("id_tindakan", tindakanID)
+                    item.Add("nama_tindakan", namaTindakan)
+
+                    listConsent.Add(item)
                 End If
+
+                For Each item As Dictionary(Of String, String) In listConsent
+
+                    Dim jsonConsent As String = _
+                        "{" & _
+                        """nama"":""" & namaPasien.Replace("""", "'") & """," & _
+                        """no_rm"":""" & idPasien & """," & _
+                        """no_transaksi"":""" & idTransaksi & """," & _
+                        """tindakan"":""" & item("nama_tindakan").Replace("""", "'") & """," & _
+                        """id_tindakan"":""" & item("id_tindakan") & """" & _
+                        "}"
+
+                    Dim responseConsent As String = InsertDataAPIRM(jsonConsent, urlConsent)
+
+                    If responseConsent.ToLower().Contains("success") Then
+                        MsgBox("Persetujuan tindakan '" & _
+                               item("nama_tindakan") & _
+                               "' berhasil disimpan.")
+                    Else
+                        MsgBox("Persetujuan tindakan '" & _
+                               item("nama_tindakan") & _
+                               "' gagal disimpan.")
+                    End If
+
+                Next
 
                 ' ================================
                 ' DATA UNTUK API PEMAKAIAN PAKET
                 ' ================================
 
-                Dim usage As New Dictionary(Of String, Object)
-                usage.Add("id_paket", rowTindakan("PaketID").ToString())
-                usage.Add("kode_voucher", rowTindakan("KodeVoucher").ToString())
-                usage.Add("id_tindakan", tindakanID)
-                usage.Add("tindakan", listTindakanApi)
-                usage.Add("qty", 1)
-                usage.Add("qty_total", Nothing)
-                usage.Add("tgl_pembelian", Nothing)
-                usage.Add("tgl_perawatan", tglPerawatan)
+                'Dim usage As New Dictionary(Of String, Object)
+                'usage.Add("id_paket", rowTindakan("PaketID").ToString())
+                'usage.Add("kode_voucher", rowTindakan("KodeVoucher").ToString())
+                'usage.Add("id_tindakan", tindakanID)
+                'usage.Add("tindakan", listTindakanApi)
+                'usage.Add("qty", 1)
+                'usage.Add("qty_total", Nothing)
+                'usage.Add("tgl_pembelian", Nothing)
+                'usage.Add("tgl_perawatan", tglPerawatan)
 
-                usageList.Add(usage)
+                'usageList.Add(usage)
+
+                For Each item As Dictionary(Of String, String) In listConsent
+
+                    Dim listTindakanApi As New List(Of String)
+                    listTindakanApi.Add(item("nama_tindakan"))
+
+                    Dim usage As New Dictionary(Of String, Object)
+
+                    usage.Add("id_paket", rowTindakan("PaketID").ToString())
+                    usage.Add("kode_voucher", rowTindakan("KodeVoucher").ToString())
+                    usage.Add("id_tindakan", item("id_tindakan"))
+                    usage.Add("tindakan", listTindakanApi)
+                    usage.Add("qty", 1)
+                    usage.Add("qty_total", Nothing)
+                    usage.Add("tgl_pembelian", Nothing)
+                    usage.Add("tgl_perawatan", tglPerawatan)
+
+                    usageList.Add(usage)
+
+                Next
 
                 If rowTindakan("Jenis Paket").ToString() = "Paket Reguler" Then
                     WriteSQL("UPDATE TransaksiPaketTindakan SET Kuota = Kuota - 1 WHERE PaketID = '" & rowTindakan("PaketID") & "' AND KodeVoucher = '" & rowTindakan("KodeVoucher") & "' AND DeletedDate IS NULL", 4)
@@ -12971,7 +13058,7 @@ Public Class FormRekamMedisDokter
             ' Tambahkan khusus untuk Paket Reguler (jika ditemukan)
             If tblTindakan.Rows.Count > 0 AndAlso tblTindakan.Rows(0)("Jenis Paket").ToString().ToUpper() = "Paket Reguler" Then
                 Dim penjamin As String = tblTindakan.Rows(0)("Penjamin").ToString()
-                Dim kodeVoucher As String = tblTindakan.Rows(0)("KodeVoucher").ToString()
+                kodeVoucher = tblTindakan.Rows(0)("KodeVoucher").ToString()
 
                 ' Loop JSON Tindakan
                 For Each tindakan As TindakanDetail In listTindakan

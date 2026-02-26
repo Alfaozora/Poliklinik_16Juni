@@ -30,7 +30,7 @@ Module ModuleInformedConsent
         Return Convert.ToBoolean(obj(key))
     End Function
 
-    Public Function ValidasiInformedConsentPaket(ByVal noRm As String, ByVal idTindakan As String, ByVal idTransaksi As String, ByVal userInput As String) As Boolean
+    Public Function ValidasiInformedConsentPaket(ByVal noRm As String, ByVal idTindakan As String, ByVal kodeVoucher As String, ByVal userInput As String) As Boolean
 
         Dim statusInformedConsent As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'SettingInformedConsent'")
 
@@ -78,7 +78,7 @@ Module ModuleInformedConsent
                     If CBool(wajibICDetail) Then
 
                         ' 🔥 Kirim TindakanIDDetail (bukan idPaket)
-                        Dim urlWebService As String = baseURL & "api/lumiera-luzelle/ic/paket/" & idTransaksi & "/" & tindakanIDDetail
+                        Dim urlWebService As String = baseURL & "api/lumiera-luzelle/ic/paket/" & kodeVoucher & "/" & tindakanIDDetail
 
                         Dim response As String = GetDataAPIRM(urlWebService)
                         Dim json As JObject = JObject.Parse(response)
@@ -100,15 +100,38 @@ Module ModuleInformedConsent
             ' ===================================
             ' PAKET REGULER
             ' ===================================
-            Dim urlWebServiceReg As String = baseURL & "api/lumiera-luzelle/ic/paket/" & idTransaksi & "/" & idTindakan
+            Dim jsonDetailReguler As String = ReadSQLNIK("SELECT DetailTindakan FROM TransaksiPaketTindakan WHERE PaketID = '" & idTindakan & "'")
 
-            Dim responseReg As String = GetDataAPIRM(urlWebServiceReg)
-            Dim jsonReg As JObject = JObject.Parse(responseReg)
-
-            If jsonReg("status").ToString() <> "success" Then
-                MsgBox(jsonReg("message").ToString(), MsgBoxStyle.Exclamation, "Warning")
+            If String.IsNullOrEmpty(jsonDetailReguler) Then
+                MsgBox("Detail tindakan paket tidak ditemukan.", MsgBoxStyle.Exclamation, "Warning")
                 Return False
             End If
+
+            Dim arrReg As JArray = JArray.Parse(jsonDetailReguler)
+
+            For Each item As JObject In arrReg
+
+                Dim tindakanIDDetail As String = item("TindakanID").ToString()
+
+                ' Cek apakah tindakan ini wajib IC
+                Dim wajibICDetail As String = ReadSQLNIK("SELECT ISNULL(StatusInformedConsent,0) FROM MasterTindakan WHERE TindakanID = '" & tindakanIDDetail & "'")
+
+                If CBool(wajibICDetail) Then
+
+                    ' 🔥 Kirim TindakanIDDetail (bukan idPaket)
+                    Dim urlWebService As String = baseURL & "api/lumiera-luzelle/ic/paket/" & kodeVoucher & "/" & tindakanIDDetail
+                    'MsgBox(urlWebService)
+                    Dim response As String = GetDataAPIRM(urlWebService)
+                    Dim json As JObject = JObject.Parse(response)
+
+                    If json("status").ToString() <> "success" Then
+                        MsgBox(json("message").ToString(), MsgBoxStyle.Exclamation, "Warning")
+                        Return False
+                    End If
+
+                End If
+
+            Next
 
             Return True
         Catch ex As Exception

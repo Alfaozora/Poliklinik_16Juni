@@ -176,6 +176,7 @@ Public Class DialogBoxPaketTindakan
     Private Sub ButtonSimpan_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonSimpan.Click
         Dim tblPaket As DataTable = GridControlPaket.DataSource
         Dim rowPaket() As DataRow = tblPaket.Select("[Pilihan]=1")
+        Dim kodeVoucher As String = TextBoxKodeVoucher.Text
 
         If rowPaket.Count > 0 Then
             Me.Close()
@@ -183,7 +184,7 @@ Public Class DialogBoxPaketTindakan
                 Case "Pendaftaran Awal"
                     FormPendaftaranAwal.LoadTindakanPaketQR(rowPaket)
                 Case "Perencanaan Tindakan"
-                    FormRekamMedisDokter.SubmitPotongPaket(rowPaket)
+                    FormRekamMedisDokter.SubmitPotongPaket(rowPaket, kodeVoucher)
                 Case Else
                     MsgBox("Error...")
             End Select

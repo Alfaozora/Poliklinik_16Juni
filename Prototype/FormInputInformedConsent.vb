@@ -32,6 +32,17 @@ Public Class FormInputInformedConsent
         End Class
     End Class
 
+    Private _KodeVoucher As String = ""
+
+    Public Property KodeVoucher() As String
+        Get
+            Return _KodeVoucher
+        End Get
+        Set(ByVal value As String)
+            _KodeVoucher = value
+        End Set
+    End Property
+
     Private Sub PanelTop_Paint(ByVal sender As System.Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles PanelTop.Paint
         Try
             e.Graphics.DrawString(formName, New Font("Arial", 12, FontStyle.Bold), Brushes.White, New Point(10, 10))
@@ -202,6 +213,10 @@ Public Class FormInputInformedConsent
                 Dim keteranganLokasi As String = ReadSQLNIK("select StrValue from MsConfig where ConfigName = 'Kota'")
                 Dim noHP As String = ReadSQLNIK("SELECT NoHandphone FROM MasterPasien WHERE NoRekamMedis = '" & Trow("IDInternet") & "'")
 
+                'Kode Voucher
+                Dim voucher As String = _KodeVoucher
+                If voucher = "" Then voucher = "-"
+
                 ' Set Jenis Kelamin
                 Dim jenisKelamin As String = ""
                 If ComboBoxPenanggungJawabJenisKelamin.Text = "Laki-laki" Then
@@ -250,6 +265,7 @@ Public Class FormInputInformedConsent
                     """hubungan_penanggung_jawab"":""" & TextBoxPenanggungJawabHubunganPasien.Text & """," & _
                     """alamat_penanggung_jawab"":""" & TextBoxPenanggungJawabAlamat.Text & """," & _
                     """status_persetujuan"":" & statusPersetujuan & "," & _
+                    """kode_voucher"":""" & voucher & """," & _
                     """status_transaksi"":""pending""" & _
                 "}"
 

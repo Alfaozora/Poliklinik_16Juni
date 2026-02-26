@@ -1163,9 +1163,9 @@ Public Class FormPembayaran
                         If jenisPaket = "Paket Reguler" Then
 
                             Dim detailJson As String = rowTindakan("DetailTindakan").ToString()
+                            Dim kuotaPaket As Integer = Convert.ToInt32(rowTindakan("Kuota"))
 
                             If detailJson <> "" Then
-
                                 Dim dtTindakan As DataTable = JsonToDataTable(detailJson)
 
                                 For Each rowDetail As DataRow In dtTindakan.Rows
@@ -1174,7 +1174,6 @@ Public Class FormPembayaran
 
                                     Dim tindakanID As String = rowDetail("TindakanID").ToString()
                                     Dim namaTindakan As String = rowDetail("NamaTindakan").ToString()
-                                    Dim kuotaTindakan As Integer = Convert.ToInt32(rowDetail("KuotaTindakan"))
 
                                     Dim listTindakanApi As New List(Of String)
                                     listTindakanApi.Add(namaTindakan)
@@ -1184,7 +1183,7 @@ Public Class FormPembayaran
                                     paket.Add("id_tindakan", tindakanID)   ' 🔥 WAJIB
                                     paket.Add("tindakan", listTindakanApi)
                                     paket.Add("qty", 0)
-                                    paket.Add("qty_total", kuotaTindakan)
+                                    paket.Add("qty_total", kuotaPaket)
                                     paket.Add("tgl_pembelian", tglPembelian)
                                     paket.Add("tgl_perawatan", Nothing)
 
