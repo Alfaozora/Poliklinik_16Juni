@@ -1,4 +1,4 @@
-Verison : 2.0.0.56 (21 Februari 2026)
+Verison : 2.0.0.56 (26 Februari 2026)
 # [New Feature] Penambahan API Untuk integrasi dengan Alat InBody
 # [New Feature] Penambahan API Untuk integrasi dengan Informed Consent
 # [New Feature] Penambahan API Untuk integrasi dengan Kirim Alat

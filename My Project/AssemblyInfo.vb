@@ -9,7 +9,7 @@ Imports System.Runtime.InteropServices
 ' Review the values of the assembly attributes
 
 <Assembly: AssemblyTitle("PoliKlinik@Net 2.0")> 
-<Assembly: AssemblyDescription("21 Januari 2026")> 
+<Assembly: AssemblyDescription("26 Februari 2026")> 
 <Assembly: AssemblyCompany("")> 
 <Assembly: AssemblyProduct("PoliKlinik@Net 2.0")> 
 <Assembly: AssemblyCopyright("Copyright ©  2023")> 

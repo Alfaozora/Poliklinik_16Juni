@@ -203,6 +203,8 @@ Public Class MasterTindakanKlinik
         SetConn()
         SetDataGrid()
 
+        InitGridAlatTindakan()
+
         ' Panggil metode untuk NavBarItemTindakanPoliUmum
         TriggerNavBarItemClick(NavBarItemTindakanPoliUmum)
     End Sub
@@ -680,7 +682,7 @@ Public Class MasterTindakanKlinik
         Dim stringQueryOrder As String = " ORDER BY TindakanID"
 
         If RadioButtonPoliUmum.Checked = True Then
-            stringQuery = "SELECT TindakanID, NamaTindakan, JenisTindakan, BiayaTindakan, JenisDokter AS 'Pelaksana', CASE WHEN Closed = 0 THEN 'Aktif' WHEN Closed = 1 THEN 'Tidak Aktif' END AS StatusTindakan from MasterTindakan"
+            stringQuery = "SELECT TindakanID, NamaTindakan, JenisTindakan, BiayaTindakan, JenisDokter AS 'Pelaksana', CASE WHEN Closed = 0 THEN 'Aktif' WHEN Closed = 1 THEN 'Tidak Aktif' END AS StatusTindakan FROM MasterTindakan"
         ElseIf RadioButtonPoliGigi.Checked = True Then
             stringQuery = "SELECT TindakanID, NamaTindakan, JenisTindakan, BiayaTindakan, JenisDokter AS 'Pelaksana', CASE WHEN Closed = 0 THEN 'Aktif' WHEN Closed = 1 THEN 'Tidak Aktif' END AS StatusTindakan FROM MasterTindakanGigi"
         End If
@@ -703,6 +705,43 @@ Public Class MasterTindakanKlinik
         End If
 
     End Function
+
+    Private Sub LoadDetailAlatFromJSON(ByVal json As String)
+
+        If json = "" Then Exit Sub
+
+        ' Pastikan DataTable sudah ada
+        If dtDetailAlat Is Nothing Then
+            InitGridAlatTindakan()
+        End If
+
+        ' Bersihkan isi lama
+        dtDetailAlat.Rows.Clear()
+
+        Dim list As List(Of DetailAlatClass)
+
+        list = JsonConvert.DeserializeObject( _
+                Of List(Of DetailAlatClass))(json)
+
+        If list Is Nothing Then Exit Sub
+
+        ' Aktifkan checkbox alat
+        CheckBoxPakaiAlat.Checked = True
+
+        Dim item As DetailAlatClass
+
+        For Each item In list
+
+            dtDetailAlat.Rows.Add( _
+                item.AlatID, _
+                item.NamaAlat, _
+                item.CartridgeID, _
+                item.NamaCartridge, _
+                item.Shoot)
+
+        Next
+
+    End Sub
 
     Public Sub LoadTindakanPoli(ByRef TindakanID As String)
         ClearDataMenuTindakan()
@@ -744,14 +783,14 @@ Public Class MasterTindakanKlinik
         End If
 
         'Set Alat
-        If Not IsDBNull(rowTindakan("AlatID")) Then
-            CheckBoxPakaiAlat.Checked = True
-            TextBoxAlatIdTindakan.Text = rowTindakan("AlatID").ToString()
-            TextBoxNamaAlatTindakan.Text = GetNamaAlat(rowTindakan("AlatID").ToString())
-            NumericShootPerTindakan.Value = CInt(rowTindakan("ShootPerTindakan"))
-        Else
-            CheckBoxPakaiAlat.Checked = False
-        End If
+        'If Not IsDBNull(rowTindakan("AlatID")) Then
+        '    CheckBoxPakaiAlat.Checked = True
+        '    TextBoxAlatIdTindakan.Text = rowTindakan("AlatID").ToString()
+        '    TextBoxNamaAlatTindakan.Text = GetNamaAlat(rowTindakan("AlatID").ToString())
+        '    NumericShootPerTindakan.Value = CInt(rowTindakan("ShootPerTindakan"))
+        'Else
+        '    CheckBoxPakaiAlat.Checked = False
+        'End If
 
 
         'Set Reminder
@@ -784,6 +823,11 @@ Public Class MasterTindakanKlinik
 
         If IsDBNull(rowTindakan("FeeDokter")) = False Then TextBoxFeeDokterTambahan.Text = Splitmoney(rowTindakan("FeeDokter"))
         If IsDBNull(rowTindakan("FeePerawat")) = False Then TextBoxFeePerawatTambahan.Text = Splitmoney(rowTindakan("FeePerawat"))
+
+        If Not IsDBNull(rowTindakan("DetailAlat")) Then
+            Dim json As String = rowTindakan("DetailAlat").ToString()
+            LoadDetailAlatFromJSON(json)
+        End If
     End Sub
 
     Private Sub ClearDataMenuTindakan()
@@ -830,10 +874,12 @@ Public Class MasterTindakanKlinik
         ComboBoxKategori.SelectedIndex = -1
         ComboBoxInformedConsent.Enabled = False
 
+        If dtDetailAlat IsNot Nothing Then
+            dtDetailAlat.Rows.Clear()
+        End If
+
         CheckBoxPakaiAlat.Checked = False
-        TextBoxNamaAlatTindakan.ResetText()
         NumericShootPerTindakan.Value = 1
-        TextBoxAlatIdTindakan.ResetText()
     End Sub
 
     Private Sub LoadPoliData()
@@ -856,6 +902,29 @@ Public Class MasterTindakanKlinik
         End If
     End Sub
 
+    Private Function GenerateDetailTindakanJSON() As String
+
+        If dtDetailAlat Is Nothing Then Return "[]"
+        If dtDetailAlat.Rows.Count = 0 Then Return "[]"
+
+        Dim list As New List(Of Object)
+
+        For Each row As DataRow In dtDetailAlat.Rows
+
+            list.Add(New With { _
+                .AlatID = row("AlatID"), _
+                .NamaAlat = row("NamaAlat"), _
+                .CartridgeID = row("CartridgeID"), _
+                .NamaCartridge = row("NamaCartridge"), _
+                .Shoot = row("Shoot") _
+            })
+
+        Next
+
+        Return JsonConvert.SerializeObject(list)
+
+    End Function
+
     Private Sub SimpanDataTindakan()
         Dim statusFee As Boolean = False
         Dim statusPersentase As Boolean = False
@@ -864,6 +933,7 @@ Public Class MasterTindakanKlinik
         Dim statusFeeKonsultasi As Boolean = False
         Dim statusInformedConsent As Boolean = False
         Dim jenisPelaksana As String = ""
+        Dim detailAlat As String = GenerateDetailTindakanJSON().Replace("'", "''")
 
         ' Set Jenis Pelaksana
         If RadioButtonPelaksanaDokter.Checked = True Then
@@ -875,25 +945,6 @@ Public Class MasterTindakanKlinik
         'Reminder
         Dim statusReminder As Integer = If(CheckBoxReminder.Checked, 1, 0)
         Dim hari As String
-
-        'Alat
-        Dim alatID As String = "NULL"
-        Dim shootAlat As Integer = 0
-
-        If CheckBoxPakaiAlat.Checked = True Then
-            If TextBoxAlatIdTindakan.Text = "" Then
-                MsgBox("Alat belum dipilih.", MsgBoxStyle.Critical)
-                Exit Sub
-            End If
-
-            If NumericShootPerTindakan.Value <= 0 Then
-                MsgBox("Jumlah shoot alat harus lebih dari 0.", MsgBoxStyle.Critical)
-                Exit Sub
-            End If
-            alatID = TextBoxAlatIdTindakan.Text
-            shootAlat = CInt(NumericShootPerTindakan.Value)
-
-        End If
 
         If TextBoxHariReminder.Text.Trim() = "" Then
             hari = "NULL"
@@ -941,9 +992,9 @@ Public Class MasterTindakanKlinik
         If TextBoxTindakanID.Text = "" Then
             ' Insert Data Baru 
             If RadioButtonPoliUmum.Checked = True Then
-                WriteSQL("INSERT INTO MasterTindakan ([NamaTindakan], [JenisTindakan], [BiayaTindakan], [JenisDokter], [CreatedDate], [CreatedBy], [StatusFeeTindakan], [StatusBHP], [StatusPersentaseFee], [StatusNominalFee], [PersentaseFeePerusahaan], [PersentaseFeeKaryawan], [FeePerTindakan], [FeeDokter], [FeePerawat], [StatusFeeKonsultasi], [MaksimalBHP], [StatusInformedConsent], [TindakanInformedConsent], [Hari], [Reminder], [PoliTujuan], [Kategori], [AlatID],[ShootPerTindakan]) " & _
+                WriteSQL("INSERT INTO MasterTindakan ([NamaTindakan], [JenisTindakan], [BiayaTindakan], [JenisDokter], [CreatedDate], [CreatedBy], [StatusFeeTindakan], [StatusBHP], [StatusPersentaseFee], [StatusNominalFee], [PersentaseFeePerusahaan], [PersentaseFeeKaryawan], [FeePerTindakan], [FeeDokter], [FeePerawat], [StatusFeeKonsultasi], [MaksimalBHP], [StatusInformedConsent], [TindakanInformedConsent], [Hari], [Reminder], [PoliTujuan], [Kategori], [DetailAlat]) " & _
                          "VALUES('" & TextBoxNamaTindakan.Text & "','" & ComboBoxGroupJenisTindakan.Text & "'," & CInt(TextBoxBiayaTindakan.Text) & ", '" & jenisPelaksana & "', GETDATE(), '" & userInput & "', '" & statusFee & "', '" & statusBHP & "', '" & statusPersentase & "', " & _
-                         "'" & statusNominal & "', '" & CDbl(TextBoxPersentaseFeePerusahaan.Text) & "', '" & CDbl(TextBoxPersentaseFeeKaryawan.Text) & "', '" & CDbl(TextBoxNominalFee.Text) & "', '" & CDbl(TextBoxFeeDokterTambahan.Text) & "', '" & CDbl(TextBoxFeePerawatTambahan.Text) & "', '" & statusFeeKonsultasi & "', '" & CDbl(TextBoxMaksimalBHP_Tindakan.Text) & "', '" & statusInformedConsent & "', '" & ComboBoxInformedConsent.Text & "', '" & hari & "', " & statusReminder & ", '" & poliGabung & "', '" & kategori & "', " & alatID & ", " & shootAlat & ")", 4)
+                         "'" & statusNominal & "', '" & CDbl(TextBoxPersentaseFeePerusahaan.Text) & "', '" & CDbl(TextBoxPersentaseFeeKaryawan.Text) & "', '" & CDbl(TextBoxNominalFee.Text) & "', '" & CDbl(TextBoxFeeDokterTambahan.Text) & "', '" & CDbl(TextBoxFeePerawatTambahan.Text) & "', '" & statusFeeKonsultasi & "', '" & CDbl(TextBoxMaksimalBHP_Tindakan.Text) & "', '" & statusInformedConsent & "', '" & ComboBoxInformedConsent.Text & "', '" & hari & "', " & statusReminder & ", '" & poliGabung & "', '" & kategori & "', '" & detailAlat & "')", 4)
             ElseIf RadioButtonPoliGigi.Checked = True Then
                 WriteSQL("INSERT INTO MasterTindakanGigi ([NamaTindakan], [JenisTindakan], [BiayaTindakan], [JenisDokter], [CreatedDate], [CreatedBy], [StatusFeeTindakan], [StatusBHP], [StatusPersentaseFee], [StatusNominalFee], [PersentaseFeePerusahaan], [PersentaseFeeKaryawan], [FeePerTindakan], [FeeDokter], [FeePerawat], [StatusFeeKonsultasi], [MaksimalBHP], [StatusInformedConsent], [TindakanInformedConsent], [Hari], [Reminder], [PoliTujuan]) " & _
                      "VALUES('" & TextBoxNamaTindakan.Text & "', '" & ComboBoxGroupJenisTindakan.Text & "', " & CInt(TextBoxBiayaTindakan.Text) & ", '" & jenisPelaksana & "', GETDATE(), '" & userInput & "', '" & statusFee & "', '" & statusBHP & "', '" & statusPersentase & "', " & _
@@ -976,8 +1027,7 @@ Public Class MasterTindakanKlinik
                               "PoliTujuan = '" & poliGabung & "'," & _
                               "UpdatedBy = '" & userInput & "'," & _
                               "Kategori = '" & kategori & "'," & _
-                              "AlatID = " & alatID & "," & _
-                              "ShootPerTindakan = " & shootAlat & "," & _
+                              "DetailAlat = '" & detailAlat & "'," & _
                               "UpdatedDate = GETDATE()"
 
             ' Insert Data Baru 
@@ -1257,6 +1307,68 @@ Public Class MasterTindakanKlinik
         End Try
     End Sub
 
+    Private dtDetailAlat As DataTable
+
+    Private Sub InitGridAlatTindakan()
+
+        dtDetailAlat = New DataTable
+
+        dtDetailAlat.Columns.Add("AlatID", GetType(Integer))
+        dtDetailAlat.Columns.Add("NamaAlat", GetType(String))
+        dtDetailAlat.Columns.Add("CartridgeID", GetType(Integer))
+        dtDetailAlat.Columns.Add("NamaCartridge", GetType(String))
+        dtDetailAlat.Columns.Add("Shoot", GetType(Integer))
+
+        DataGridViewAlatTindakan.DataSource = dtDetailAlat
+
+    End Sub
+
+    Private Sub ButtonTambahAlat_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonTambahAlat.Click
+        If dtDetailAlat Is Nothing Then
+            InitGridAlatTindakan()
+        End If
+
+        ' ===== VALIDASI =====
+        If ComboBoxAlatTindakan.SelectedIndex = -1 Then
+            MsgBox("Pilih alat terlebih dahulu")
+            Exit Sub
+        End If
+
+        If ComboBoxCartridgeTindakan.SelectedIndex = -1 Then
+            MsgBox("Pilih cartridge terlebih dahulu")
+            Exit Sub
+        End If
+
+        Dim shoot As Integer = CInt(NumericShootPerTindakan.Value)
+
+        If shoot <= 0 Then
+            MsgBox("Shoot harus lebih dari 0")
+            Exit Sub
+        End If
+
+        ' ===== AMBIL DATA =====
+        Dim alatID As Integer = CInt(ComboBoxAlatTindakan.SelectedValue)
+        Dim namaAlat As String = ComboBoxAlatTindakan.Text
+
+        Dim cartridgeID As Integer = CInt(ComboBoxCartridgeTindakan.SelectedValue)
+        Dim namaCartridge As String = ComboBoxCartridgeTindakan.Text
+
+        ' ===== CEK DUPLIKAT =====
+        For Each row As DataRow In dtDetailAlat.Rows
+            If CInt(row("CartridgeID")) = cartridgeID Then
+                MsgBox("Cartridge sudah ditambahkan.")
+                Exit Sub
+            End If
+        Next
+
+        ' ===== TAMBAH KE GRID =====
+        dtDetailAlat.Rows.Add(alatID, namaAlat, cartridgeID, namaCartridge, shoot)
+
+        NumericShootPerTindakan.Value = 1
+        ComboBoxCartridgeTindakan.SelectedIndex = -1
+        ComboBoxCartridgeTindakan.Focus()
+    End Sub
+
     Private Sub ButtonClearMasterTindakan_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonClearMasterTindakan.Click
         ClearDataMenuTindakan()
     End Sub
@@ -1333,15 +1445,15 @@ Public Class MasterTindakanKlinik
     End Sub
 
     Private Sub HitungKuotaSisa()
-        Dim kuotaTotal As Integer = CInt(NumericKuotaAwal.Value)
+        Dim kuotaTotal As Integer = CInt(NumericKuotaAwalCartridge.Value)
         Dim kuotaTerpakai As Integer = 0
 
-        Integer.TryParse(TextBoxKuotaTerpakai.Text, kuotaTerpakai)
+        Integer.TryParse(TextBoxKuotaTerpakaiCartridge.Text, kuotaTerpakai)
 
-        TextBoxKuotaSisa.Text = (kuotaTotal - kuotaTerpakai).ToString()
+        TextBoxKuotaSisaCartridge.Text = (kuotaTotal - kuotaTerpakai).ToString()
     End Sub
 
-    Private Sub NumericKuotaTotal_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles NumericKuotaAwal.ValueChanged
+    Private Sub NumericKuotaTotal_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs)
         HitungKuotaSisa()
     End Sub
 
@@ -1353,16 +1465,37 @@ Public Class MasterTindakanKlinik
         TextBoxKodeAlat.Text = ""
         TextBoxNamaAlat.Text = ""
 
-        ' Reset kuota
-        NumericKuotaAwal.Value = 1
-        TextBoxKuotaTerpakai.Text = "0"
-        TextBoxKuotaSisa.Text = "0"
-
         ' Status aktif default ON
         CheckBoxAlatAktif.Checked = True
 
         ' Fokus ke field pertama
         TextBoxKodeAlat.Focus()
+
+        DataGridViewAlat.DataSource = Nothing
+        DataGridViewAlat.Rows.Clear()
+    End Sub
+
+    Private Sub ClearFormMasterCartridge()
+        ' Reset ID (penanda insert / update)
+        TextBoxIdCartridge.Text = ""
+
+        ' Reset input utama
+        TextBoxKodeCartridge.Text = ""
+        TextBoxNamaCartridge.Text = ""
+
+        ' Reset kuota
+        NumericKuotaAwalCartridge.Value = 1
+        TextBoxKuotaTerpakaiCartridge.Text = "0"
+        TextBoxKuotaSisaCartridge.Text = "0"
+        TextBoxKuotaTotalCartridge.Text = "0"
+
+        ' Status aktif default ON
+        CheckBoxCartridge.Checked = True
+
+        ComboBoxNamaAlat.SelectedIndex = -1
+
+        ' Fokus ke field pertama
+        TextBoxKodeCartridge.Focus()
 
         DataGridViewAlat.DataSource = Nothing
         DataGridViewAlat.Rows.Clear()
@@ -1381,15 +1514,14 @@ Public Class MasterTindakanKlinik
         TextBoxKodeAlat.Text = row.Cells("KodeAlat").Value.ToString()
         TextBoxNamaAlat.Text = row.Cells("NamaAlat").Value.ToString()
 
-        NumericKuotaAwal.Value = CInt(row.Cells("KuotaTotal").Value)
-        TextBoxKuotaTerpakai.Text = row.Cells("KuotaTerpakai").Value.ToString()
-        TextBoxKuotaSisa.Text = row.Cells("KuotaSisa").Value.ToString()
-
         CheckBoxAlatAktif.Checked = (row.Cells("IsAktif").Value = True)
 
     End Sub
 
     Private Sub FormatGridMasterAlat()
+
+        If DataGridViewAlat.DataSource Is Nothing Then Exit Sub
+        If DataGridViewAlat.Columns.Count = 0 Then Exit Sub
 
         With DataGridViewAlat
 
@@ -1400,10 +1532,41 @@ Public Class MasterTindakanKlinik
             .MultiSelect = False
             .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
 
-            .Columns("AlatID").Visible = False
+            If .Columns.Contains("AlatID") Then
+                .Columns("AlatID").Visible = False
+            End If
 
-            .Columns("KodeAlat").HeaderText = "Kode"
-            .Columns("NamaAlat").HeaderText = "Nama Alat"
+            If .Columns.Contains("KodeAlat") Then
+                .Columns("KodeAlat").HeaderText = "Kode"
+            End If
+
+            If .Columns.Contains("NamaAlat") Then
+                .Columns("NamaAlat").HeaderText = "Nama Alat"
+            End If
+
+            If .Columns.Contains("IsAktif") Then
+                .Columns("IsAktif").HeaderText = "Aktif"
+            End If
+
+        End With
+
+    End Sub
+
+    Private Sub FormatGridMasterCartridge()
+
+        With DataGridViewAlat
+
+            .ReadOnly = True
+            .AllowUserToAddRows = False
+            .AllowUserToDeleteRows = False
+            .SelectionMode = DataGridViewSelectionMode.FullRowSelect
+            .MultiSelect = False
+            .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+
+            .Columns("CartridgeID").Visible = False
+
+            .Columns("KodeCartridge").HeaderText = "Kode"
+            .Columns("NamaCartridge").HeaderText = "Nama Cartridge"
             .Columns("KuotaAwal").HeaderText = "Kuota Awal"
             .Columns("KuotaTotal").HeaderText = "Kuota Total"
             .Columns("KuotaTerpakai").HeaderText = "Terpakai"
@@ -1434,11 +1597,9 @@ Public Class MasterTindakanKlinik
 
     Private Sub LoadGridMasterAlat(Optional ByVal alatID As String = "")
 
-        Dim sql As String = ""
-        sql = "SELECT " & _
-              "AlatID, KodeAlat, NamaAlat, KuotaAwal, KuotaTotal, KuotaTerpakai, " & _
-              "(KuotaTotal - KuotaTerpakai) AS KuotaSisa, IsAktif " & _
-              "FROM MasterAlat "
+        Dim sql As String = _
+            "SELECT AlatID, KodeAlat, NamaAlat, IsAktif " & _
+            "FROM MasterAlat "
 
         If alatID <> "" Then
             sql &= "WHERE AlatID = '" & alatID & "' "
@@ -1449,32 +1610,93 @@ Public Class MasterTindakanKlinik
         Dim dt As DataTable = ReadSQL(sql)
 
         DataGridViewAlat.AutoGenerateColumns = True
-        DataGridViewAlat.DataSource = Nothing
         DataGridViewAlat.DataSource = dt
 
         FormatGridMasterAlat()
 
     End Sub
 
+    Private Sub LoadGridMasterCartridge(Optional ByVal alatID As String = "")
+
+        Dim sql As String = ""
+
+        sql = "SELECT " & _
+              "c.CartridgeID, " & _
+              "c.KodeCartridge, " & _
+              "c.NamaCartridge, " & _
+              "a.NamaAlat, " & _
+              "c.KuotaAwal, " & _
+              "c.KuotaTotal, " & _
+              "c.KuotaTerpakai, " & _
+              "(c.KuotaTotal - c.KuotaTerpakai) AS KuotaSisa, " & _
+              "c.IsAktif " & _
+              "FROM MasterCartridge c " & _
+              "INNER JOIN MasterAlat a ON a.AlatID = c.AlatID "
+
+        If alatID <> "" Then
+            sql &= "WHERE c.AlatID = '" & alatID & "' "
+        End If
+
+        sql &= "ORDER BY c.NamaCartridge"
+
+        Dim dt As DataTable = ReadSQL(sql)
+
+        DataGridViewAlat.AutoGenerateColumns = True
+        DataGridViewAlat.DataSource = dt
+
+        FormatGridMasterCartridge()
+
+    End Sub
+
     Private Sub InsertMasterAlat()
 
-        Dim statusAktif As Integer = If(CheckBoxAlatAktif.Checked = True, 1, 0)
+        Dim statusAktif As Integer = If(CheckBoxAlatAktif.Checked, 1, 0)
 
-        Dim kuotaAwal As Integer = CInt(NumericKuotaAwal.Value)
+            WriteSQL("INSERT INTO MasterAlat " & _
+                     "(KodeAlat, NamaAlat, IsAktif, CreatedAt, CreatedBy) " & _
+                     "VALUES (" & _
+                     "'" & TextBoxKodeAlat.Text & "', " & _
+                     "'" & TextBoxNamaAlat.Text & "', " & _
+                     statusAktif & ", " & _
+                     "GETDATE(), " & _
+                     "'" & userInput & "')", 4)
 
-        WriteSQL("INSERT INTO MasterAlat " & _
-                 "(KodeAlat, NamaAlat, KuotaTotal, KuotaTerpakai, IsAktif, CreatedAt, CreatedBy, KuotaAwal) " & _
+            MsgBox("Berhasil menyimpan data alat.", MsgBoxStyle.Information, "Success!")
+
+    End Sub
+
+    Private Sub InsertMasterCartridge()
+
+        If ComboBoxNamaAlat.SelectedIndex = -1 Then
+            MsgBox("Pilih alat terlebih dahulu")
+            Exit Sub
+        End If
+
+        Dim statusAktif As Integer = If(CheckBoxCartridge.Checked, 1, 0)
+
+        Dim kuotaAwal As Integer = CInt(NumericKuotaAwalCartridge.Value)
+
+        Dim alatID As Integer = CInt(ComboBoxNamaAlat.SelectedValue)
+
+        If TextBoxKodeCartridge.Text = "" Or TextBoxNamaCartridge.Text = "" Then
+            MsgBox("Kode dan Nama cartridge wajib diisi")
+            Exit Sub
+        End If
+
+        WriteSQL("INSERT INTO MasterCartridge " & _
+                 "(KodeCartridge, NamaCartridge, KuotaTotal, KuotaTerpakai, IsAktif, CreatedAt, CreatedBy, KuotaAwal, AlatID) " & _
                  "VALUES (" & _
-                 "'" & TextBoxKodeAlat.Text & "', " & _
-                 "'" & TextBoxNamaAlat.Text & "', " & _
+                 "'" & TextBoxKodeCartridge.Text.Replace("'", "''") & "', " & _
+                 "'" & TextBoxNamaCartridge.Text.Replace("'", "''") & "', " & _
                  kuotaAwal & ", " & _
                  "0, " & _
                  statusAktif & ", " & _
-                 "GETDATE(), '" & userInput & "', " & _
-                 kuotaAwal & ")", 4)
+                 "GETDATE(), " & _
+                 "'" & userInput & "', " & _
+                 kuotaAwal & ", " & _
+                 alatID & ")", 4)
 
-
-        MsgBox("Berhasil menyimpan data alat.", MsgBoxStyle.Information, "Success!")
+        MsgBox("Berhasil menyimpan data cartridge.", MsgBoxStyle.Information, "Success!")
 
     End Sub
 
@@ -1482,9 +1704,34 @@ Public Class MasterTindakanKlinik
 
         Dim statusAktif As Integer = If(CheckBoxAlatAktif.Checked = True, 1, 0)
 
+        Dim parameterUpdate As String = ""
+        parameterUpdate = "KodeAlat = '" & TextBoxKodeAlat.Text.Replace("'", "''") & "', " & _
+                          "NamaAlat = '" & TextBoxNamaAlat.Text.Replace("'", "''") & "', " & _
+                          "IsAktif = " & statusAktif & ", " & _
+                          "UpdatedAt = GETDATE(), " & _
+                          "UpdatedBy = '" & userInput & "'"
+
+        WriteSQL("UPDATE MasterAlat SET " & _
+                 parameterUpdate & _
+                 " WHERE AlatID = '" & TextBoxAlatId.Text & "'", 4)
+
+        MsgBox("Berhasil mengubah data alat.", MsgBoxStyle.Information, "Success!")
+
+    End Sub
+
+    Private Sub UpdateMasterCartridge()
+
+        Dim statusAktif As Integer = If(CheckBoxCartridge.Checked = True, 1, 0)
+
         ' Ambil kuota terpakai lama
-        Dim kuotaTerpakai As Integer = CInt(TextBoxKuotaTerpakai.Text)
-        Dim kuotaAwalBaru As Integer = CInt(NumericKuotaAwal.Value)
+        Dim kuotaTerpakai As Integer = CInt(TextBoxKuotaTerpakaiCartridge.Text)
+        Dim kuotaAwalBaru As Integer = CInt(NumericKuotaAwalCartridge.Value)
+        Dim alatID As Integer = CInt(ComboBoxNamaAlat.SelectedValue)
+
+        If TextBoxKodeCartridge.Text = "" Or TextBoxNamaCartridge.Text = "" Then
+            MsgBox("Kode dan Nama cartridge wajib diisi")
+            Exit Sub
+        End If
 
         ' Validasi kuota
         If kuotaAwalBaru < kuotaTerpakai Then
@@ -1493,9 +1740,15 @@ Public Class MasterTindakanKlinik
             Exit Sub
         End If
 
+        If ComboBoxNamaAlat.SelectedIndex = -1 Then
+            MsgBox("Pilih alat terlebih dahulu")
+            Exit Sub
+        End If
+
         Dim parameterUpdate As String = ""
-        parameterUpdate = "KodeAlat = '" & TextBoxKodeAlat.Text.Replace("'", "''") & "', " & _
-                          "NamaAlat = '" & TextBoxNamaAlat.Text.Replace("'", "''") & "', " & _
+        parameterUpdate = "KodeCartridge = '" & TextBoxKodeCartridge.Text.Replace("'", "''") & "', " & _
+                          "NamaCartridge = '" & TextBoxNamaCartridge.Text.Replace("'", "''") & "', " & _
+                          "AlatID = " & alatID & ", " & _
                           "IsAktif = " & statusAktif & ", " & _
                           "UpdatedAt = GETDATE(), " & _
                           "UpdatedBy = '" & userInput & "'"
@@ -1506,7 +1759,7 @@ Public Class MasterTindakanKlinik
                                ", KuotaTotal = " & kuotaAwalBaru
         Else
             ' Sudah ada pemakaian → blok perubahan kuota awal
-            If kuotaAwalBaru <> CInt(NumericKuotaAwal.Text) Then
+            If kuotaAwalBaru <> CInt(NumericKuotaAwalCartridge.Value) Then
                 MsgBox("Kuota awal tidak dapat diubah karena sudah ada pemakaian." & vbCrLf & _
                        "Gunakan fitur Top Up untuk menambah kuota.", _
                        MsgBoxStyle.Exclamation, "Peringatan")
@@ -1514,16 +1767,61 @@ Public Class MasterTindakanKlinik
             End If
         End If
 
-        WriteSQL("UPDATE MasterAlat SET " & _
+        WriteSQL("UPDATE MasterCartridge SET " & _
                  parameterUpdate & _
-                 " WHERE AlatID = '" & TextBoxAlatId.Text & "'", 4)
+                 " WHERE CartridgeID = '" & TextBoxIdCartridge.Text & "'", 4)
 
-        MsgBox("Berhasil mengubah data alat.", MsgBoxStyle.Information, "Success!")
+        MsgBox("Berhasil mengubah data cartridge.", MsgBoxStyle.Information, "Success!")
 
     End Sub
 
+    Private Sub LoadComboAlat()
 
-    Private Sub ButtonSimpanAlat_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonSimpanAlat.Click
+        Dim sql As String = _
+            "SELECT AlatID, NamaAlat " & _
+            "FROM MasterAlat " & _
+            "WHERE IsAktif = 1 " & _
+            "ORDER BY NamaAlat"
+
+        Dim dt As DataTable = ReadSQL(sql)
+
+        ComboBoxNamaAlat.DataSource = dt
+        ComboBoxNamaAlat.DisplayMember = "NamaAlat"
+        ComboBoxNamaAlat.ValueMember = "AlatID"
+
+        ComboBoxNamaAlat.SelectedIndex = -1
+
+    End Sub
+
+    Private Sub TabControl1_SelectedIndexChanged() _
+        Handles TabControl1.SelectedIndexChanged
+
+        If TabControl1.SelectedTab Is TabPage2 Then
+            LoadComboAlat()
+        End If
+
+    End Sub
+
+    Private Sub SimpanCartridge()
+
+        If TextBoxKodeCartridge.Text = "" Or TextBoxNamaCartridge.Text = "" Then
+            MsgBox("Kode dan Nama cartridge wajib diisi")
+            Exit Sub
+        End If
+
+        If TextBoxIdCartridge.Text = "" Then
+            InsertMasterCartridge()
+        Else
+            UpdateMasterCartridge()
+        End If
+
+        ClearFormMasterCartridge()
+        LoadGridMasterCartridge()
+
+    End Sub
+
+    Private Sub SimpanAlat()
+
         If TextBoxKodeAlat.Text = "" Or TextBoxNamaAlat.Text = "" Then
             MsgBox("Kode dan Nama alat wajib diisi")
             Exit Sub
@@ -1537,15 +1835,30 @@ Public Class MasterTindakanKlinik
 
         ClearFormMasterAlat()
         LoadGridMasterAlat()
+
+    End Sub
+
+    Private Sub ButtonSimpanAlat_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonSimpanAlat.Click
+        Select Case TabControl1.SelectedTab.Name
+
+            Case "TabPage1"
+                SimpanAlat()
+
+            Case "TabPage2"
+                SimpanCartridge()
+
+        End Select
     End Sub
 
     Private Sub ButtonClearAlat_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonClearAlat.Click
-        ClearFormMasterAlat()
-    End Sub
+        Select Case TabControl1.SelectedTab.Name
 
-    Private Sub ButtonCariAlat_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCariAlat.Click
-        Find.Show()
-        Find.Query("SELECT AlatID, KodeAlat, NamaAlat, KuotaAwal, KuotaTotal, KuotaTerpakai, IsAktif FROM MasterAlat ", "ORDER BY CreatedAt DESC", "FindMasterAlat", 2)
+            Case "TabPage1"
+                ClearFormMasterAlat()
+
+            Case "TabPage2"
+                ClearFormMasterCartridge()
+        End Select
     End Sub
 
     Public Sub LoadDetailAlat(ByRef AlatID As String)
@@ -1562,34 +1875,10 @@ Public Class MasterTindakanKlinik
 
         Dim row As DataRow = dt.Rows(0)
 
-        ' Ambil nilai dengan aman
-        Dim kuotaAwal As Integer = 0
-        Dim kuotaTotal As Integer = 0
-        Dim kuotaTerpakai As Integer = 0
-
-        If Not IsDBNull(row("KuotaAwal")) Then
-            kuotaAwal = CInt(row("KuotaAwal"))
-        End If
-
-        If Not IsDBNull(row("KuotaTotal")) Then
-            kuotaTotal = CInt(row("KuotaTotal"))
-        End If
-
-        If Not IsDBNull(row("KuotaTerpakai")) Then
-            kuotaTerpakai = CInt(row("KuotaTerpakai"))
-        End If
-
-        Dim kuotaSisa As Integer = kuotaTotal - kuotaTerpakai
-
         ' Isi form
         TextBoxAlatID.Text = row("AlatID").ToString()
         TextBoxKodeAlat.Text = row("KodeAlat").ToString()
         TextBoxNamaAlat.Text = row("NamaAlat").ToString()
-
-        NumericKuotaAwal.Value = kuotaAwal
-        TextBoxKuotaTotal.Text = kuotaTotal.ToString()
-        TextBoxKuotaTerpakai.Text = kuotaTerpakai.ToString()
-        TextBoxKuotaSisa.Text = kuotaSisa.ToString()
 
         CheckBoxAlatAktif.Checked = (row("IsAktif") = True)
 
@@ -1597,16 +1886,127 @@ Public Class MasterTindakanKlinik
 
     End Sub
 
+    Public Sub LoadDetailCartridge(ByRef CartridgeID As String)
+
+        Dim sql As String = "SELECT * FROM MasterCartridge WHERE CartridgeID = '" & CartridgeID & "'"
+
+        Dim dt As DataTable = ReadSQL(sql)
+
+        If dt.Rows.Count = 0 Then
+            MsgBox("Data cartridge tidak ditemukan.", MsgBoxStyle.Exclamation)
+            Exit Sub
+        End If
+
+        Dim row As DataRow = dt.Rows(0)
+
+        Dim kuotaAwal As Integer = If(IsDBNull(row("KuotaAwal")), 0, CInt(row("KuotaAwal")))
+        Dim kuotaTotal As Integer = If(IsDBNull(row("KuotaTotal")), 0, CInt(row("KuotaTotal")))
+        Dim kuotaTerpakai As Integer = If(IsDBNull(row("KuotaTerpakai")), 0, CInt(row("KuotaTerpakai")))
+
+        Dim kuotaSisa As Integer = kuotaTotal - kuotaTerpakai
+
+        ' =============================
+        ' ISI FORM
+        ' =============================
+
+        TextBoxIdCartridge.Text = row("CartridgeID").ToString()
+        TextBoxKodeCartridge.Text = row("KodeCartridge").ToString()
+        TextBoxNamaCartridge.Text = row("NamaCartridge").ToString()
+
+        NumericKuotaAwalCartridge.Value = kuotaAwal
+        TextBoxKuotaTotalCartridge.Text = kuotaTotal.ToString()
+        TextBoxKuotaTerpakaiCartridge.Text = kuotaTerpakai.ToString()
+        TextBoxKuotaSisaCartridge.Text = kuotaSisa.ToString()
+
+        CheckBoxCartridge.Checked = CBool(row("IsAktif"))
+
+        ' =============================
+        ' ⭐ SET COMBO ALAT
+        ' =============================
+
+        If Not IsDBNull(row("AlatID")) Then
+            ComboBoxNamaAlat.SelectedValue = CInt(row("AlatID"))
+        Else
+            ComboBoxNamaAlat.SelectedIndex = -1
+        End If
+
+        ' =============================
+        ' LOAD GRID (OPTIONAL)
+        ' =============================
+
+        LoadGridMasterCartridge(row("AlatID").ToString())
+
+    End Sub
+
+    Private isLoadingCombo As Boolean = False
+
+    Private Sub ComboBoxAlatTindakan_SelectedIndexChanged() _
+        Handles ComboBoxAlatTindakan.SelectedIndexChanged
+
+        If isLoadingCombo Then Exit Sub
+        If ComboBoxAlatTindakan.SelectedIndex = -1 Then Exit Sub
+        If ComboBoxAlatTindakan.SelectedValue Is Nothing Then Exit Sub
+        If TypeOf ComboBoxAlatTindakan.SelectedValue Is DataRowView Then Exit Sub
+        If Not IsNumeric(ComboBoxAlatTindakan.SelectedValue) Then Exit Sub
+
+        Dim alatID As Integer = CInt(ComboBoxAlatTindakan.SelectedValue)
+
+        LoadCartridgeByAlat(alatID)
+
+    End Sub
+
+    Private Sub LoadComboAlatTindakan()
+
+        isLoadingCombo = True
+
+        Dim sql As String = "SELECT AlatID, NamaAlat FROM MasterAlat WHERE IsAktif=1"
+
+        Dim dt As DataTable = ReadSQL(sql)
+
+        ComboBoxAlatTindakan.DataSource = dt
+        ComboBoxAlatTindakan.DisplayMember = "NamaAlat"
+        ComboBoxAlatTindakan.ValueMember = "AlatID"
+        ComboBoxAlatTindakan.SelectedIndex = -1
+
+        isLoadingCombo = False
+
+    End Sub
+
+    Private Sub LoadCartridgeByAlat(ByVal alatID As Integer)
+
+        Dim sql As String = _
+            "SELECT CartridgeID, NamaCartridge " & _
+            "FROM MasterCartridge " & _
+            "WHERE AlatID = " & alatID & " " & _
+            "AND IsAktif = 1 " & _
+            "ORDER BY NamaCartridge"
+
+        Dim dt As DataTable = ReadSQL(sql)
+
+        ComboBoxCartridgeTindakan.DataSource = Nothing
+
+        ComboBoxCartridgeTindakan.DisplayMember = "NamaCartridge"
+        ComboBoxCartridgeTindakan.ValueMember = "CartridgeID"
+        ComboBoxCartridgeTindakan.DataSource = dt
+
+        ComboBoxCartridgeTindakan.SelectedIndex = -1
+
+    End Sub
 
     Private Sub CheckBoxPakaiAlat_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckBoxPakaiAlat.CheckedChanged
         If CheckBoxPakaiAlat.Checked Then
-            ButtonCariAlatTindakan.Enabled = True
-            TextBoxNamaAlatTindakan.ReadOnly = False
             NumericShootPerTindakan.ReadOnly = False
+            ComboBoxAlatTindakan.Enabled = True
+            ComboBoxCartridgeTindakan.Enabled = True
+
+            LoadComboAlatTindakan()
         Else
-            ButtonCariAlatTindakan.Enabled = False
-            TextBoxNamaAlatTindakan.ReadOnly = True
             NumericShootPerTindakan.ReadOnly = True
+            ComboBoxAlatTindakan.DataSource = Nothing
+            ComboBoxCartridgeTindakan.DataSource = Nothing
+
+            ComboBoxAlatTindakan.Enabled = False
+            ComboBoxCartridgeTindakan.Enabled = False
         End If
     End Sub
 
@@ -1622,17 +2022,9 @@ Public Class MasterTindakanKlinik
         End If
 
         Dim row As DataRow = dt.Rows(0)
-
-        TextBoxNamaAlatTindakan.Text = row("NamaAlat").ToString()
-        TextBoxAlatIdTindakan.Text = row("AlatID").ToString()
     End Sub
 
-    Private Sub ButtonCariAlatTindakan_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCariAlatTindakan.Click
-        Find.Show()
-        Find.Query("SELECT AlatID, KodeAlat, NamaAlat, KuotaTotal, KuotaTerpakai, IsAktif FROM MasterAlat ", "ORDER BY CreatedAt DESC", "FindMasterAlatTindakan", 2)
-    End Sub
-
-    Private Sub ButtonCetakRiwayat_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCetakRiwayat.Click
+    Private Sub ButtonCetakRiwayat_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         If TextBoxAlatId.Text.Trim() = "" Then
             MsgBox("Pilih alat terlebih dahulu.", MsgBoxStyle.Exclamation)
             Exit Sub
@@ -1778,5 +2170,15 @@ Public Class MasterTindakanKlinik
 
         'report.RunDesigner()
         report.ShowPreview()
+    End Sub
+
+    Private Sub ButtonCariAlat_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCariAlat.Click
+        Find.Show()
+        Find.Query("SELECT AlatID, KodeAlat, NamaAlat, IsAktif FROM MasterAlat ", "ORDER BY CreatedAt DESC", "FindMasterAlat", 2)
+    End Sub
+
+    Private Sub ButtonCariCartridge_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCariCartridge.Click
+        Find.Show()
+        Find.Query("SELECT CartridgeID, KodeCartridge, NamaCartridge, KuotaAwal, KuotaTotal, KuotaTerpakai, IsAktif FROM MasterCartridge ", "ORDER BY CreatedAt DESC", "FindMasterCartridge", 2)
     End Sub
 End Class

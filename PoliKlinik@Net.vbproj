@@ -373,6 +373,7 @@
     <Compile Include="Form_Trial\UserControl1.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Master\Poli\DetailAlatClass.vb" />
     <Compile Include="Master\Poli\MasterTindakanKlinik.Designer.vb">
       <DependentUpon>MasterTindakanKlinik.vb</DependentUpon>
     </Compile>

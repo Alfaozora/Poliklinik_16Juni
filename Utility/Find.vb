@@ -367,6 +367,8 @@ Public Class Find
                     MasterTindakanKlinik.LoadDetailPaket(Grdrow("PaketID").ToString)
                 Case "FindMasterAlat"
                     MasterTindakanKlinik.LoadDetailAlat(Grdrow("AlatID").ToString)
+                Case "FindMasterCartridge"
+                    MasterTindakanKlinik.LoadDetailCartridge(Grdrow("CartridgeID").ToString)
                 Case "FindMasterAlatTindakan"
                     MasterTindakanKlinik.LoadDetailAlatTindakan(Grdrow("AlatID").ToString)
                 Case "FindInvoiceLab"
