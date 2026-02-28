@@ -13228,48 +13228,100 @@ Public Class FormRekamMedisDokter
 
     End Function
 
-    Private Sub ProsesPemotonganKuotaAlat(ByVal transPoliIDDetail As String, ByVal tindakanID As String, ByVal qtyTindakan As Integer)
+    Private Function GetDetailTindakanJSON(ByVal tindakanID As String) As String
 
-        Dim dtAlat As DataTable = GetDataAlatTindakan(tindakanID)
+        Dim sql As String = "SELECT DetailAlat FROM MasterTindakan WHERE TindakanID='" & tindakanID & "'"
 
-        ' Tindakan tidak pakai alat
-        If dtAlat.Rows.Count = 0 Then Exit Sub
+        Dim dt As DataTable = ReadSQL(sql)
 
-        Dim alatID As String = dtAlat.Rows(0)("AlatID").ToString()
-        Dim shootPerTindakan As Integer = CInt(dtAlat.Rows(0)("ShootPerTindakan"))
+        If dt.Rows.Count = 0 Then Return ""
 
-        Dim totalShoot As Integer = shootPerTindakan * qtyTindakan
+        If IsDBNull(dt.Rows(0)("DetailAlat")) Then Return ""
 
-        'Cek kuota
-        Dim kuotaSisa As Integer = GetKuotaSisaAlat(alatID)
+        Return dt.Rows(0)("DetailAlat").ToString()
 
-        If kuotaSisa < totalShoot Then
-            MsgBox("Kuota alat tidak mencukupi." & vbCrLf & _
-                   "Sisa: " & kuotaSisa & ", Dibutuhkan: " & totalShoot, MsgBoxStyle.Critical)
-            Exit Sub
-        End If
+    End Function
 
-        'TRANSACTION SQL
+    Private Function GetKuotaSisaCartridge(ByVal cartridgeID As Integer) As Integer
+
+        Dim sql As String = "SELECT (KuotaTotal - KuotaTerpakai) AS Sisa FROM MasterCartridge " & _
+            "WHERE CartridgeID=" & cartridgeID
+
+        Dim dt As DataTable = ReadSQL(sql)
+
+        If dt.Rows.Count = 0 Then Return 0
+
+        Return CInt(dt.Rows(0)("Sisa"))
+
+    End Function
+
+    Private Sub ProsesPemotonganKuotaAlat( _
+    ByVal transPoliIDDetail As String, _
+    ByVal tindakanID As String, _
+    ByVal qtyTindakan As Integer)
+
+        Dim json As String = GetDetailTindakanJSON(tindakanID)
+
+        If json = "" Then Exit Sub
+
+        Dim list As List(Of DetailAlatClass)
+
+        list = Newtonsoft.Json.JsonConvert.DeserializeObject(Of List(Of DetailAlatClass))(json)
+
+        If list Is Nothing Then Exit Sub
+
         Dim dbTran As New DBTransaction
 
         Try
+
             dbTran.BeginTransaction()
 
-            dbTran.Execute( _
-                "INSERT INTO LogPemakaianAlat " & _
-                "(TransaksiDetailID, AlatID, ShootDipakai, TglPemakaian, UserInput) VALUES (" & _
-                transPoliIDDetail & "," & alatID & "," & totalShoot & ",GETDATE(),'" & userInput & "')")
+            Dim item As DetailAlatClass
 
-            dbTran.Execute( _
-                "UPDATE MasterAlat SET " & _
-                "KuotaTerpakai = KuotaTerpakai + " & totalShoot & " " & _
-                "WHERE AlatID = " & alatID)
+            For Each item In list
+
+                Dim totalShoot As Integer = item.Shoot * qtyTindakan
+
+                ' ======================
+                ' CEK KUOTA CARTRIDGE
+                ' ======================
+                Dim kuotaSisa As Integer = GetKuotaSisaCartridge(item.CartridgeID)
+
+                If kuotaSisa < totalShoot Then
+                    Throw New Exception( _
+                        "Kuota cartridge tidak mencukupi : " & _
+                        item.NamaCartridge)
+                End If
+
+                ' ======================
+                ' LOG PEMAKAIAN
+                ' ======================
+                dbTran.Execute( _
+                    "INSERT INTO LogPemakaianAlat " & _
+                    "(TransaksiDetailID, AlatID, CartridgeID, ShootDipakai, TglPemakaian, UserInput) VALUES (" & _
+                    transPoliIDDetail & "," & _
+                    item.AlatID & "," & _
+                    item.CartridgeID & "," & _
+                    totalShoot & ",GETDATE(),'" & userInput & "')")
+
+                ' ======================
+                ' UPDATE CARTRIDGE
+                ' ======================
+                dbTran.Execute( _
+                    "UPDATE MasterCartridge SET " & _
+                    "KuotaTerpakai = KuotaTerpakai + " & totalShoot & " " & _
+                    "WHERE CartridgeID = " & item.CartridgeID)
+
+            Next
 
             dbTran.Commit()
 
         Catch ex As Exception
+
             dbTran.Rollback()
+
             MsgBox("Gagal potong kuota alat : " & ex.Message, MsgBoxStyle.Critical)
+
         End Try
 
     End Sub
@@ -13279,18 +13331,24 @@ Public Class FormRekamMedisDokter
         Dim dbTran As New DBTransaction
 
         Try
+
             dbTran.BeginTransaction()
 
-            'Balikin kuota alat (berdasarkan log)
+            ' ===============================
+            ' KEMBALIKAN KUOTA CARTRIDGE
+            ' ===============================
             dbTran.Execute( _
-                "UPDATE MA SET " & _
-                "MA.KuotaTerpakai = MA.KuotaTerpakai - LPA.ShootDipakai " & _
-                "FROM MasterAlat MA " & _
-                "INNER JOIN LogPemakaianAlat LPA ON MA.AlatID = LPA.AlatID " & _
+                "UPDATE MC SET " & _
+                "MC.KuotaTerpakai = MC.KuotaTerpakai - LPA.ShootDipakai " & _
+                "FROM MasterCartridge MC " & _
+                "INNER JOIN LogPemakaianAlat LPA " & _
+                "ON MC.CartridgeID = LPA.CartridgeID " & _
                 "WHERE LPA.TransaksiDetailID = " & transPoliIDDetail & " " & _
                 "AND LPA.IsVoid = 0")
 
-            'Void log pemakaian alat
+            ' ===============================
+            ' VOID LOG PEMAKAIAN
+            ' ===============================
             dbTran.Execute( _
                 "UPDATE LogPemakaianAlat SET " & _
                 "IsVoid = 1, " & _
@@ -13302,8 +13360,11 @@ Public Class FormRekamMedisDokter
             dbTran.Commit()
 
         Catch ex As Exception
+
             dbTran.Rollback()
-            MsgBox("Gagal rollback kuota alat : " & ex.Message, MsgBoxStyle.Critical)
+
+            MsgBox("Gagal rollback kuota cartridge : " & ex.Message, MsgBoxStyle.Critical)
+
         End Try
 
     End Sub
