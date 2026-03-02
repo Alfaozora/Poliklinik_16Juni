@@ -936,6 +936,145 @@ Public Class FormPembayaran
         Return dt
     End Function
 
+    Private Sub SendInvoiceValidator()
+
+        Try
+
+            Dim nama As String = ReadSQLNIK("SELECT Nama FROM MasterPasien WHERE NoRekamMedis='" & _noRekamMedis & "'")
+
+            Dim payload As New Dictionary(Of String, Object)
+
+            payload.Add("nomor_registrasi", _noRekamMedis)
+            payload.Add("nomor_transaksi", _nomorUrutTransaksi)
+            payload.Add("nama_pasien", nama)
+            payload.Add("nett_bayar", TextBoxTotalBayar.Value)
+            payload.Add("tanggal_transaksi", Now.ToString("yyyy-MM-dd HH:mm:ss"))
+            payload.Add("nama_kasir", userInput)
+
+            Dim jsonParam As String = JsonConvert.SerializeObject(payload)
+
+            Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+
+            Dim urlApi As String = baseURL & "api/invoice/store"
+
+            Dim response As String = InsertDataAPIRM(jsonParam, urlApi)
+
+            ' ======================
+            ' DEBUG RESPONSE
+            ' ======================
+            If response Is Nothing OrElse response.Trim = "" Then
+                Throw New Exception("Response kosong dari server")
+            End If
+
+            ' ⭐ CEK APAKAH JSON VALID
+            If Not response.Trim.StartsWith("{") Then
+                Throw New Exception("Response bukan JSON : " & response)
+            End If
+
+            ' ======================
+            ' PARSE JSON
+            ' ======================
+            Dim obj = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(response)
+
+            If obj.ContainsKey("status") AndAlso CBool(obj("status")) = True Then
+
+                Dim urlValidator As String = obj("url").ToString()
+                Dim keyValidator As String = obj("key").ToString()
+
+                WriteSQL("UPDATE TransaksiDetail SET " & _
+                         "ValidatorURL='" & urlValidator.Replace("'", "''") & "'," & _
+                         "ValidatorKey='" & keyValidator.Replace("'", "''") & "' " & _
+                         "WHERE NoUrut='" & _nomorUrutTransaksi.Replace("'", "''") & "'", 4)
+
+            Else
+                Throw New Exception("API gagal : " & response)
+            End If
+
+        Catch ex As Exception
+            MsgBox("Gagal kirim validator : " & ex.Message)
+        End Try
+
+    End Sub
+
+    'Private Sub SendInvoiceValidator()
+
+    '    Try
+
+    '        MsgBox("START SEND VALIDATOR")
+
+    '        Dim nama As String = ReadSQLNIK("SELECT Nama FROM MasterPasien WHERE NoRekamMedis='" & _noRekamMedis & "'")
+
+    '        MsgBox("Nama pasien : " & nama)
+
+    '        Dim payload As New Dictionary(Of String, Object)
+
+    '        payload.Add("nomor_registrasi", _noRekamMedis)
+    '        payload.Add("nomor_transaksi", _nomorUrutTransaksi)
+    '        payload.Add("nama_pasien", nama)
+    '        payload.Add("nett_bayar", TextBoxTotalBayar.Value)
+    '        payload.Add("tanggal_transaksi", Now.ToString("yyyy-MM-dd HH:mm:ss"))
+    '        payload.Add("nama_kasir", userInput)
+
+    '        Dim jsonParam As String = JsonConvert.SerializeObject(payload)
+
+    '        MsgBox("JSON DIKIRIM :" & vbCrLf & jsonParam)
+
+    '        Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+
+    '        MsgBox("BASE URL : " & baseURL)
+
+    '        Dim urlApi As String = baseURL & "/api/invoice/store"
+
+    '        MsgBox("URL API : " & urlApi)
+
+    '        Dim response As String = InsertDataAPIRM(jsonParam, urlApi)
+
+    '        MsgBox("RESPONSE SERVER :" & vbCrLf & response)
+
+    '        ' ======================
+    '        ' VALIDASI RESPONSE
+    '        ' ======================
+    '        If response Is Nothing OrElse response.Trim = "" Then
+    '            MsgBox("Response kosong!")
+    '            Exit Sub
+    '        End If
+
+    '        If Not response.Trim.StartsWith("{") Then
+    '            MsgBox("Response bukan JSON!" & vbCrLf & response)
+    '            Exit Sub
+    '        End If
+
+    '        MsgBox("Response JSON VALID")
+
+    '        Dim obj = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(response)
+
+    '        MsgBox("JSON BERHASIL DI PARSE")
+
+    '        If obj.ContainsKey("status") AndAlso CBool(obj("status")) = True Then
+
+    '            Dim urlValidator As String = obj("url").ToString()
+    '            Dim keyValidator As String = obj("key").ToString()
+
+    '            MsgBox("URL VALIDATOR : " & urlValidator)
+    '            MsgBox("KEY VALIDATOR : " & keyValidator)
+
+    '            WriteSQL("UPDATE TransaksiDetail SET " & _
+    '                     "ValidatorURL='" & urlValidator.Replace("'", "''") & "'," & _
+    '                     "ValidatorKey='" & keyValidator.Replace("'", "''") & "' " & _
+    '                     "WHERE NoUrut='" & _nomorUrutTransaksi.Replace("'", "''") & "'", 4)
+
+    '            MsgBox("Validator berhasil disimpan")
+
+    '        Else
+    '            MsgBox("API status FALSE :" & response)
+    '        End If
+
+    '    Catch ex As Exception
+    '        MsgBox("ERROR BESAR :" & vbCrLf & ex.ToString())
+    '    End Try
+
+    'End Sub
+
     Private Sub SaveDataPembayaran()
         '# Variabel Umum
         Dim NewHeader As DataTable = CreateTable()
@@ -1293,6 +1432,9 @@ Public Class FormPembayaran
                 ' Insert / Update Detail Waktu Transaksi (WaktuSelesaiPendaftaran)
                 SetDetailWaktuTransaksi(_nomorUrutTransaksi, "WaktuSelesaiPendaftaran", userInput)
 
+                'Send Validator
+                SendInvoiceValidator()
+
                 ' Pesan Success
                 If NoUrutBPJS = "" Then
                     ' Non BPJS
@@ -1488,6 +1630,9 @@ Public Class FormPembayaran
                 'If Jeniscetak = "Struk" Then
                 '    Report.PageHeight = txtotalrow
                 'End If
+
+                'Send Validator
+                SendInvoiceValidator()
 
                 ' Pesan Success
                 MsgBox("Berhasil Menyimpan Data Transaksi." & vbCrLf & "No Transaksi : " & _nomorUrutTransaksi, MsgBoxStyle.Information, "Success!")
