@@ -1501,22 +1501,22 @@ Public Class MasterTindakanKlinik
         DataGridViewAlat.Rows.Clear()
     End Sub
 
-    Private Sub DataGridViewAlat_CellDoubleClick( _
-    ByVal sender As Object, _
-    ByVal e As DataGridViewCellEventArgs) _
-    Handles DataGridViewAlat.CellDoubleClick
+    'Private Sub DataGridViewAlat_CellDoubleClick( _
+    'ByVal sender As Object, _
+    'ByVal e As DataGridViewCellEventArgs) _
+    'Handles DataGridViewAlat.CellDoubleClick
 
-        If e.RowIndex < 0 Then Exit Sub
+    '    If e.RowIndex < 0 Then Exit Sub
 
-        Dim row As DataGridViewRow = DataGridViewAlat.Rows(e.RowIndex)
+    '    Dim row As DataGridViewRow = DataGridViewAlat.Rows(e.RowIndex)
 
-        TextBoxAlatId.Text = row.Cells("AlatID").Value.ToString()
-        TextBoxKodeAlat.Text = row.Cells("KodeAlat").Value.ToString()
-        TextBoxNamaAlat.Text = row.Cells("NamaAlat").Value.ToString()
+    '    TextBoxAlatId.Text = row.Cells("AlatID").Value.ToString()
+    '    TextBoxKodeAlat.Text = row.Cells("KodeAlat").Value.ToString()
+    '    TextBoxNamaAlat.Text = row.Cells("NamaAlat").Value.ToString()
 
-        CheckBoxAlatAktif.Checked = (row.Cells("IsAktif").Value = True)
+    '    CheckBoxAlatAktif.Checked = (row.Cells("IsAktif").Value = True)
 
-    End Sub
+    'End Sub
 
     Private Sub FormatGridMasterAlat()
 
@@ -1616,7 +1616,9 @@ Public Class MasterTindakanKlinik
 
     End Sub
 
-    Private Sub LoadGridMasterCartridge(Optional ByVal alatID As String = "")
+    Private Sub LoadGridMasterCartridge( _
+        Optional ByVal alatID As String = "", _
+        Optional ByVal cartridgeID As String = "")
 
         Dim sql As String = ""
 
@@ -1633,7 +1635,9 @@ Public Class MasterTindakanKlinik
               "FROM MasterCartridge c " & _
               "INNER JOIN MasterAlat a ON a.AlatID = c.AlatID "
 
-        If alatID <> "" Then
+        If cartridgeID <> "" Then
+            sql &= "WHERE c.CartridgeID = '" & cartridgeID & "' "
+        ElseIf alatID <> "" Then
             sql &= "WHERE c.AlatID = '" & alatID & "' "
         End If
 
@@ -1934,8 +1938,8 @@ Public Class MasterTindakanKlinik
         ' LOAD GRID (OPTIONAL)
         ' =============================
 
-        LoadGridMasterCartridge(row("AlatID").ToString())
-
+        'LoadGridMasterCartridge(row("AlatID").ToString())
+        LoadGridMasterCartridge("", row("CartridgeID").ToString())
     End Sub
 
     Private isLoadingCombo As Boolean = False
@@ -2024,7 +2028,17 @@ Public Class MasterTindakanKlinik
         Dim row As DataRow = dt.Rows(0)
     End Sub
 
-    Private Sub ButtonCetakRiwayat_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+    Private Sub ButtonCariAlat_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCariAlat.Click
+        Find.Show()
+        Find.Query("SELECT AlatID, KodeAlat, NamaAlat, IsAktif FROM MasterAlat ", "ORDER BY CreatedAt DESC", "FindMasterAlat", 2)
+    End Sub
+
+    Private Sub ButtonCariCartridge_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCariCartridge.Click
+        Find.Show()
+        Find.Query("SELECT CartridgeID, KodeCartridge, NamaCartridge, KuotaAwal, KuotaTotal, KuotaTerpakai, IsAktif FROM MasterCartridge ", "ORDER BY CreatedAt DESC", "FindMasterCartridge", 2)
+    End Sub
+
+    Private Sub ButtonCetakRiwayat_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCetakRiwayat.Click
         If TextBoxAlatId.Text.Trim() = "" Then
             MsgBox("Pilih alat terlebih dahulu.", MsgBoxStyle.Exclamation)
             Exit Sub
@@ -2043,39 +2057,33 @@ Public Class MasterTindakanKlinik
               "DECLARE @TglAkhir DATETIME = '" & tglAkhir & "' " & _
               " ;WITH Ledger AS ( " & _
               " SELECT " & _
-              " MA.CreatedAt AS Tanggal, " & _
+              " MC.CreatedAt AS Tanggal, " & _
               " 'SALDO AWAL' AS JenisTransaksi, " & _
-              " 'Kuota awal alat' AS Keterangan, " & _
-              " CAST(MA.KuotaAwal AS INT) AS Debet, " & _
-              " CAST(0 AS INT) AS Kredit " & _
-              " FROM MasterAlat MA " & _
+              " MA.NamaAlat + ' - ' + MC.NamaCartridge AS Keterangan, " & _
+              " MC.KuotaAwal AS Debet, " & _
+              " 0 AS Kredit, " & _
+              " MC.CartridgeID " & _
+              " FROM MasterCartridge MC " & _
+              " INNER JOIN MasterAlat MA ON MA.AlatID = MC.AlatID " & _
               " WHERE MA.AlatID = @AlatID " & _
-              " UNION ALL " & _
-              " SELECT " & _
-              " LTA.CreatedAt, " & _
-              " 'TOP UP', " & _
-              " ISNULL(LTA.Keterangan, 'Top up kuota alat'), " & _
-              " LTA.JumlahTopUp, " & _
-              " 0 " & _
-              " FROM LogTopUpAlat LTA " & _
-              " WHERE LTA.AlatID = @AlatID " & _
-              " AND LTA.CreatedAt BETWEEN @TglAwal AND @TglAkhir " & _
               " UNION ALL " & _
               " SELECT " & _
               " LPA.TglPemakaian, " & _
               " 'PEMAKAIAN', " & _
-              " TPD.NamaTindakan + ' - ' + MP.Nama, " & _
+              " TPD.NamaTindakan + ' - ' + MP.Nama + " & _
+              " ' | ' + MC.NamaCartridge, " & _
               " 0, " & _
-              " LPA.ShootDipakai " & _
+              " LPA.ShootDipakai, " & _
+              " MC.CartridgeID " & _
               " FROM LogPemakaianAlat LPA " & _
-              " INNER JOIN TransaksiPoliDetail TPD " & _
-              " ON LPA.TransaksiDetailID = TPD.TransPoliIDDetail " & _
-              " INNER JOIN TransaksiPoli TP " & _
-              " ON TPD.TransPoliID = TP.TransPoliID " & _
-              " INNER JOIN MasterPasien MP " & _
-              " ON TP.IDInternet = MP.NoRekamMedis " & _
-              " WHERE LPA.AlatID = @AlatID " & _
+              " INNER JOIN MasterCartridge MC ON MC.CartridgeID = LPA.CartridgeID " & _
+              " INNER JOIN MasterAlat MA ON MA.AlatID = MC.AlatID " & _
+              " INNER JOIN TransaksiPoliDetail TPD ON TPD.TransPoliIDDetail = LPA.TransaksiDetailID " & _
+              " INNER JOIN TransaksiPoli TP ON TP.TransPoliID = TPD.TransPoliID " & _
+              " INNER JOIN MasterPasien MP ON MP.NoRekamMedis = TP.IDInternet " & _
+              " WHERE MA.AlatID = @AlatID " & _
               " AND LPA.IsVoid = 0 " & _
+              " AND LPA.Status = 1 " & _
               " AND LPA.TglPemakaian BETWEEN @TglAwal AND @TglAkhir " & _
               " ) " & _
               " SELECT " & _
@@ -2084,52 +2092,42 @@ Public Class MasterTindakanKlinik
               " L1.Keterangan, " & _
               " L1.Debet, " & _
               " L1.Kredit, " & _
-              " ( " & _
-              "   SELECT SUM(L2.Debet - L2.Kredit) " & _
-              "   FROM Ledger L2 " & _
-              "   WHERE L2.Tanggal < L1.Tanggal " & _
-              "   OR (L2.Tanggal = L1.Tanggal AND L2.JenisTransaksi <= L1.JenisTransaksi) " & _
-              " ) AS Saldo " & _
+              " (SELECT SUM(L2.Debet - L2.Kredit) " & _
+              "  FROM Ledger L2 " & _
+              "  WHERE L2.CartridgeID = L1.CartridgeID " & _
+              "  AND L2.Tanggal <= L1.Tanggal) AS Saldo " & _
               " FROM Ledger L1 " & _
-              " ORDER BY L1.Tanggal, " & _
-              " CASE " & _
-              "   WHEN L1.JenisTransaksi = 'SALDO AWAL' THEN 0 " & _
-              "   WHEN L1.JenisTransaksi = 'TOP UP' THEN 1 " & _
-              "   ELSE 2 " & _
-              " END "
+              " ORDER BY L1.CartridgeID, L1.Tanggal"
 
         Dim dt As DataTable = ReadSQL(sql)
 
         Dim sqlSummary As String = ""
-        sqlSummary = "SELECT " & _
-             "MA.KuotaAwal, " & _
-             "ISNULL(( " & _
-             "    SELECT SUM(JumlahTopUp) " & _
-             "    FROM LogTopUpAlat " & _
-             "    WHERE AlatID = MA.AlatID " & _
-             "),0) AS TotalTopUp, " & _
-             "ISNULL(( " & _
-             "    SELECT SUM(ShootDipakai) " & _
-             "    FROM LogPemakaianAlat " & _
-             "    WHERE AlatID = MA.AlatID " & _
-             "    AND IsVoid = 0 " & _
-             "),0) AS TotalPemakaian, " & _
-             "( " & _
-             "    MA.KuotaAwal " & _
-             "    + ISNULL(( " & _
-             "        SELECT SUM(JumlahTopUp) " & _
-             "        FROM LogTopUpAlat " & _
-             "        WHERE AlatID = MA.AlatID " & _
-             "    ),0) " & _
-             "    - ISNULL(( " & _
-             "        SELECT SUM(ShootDipakai) " & _
-             "        FROM LogPemakaianAlat " & _
-             "        WHERE AlatID = MA.AlatID " & _
-             "        AND IsVoid = 0 " & _
-             "    ),0) " & _
-             ") AS SaldoAkhir " & _
-             "FROM MasterAlat MA " & _
-             "WHERE MA.AlatID = " & alatID
+        sqlSummary = _
+            "DECLARE @AlatID INT = " & alatID & " " & _
+            "SELECT " & _
+            "(SELECT ISNULL(SUM(KuotaAwal),0) " & _
+            " FROM MasterCartridge " & _
+            " WHERE AlatID=@AlatID) AS KuotaAwal, " & _
+            "(SELECT ISNULL(SUM(JumlahTopUp),0) " & _
+            " FROM LogTopUpAlat " & _
+            " WHERE AlatID=@AlatID) AS TotalTopUp, " & _
+            "(SELECT ISNULL(SUM(LPA.ShootDipakai),0) " & _
+            " FROM LogPemakaianAlat LPA " & _
+            " INNER JOIN MasterCartridge MC " & _
+            " ON MC.CartridgeID = LPA.CartridgeID " & _
+            " WHERE MC.AlatID=@AlatID " & _
+            " AND LPA.Status=1 " & _
+            " AND LPA.IsVoid=0) AS TotalPemakaian, " & _
+            "( " & _
+            " (SELECT ISNULL(SUM(KuotaAwal),0) FROM MasterCartridge WHERE AlatID=@AlatID) " & _
+            " + (SELECT ISNULL(SUM(JumlahTopUp),0) FROM LogTopUpAlat WHERE AlatID=@AlatID) " & _
+            " - (SELECT ISNULL(SUM(LPA.ShootDipakai),0) " & _
+            "    FROM LogPemakaianAlat LPA " & _
+            "    INNER JOIN MasterCartridge MC ON MC.CartridgeID=LPA.CartridgeID " & _
+            "    WHERE MC.AlatID=@AlatID " & _
+            "    AND LPA.Status=1 " & _
+            "    AND LPA.IsVoid=0) " & _
+            ") AS SaldoAkhir"
 
         Dim dtSummary As DataTable = ReadSQL(sqlSummary)
 
@@ -2170,15 +2168,5 @@ Public Class MasterTindakanKlinik
 
         'report.RunDesigner()
         report.ShowPreview()
-    End Sub
-
-    Private Sub ButtonCariAlat_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCariAlat.Click
-        Find.Show()
-        Find.Query("SELECT AlatID, KodeAlat, NamaAlat, IsAktif FROM MasterAlat ", "ORDER BY CreatedAt DESC", "FindMasterAlat", 2)
-    End Sub
-
-    Private Sub ButtonCariCartridge_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCariCartridge.Click
-        Find.Show()
-        Find.Query("SELECT CartridgeID, KodeCartridge, NamaCartridge, KuotaAwal, KuotaTotal, KuotaTerpakai, IsAktif FROM MasterCartridge ", "ORDER BY CreatedAt DESC", "FindMasterCartridge", 2)
     End Sub
 End Class

@@ -13297,20 +13297,20 @@ Public Class FormRekamMedisDokter
                 ' LOG PEMAKAIAN
                 ' ======================
                 dbTran.Execute( _
-                    "INSERT INTO LogPemakaianAlat " & _
-                    "(TransaksiDetailID, AlatID, CartridgeID, ShootDipakai, TglPemakaian, UserInput) VALUES (" & _
-                    transPoliIDDetail & "," & _
-                    item.AlatID & "," & _
-                    item.CartridgeID & "," & _
-                    totalShoot & ",GETDATE(),'" & userInput & "')")
+                     "INSERT INTO LogPemakaianAlat " & _
+                     "(TransaksiDetailID, AlatID, CartridgeID, ShootDipakai, TglPemakaian, UserInput, Status) VALUES (" & _
+                     transPoliIDDetail & "," & _
+                     item.AlatID & "," & _
+                     item.CartridgeID & "," & _
+                     totalShoot & ",GETDATE(),'" & userInput & "',0)")
 
                 ' ======================
                 ' UPDATE CARTRIDGE
                 ' ======================
-                dbTran.Execute( _
-                    "UPDATE MasterCartridge SET " & _
-                    "KuotaTerpakai = KuotaTerpakai + " & totalShoot & " " & _
-                    "WHERE CartridgeID = " & item.CartridgeID)
+                'dbTran.Execute( _
+                '    "UPDATE MasterCartridge SET " & _
+                '    "KuotaTerpakai = KuotaTerpakai + " & totalShoot & " " & _
+                '    "WHERE CartridgeID = " & item.CartridgeID)
 
             Next
 
@@ -13334,9 +13334,34 @@ Public Class FormRekamMedisDokter
 
             dbTran.BeginTransaction()
 
-            ' ===============================
+            ' ======================================
+            ' CEK STATUS PEMAKAIAN
+            ' ======================================
+            Dim dtCek As DataTable = ReadSQL( _
+                "SELECT COUNT(*) AS Jumlah " & _
+                "FROM LogPemakaianAlat " & _
+                "WHERE TransaksiDetailID = " & transPoliIDDetail & " " & _
+                "AND Status = 1 " & _
+                "AND IsVoid = 0")
+
+            If dtCek.Rows.Count > 0 Then
+
+                If CInt(dtCek.Rows(0)("Jumlah")) > 0 Then
+                    dbTran.Rollback()
+
+                    MsgBox("Pemakaian alat sudah selesai tindakan." & vbCrLf & _
+                           "Data tidak dapat dihapus / void.", _
+                           MsgBoxStyle.Exclamation)
+
+                    Exit Sub
+                End If
+
+            End If
+
+
+            ' ======================================
             ' KEMBALIKAN KUOTA CARTRIDGE
-            ' ===============================
+            ' ======================================
             dbTran.Execute( _
                 "UPDATE MC SET " & _
                 "MC.KuotaTerpakai = MC.KuotaTerpakai - LPA.ShootDipakai " & _
@@ -13346,9 +13371,9 @@ Public Class FormRekamMedisDokter
                 "WHERE LPA.TransaksiDetailID = " & transPoliIDDetail & " " & _
                 "AND LPA.IsVoid = 0")
 
-            ' ===============================
-            ' VOID LOG PEMAKAIAN
-            ' ===============================
+            ' ======================================
+            ' VOID LOG
+            ' ======================================
             dbTran.Execute( _
                 "UPDATE LogPemakaianAlat SET " & _
                 "IsVoid = 1, " & _

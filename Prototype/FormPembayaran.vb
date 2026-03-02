@@ -1368,7 +1368,28 @@ Public Class FormPembayaran
                               "AND JenisTindakan = '" & Trow("Jenis").ToString().Replace("'", "''") & "'", 4)
 
                         
+                        ' ===============================
+                        ' FINALISASI PEMAKAIAN ALAT
+                        ' ===============================
+                        WriteSQL( _
+                             "UPDATE LogPemakaianAlat SET Status = 1 " & _
+                             "WHERE TransaksiDetailID = '" & _
+                             Trow("TransPoliIDDetail") & "' " & _
+                             "AND Status = 0 " & _
+                             "AND IsVoid = 0", 4)
 
+                        ' ===============================
+                        ' POTONG KUOTA CARTRIDGE (FINAL)
+                        ' ===============================
+                        WriteSQL( _
+                            "UPDATE MC SET " & _
+                            "MC.KuotaTerpakai = MC.KuotaTerpakai + LPA.ShootDipakai " & _
+                            "FROM MasterCartridge MC " & _
+                            "INNER JOIN LogPemakaianAlat LPA ON MC.CartridgeID = LPA.CartridgeID " & _
+                            "WHERE LPA.TransaksiDetailID = '" & _
+                            Trow("TransPoliIDDetail") & "' " & _
+                            "AND LPA.Status = 1 " & _
+                            "AND LPA.IsVoid = 0", 4)
                     End If
 
                     'NewHeader.Rows.Clear()
