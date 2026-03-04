@@ -2621,23 +2621,35 @@ Public Class FormRekamMedisDokter
         End Try
     End Function
 
-    Sub ApiInsertPasien(ByVal noRM As String, ByVal nama As String, ByVal tglLahir As Date, ByVal jenisKelamin As String)
+    Function ApiInsertPasien(ByVal noRM As String, ByVal nama As String, _
+                         ByVal tglLahir As Date, ByVal jenisKelamin As String) As Boolean
 
-        Dim baseUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+        Try
+            Dim baseUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+            If Not baseUrl.EndsWith("/") Then baseUrl &= "/"
 
-        If Not baseUrl.EndsWith("/") Then baseUrl &= "/"
+            Dim json As String = "{""NoRekamMedis"":""" & noRM & """," & _
+                                 """Nama"":""" & nama & """," & _
+                                 """TglLahir"":""" & Format(tglLahir, "yyyy-MM-dd") & """," & _
+                                 """JenisKelamin"":""" & jenisKelamin & """}"
 
-        Dim json As String = _
-            "{" & _
-            """NoRekamMedis"":""" & noRM & """," & _
-            """Nama"":""" & nama & """," & _
-            """TglLahir"":""" & Format(tglLahir, "yyyy-MM-dd") & """," & _
-            """JenisKelamin"":""" & jenisKelamin & """" & _
-            "}"
+            Dim response As String = InsertDataAPIRM(json, baseUrl & "api/pasien/store")
 
-        InsertDataAPIRM(json, baseUrl & "api/pasien/store")
+            Dim result As JObject = JObject.Parse(response)
 
-    End Sub
+            If result("status").ToString() = "success" Then
+                Return True
+            Else
+                MsgBox("Insert pasien gagal: " & result("message").ToString())
+                Return False
+            End If
+
+        Catch ex As Exception
+            MsgBox("Error insert pasien: " & ex.Message)
+            Return False
+        End Try
+
+    End Function
 
     Private Sub SendToApiPemFisik(ByVal noTransaksi As String, ByVal noRM As String, ByVal keadaanUmum As String, ByVal sistole As Double, ByVal diastole As Double, ByVal heartRate As Double, ByVal suhu As Double, ByVal Saturasi As Double, ByVal tinggi As Double, ByVal berat As Double, ByVal lingkarPerut As Double, ByVal imt As Double, ByVal KeteranganIMT As String, ByVal nafas As Double)
         Try
@@ -2678,9 +2690,9 @@ Public Class FormRekamMedisDokter
 
             ' --- Tampilkan hasil ---
             If status = "success" Then
-                'MsgBox("Data berhasil dikirim ke API ERM." & vbCrLf & _
-                '       "Pesan: " & message & vbCrLf & _
-                '       "Dengan ID: " & insertedId)
+                MsgBox("Data berhasil dikirim ke API ERM." & vbCrLf & _
+                       "Pesan: " & message & vbCrLf & _
+                       "Dengan ID: " & insertedId)
             Else
                 MsgBox("API mengembalikan status gagal: " & status & vbCrLf & message)
             End If
