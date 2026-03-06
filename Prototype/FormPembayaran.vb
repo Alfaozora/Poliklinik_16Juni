@@ -944,6 +944,8 @@ Public Class FormPembayaran
             Dim jenisKelamin As String = ""
             Dim tglLahir As String = ""
             Dim alamat As String = ""
+            Dim pelaksana As String = ""
+            Dim transPoliID As String = _idTransaksi
 
             Dim dt As DataTable = ReadSQL("SELECT Nama,JenisKelamin,TglLahir,DomisiliAlamat FROM MasterPasien WHERE NoRekamMedis='" & _noRekamMedis & "'")
 
@@ -953,6 +955,13 @@ Public Class FormPembayaran
                 tglLahir = CDate(dt.Rows(0)("TglLahir")).ToString("yyyy-MM-dd")
                 alamat = dt.Rows(0)("DomisiliAlamat").ToString
             End If
+
+
+            '========================
+            ' AMBIL DOKTER PELAKSANA
+            '========================
+            pelaksana = ReadSQLNIK("SELECT DokterPoli FROM TransaksiPoli WHERE TransPoliID='" & _idTransaksi & "'")
+
 
             Dim tindakanList As New List(Of Object)
 
@@ -971,20 +980,24 @@ Public Class FormPembayaran
 
             Next
 
+
             Dim payload As New Dictionary(Of String, Object)
 
             payload.Add("nomor_registrasi", _noRekamMedis)
+            payload.Add("id_bayar", transPoliID)
             payload.Add("nomor_transaksi", _nomorUrutTransaksi)
             payload.Add("jenis_invoice", jenisInvoice)
             payload.Add("nama_pasien", nama)
             payload.Add("jenis_kelamin", jenisKelamin)
             payload.Add("tgl_lahir", tglLahir)
             payload.Add("alamat", alamat)
+            payload.Add("pelaksana", pelaksana)
             payload.Add("detail_tindakan", tindakanList)
             payload.Add("total_bayar", CDbl(TextBoxTotalBayar.Value))
             payload.Add("nett_bayar", CDbl(TextBoxTotalBayar.Value))
             payload.Add("tanggal_transaksi", Now.ToString("yyyy-MM-dd HH:mm:ss"))
             payload.Add("nama_kasir", userInput)
+
 
             Dim jsonParam As String = JsonConvert.SerializeObject(payload)
 
