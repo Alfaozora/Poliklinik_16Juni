@@ -2415,13 +2415,14 @@ Public Class FormRekamMedisDokter
 
         Dim statusInformedConsent As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'SettingInformedConsent'")
 
-        ' Skip jika fitur tidak aktif
+        ' Jika fitur dimatikan
         If statusInformedConsent = "No" Then Return True
 
-        ' Skip jika tindakan tidak membutuhkan IC
+        ' Jika tindakan tidak membutuhkan IC
         If CheckBoxInformedConsent.Checked = False Then Return True
 
         Try
+
             Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
 
             Dim urlWebService As String = baseURL & "api/lumiera-luzelle/ic/tindakan/" & idTransaksi & "/" & TextBoxTindakanID.Text
@@ -2433,74 +2434,79 @@ Public Class FormRekamMedisDokter
             ' ===============================
             ' VALIDASI RESPONSE
             ' ===============================
+
             If json("status").ToString() <> "success" Then
+
                 MsgBox(json("message").ToString(), MsgBoxStyle.Exclamation, "Warning")
                 Return False
+
             End If
 
             Dim data As JObject = json("data")
 
+
             ' ===============================
             ' INSERT KE DATABASE LOKAL
             ' ===============================
+
             Dim query As String = _
-                "INSERT INTO InformedConsent " & _
-                "(NoTransaksi, NoRekamMedis, TglTransaksi, NoNIK, NamaPasien, UmurPasien, " & _
-                "JenisKelaminPasien, AlamatPasien, NamaDokter, NamaPerawat, " & _
-                "KeteranganDiagnosis, DasarDiagnosis, TindakanID, KeteranganTindakan, " & _
-                "IndikasiTindakan, TataCara, TujuanTindakan, Risiko, Komplikasi, Prognosis, " & _
-                "AlternatifTindakan, BiayaTindakan, NamaPenanggungJawab, UmurPenanggungJawab, " & _
-                "JenisKelaminPenanggungJawab, HubunganPenanggungJawab, AlamatPenanggungJawab, " & _
-                "StatusPersetujuan, StatusTransaksi, SignatureDokter1, SignaturePerawat, SignaturePasien1, " & _
-                "CreatedBy, CreatedDate) " & _
-                "VALUES " & _
-                "(@NoTransaksi,@NoRekamMedis,@Tgl,@NoNIK,@Nama,@Umur,@Sex,@Alamat," & _
-                "@Dokter,@Perawat,@Diagnosis,@Dasar,@TindakanID,@KetTindakan," & _
-                "@Indikasi,@TataCara,@Tujuan,@Risiko,@Komplikasi,@Prognosis," & _
-                "@Alternatif,@Biaya,@PJ,@UmurPJ,@SexPJ,@HubunganPJ,@AlamatPJ," & _
-                "@StatusPersetujuan,@StatusTransaksi,@TTDDokter,@TTDPerawat,@TTDPasien," & _
-                "@User,GETDATE())"
+            "INSERT INTO InformedConsent " & _
+            "(NoTransaksi,NoRekamMedis,TglTransaksi,NamaPasien,UmurPasien,JenisKelaminPasien," & _
+            "AlamatPasien,NamaDokter,NamaPerawat,KeteranganDiagnosis,DasarDiagnosis," & _
+            "TindakanID,KeteranganTindakan,IndikasiTindakan,TataCara,TujuanTindakan,Risiko," & _
+            "Komplikasi,Prognosis,AlternatifTindakan,BiayaTindakan,NamaPenanggungJawab," & _
+            "UmurPenanggungJawab,JenisKelaminPenanggungJawab,HubunganPenanggungJawab," & _
+            "AlamatPenanggungJawab,StatusPersetujuan,StatusTransaksi,SignatureDokter1," & _
+            "SignaturePerawat,SignaturePasien1,CreatedBy,CreatedDate) " & _
+            "VALUES " & _
+            "(@NoTransaksi,@NoRM,@Tgl,@Nama,@Umur,@Sex,@Alamat,@Dokter,@Perawat," & _
+            "@Diagnosis,@Dasar,@TindakanID,@KetTindakan,@Indikasi,@TataCara,@Tujuan," & _
+            "@Risiko,@Komplikasi,@Prognosis,@Alternatif,@Biaya,@PJ,@UmurPJ,@SexPJ," & _
+            "@HubunganPJ,@AlamatPJ,@StatusPersetujuan,@StatusTransaksi,@TTDDokter," & _
+            "@TTDPerawat,@TTDPasien,@User,GETDATE())"
+
 
             WriteParameterizedLokalSQL(query, 4, _
-                New SqlParameter("@NoTransaksi", data("no_transaksi").Value(Of String)()), _
-                New SqlParameter("@NoRekamMedis", data("no_rm").Value(Of String)()), _
-                New SqlParameter("@Tgl", Date.Parse(data("tgl").Value(Of String)())), _
-                New SqlParameter("@NoNIK", data("no_nik").Value(Of String)()), _
-                New SqlParameter("@Nama", data("nama").Value(Of String)()), _
-                New SqlParameter("@Umur", data("umur").Value(Of Integer)()), _
-                New SqlParameter("@Sex", data("sex").Value(Of String)()), _
-                New SqlParameter("@Alamat", data("alamat").Value(Of String)()), _
-                New SqlParameter("@Dokter", data("dokter").Value(Of String)()), _
-                New SqlParameter("@Perawat", data("perawat").Value(Of String)()), _
-                New SqlParameter("@Diagnosis", data("ket_diagnosis").Value(Of String)()), _
-                New SqlParameter("@Dasar", data("dasar_diagnosis").Value(Of String)()), _
-                New SqlParameter("@TindakanID", data("id_tindakan").Value(Of String)()), _
-                New SqlParameter("@KetTindakan", data("ket_tindakan").Value(Of String)()), _
-                New SqlParameter("@Indikasi", data("indikasi_tindakan").Value(Of String)()), _
-                New SqlParameter("@TataCara", data("tata_cara").Value(Of String)()), _
-                New SqlParameter("@Tujuan", data("tujuan_tindakan").Value(Of String)()), _
-                New SqlParameter("@Risiko", data("risiko").Value(Of String)()), _
-                New SqlParameter("@Komplikasi", data("komplikasi").Value(Of String)()), _
-                New SqlParameter("@Prognosis", data("prognosis").Value(Of String)()), _
-                New SqlParameter("@Alternatif", data("alternatif_tindakan").Value(Of String)()), _
-                New SqlParameter("@Biaya", data("biaya_tindakan").Value(Of Decimal)()), _
-                New SqlParameter("@PJ", data("nama_penanggung_jawab").Value(Of String)()), _
-                New SqlParameter("@UmurPJ", data("umur_penanggung_jawab").Value(Of Integer)()), _
-                New SqlParameter("@SexPJ", data("sex_penanggung_jawab").Value(Of String)()), _
-                New SqlParameter("@HubunganPJ", data("hubungan_penanggung_jawab").Value(Of String)()), _
-                New SqlParameter("@AlamatPJ", data("alamat_penanggung_jawab").Value(Of String)()), _
-                New SqlParameter("@StatusPersetujuan", data("status_persetujuan").Value(Of Boolean)()), _
-                New SqlParameter("@StatusTransaksi", data("status_transaksi").Value(Of String)()), _
-                New SqlParameter("@TTDDokter", data("ttd_dokter").Value(Of String)()), _
-                New SqlParameter("@TTDPerawat", data("ttd_perawat").Value(Of String)()), _
-                New SqlParameter("@TTDPasien", data("ttd_pasien").Value(Of String)()), _
+                New SqlParameter("@NoTransaksi", data("no_transaksi").ToString()), _
+                New SqlParameter("@NoRM", data("no_rm").ToString()), _
+                New SqlParameter("@Tgl", Date.Parse(data("tgl").ToString())), _
+                New SqlParameter("@Nama", data("nama").ToString()), _
+                New SqlParameter("@Umur", Val(data("umur").ToString())), _
+                New SqlParameter("@Sex", data("sex").ToString()), _
+                New SqlParameter("@Alamat", data("alamat").ToString()), _
+                New SqlParameter("@Dokter", data("dokter").ToString()), _
+                New SqlParameter("@Perawat", data("perawat").ToString()), _
+                New SqlParameter("@Diagnosis", data("ket_diagnosis").ToString()), _
+                New SqlParameter("@Dasar", data("dasar_diagnosis").ToString()), _
+                New SqlParameter("@TindakanID", data("id_tindakan").ToString()), _
+                New SqlParameter("@KetTindakan", data("ket_tindakan").ToString()), _
+                New SqlParameter("@Indikasi", data("indikasi_tindakan").ToString()), _
+                New SqlParameter("@TataCara", data("tata_cara").ToString()), _
+                New SqlParameter("@Tujuan", data("tujuan_tindakan").ToString()), _
+                New SqlParameter("@Risiko", data("risiko").ToString()), _
+                New SqlParameter("@Komplikasi", data("komplikasi").ToString()), _
+                New SqlParameter("@Prognosis", data("prognosis").ToString()), _
+                New SqlParameter("@Alternatif", data("alternatif_tindakan").ToString()), _
+                New SqlParameter("@Biaya", Val(data("biaya_tindakan").ToString())), _
+                New SqlParameter("@PJ", data("nama_penanggung_jawab").ToString()), _
+                New SqlParameter("@UmurPJ", Val(data("umur_penanggung_jawab").ToString())), _
+                New SqlParameter("@SexPJ", data("sex_penanggung_jawab").ToString()), _
+                New SqlParameter("@HubunganPJ", data("hubungan_penanggung_jawab").ToString()), _
+                New SqlParameter("@AlamatPJ", data("alamat_penanggung_jawab").ToString()), _
+                New SqlParameter("@StatusPersetujuan", CBool(data("status_persetujuan"))), _
+                New SqlParameter("@StatusTransaksi", data("status_transaksi").ToString()), _
+                New SqlParameter("@TTDDokter", data("ttd_dokter").ToString()), _
+                New SqlParameter("@TTDPerawat", data("ttd_perawat").ToString()), _
+                New SqlParameter("@TTDPasien", data("ttd_pasien").ToString()), _
                 New SqlParameter("@User", userInput))
 
             Return True
 
         Catch ex As Exception
+
             MsgBox("Gagal validasi informed consent:" & vbCrLf & ex.Message, MsgBoxStyle.Critical, "ERROR")
             Return False
+
         End Try
 
     End Function

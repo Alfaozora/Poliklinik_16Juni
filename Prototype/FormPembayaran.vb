@@ -2390,6 +2390,9 @@ Public Class FormPembayaran
     End Sub
 
     Private Sub GenerateInvoice(ByVal JenisTransaksi As String, ByVal JenisProses As String, ByVal NomorTransaksi As String)
+        ' validator
+        Dim validatorURL As String = ReadSQLNIK("SELECT TOP 1 ValidatorURL FROM TransaksiDetail WHERE NoUrut = '" & NomorTransaksi & "'")
+
         ' Validasi Pembayaran
         If CheckBoxLunasBayar.Checked = False Then
             MessageBox.Show("Gagal!. Transaksi belum dilakukan pembayaran.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
@@ -2449,8 +2452,6 @@ Public Class FormPembayaran
 
         ' Eksekusi query ke DataTable
         Dim tblTindakan As DataTable = ReadSQL(queryAwal)
-
-
 
         ' Set Data Pasien
         Dim tblsPasien As DataTable = ReadSQL("SELECT NoHandphone, Email, NoRekamMedis, Nama + ' / (' + JenisKelamin + ')' AS 'Nama', YEAR(TglLahir) AS 'TahunLahir', MONTH(TglLahir) AS 'BulanLahir', DAY(TglLahir) AS 'TanggalLahir', " & _
@@ -2577,6 +2578,22 @@ Public Class FormPembayaran
         Report.DataSource = NewHeader
         'Report.RunDesigner()
 
+        If validatorURL <> "" Then
+
+            Dim Generator As New MessagingToolkit.Barcode.BarcodeEncoder
+            Dim qrImage As Bitmap = Generator.Encode(MessagingToolkit.Barcode.BarcodeFormat.QRCode, validatorURL)
+
+            Dim picQR As XRPictureBox
+            picQR = CType(Report.FindControl("xrValidator", True), XRPictureBox)
+
+            If Not picQR Is Nothing Then
+                picQR.Image = qrImage
+            Else
+                MsgBox("Control xrValidator tidak ditemukan di report.")
+            End If
+
+        End If
+
         Dim tblPembayaran As New DataTable
         Dim nominalTotalInvoice As Double
         Dim nominalKembaliInvoice As Double
@@ -2678,6 +2695,7 @@ Public Class FormPembayaran
             Case "Preview"
                 Report.ShowPreview()
             Case "Cetak"
+                'Report.RunDesigner()
                 Report.Print()
             Case "Export PDF"
                 Dim sfd As New SaveFileDialog()
@@ -2694,6 +2712,7 @@ Public Class FormPembayaran
                     End If
 
                     ' Simpan PDF ke lokasi yang dipilih user
+                    'Report.RunDesigner()
                     Report.CreatePdfDocument(filepath)
                 End If
             Case "WhatsApp"
