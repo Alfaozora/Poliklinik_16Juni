@@ -2,8 +2,11 @@ Verison : 2.0.0.56 (26 Februari 2026)
 # [New Feature] Penambahan API Untuk integrasi dengan Alat InBody
 # [New Feature] Penambahan API Untuk integrasi dengan Informed Consent
 # [New Feature] Penambahan API Untuk integrasi dengan Kirim Alat
-# [New Feature] Penambahan Master Alat
+# [New Feature] Penambahan Master Alat Cartridge
+# [New Feature] Penambahan QR Validator Invoice
 # [Usability Improvement] Menambahkan Kategori Tindakan dan Alat pada Master Tindakan
+# [Usability Improvement] Menambahkan Fitur Tanpa Tanggal di Riwayat Penggunaan Paket
+# [Usability Improvement] Menambahkan Fitur Download Excel di Riwayat Penggunaan Paket
 # [Bug Fix] Memperbaiki Bug saat menampilkan Rekap Pendapatan Klinik
 
 Version : 2.0.0.55 (29 Desember 2025)

@@ -819,6 +819,12 @@
     <Compile Include="Prototype\FormPenerimaanBarang.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Prototype\FormPreOrderCartridge.Designer.vb">
+      <DependentUpon>FormPreOrderCartridge.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormPreOrderCartridge.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Prototype\FormRekamMedisDokter.Designer.vb">
       <DependentUpon>FormRekamMedisDokter.vb</DependentUpon>
     </Compile>
@@ -1671,6 +1677,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormPenerimaanBarang.resx">
       <DependentUpon>FormPenerimaanBarang.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormPreOrderCartridge.resx">
+      <DependentUpon>FormPreOrderCartridge.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormRekamMedisDokter.resx">
       <DependentUpon>FormRekamMedisDokter.vb</DependentUpon>

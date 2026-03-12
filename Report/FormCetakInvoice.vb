@@ -586,6 +586,8 @@ Public Class FormCetakInvoice
         Dim tblTindakan As DataTable = GridControlTindakan.DataSource
         Dim NewHeader As DataTable = CreateTable()
 
+        Dim validatorURL As String = ReadSQLNIK("SELECT TOP 1 ValidatorURL FROM TransaksiDetail WHERE NoUrut = '" & TextBoxNomorTransaksi.Text & "'")
+
         Report = New XtraReport
 
         If Jeniscetak = "Struk" Then
@@ -771,6 +773,22 @@ Public Class FormCetakInvoice
 
         Report.DataSource = NewHeader
 
+        If validatorURL <> "" Then
+
+            Dim Generator As New MessagingToolkit.Barcode.BarcodeEncoder
+            Dim qrImage As Bitmap = Generator.Encode(MessagingToolkit.Barcode.BarcodeFormat.QRCode, validatorURL)
+
+            Dim picQR As XRPictureBox
+            picQR = CType(Report.FindControl("xrValidator", True), XRPictureBox)
+
+            If Not picQR Is Nothing Then
+                picQR.Image = qrImage
+            Else
+                MsgBox("Control xrValidator tidak ditemukan di report.")
+            End If
+
+        End If
+
         If Jeniscetak = "Struk" Then
             Report.Bands.Item(BandKind.TopMargin).Controls("txalamat").Text = Utility.GetConfig("CompanyAddr")
             Report.Bands.Item(BandKind.TopMargin).Controls("txtelfon").Text = Utility.GetConfig("CompanyContact")
@@ -783,6 +801,7 @@ Public Class FormCetakInvoice
         Report.Bands.Item(BandKind.BottomMargin).Controls("lbltanggalcetak").Text = Format(DateAndTime.Now, "dd-MMM-yyyy HH:mmm:ss")
 
         Dim Ttemp As New DataTable
+
 
         Select Case cmbjenis.Text
             Case "POLI"

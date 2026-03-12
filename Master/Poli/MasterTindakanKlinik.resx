@@ -204,6 +204,16 @@
         fwCaYJPvXF5tHAAAAABJRU5ErkJggg==
 </value>
   </data>
+  <data name="ButtonPreOrder.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAACxMAAAsTAQCanBgAAADtSURBVDhPzdM9SwRBDMbxFYRTC1/gmhMPwd7SThuxEAQL
+        X7AVPCwtbGysBMHKq7RQO9FCxI/h1/pJJCvHucuunYGnmJnkn5kkUxRFUaCDwz+qE7Hfhi7esdVS4dsd
+        B9z+bDRY+NYCMMBFjQZtAH2s1KjfCGhj/xyAIXZwircxDdsAZjGFGSyMaBKLOUS7mK4DnGMde7hJXeIY
+        TzjACT7QqwJEG+dyr2zfUgTn+VWuQ49VgBikNWyPDNBRZr7GJ+6xj+dfgCrDZl57GXfYyLq8lg5Nn2k1
+        3xzXjtrMJ/CsBDR954D08ICXyBzBmPgCcjM8Pks7j6EAAAAASUVORK5CYII=
+</value>
+  </data>
   <data name="ButtonSimpanMasterTindakan.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABGdBTUEAALGPC/xhBQAAANZJREFUSEtj

@@ -210,7 +210,7 @@
         Dim sql As String = _
             "SELECT COUNT(*) FROM TransaksiPoli TP " & _
             "INNER JOIN TransaksiPoliDetail TPD ON TP.TransPoliID = TPD.TransPoliID " & _
-            "WHERE TP.IDInterner = '" & noRM.Replace("'", "''") & "' " & _
+            "WHERE TP.IDInternet = '" & noRM.Replace("'", "''") & "' " & _
             "AND TPD.KodeVoucher = '" & kodeVoucher.Replace("'", "''") & "'"
 
         Dim dt As DataTable = ReadSQL(sql)

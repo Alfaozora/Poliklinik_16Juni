@@ -12,6 +12,7 @@ Imports System.Web.UI.WebControls
 Imports System.Text
 Imports DevExpress.XtraGrid.Columns
 Imports DevExpress.XtraGrid.Views.Grid
+Imports Microsoft.Office.Interop
 
 Public Class ReportLogPaketTindakan
     Private formName As String = "RIWAYAT PAKET TINDAKAN"
@@ -376,11 +377,10 @@ Public Class ReportLogPaketTindakan
         TextBoxNamaRekamMedis.Text = Trow("Nama").ToString
     End Sub
 
+    'NEW
     Function GetDataHeaderPaketReguler() As DataTable
-        Dim tglTransaksiAwal As Date = TglAwalTransaksi.Value
-        Dim tglTransaksiAkhir As Date = TglAkhirTransaksi.Value
-        Dim tblResult As New DataTable
 
+        Dim tblResult As New DataTable
         Dim query As New StringBuilder()
 
         query.AppendLine("SELECT ")
@@ -391,8 +391,9 @@ Public Class ReportLogPaketTindakan
         query.AppendLine("    STUFF(( ")
         query.AppendLine("        SELECT ', ' + tblPaketDetail.NamaTindakan ")
         query.AppendLine("        FROM TransaksiPaketTindakanDetail tblPaketDetail ")
-        query.AppendLine("        WHERE tblPaketDetail.PaketID = tblPaket.PaketID AND tblPaketDetail.KodeVoucher = tblPaket.KodeVoucher ")
-        query.AppendLine("        FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '') ")
+        query.AppendLine("        WHERE tblPaketDetail.PaketID = tblPaket.PaketID ")
+        query.AppendLine("        AND tblPaketDetail.KodeVoucher = tblPaket.KodeVoucher ")
+        query.AppendLine("        FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'),1,2,'') ")
         query.AppendLine("    AS 'Nama Tindakan', ")
         query.AppendLine("    tblPaket.JenisPaket AS 'Jenis Paket', ")
         query.AppendLine("    tblPaket.Kuota, ")
@@ -402,47 +403,139 @@ Public Class ReportLogPaketTindakan
         query.AppendLine("    tblPaket.KodeVoucher, ")
         query.AppendLine("    0 AS 'TindakanID' ")
         query.AppendLine("FROM TransaksiPaketTindakan tblPaket ")
-        query.AppendLine("LEFT JOIN MasterPasien tblPasien ON tblPasien.NoRekamMedis = tblPaket.NoRekamMedis ")
-        query.AppendLine("WHERE tblPaket.JenisPaket = 'Paket Reguler'")
+        query.AppendLine("LEFT JOIN MasterPasien tblPasien ")
+        query.AppendLine("ON tblPasien.NoRekamMedis = tblPaket.NoRekamMedis ")
+        query.AppendLine("WHERE tblPaket.JenisPaket = 'Paket Reguler' ")
+
         If TextBoxNomorRekamMedis.Text <> "" Then
             query.AppendLine("AND tblPaket.NoRekamMedis = '" & TextBoxNomorRekamMedis.Text & "'")
         End If
-        query.AppendLine("AND (CONVERT(DATE, tblPaket.TanggalMulaiPaket) BETWEEN '" & Format(tglTransaksiAwal.Date, "yyyyMMdd") & "' AND '" & Format(tglTransaksiAkhir.Date, "yyyyMMdd") & "') AND tblPaket.DeletedDate IS NULL")
-        query.AppendLine("ORDER BY tblPaket.PaketID;")
+
+        If Not CheckBoxFilterTanggal.Checked Then
+            query.AppendLine("AND CONVERT(DATE, tblPaket.TanggalMulaiPaket) BETWEEN '" & _
+                             Format(TglAwalTransaksi.Value, "yyyyMMdd") & _
+                             "' AND '" & _
+                             Format(TglAkhirTransaksi.Value, "yyyyMMdd") & "'")
+        End If
+
+        query.AppendLine("AND tblPaket.DeletedDate IS NULL ")
+        query.AppendLine("ORDER BY tblPaket.PaketID")
 
         tblResult = ReadSQL(query.ToString())
 
         Return tblResult
+
     End Function
 
-    Function GetDataDetailPaketReguler() As DataTable
-        Dim tglTransaksiAwal As Date = TglAwalTransaksi.Value
-        Dim tglTransaksiAkhir As Date = TglAkhirTransaksi.Value
-        Dim tblResult As New DataTable
+    'OLD
+    'Function GetDataHeaderPaketReguler() As DataTable
+    '    Dim tglTransaksiAwal As Date = TglAwalTransaksi.Value
+    '    Dim tglTransaksiAkhir As Date = TglAkhirTransaksi.Value
+    '    Dim tblResult As New DataTable
 
+    '    Dim query As New StringBuilder()
+
+    '    query.AppendLine("SELECT ")
+    '    query.AppendLine("    tblPasien.Nama, ")
+    '    query.AppendLine("    tblPaket.NoRekamMedis AS 'No RM', ")
+    '    query.AppendLine("    tblPaket.NoTransaksi AS 'No Transaksi', ")
+    '    query.AppendLine("    tblPaket.NamaPaket AS 'Nama Paket', ")
+    '    query.AppendLine("    STUFF(( ")
+    '    query.AppendLine("        SELECT ', ' + tblPaketDetail.NamaTindakan ")
+    '    query.AppendLine("        FROM TransaksiPaketTindakanDetail tblPaketDetail ")
+    '    query.AppendLine("        WHERE tblPaketDetail.PaketID = tblPaket.PaketID AND tblPaketDetail.KodeVoucher = tblPaket.KodeVoucher ")
+    '    query.AppendLine("        FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '') ")
+    '    query.AppendLine("    AS 'Nama Tindakan', ")
+    '    query.AppendLine("    tblPaket.JenisPaket AS 'Jenis Paket', ")
+    '    query.AppendLine("    tblPaket.Kuota, ")
+    '    query.AppendLine("    tblPaket.TanggalMulaiPaket AS 'Tgl Mulai', ")
+    '    query.AppendLine("    tblPaket.TanggalAkhirPaket AS 'Tgl Berakhir', ")
+    '    query.AppendLine("    tblPaket.PaketID, ")
+    '    query.AppendLine("    tblPaket.KodeVoucher, ")
+    '    query.AppendLine("    0 AS 'TindakanID' ")
+    '    query.AppendLine("FROM TransaksiPaketTindakan tblPaket ")
+    '    query.AppendLine("LEFT JOIN MasterPasien tblPasien ON tblPasien.NoRekamMedis = tblPaket.NoRekamMedis ")
+    '    query.AppendLine("WHERE tblPaket.JenisPaket = 'Paket Reguler'")
+    '    If TextBoxNomorRekamMedis.Text <> "" Then
+    '        query.AppendLine("AND tblPaket.NoRekamMedis = '" & TextBoxNomorRekamMedis.Text & "'")
+    '    End If
+    '    query.AppendLine("AND (CONVERT(DATE, tblPaket.TanggalMulaiPaket) BETWEEN '" & Format(tglTransaksiAwal.Date, "yyyyMMdd") & "' AND '" & Format(tglTransaksiAkhir.Date, "yyyyMMdd") & "') AND tblPaket.DeletedDate IS NULL")
+    '    query.AppendLine("ORDER BY tblPaket.PaketID;")
+
+    '    tblResult = ReadSQL(query.ToString())
+
+    '    Return tblResult
+    'End Function
+
+    'NEW
+    Function GetDataDetailPaketReguler() As DataTable
+
+        Dim tblResult As New DataTable
         Dim query As New StringBuilder()
 
-        query.AppendLine("SELECT tblLog.NoTransaksi, tblPasien.Nama, tblLog.NoRekamMedis AS 'No RM', ")
-        query.AppendLine("       tblLog.KodeVoucher, tblLog.PaketID, ")
-        query.AppendLine("       tblLog.TanggalTransaksi AS 'Tgl Transaksi'")
-        query.AppendLine("FROM LogPenggunaanPaket tblLog")
+        query.AppendLine("SELECT tblLog.NoTransaksi, ")
+        query.AppendLine("       tblPasien.Nama, ")
+        query.AppendLine("       tblLog.NoRekamMedis AS 'No RM', ")
+        query.AppendLine("       tblLog.KodeVoucher, ")
+        query.AppendLine("       tblLog.PaketID, ")
+        query.AppendLine("       tblLog.TanggalTransaksi AS 'Tgl Transaksi' ")
+        query.AppendLine("FROM LogPenggunaanPaket tblLog ")
         query.AppendLine("INNER JOIN TransaksiPaketTindakan tblPaket ")
         query.AppendLine("    ON tblLog.KodeVoucher = tblPaket.KodeVoucher ")
-        query.AppendLine("    AND tblLog.PaketID = tblPaket.PaketID")
+        query.AppendLine("    AND tblLog.PaketID = tblPaket.PaketID ")
         query.AppendLine("INNER JOIN MasterPasien tblPasien ")
-        query.AppendLine("    ON tblLog.NoRekamMedis = tblPasien.NoRekamMedis")
-        query.AppendLine("WHERE tblPaket.JenisPaket = 'Paket Reguler'")
+        query.AppendLine("    ON tblLog.NoRekamMedis = tblPasien.NoRekamMedis ")
+        query.AppendLine("WHERE tblPaket.JenisPaket = 'Paket Reguler' ")
+
         If TextBoxNomorRekamMedis.Text <> "" Then
             query.AppendLine("AND tblPaket.NoRekamMedis = '" & TextBoxNomorRekamMedis.Text & "'")
         End If
-        query.AppendLine("AND (CONVERT(DATE, tblPaket.TanggalMulaiPaket) BETWEEN '" & Format(tglTransaksiAwal.Date, "yyyyMMdd") & "' AND '" & Format(tglTransaksiAkhir.Date, "yyyyMMdd") & "') ")
-        query.AppendLine("AND tblLog.DeletedDate IS NULL")
-        query.AppendLine("ORDER BY tblLog.PaketID, tblLog.KodeVoucher;")
+
+        If Not CheckBoxFilterTanggal.Checked Then
+            query.AppendLine("AND CONVERT(DATE,tblPaket.TanggalMulaiPaket) BETWEEN '" & _
+                             Format(TglAwalTransaksi.Value, "yyyyMMdd") & _
+                             "' AND '" & _
+                             Format(TglAkhirTransaksi.Value, "yyyyMMdd") & "'")
+        End If
+
+        query.AppendLine("AND tblLog.DeletedDate IS NULL ")
+        query.AppendLine("ORDER BY tblLog.PaketID, tblLog.KodeVoucher ")
 
         tblResult = ReadSQL(query.ToString())
 
         Return tblResult
+
     End Function
+
+    'OLD
+    'Function GetDataDetailPaketReguler() As DataTable
+    '    Dim tglTransaksiAwal As Date = TglAwalTransaksi.Value
+    '    Dim tglTransaksiAkhir As Date = TglAkhirTransaksi.Value
+    '    Dim tblResult As New DataTable
+
+    '    Dim query As New StringBuilder()
+
+    '    query.AppendLine("SELECT tblLog.NoTransaksi, tblPasien.Nama, tblLog.NoRekamMedis AS 'No RM', ")
+    '    query.AppendLine("       tblLog.KodeVoucher, tblLog.PaketID, ")
+    '    query.AppendLine("       tblLog.TanggalTransaksi AS 'Tgl Transaksi'")
+    '    query.AppendLine("FROM LogPenggunaanPaket tblLog")
+    '    query.AppendLine("INNER JOIN TransaksiPaketTindakan tblPaket ")
+    '    query.AppendLine("    ON tblLog.KodeVoucher = tblPaket.KodeVoucher ")
+    '    query.AppendLine("    AND tblLog.PaketID = tblPaket.PaketID")
+    '    query.AppendLine("INNER JOIN MasterPasien tblPasien ")
+    '    query.AppendLine("    ON tblLog.NoRekamMedis = tblPasien.NoRekamMedis")
+    '    query.AppendLine("WHERE tblPaket.JenisPaket = 'Paket Reguler'")
+    '    If TextBoxNomorRekamMedis.Text <> "" Then
+    '        query.AppendLine("AND tblPaket.NoRekamMedis = '" & TextBoxNomorRekamMedis.Text & "'")
+    '    End If
+    '    query.AppendLine("AND (CONVERT(DATE, tblPaket.TanggalMulaiPaket) BETWEEN '" & Format(tglTransaksiAwal.Date, "yyyyMMdd") & "' AND '" & Format(tglTransaksiAkhir.Date, "yyyyMMdd") & "') ")
+    '    query.AppendLine("AND tblLog.DeletedDate IS NULL")
+    '    query.AppendLine("ORDER BY tblLog.PaketID, tblLog.KodeVoucher;")
+
+    '    tblResult = ReadSQL(query.ToString())
+
+    '    Return tblResult
+    'End Function
 
     Private Sub ButtonClearData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonClearData.Click
         SetClearGrid()
@@ -451,5 +544,72 @@ Public Class ReportLogPaketTindakan
     Private Sub SetClearGrid()
         TextBoxNomorRekamMedis.ResetText()
         TextBoxNamaRekamMedis.ResetText()
+    End Sub
+
+    Private Sub ButtonDownloadExcel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonDownloadExcel.Click
+        Dim dtHeader As DataTable = GetDataHeaderPaketReguler()
+        Dim dtDetail As DataTable = GetDataDetailPaketReguler()
+
+        If dtHeader.Rows.Count = 0 Then
+            MessageBox.Show("Data tidak ada", "Informasi")
+            Exit Sub
+        End If
+
+        Dim sfd As New SaveFileDialog
+        sfd.Filter = "CSV Files (*.csv)|*.csv"
+        sfd.FileName = "Laporan_Paket_Reguler_" & Format(Now, "yyyyMMdd") & ".csv"
+
+        If sfd.ShowDialog = DialogResult.OK Then
+
+            Dim sb As New StringBuilder()
+
+            '================
+            'HEADER
+            '================
+            sb.AppendLine("DATA PAKET REGULER")
+            sb.AppendLine()
+
+            For i As Integer = 0 To dtHeader.Columns.Count - 1
+                sb.Append(dtHeader.Columns(i).ColumnName)
+                If i < dtHeader.Columns.Count - 1 Then sb.Append(",")
+            Next
+            sb.AppendLine()
+
+            For Each row As DataRow In dtHeader.Rows
+                For i As Integer = 0 To dtHeader.Columns.Count - 1
+                    sb.Append("""" & row(i).ToString() & """")
+                    If i < dtHeader.Columns.Count - 1 Then sb.Append(",")
+                Next
+                sb.AppendLine()
+            Next
+
+            sb.AppendLine()
+            sb.AppendLine()
+
+            '================
+            'DETAIL
+            '================
+            sb.AppendLine("DETAIL PENGGUNAAN PAKET")
+            sb.AppendLine()
+
+            For i As Integer = 0 To dtDetail.Columns.Count - 1
+                sb.Append(dtDetail.Columns(i).ColumnName)
+                If i < dtDetail.Columns.Count - 1 Then sb.Append(",")
+            Next
+            sb.AppendLine()
+
+            For Each row As DataRow In dtDetail.Rows
+                For i As Integer = 0 To dtDetail.Columns.Count - 1
+                    sb.Append("""" & row(i).ToString() & """")
+                    If i < dtDetail.Columns.Count - 1 Then sb.Append(",")
+                Next
+                sb.AppendLine()
+            Next
+
+            System.IO.File.WriteAllText(sfd.FileName, sb.ToString(), Encoding.UTF8)
+
+            MessageBox.Show("CSV berhasil dibuat")
+
+        End If
     End Sub
 End Class

@@ -26,6 +26,7 @@ Partial Class ReportLogPaketTindakan
         Me.PanelTop = New System.Windows.Forms.Panel
         Me.btnClose = New System.Windows.Forms.Button
         Me.Panel1 = New System.Windows.Forms.Panel
+        Me.CheckBoxFilterTanggal = New System.Windows.Forms.CheckBox
         Me.ButtonClearData = New System.Windows.Forms.Button
         Me.TextBoxNamaRekamMedis = New System.Windows.Forms.TextBox
         Me.Panel9 = New System.Windows.Forms.Panel
@@ -43,6 +44,7 @@ Partial Class ReportLogPaketTindakan
         Me.SplitContainerRiwayatPaket = New System.Windows.Forms.SplitContainer
         Me.GridControlRiwayatPaket = New DevExpress.XtraGrid.GridControl
         Me.GridViewRiwayatPaket = New DevExpress.XtraGrid.Views.Grid.GridView
+        Me.ButtonDownloadExcel = New System.Windows.Forms.Button
         Me.PanelTop.SuspendLayout()
         Me.Panel1.SuspendLayout()
         Me.Panel9.SuspendLayout()
@@ -80,6 +82,8 @@ Partial Class ReportLogPaketTindakan
         'Panel1
         '
         Me.Panel1.BackColor = System.Drawing.Color.Transparent
+        Me.Panel1.Controls.Add(Me.ButtonDownloadExcel)
+        Me.Panel1.Controls.Add(Me.CheckBoxFilterTanggal)
         Me.Panel1.Controls.Add(Me.ButtonClearData)
         Me.Panel1.Controls.Add(Me.TextBoxNamaRekamMedis)
         Me.Panel1.Controls.Add(Me.Panel9)
@@ -97,6 +101,16 @@ Partial Class ReportLogPaketTindakan
         Me.Panel1.Name = "Panel1"
         Me.Panel1.Size = New System.Drawing.Size(1000, 200)
         Me.Panel1.TabIndex = 6
+        '
+        'CheckBoxFilterTanggal
+        '
+        Me.CheckBoxFilterTanggal.AutoSize = True
+        Me.CheckBoxFilterTanggal.Location = New System.Drawing.Point(548, 26)
+        Me.CheckBoxFilterTanggal.Name = "CheckBoxFilterTanggal"
+        Me.CheckBoxFilterTanggal.Size = New System.Drawing.Size(103, 19)
+        Me.CheckBoxFilterTanggal.TabIndex = 571
+        Me.CheckBoxFilterTanggal.Text = "Tanpa Tanggal"
+        Me.CheckBoxFilterTanggal.UseVisualStyleBackColor = True
         '
         'ButtonClearData
         '
@@ -326,6 +340,27 @@ Partial Class ReportLogPaketTindakan
         Me.GridViewRiwayatPaket.OptionsView.ShowGroupPanel = False
         Me.GridViewRiwayatPaket.PaintStyleName = "Office2003"
         '
+        'ButtonDownloadExcel
+        '
+        Me.ButtonDownloadExcel.BackColor = System.Drawing.Color.LimeGreen
+        Me.ButtonDownloadExcel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
+        Me.ButtonDownloadExcel.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonDownloadExcel.FlatAppearance.BorderSize = 0
+        Me.ButtonDownloadExcel.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonDownloadExcel.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.ButtonDownloadExcel.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonDownloadExcel.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.ButtonDownloadExcel.ForeColor = System.Drawing.Color.White
+        Me.ButtonDownloadExcel.Image = CType(resources.GetObject("ButtonDownloadExcel.Image"), System.Drawing.Image)
+        Me.ButtonDownloadExcel.Location = New System.Drawing.Point(538, 147)
+        Me.ButtonDownloadExcel.Name = "ButtonDownloadExcel"
+        Me.ButtonDownloadExcel.Size = New System.Drawing.Size(196, 35)
+        Me.ButtonDownloadExcel.TabIndex = 572
+        Me.ButtonDownloadExcel.Text = "Download Excel"
+        Me.ButtonDownloadExcel.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.ButtonDownloadExcel.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.ButtonDownloadExcel.UseVisualStyleBackColor = False
+        '
         'ReportLogPaketTindakan
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)
@@ -375,4 +410,6 @@ Partial Class ReportLogPaketTindakan
     Friend WithEvents GridViewRiwayatPaket As DevExpress.XtraGrid.Views.Grid.GridView
     Friend WithEvents TextBoxNamaRekamMedis As System.Windows.Forms.TextBox
     Friend WithEvents ButtonClearData As System.Windows.Forms.Button
+    Friend WithEvents CheckBoxFilterTanggal As System.Windows.Forms.CheckBox
+    Friend WithEvents ButtonDownloadExcel As System.Windows.Forms.Button
 End Class

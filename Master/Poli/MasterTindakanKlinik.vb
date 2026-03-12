@@ -1485,6 +1485,7 @@ Public Class MasterTindakanKlinik
 
         ' Reset kuota
         NumericKuotaAwalCartridge.Value = 1
+        NumericKuotaMinimumCartridge.Value = 1
         TextBoxKuotaTerpakaiCartridge.Text = "0"
         TextBoxKuotaSisaCartridge.Text = "0"
         TextBoxKuotaTotalCartridge.Text = "0"
@@ -1679,6 +1680,7 @@ Public Class MasterTindakanKlinik
         Dim statusAktif As Integer = If(CheckBoxCartridge.Checked, 1, 0)
 
         Dim kuotaAwal As Integer = CInt(NumericKuotaAwalCartridge.Value)
+        Dim kuotaMinimum As Integer = CInt(NumericKuotaMinimumCartridge.Value)
 
         Dim alatID As Integer = CInt(ComboBoxNamaAlat.SelectedValue)
 
@@ -1688,7 +1690,7 @@ Public Class MasterTindakanKlinik
         End If
 
         WriteSQL("INSERT INTO MasterCartridge " & _
-                 "(KodeCartridge, NamaCartridge, KuotaTotal, KuotaTerpakai, IsAktif, CreatedAt, CreatedBy, KuotaAwal, AlatID) " & _
+                 "(KodeCartridge, NamaCartridge, KuotaTotal, KuotaTerpakai, IsAktif, CreatedAt, CreatedBy, KuotaAwal, KuotaMinimum, AlatID) " & _
                  "VALUES (" & _
                  "'" & TextBoxKodeCartridge.Text.Replace("'", "''") & "', " & _
                  "'" & TextBoxNamaCartridge.Text.Replace("'", "''") & "', " & _
@@ -1698,6 +1700,7 @@ Public Class MasterTindakanKlinik
                  "GETDATE(), " & _
                  "'" & userInput & "', " & _
                  kuotaAwal & ", " & _
+                 kuotaMinimum & ", " & _
                  alatID & ")", 4)
 
         MsgBox("Berhasil menyimpan data cartridge.", MsgBoxStyle.Information, "Success!")
@@ -1730,6 +1733,8 @@ Public Class MasterTindakanKlinik
         ' Ambil kuota terpakai lama
         Dim kuotaTerpakai As Integer = CInt(TextBoxKuotaTerpakaiCartridge.Text)
         Dim kuotaAwalBaru As Integer = CInt(NumericKuotaAwalCartridge.Value)
+        Dim kuotaMinimum As Integer = CInt(NumericKuotaMinimumCartridge.Value)
+
         Dim alatID As Integer = CInt(ComboBoxNamaAlat.SelectedValue)
 
         If TextBoxKodeCartridge.Text = "" Or TextBoxNamaCartridge.Text = "" Then
@@ -1750,20 +1755,23 @@ Public Class MasterTindakanKlinik
         End If
 
         Dim parameterUpdate As String = ""
+
         parameterUpdate = "KodeCartridge = '" & TextBoxKodeCartridge.Text.Replace("'", "''") & "', " & _
                           "NamaCartridge = '" & TextBoxNamaCartridge.Text.Replace("'", "''") & "', " & _
                           "AlatID = " & alatID & ", " & _
+                          "KuotaMinimum = " & kuotaMinimum & ", " & _
                           "IsAktif = " & statusAktif & ", " & _
                           "UpdatedAt = GETDATE(), " & _
                           "UpdatedBy = '" & userInput & "'"
 
         ' Jika belum ada pemakaian → boleh ubah kuota awal
+        Dim kuotaAwalLama As Integer = CInt(NumericKuotaAwalCartridge.Text)
+
         If kuotaTerpakai = 0 Then
             parameterUpdate &= ", KuotaAwal = " & kuotaAwalBaru & _
                                ", KuotaTotal = " & kuotaAwalBaru
         Else
-            ' Sudah ada pemakaian → blok perubahan kuota awal
-            If kuotaAwalBaru <> CInt(NumericKuotaAwalCartridge.Value) Then
+            If kuotaAwalBaru <> kuotaAwalLama Then
                 MsgBox("Kuota awal tidak dapat diubah karena sudah ada pemakaian." & vbCrLf & _
                        "Gunakan fitur Top Up untuk menambah kuota.", _
                        MsgBoxStyle.Exclamation, "Peringatan")
@@ -1906,6 +1914,7 @@ Public Class MasterTindakanKlinik
         Dim kuotaAwal As Integer = If(IsDBNull(row("KuotaAwal")), 0, CInt(row("KuotaAwal")))
         Dim kuotaTotal As Integer = If(IsDBNull(row("KuotaTotal")), 0, CInt(row("KuotaTotal")))
         Dim kuotaTerpakai As Integer = If(IsDBNull(row("KuotaTerpakai")), 0, CInt(row("KuotaTerpakai")))
+        Dim kuotaMinimum As Integer = If(IsDBNull(row("KuotaMinimum")), 0, CInt(row("KuotaMinimum")))
 
         Dim kuotaSisa As Integer = kuotaTotal - kuotaTerpakai
 
@@ -1918,6 +1927,7 @@ Public Class MasterTindakanKlinik
         TextBoxNamaCartridge.Text = row("NamaCartridge").ToString()
 
         NumericKuotaAwalCartridge.Value = kuotaAwal
+        NumericKuotaMinimumCartridge.Value = kuotaMinimum
         TextBoxKuotaTotalCartridge.Text = kuotaTotal.ToString()
         TextBoxKuotaTerpakaiCartridge.Text = kuotaTerpakai.ToString()
         TextBoxKuotaSisaCartridge.Text = kuotaSisa.ToString()
@@ -2035,7 +2045,7 @@ Public Class MasterTindakanKlinik
 
     Private Sub ButtonCariCartridge_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCariCartridge.Click
         Find.Show()
-        Find.Query("SELECT CartridgeID, KodeCartridge, NamaCartridge, KuotaAwal, KuotaTotal, KuotaTerpakai, IsAktif FROM MasterCartridge ", "ORDER BY CreatedAt DESC", "FindMasterCartridge", 2)
+        Find.Query("SELECT CartridgeID, KodeCartridge, NamaCartridge, KuotaAwal, KuotaTotal, KuotaTerpakai, KuotaMinimum IsAktif FROM MasterCartridge ", "ORDER BY CreatedAt DESC", "FindMasterCartridge", 2)
     End Sub
 
     Private Sub ButtonCetakRiwayat_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCetakRiwayat.Click
@@ -2168,5 +2178,9 @@ Public Class MasterTindakanKlinik
 
         'report.RunDesigner()
         report.ShowPreview()
+    End Sub
+
+    Private Sub ButtonPreOrder_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonPreOrder.Click
+        FormPreOrderCartridge.ShowDialog()
     End Sub
 End Class
