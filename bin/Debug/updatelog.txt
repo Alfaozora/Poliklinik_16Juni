@@ -4,6 +4,7 @@ Verison : 2.0.0.56 (26 Februari 2026)
 # [New Feature] Penambahan API Untuk integrasi dengan Kirim Alat
 # [New Feature] Penambahan Master Alat Cartridge
 # [New Feature] Penambahan QR Validator Invoice
+# [New Feature] Penambahan Download Excel pada Laporan Kunjungan
 # [Usability Improvement] Menambahkan Kategori Tindakan dan Alat pada Master Tindakan
 # [Usability Improvement] Menambahkan Fitur Tanpa Tanggal di Riwayat Penggunaan Paket
 # [Usability Improvement] Menambahkan Fitur Download Excel di Riwayat Penggunaan Paket

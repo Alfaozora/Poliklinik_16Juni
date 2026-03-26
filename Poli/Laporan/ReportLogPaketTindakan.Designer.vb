@@ -44,7 +44,7 @@ Partial Class ReportLogPaketTindakan
         Me.SplitContainerRiwayatPaket = New System.Windows.Forms.SplitContainer
         Me.GridControlRiwayatPaket = New DevExpress.XtraGrid.GridControl
         Me.GridViewRiwayatPaket = New DevExpress.XtraGrid.Views.Grid.GridView
-        Me.ButtonDownloadExcel = New System.Windows.Forms.Button
+        Me.ButtonLaporanPdf = New System.Windows.Forms.Button
         Me.PanelTop.SuspendLayout()
         Me.Panel1.SuspendLayout()
         Me.Panel9.SuspendLayout()
@@ -82,7 +82,7 @@ Partial Class ReportLogPaketTindakan
         'Panel1
         '
         Me.Panel1.BackColor = System.Drawing.Color.Transparent
-        Me.Panel1.Controls.Add(Me.ButtonDownloadExcel)
+        Me.Panel1.Controls.Add(Me.ButtonLaporanPdf)
         Me.Panel1.Controls.Add(Me.CheckBoxFilterTanggal)
         Me.Panel1.Controls.Add(Me.ButtonClearData)
         Me.Panel1.Controls.Add(Me.TextBoxNamaRekamMedis)
@@ -340,26 +340,26 @@ Partial Class ReportLogPaketTindakan
         Me.GridViewRiwayatPaket.OptionsView.ShowGroupPanel = False
         Me.GridViewRiwayatPaket.PaintStyleName = "Office2003"
         '
-        'ButtonDownloadExcel
+        'ButtonLaporanPdf
         '
-        Me.ButtonDownloadExcel.BackColor = System.Drawing.Color.LimeGreen
-        Me.ButtonDownloadExcel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
-        Me.ButtonDownloadExcel.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.ButtonDownloadExcel.FlatAppearance.BorderSize = 0
-        Me.ButtonDownloadExcel.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
-        Me.ButtonDownloadExcel.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.ButtonDownloadExcel.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.ButtonDownloadExcel.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.ButtonDownloadExcel.ForeColor = System.Drawing.Color.White
-        Me.ButtonDownloadExcel.Image = CType(resources.GetObject("ButtonDownloadExcel.Image"), System.Drawing.Image)
-        Me.ButtonDownloadExcel.Location = New System.Drawing.Point(538, 147)
-        Me.ButtonDownloadExcel.Name = "ButtonDownloadExcel"
-        Me.ButtonDownloadExcel.Size = New System.Drawing.Size(196, 35)
-        Me.ButtonDownloadExcel.TabIndex = 572
-        Me.ButtonDownloadExcel.Text = "Download Excel"
-        Me.ButtonDownloadExcel.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.ButtonDownloadExcel.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-        Me.ButtonDownloadExcel.UseVisualStyleBackColor = False
+        Me.ButtonLaporanPdf.BackColor = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
+        Me.ButtonLaporanPdf.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
+        Me.ButtonLaporanPdf.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonLaporanPdf.FlatAppearance.BorderSize = 0
+        Me.ButtonLaporanPdf.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonLaporanPdf.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.ButtonLaporanPdf.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonLaporanPdf.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.ButtonLaporanPdf.ForeColor = System.Drawing.Color.White
+        Me.ButtonLaporanPdf.Image = CType(resources.GetObject("ButtonLaporanPdf.Image"), System.Drawing.Image)
+        Me.ButtonLaporanPdf.Location = New System.Drawing.Point(538, 147)
+        Me.ButtonLaporanPdf.Name = "ButtonLaporanPdf"
+        Me.ButtonLaporanPdf.Size = New System.Drawing.Size(178, 35)
+        Me.ButtonLaporanPdf.TabIndex = 572
+        Me.ButtonLaporanPdf.Text = "Download Laporan"
+        Me.ButtonLaporanPdf.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.ButtonLaporanPdf.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.ButtonLaporanPdf.UseVisualStyleBackColor = False
         '
         'ReportLogPaketTindakan
         '
@@ -411,5 +411,5 @@ Partial Class ReportLogPaketTindakan
     Friend WithEvents TextBoxNamaRekamMedis As System.Windows.Forms.TextBox
     Friend WithEvents ButtonClearData As System.Windows.Forms.Button
     Friend WithEvents CheckBoxFilterTanggal As System.Windows.Forms.CheckBox
-    Friend WithEvents ButtonDownloadExcel As System.Windows.Forms.Button
+    Friend WithEvents ButtonLaporanPdf As System.Windows.Forms.Button
 End Class

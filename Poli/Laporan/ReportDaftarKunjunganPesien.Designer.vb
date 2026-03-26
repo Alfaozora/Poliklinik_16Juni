@@ -31,6 +31,7 @@ Partial Class ReportDaftarKunjunganPesien
         Me.btnClose = New System.Windows.Forms.Button
         Me.Panel1 = New System.Windows.Forms.Panel
         Me.PanelKeadaanUmumMenuPemeriksaanAwal = New System.Windows.Forms.Panel
+        Me.ButtonDownloadExcel = New System.Windows.Forms.Button
         Me.TextBoxNomorTransaksi = New System.Windows.Forms.TextBox
         Me.ButtonCariPeserta = New System.Windows.Forms.Button
         Me.TextBoxNomorPeserta = New System.Windows.Forms.TextBox
@@ -95,6 +96,7 @@ Partial Class ReportDaftarKunjunganPesien
         'PanelKeadaanUmumMenuPemeriksaanAwal
         '
         Me.PanelKeadaanUmumMenuPemeriksaanAwal.BackColor = System.Drawing.Color.Transparent
+        Me.PanelKeadaanUmumMenuPemeriksaanAwal.Controls.Add(Me.ButtonDownloadExcel)
         Me.PanelKeadaanUmumMenuPemeriksaanAwal.Controls.Add(Me.TextBoxNomorTransaksi)
         Me.PanelKeadaanUmumMenuPemeriksaanAwal.Controls.Add(Me.ButtonCariPeserta)
         Me.PanelKeadaanUmumMenuPemeriksaanAwal.Controls.Add(Me.TextBoxNomorPeserta)
@@ -111,8 +113,27 @@ Partial Class ReportDaftarKunjunganPesien
         Me.PanelKeadaanUmumMenuPemeriksaanAwal.Font = New System.Drawing.Font("Segoe UI", 9.75!)
         Me.PanelKeadaanUmumMenuPemeriksaanAwal.Location = New System.Drawing.Point(41, 11)
         Me.PanelKeadaanUmumMenuPemeriksaanAwal.Name = "PanelKeadaanUmumMenuPemeriksaanAwal"
-        Me.PanelKeadaanUmumMenuPemeriksaanAwal.Size = New System.Drawing.Size(415, 211)
+        Me.PanelKeadaanUmumMenuPemeriksaanAwal.Size = New System.Drawing.Size(632, 211)
         Me.PanelKeadaanUmumMenuPemeriksaanAwal.TabIndex = 521
+        '
+        'ButtonDownloadExcel
+        '
+        Me.ButtonDownloadExcel.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(192, Byte), Integer), CType(CType(0, Byte), Integer))
+        Me.ButtonDownloadExcel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
+        Me.ButtonDownloadExcel.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonDownloadExcel.FlatAppearance.BorderSize = 0
+        Me.ButtonDownloadExcel.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonDownloadExcel.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.ButtonDownloadExcel.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonDownloadExcel.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.ButtonDownloadExcel.ForeColor = System.Drawing.Color.White
+        Me.ButtonDownloadExcel.Location = New System.Drawing.Point(410, 162)
+        Me.ButtonDownloadExcel.Name = "ButtonDownloadExcel"
+        Me.ButtonDownloadExcel.Size = New System.Drawing.Size(203, 35)
+        Me.ButtonDownloadExcel.TabIndex = 529
+        Me.ButtonDownloadExcel.Text = "Download Excel"
+        Me.ButtonDownloadExcel.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.ButtonDownloadExcel.UseVisualStyleBackColor = False
         '
         'TextBoxNomorTransaksi
         '
@@ -430,4 +451,5 @@ Partial Class ReportDaftarKunjunganPesien
     Friend WithEvents TextBoxNomorPeserta As System.Windows.Forms.TextBox
     Friend WithEvents TextBoxNomorTransaksi As System.Windows.Forms.TextBox
     Friend WithEvents ButtonCariPeserta As System.Windows.Forms.Button
+    Friend WithEvents ButtonDownloadExcel As System.Windows.Forms.Button
 End Class

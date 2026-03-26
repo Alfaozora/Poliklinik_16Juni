@@ -359,8 +359,8 @@ Public Class MasterTindakanKlinik
 
         If TextBoxReffID.Text = "" Then ' Insert Paket
             ' Save ke tabel MasterPaketTindakan
-            WriteSQL("INSERT INTO MasterPaketTindakan (NamaPaket, KeteranganPaket, JenisPaket, HargaAwal, DiskonNominal, HargaNett, Kuota, MaksimalBHP, DetailTindakan, TanggalMulai, TanggalBerakhir, DurasiAktif, CreatedBy, CreatedDate, PoliTujuan, StatusInformedConsent, TindakanInformedConsent) " & _
-                     "VALUES('" & TextBoxNamaPaket.Text & "', '" & TextBoxKeteranganPaket.Text & "', '" & jenisPaket & "', " & CDbl(TextBoxHargaAwal.Text) & ", " & CDbl(TextBoxTotalDiskon.Text) & ", " & CDbl(TextBoxHargaNett.Text) & ", " & CDbl(TextBoxKuotaPaket.Text) & ", " & CDbl(TextBoxMaksimalBHP_Paket.Text) & ", '" & jsonDataGrid & "', '" & Format(TglAwalPaket.Value, "MM/dd/yyyy") & "', '" & Format(TglAkhirPaket.Value, "MM/dd/yyyy") & "', " & CDbl(TextBoxDurasiAktifPaket.Text) & ", '" & userInput & "', GETDATE(), '" & poliGabung & "', '" & statusInformedConsent & "', '" & ComboBoxICPaket.Text & "')", 4)
+            WriteSQL("INSERT INTO MasterPaketTindakan (NamaPaket, KeteranganPaket, JenisPaket, HargaAwal, DiskonNominal, HargaNett, Kuota, MaksimalBHP, DetailTindakan, TanggalMulai, TanggalBerakhir, DurasiAktif, CreatedBy, CreatedDate, PoliTujuan, StatusInformedConsent, TindakanInformedConsent, IsSync) " & _
+                     "VALUES('" & TextBoxNamaPaket.Text & "', '" & TextBoxKeteranganPaket.Text & "', '" & jenisPaket & "', " & CDbl(TextBoxHargaAwal.Text) & ", " & CDbl(TextBoxTotalDiskon.Text) & ", " & CDbl(TextBoxHargaNett.Text) & ", " & CDbl(TextBoxKuotaPaket.Text) & ", " & CDbl(TextBoxMaksimalBHP_Paket.Text) & ", '" & jsonDataGrid & "', '" & Format(TglAwalPaket.Value, "MM/dd/yyyy") & "', '" & Format(TglAkhirPaket.Value, "MM/dd/yyyy") & "', " & CDbl(TextBoxDurasiAktifPaket.Text) & ", '" & userInput & "', GETDATE(), '" & poliGabung & "', '" & statusInformedConsent & "', '" & ComboBoxICPaket.Text & "', 0)", 4)
 
             ' Get Reff ID
             reffID = ReadSQLNIK("SELECT TOP(1) PaketID FROM MasterPaketTindakan WHERE NamaPaket = '" & TextBoxNamaPaket.Text & "' ORDER BY CreatedDate DESC")
@@ -368,7 +368,44 @@ Public Class MasterTindakanKlinik
             ' Save Detail Grid Paket
             SimpanDetailPaket(reffID)
 
-            MsgBox("Data Paket Berhasil Disimpan.", MsgBoxStyle.Information, "Success")
+            ' =========================
+            ' 🔥 KIRIM KE API (INSERT)
+            ' =========================
+            Dim payload As New Dictionary(Of String, Object)
+
+            payload("PaketID") = reffID
+            payload("NamaPaket") = TextBoxNamaPaket.Text
+            payload("KeteranganPaket") = TextBoxKeteranganPaket.Text
+            payload("JenisPaket") = jenisPaket
+            payload("HargaAwal") = CDbl(TextBoxHargaAwal.Text)
+            payload("DiskonNominal") = CDbl(TextBoxTotalDiskon.Text)
+            payload("HargaNett") = CDbl(TextBoxHargaNett.Text)
+            payload("Kuota") = CDbl(TextBoxKuotaPaket.Text)
+            payload("MaksimalBHP") = CDbl(TextBoxMaksimalBHP_Paket.Text)
+            payload("DetailTindakan") = jsonDataGrid
+            payload("TanggalMulai") = Format(TglAwalPaket.Value, "yyyy-MM-dd")
+            payload("TanggalBerakhir") = Format(TglAkhirPaket.Value, "yyyy-MM-dd")
+            payload("DurasiAktif") = CDbl(TextBoxDurasiAktifPaket.Text)
+            payload("CreatedBy") = userInput
+            payload("PoliTujuan") = poliGabung
+            payload("StatusInformedConsent") = If(statusInformedConsent, 1, 0)
+            payload("TindakanInformedConsent") = ComboBoxICPaket.Text
+
+            Dim jsonParam As String = JsonConvert.SerializeObject(payload)
+
+            Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+            Dim urlWebService As String = baseURL & "api/paket-tindakan"
+
+            Dim responseApi As String = InsertDataAPIRM(jsonParam, urlWebService)
+
+            If responseApi.Contains("success") Then
+                WriteSQL("UPDATE MasterPaketTindakan SET IsSync = 1 WHERE PaketID = '" & reffID & "'", 4)
+                MsgBox("Data Paket Berhasil Disimpan & Sync Server", MsgBoxStyle.Information, "Success")
+            Else
+                MsgBox("Data lokal tersimpan, tapi gagal sync ke server", MsgBoxStyle.Exclamation)
+            End If
+
+            'MsgBox("Data Paket Berhasil Disimpan.", MsgBoxStyle.Information, "Success")
         Else ' Update Paket
             reffID = TextBoxReffID.Text ' Set UUID
 
@@ -388,14 +425,52 @@ Public Class MasterTindakanKlinik
                               "PoliTujuan = '" & poliGabung & "'," & _
                               "StatusInformedConsent = '" & statusInformedConsent & "'," & _
                               "TindakanInformedConsent = '" & ComboBoxICPaket.Text & "'," & _
-                              "UpdatedDate = GETDATE()"
+                              "UpdatedDate = GETDATE()," & _
+                              "IsSync = 0"
 
             WriteSQL("UPDATE MasterPaketTindakan SET " & parameterUpdate & " WHERE PaketID = '" & reffID & "'", 4)
 
             ' Save Detail Grid Paket
             SimpanDetailPaket(reffID)
 
-            MsgBox("Data Paket Berhasil Diperbarui.", MsgBoxStyle.Information, "Success")
+            ' =========================
+            ' 🔥 KIRIM KE API (UPDATE)
+            ' =========================
+            Dim payload As New Dictionary(Of String, Object)
+
+            payload("PaketID") = reffID
+            payload("NamaPaket") = TextBoxNamaPaket.Text
+            payload("KeteranganPaket") = TextBoxKeteranganPaket.Text
+            payload("JenisPaket") = jenisPaket
+            payload("HargaAwal") = CDbl(TextBoxHargaAwal.Text)
+            payload("DiskonNominal") = CDbl(TextBoxTotalDiskon.Text)
+            payload("HargaNett") = CDbl(TextBoxHargaNett.Text)
+            payload("Kuota") = CDbl(TextBoxKuotaPaket.Text)
+            payload("MaksimalBHP") = CDbl(TextBoxMaksimalBHP_Paket.Text)
+            payload("DetailTindakan") = jsonDataGrid
+            payload("TanggalMulai") = Format(TglAwalPaket.Value, "yyyy-MM-dd")
+            payload("TanggalBerakhir") = Format(TglAkhirPaket.Value, "yyyy-MM-dd")
+            payload("DurasiAktif") = CDbl(TextBoxDurasiAktifPaket.Text)
+            payload("CreatedBy") = userInput
+            payload("PoliTujuan") = poliGabung
+            payload("StatusInformedConsent") = If(statusInformedConsent, 1, 0)
+            payload("TindakanInformedConsent") = ComboBoxICPaket.Text
+
+            Dim jsonParam As String = JsonConvert.SerializeObject(payload)
+
+            Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+            Dim urlWebService As String = baseURL & "api/paket-tindakan" ' bisa sama endpoint
+
+            Dim responseApi As String = InsertDataAPIRM(jsonParam, urlWebService)
+
+            If responseApi.Contains("success") Then
+                WriteSQL("UPDATE MasterPaketTindakan SET IsSync = 1 WHERE PaketID = '" & reffID & "'", 4)
+                MsgBox("Data Paket Berhasil Update & Sync Server", MsgBoxStyle.Information, "Success")
+            Else
+                MsgBox("Update lokal berhasil, tapi gagal sync ke server", MsgBoxStyle.Exclamation)
+            End If
+
+            'MsgBox("Data Paket Berhasil Diperbarui.", MsgBoxStyle.Information, "Success")
         End If
     End Sub
 

@@ -339,4 +339,92 @@ Public Class ReportDaftarKunjunganPesien
             e.Value = e.RowIndex + 1 ' Nomor urut dimulai dari 1
         End If
     End Sub
+
+    Sub ExportCSV(ByVal dt As DataTable)
+
+        Dim sfd As New SaveFileDialog
+        sfd.Filter = "CSV File (*.csv)|*.csv"
+        sfd.FileName = "LaporanKunjungan.csv"
+
+        If sfd.ShowDialog = DialogResult.OK Then
+
+            Dim sw As New IO.StreamWriter(sfd.FileName, False, System.Text.Encoding.UTF8)
+
+            'Header
+            For i As Integer = 0 To dt.Columns.Count - 1
+                sw.Write(dt.Columns(i).ColumnName)
+                If i < dt.Columns.Count - 1 Then sw.Write(",")
+            Next
+            sw.WriteLine()
+
+            'Data
+            For Each r As DataRow In dt.Rows
+                For i As Integer = 0 To dt.Columns.Count - 1
+                    sw.Write("""" & r(i).ToString() & """")
+                    If i < dt.Columns.Count - 1 Then sw.Write(",")
+                Next
+                sw.WriteLine()
+            Next
+
+            sw.Close()
+
+            MessageBox.Show("Export CSV berhasil", "Informasi")
+
+        End If
+
+    End Sub
+
+    Private Sub ButtonDownloadExcel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonDownloadExcel.Click
+
+        Dim kondisi As String = ""
+
+        If RadioButtonOpsiIndividu.Checked = True Then
+
+            kondisi = " AND TP.IDInternet = '" & TextBoxNomorPeserta.Text & "' "
+
+        ElseIf RadioButtonOpsiNoTransaksi.Checked = True Then
+
+            kondisi = " AND TP.NoUrut = '" & TextBoxNomorTransaksi.Text & "' "
+
+        ElseIf RadioButtonOpsiHarian.Checked = True Then
+
+            kondisi = " AND CAST(TP.TglPoli AS DATE) = '" & Format(DateTimePickerTglHarian.Value, "yyyy-MM-dd") & "' "
+
+        ElseIf RadioButtonOpsiBulanan.Checked = True Then
+
+            Dim bulanSearch As String = Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(ComboBoxBulan.Text, _
+            "Januari", "01"), "Februari", "02"), "Maret", "03"), "April", "04"), "Mei", "05"), "Juni", "06"), _
+            "Juli", "07"), "Agustus", "08"), "September", "09"), "Oktober", "10"), "November", "11"), "Desember", "12")
+
+            Dim tahunSearch As String = ComboBoxTahun.Text
+
+            kondisi = " AND YEAR(TP.TglPoli) = '" & tahunSearch & "' AND MONTH(TP.TglPoli) = '" & bulanSearch & "' "
+
+        End If
+
+
+        Dim query As String = "SELECT " & _
+            "CAST(TP.TglPoli AS DATE) AS TglPoli, " & _
+            "TD.JenisPoli, " & _
+            "TP.NoUrut, " & _
+            "MP.Nama, " & _
+            "ISNULL(TPD.KodeVoucher,'-') AS KodeVoucher, " & _
+            "TPD.NamaTindakan, " & _
+            "TPD.NettBayar AS Nominal, " & _
+            "ISNULL(TPB.JenisBayar,'-') AS JenisBayar, " & _
+            "ISNULL(TPB.NoJenisBayar,'-') AS NoJenisBayar " & _
+        "FROM TransaksiPoli TP " & _
+        "INNER JOIN MasterPasien MP ON TP.IDInternet = MP.NoRekamMedis " & _
+        "LEFT JOIN TransaksiPoliDetail TPD ON TP.TransPoliID = TPD.TransPoliID " & _
+        "LEFT JOIN TransaksiDetail TD ON TP.NoUrut = TD.NoUrut " & _
+        "LEFT JOIN TransaksiPoliBayar TPB ON TP.TransPoliID = TPB.TransPoliID " & _
+        "WHERE ISNULL(TPD.DeletedBy,'') = '' " & _
+        kondisi & _
+        " ORDER BY TP.TglPoli, TP.NoUrut"
+
+        Dim dt As DataTable = ReadSQL(query)
+
+        ExportCSV(dt)
+
+    End Sub
 End Class

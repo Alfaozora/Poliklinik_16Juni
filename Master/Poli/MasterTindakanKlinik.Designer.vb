@@ -198,6 +198,7 @@ Partial Class MasterTindakanKlinik
         Me.TextBoxNamaAlat = New System.Windows.Forms.TextBox
         Me.Label43 = New System.Windows.Forms.Label
         Me.TabPage2 = New System.Windows.Forms.TabPage
+        Me.ButtonPreOrder = New System.Windows.Forms.Button
         Me.Label38 = New System.Windows.Forms.Label
         Me.NumericKuotaMinimumCartridge = New System.Windows.Forms.NumericUpDown
         Me.Label58 = New System.Windows.Forms.Label
@@ -225,7 +226,6 @@ Partial Class MasterTindakanKlinik
         Me.Button4 = New System.Windows.Forms.Button
         Me.NavBarItem3 = New DevExpress.XtraNavBar.NavBarItem
         Me.NavBarItem4 = New DevExpress.XtraNavBar.NavBarItem
-        Me.ButtonPreOrder = New System.Windows.Forms.Button
         Me.PanelTop.SuspendLayout()
         Me.PanelMasterTindakanKlinik.SuspendLayout()
         Me.SplitContainer1.Panel1.SuspendLayout()
@@ -2530,6 +2530,28 @@ Partial Class MasterTindakanKlinik
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Cardtridge"
         '
+        'ButtonPreOrder
+        '
+        Me.ButtonPreOrder.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonPreOrder.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+        Me.ButtonPreOrder.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonPreOrder.FlatAppearance.BorderSize = 0
+        Me.ButtonPreOrder.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonPreOrder.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.ButtonPreOrder.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonPreOrder.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.ButtonPreOrder.ForeColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(254, Byte), Integer))
+        Me.ButtonPreOrder.Image = CType(resources.GetObject("ButtonPreOrder.Image"), System.Drawing.Image)
+        Me.ButtonPreOrder.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.ButtonPreOrder.Location = New System.Drawing.Point(528, 175)
+        Me.ButtonPreOrder.Name = "ButtonPreOrder"
+        Me.ButtonPreOrder.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.ButtonPreOrder.Size = New System.Drawing.Size(119, 25)
+        Me.ButtonPreOrder.TabIndex = 656
+        Me.ButtonPreOrder.Text = "Pre-Order"
+        Me.ButtonPreOrder.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.ButtonPreOrder.UseVisualStyleBackColor = False
+        '
         'Label38
         '
         Me.Label38.AutoSize = True
@@ -2869,28 +2891,6 @@ Partial Class MasterTindakanKlinik
         Me.NavBarItem4.LargeImage = CType(resources.GetObject("NavBarItem4.LargeImage"), System.Drawing.Image)
         Me.NavBarItem4.Name = "NavBarItem4"
         Me.NavBarItem4.SmallImage = CType(resources.GetObject("NavBarItem4.SmallImage"), System.Drawing.Image)
-        '
-        'ButtonPreOrder
-        '
-        Me.ButtonPreOrder.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
-        Me.ButtonPreOrder.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
-        Me.ButtonPreOrder.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.ButtonPreOrder.FlatAppearance.BorderSize = 0
-        Me.ButtonPreOrder.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
-        Me.ButtonPreOrder.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.ButtonPreOrder.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.ButtonPreOrder.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.ButtonPreOrder.ForeColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(254, Byte), Integer))
-        Me.ButtonPreOrder.Image = CType(resources.GetObject("ButtonPreOrder.Image"), System.Drawing.Image)
-        Me.ButtonPreOrder.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.ButtonPreOrder.Location = New System.Drawing.Point(528, 175)
-        Me.ButtonPreOrder.Name = "ButtonPreOrder"
-        Me.ButtonPreOrder.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.ButtonPreOrder.Size = New System.Drawing.Size(119, 25)
-        Me.ButtonPreOrder.TabIndex = 656
-        Me.ButtonPreOrder.Text = "Pre-Order"
-        Me.ButtonPreOrder.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-        Me.ButtonPreOrder.UseVisualStyleBackColor = False
         '
         'MasterTindakanKlinik
         '
