@@ -743,7 +743,8 @@ Public Class ReportLogPaketTindakan
         query.AppendLine("        AND LPP2.PaketID = LPP.PaketID")
         query.AppendLine("        AND LPP2.NoTransaksi <= LPP.NoTransaksi")
         query.AppendLine("        AND LPP2.DeletedBy IS NULL")
-        query.AppendLine("    ) AS SisaKuota")
+        query.AppendLine("    ) AS SisaKuota,")
+        query.AppendLine("    CAST(MAX(TPT.TanggalAkhirPaket) AS DATE) AS TanggalAkhirPaket")
 
         query.AppendLine("FROM LogPenggunaanPaket LPP")
 
@@ -761,6 +762,13 @@ Public Class ReportLogPaketTindakan
         query.AppendLine("    FROM TransaksiDetail")
         query.AppendLine(") TD")
         query.AppendLine("    ON TD.NoUrut = LPP.NoTransaksi")
+
+        query.AppendLine("OUTER APPLY (")
+        query.AppendLine("    SELECT TOP 1 TanggalAkhirPaket")
+        query.AppendLine("    FROM TransaksiPaketTindakan TPT")
+        query.AppendLine("    WHERE TPT.KodeVoucher = LPP.KodeVoucher")
+        query.AppendLine(") TPT")
+
 
         query.AppendLine("WHERE ")
         query.AppendLine("    LPP.DeletedBy IS NULL")
@@ -786,7 +794,7 @@ Public Class ReportLogPaketTindakan
 
         query.AppendLine("ORDER BY ")
         query.AppendLine("    TD.JenisPoli,")
-        query.AppendLine("    MAX(LPP.TanggalTransaksi)")
+        query.AppendLine("    Tgl")
 
         ' 🔍 DEBUG (opsional tapi sangat disarankan)
         ' MsgBox(query.ToString())
@@ -828,7 +836,8 @@ Public Class ReportLogPaketTindakan
         query.AppendLine("        AND LPP2.TindakanID = LPP.TindakanID")
         query.AppendLine("        AND LPP2.NoTransaksi <= LPP.NoTransaksi")
         query.AppendLine("        AND LPP2.DeletedBy IS NULL")
-        query.AppendLine("    ) AS SisaKuota")
+        query.AppendLine("    ) AS SisaKuota,")
+        query.AppendLine("    MAX(TPT.TanggalAkhirPaket) AS TanggalAkhirPaket")
 
         query.AppendLine("FROM LogPenggunaanPaket LPP")
 
@@ -848,6 +857,14 @@ Public Class ReportLogPaketTindakan
 
         query.AppendLine("LEFT JOIN MasterPasien p")
         query.AppendLine("    ON p.NoRekamMedis = pkt.NoRekamMedis")
+
+        query.AppendLine("OUTER APPLY (")
+        query.AppendLine("    SELECT TOP 1 TanggalAkhirPaket")
+        query.AppendLine("    FROM TransaksiPaketTindakan TPT")
+        query.AppendLine("    WHERE TPT.KodeVoucher = LPP.KodeVoucher")
+        query.AppendLine("    AND TPT.PaketID = LPP.PaketID")
+        query.AppendLine("    ORDER BY TanggalAkhirPaket DESC")
+        query.AppendLine(") TPT")
 
         query.AppendLine("WHERE LPP.DeletedBy IS NULL")
         query.AppendLine("AND ('" & NoRM & "' = '' OR LPP.NoRekamMedis = '" & NoRM & "')")
@@ -945,6 +962,12 @@ Public Class ReportLogPaketTindakan
 
         Dim stringTglAwal As String = Format(tglAwal, "dd MMMM yyyy")
         Dim stringTglAkhir As String = Format(tglAkhir, "dd MMMM yyyy")
+
+        If RadioButtonOptionPaketReguler.Checked Then
+            Report.Bands.Item(BandKind.ReportHeader).Controls("xrLabelJudulLaporan").Text = "Laporan Pengambilan Paket Reguler"
+        Else
+            Report.Bands.Item(BandKind.ReportHeader).Controls("xrLabelJudulLaporan").Text = "Laporan Pengambilan Paket Per-Tindakan"
+        End If
 
         If CheckBoxFilterTanggal.Checked Then
             Report.Bands.Item(BandKind.ReportHeader).Controls("xrLabelTanggalLaporan").Text = "Semua Tanggal"

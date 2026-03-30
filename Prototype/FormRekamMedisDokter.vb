@@ -2411,6 +2411,152 @@ Public Class FormRekamMedisDokter
     '    Return True
     'End Function
 
+    'Debug
+    'Function ValidasiSignatureInformedConsent() As Boolean
+
+    '    Dim statusInformedConsent As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'SettingInformedConsent'")
+
+    '    MsgBox("Status IC: " & statusInformedConsent)
+
+    '    If statusInformedConsent = "No" Then Return True
+    '    If CheckBoxInformedConsent.Checked = False Then Return True
+
+    '    Try
+
+    '        Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+    '        MsgBox("Base URL: " & baseURL)
+
+    '        Dim urlWebService As String = baseURL & "api/lumiera-luzelle/ic/tindakan/" & idTransaksi & "/" & TextBoxTindakanID.Text
+    '        MsgBox("URL: " & urlWebService)
+
+    '        Dim response As String = GetDataAPIRM(urlWebService)
+    '        MsgBox("Response API:" & vbCrLf & response)
+
+    '        If String.IsNullOrEmpty(response) Then
+    '            MsgBox("Response kosong!", MsgBoxStyle.Critical)
+    '            Return False
+    '        End If
+
+    '        Dim json As JObject = JObject.Parse(response)
+    '        MsgBox("JSON berhasil di-parse")
+
+    '        ' ===============================
+    '        ' VALIDASI STATUS
+    '        ' ===============================
+    '        If json("status") Is Nothing Then
+    '            MsgBox("Field 'status' tidak ada", MsgBoxStyle.Critical)
+    '            Return False
+    '        End If
+
+    '        MsgBox("Status: " & json("status").ToString())
+
+    '        If json("status").ToString() <> "success" Then
+    '            MsgBox("Message: " & If(json("message") IsNot Nothing, json("message").ToString(), "Tidak ada message"), MsgBoxStyle.Exclamation)
+    '            Return False
+    '        End If
+
+    '        ' ===============================
+    '        ' VALIDASI DATA
+    '        ' ===============================
+    '        If json("data") Is Nothing Then
+    '            MsgBox("Data kosong!", MsgBoxStyle.Critical)
+    '            Return False
+    '        End If
+
+    '        Dim data As JObject = json("data")
+    '        MsgBox("Masuk ke data object")
+
+    '        ' ===============================
+    '        ' CEK FIELD SATU-SATU (PENTING 🔥)
+    '        ' ===============================
+    '        MsgBox("no_transaksi: " & If(data("no_transaksi") IsNot Nothing, data("no_transaksi").ToString(), "NULL"))
+    '        MsgBox("no_rm: " & If(data("no_rm") IsNot Nothing, data("no_rm").ToString(), "NULL"))
+    '        MsgBox("tgl: " & If(data("tgl") IsNot Nothing, data("tgl").ToString(), "NULL"))
+    '        MsgBox("nama: " & If(data("nama") IsNot Nothing, data("nama").ToString(), "NULL"))
+    '        MsgBox("ttd_dokter: " & If(data("ttd_dokter") IsNot Nothing, data("ttd_dokter").ToString(), "NULL"))
+    '        MsgBox("ttd_perawat: " & If(data("ttd_perawat") IsNot Nothing, data("ttd_perawat").ToString(), "NULL"))
+    '        MsgBox("ttd_pasien: " & If(data("ttd_pasien") IsNot Nothing, data("ttd_pasien").ToString(), "NULL"))
+
+    '        ' ===============================
+    '        ' TEST PARSING YANG RAWAN ERROR
+    '        ' ===============================
+    '        MsgBox("Test parsing tanggal...")
+    '        Dim tglTest As Date = Date.Parse(data("tgl").ToString())
+
+    '        MsgBox("Test parsing boolean...")
+    '        Dim statusSetuju As Boolean = CBool(data("status_persetujuan"))
+
+    '        MsgBox("Semua parsing aman, lanjut INSERT")
+
+    '        ' ===============================
+    '        ' INSERT
+    '        ' ===============================
+    '        ' (biarkan seperti semula dulu)
+
+    '        Dim query As String = _
+    '        "INSERT INTO InformedConsent " & _
+    '        "(NoTransaksi,NoRekamMedis,TglTransaksi,NamaPasien,UmurPasien,JenisKelaminPasien," & _
+    '        "AlamatPasien,NamaDokter,NamaPerawat,KeteranganDiagnosis,DasarDiagnosis," & _
+    '        "TindakanID,KeteranganTindakan,IndikasiTindakan,TataCara,TujuanTindakan,Risiko," & _
+    '        "Komplikasi,Prognosis,AlternatifTindakan,BiayaTindakan,NamaPenanggungJawab," & _
+    '        "UmurPenanggungJawab,JenisKelaminPenanggungJawab,HubunganPenanggungJawab," & _
+    '        "AlamatPenanggungJawab,StatusPersetujuan,StatusTransaksi,SignatureDokter1," & _
+    '        "SignaturePerawat,SignaturePasien1,CreatedBy,CreatedDate) " & _
+    '        "VALUES " & _
+    '        "(@NoTransaksi,@NoRM,@Tgl,@Nama,@Umur,@Sex,@Alamat,@Dokter,@Perawat," & _
+    '        "@Diagnosis,@Dasar,@TindakanID,@KetTindakan,@Indikasi,@TataCara,@Tujuan," & _
+    '        "@Risiko,@Komplikasi,@Prognosis,@Alternatif,@Biaya,@PJ,@UmurPJ,@SexPJ," & _
+    '        "@HubunganPJ,@AlamatPJ,@StatusPersetujuan,@StatusTransaksi,@TTDDokter," & _
+    '        "@TTDPerawat,@TTDPasien,@User,GETDATE())"
+
+    '        WriteParameterizedLokalSQL(query, 4, _
+    '            New SqlParameter("@NoTransaksi", data("no_transaksi").ToString()), _
+    '            New SqlParameter("@NoRM", data("no_rm").ToString()), _
+    '            New SqlParameter("@Tgl", Date.Parse(data("tgl").ToString())), _
+    '            New SqlParameter("@Nama", data("nama").ToString()), _
+    '            New SqlParameter("@Umur", Val(data("umur").ToString())), _
+    '            New SqlParameter("@Sex", data("sex").ToString()), _
+    '            New SqlParameter("@Alamat", data("alamat").ToString()), _
+    '            New SqlParameter("@Dokter", data("dokter").ToString()), _
+    '            New SqlParameter("@Perawat", data("perawat").ToString()), _
+    '            New SqlParameter("@Diagnosis", data("ket_diagnosis").ToString()), _
+    '            New SqlParameter("@Dasar", data("dasar_diagnosis").ToString()), _
+    '            New SqlParameter("@TindakanID", data("id_tindakan").ToString()), _
+    '            New SqlParameter("@KetTindakan", data("ket_tindakan").ToString()), _
+    '            New SqlParameter("@Indikasi", data("indikasi_tindakan").ToString()), _
+    '            New SqlParameter("@TataCara", data("tata_cara").ToString()), _
+    '            New SqlParameter("@Tujuan", data("tujuan_tindakan").ToString()), _
+    '            New SqlParameter("@Risiko", data("risiko").ToString()), _
+    '            New SqlParameter("@Komplikasi", data("komplikasi").ToString()), _
+    '            New SqlParameter("@Prognosis", data("prognosis").ToString()), _
+    '            New SqlParameter("@Alternatif", data("alternatif_tindakan").ToString()), _
+    '            New SqlParameter("@Biaya", Val(data("biaya_tindakan").ToString())), _
+    '            New SqlParameter("@PJ", data("nama_penanggung_jawab").ToString()), _
+    '            New SqlParameter("@UmurPJ", Val(data("umur_penanggung_jawab").ToString())), _
+    '            New SqlParameter("@SexPJ", data("sex_penanggung_jawab").ToString()), _
+    '            New SqlParameter("@HubunganPJ", data("hubungan_penanggung_jawab").ToString()), _
+    '            New SqlParameter("@AlamatPJ", data("alamat_penanggung_jawab").ToString()), _
+    '            New SqlParameter("@StatusPersetujuan", CBool(data("status_persetujuan"))), _
+    '            New SqlParameter("@StatusTransaksi", data("status_transaksi").ToString()), _
+    '            New SqlParameter("@TTDDokter", data("ttd_dokter").ToString()), _
+    '            New SqlParameter("@TTDPerawat", data("ttd_perawat").ToString()), _
+    '            New SqlParameter("@TTDPasien", data("ttd_pasien").ToString()), _
+    '            New SqlParameter("@User", userInput))
+
+    '        MsgBox("INSERT BERHASIL")
+
+    '        Return True
+
+    '    Catch ex As Exception
+
+    '        MsgBox("ERROR DETAIL:" & vbCrLf & ex.ToString(), MsgBoxStyle.Critical, "ERROR")
+    '        Return False
+
+    '    End Try
+
+    'End Function
+
+    'NEW
     Function ValidasiSignatureInformedConsent() As Boolean
 
         Dim statusInformedConsent As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'SettingInformedConsent'")
@@ -2435,11 +2581,14 @@ Public Class FormRekamMedisDokter
             ' VALIDASI RESPONSE
             ' ===============================
 
-            If json("status").ToString() <> "success" Then
-
-                MsgBox(json("message").ToString(), MsgBoxStyle.Exclamation, "Warning")
+            If json("status") Is Nothing OrElse json("status").ToString() <> "success" Then
+                MsgBox(If(json("message") IsNot Nothing, json("message").ToString(), "Response tidak valid"), MsgBoxStyle.Exclamation, "Warning")
                 Return False
+            End If
 
+            If json("data") Is Nothing Then
+                MsgBox("Data informed consent kosong", MsgBoxStyle.Exclamation, "Warning")
+                Return False
             End If
 
             Dim data As JObject = json("data")
