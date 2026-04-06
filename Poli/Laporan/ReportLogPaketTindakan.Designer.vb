@@ -26,6 +26,7 @@ Partial Class ReportLogPaketTindakan
         Me.PanelTop = New System.Windows.Forms.Panel
         Me.btnClose = New System.Windows.Forms.Button
         Me.Panel1 = New System.Windows.Forms.Panel
+        Me.ButtonLaporanPdf = New System.Windows.Forms.Button
         Me.CheckBoxFilterTanggal = New System.Windows.Forms.CheckBox
         Me.ButtonClearData = New System.Windows.Forms.Button
         Me.TextBoxNamaRekamMedis = New System.Windows.Forms.TextBox
@@ -44,7 +45,7 @@ Partial Class ReportLogPaketTindakan
         Me.SplitContainerRiwayatPaket = New System.Windows.Forms.SplitContainer
         Me.GridControlRiwayatPaket = New DevExpress.XtraGrid.GridControl
         Me.GridViewRiwayatPaket = New DevExpress.XtraGrid.Views.Grid.GridView
-        Me.ButtonLaporanPdf = New System.Windows.Forms.Button
+        Me.CheckBoxDownloadLaporanTindakan = New System.Windows.Forms.CheckBox
         Me.PanelTop.SuspendLayout()
         Me.Panel1.SuspendLayout()
         Me.Panel9.SuspendLayout()
@@ -82,6 +83,7 @@ Partial Class ReportLogPaketTindakan
         'Panel1
         '
         Me.Panel1.BackColor = System.Drawing.Color.Transparent
+        Me.Panel1.Controls.Add(Me.CheckBoxDownloadLaporanTindakan)
         Me.Panel1.Controls.Add(Me.ButtonLaporanPdf)
         Me.Panel1.Controls.Add(Me.CheckBoxFilterTanggal)
         Me.Panel1.Controls.Add(Me.ButtonClearData)
@@ -101,6 +103,27 @@ Partial Class ReportLogPaketTindakan
         Me.Panel1.Name = "Panel1"
         Me.Panel1.Size = New System.Drawing.Size(1000, 200)
         Me.Panel1.TabIndex = 6
+        '
+        'ButtonLaporanPdf
+        '
+        Me.ButtonLaporanPdf.BackColor = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
+        Me.ButtonLaporanPdf.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
+        Me.ButtonLaporanPdf.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonLaporanPdf.FlatAppearance.BorderSize = 0
+        Me.ButtonLaporanPdf.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonLaporanPdf.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.ButtonLaporanPdf.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonLaporanPdf.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.ButtonLaporanPdf.ForeColor = System.Drawing.Color.White
+        Me.ButtonLaporanPdf.Image = CType(resources.GetObject("ButtonLaporanPdf.Image"), System.Drawing.Image)
+        Me.ButtonLaporanPdf.Location = New System.Drawing.Point(538, 147)
+        Me.ButtonLaporanPdf.Name = "ButtonLaporanPdf"
+        Me.ButtonLaporanPdf.Size = New System.Drawing.Size(178, 35)
+        Me.ButtonLaporanPdf.TabIndex = 572
+        Me.ButtonLaporanPdf.Text = "Download Laporan"
+        Me.ButtonLaporanPdf.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.ButtonLaporanPdf.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.ButtonLaporanPdf.UseVisualStyleBackColor = False
         '
         'CheckBoxFilterTanggal
         '
@@ -340,26 +363,15 @@ Partial Class ReportLogPaketTindakan
         Me.GridViewRiwayatPaket.OptionsView.ShowGroupPanel = False
         Me.GridViewRiwayatPaket.PaintStyleName = "Office2003"
         '
-        'ButtonLaporanPdf
+        'CheckBoxDownloadLaporanTindakan
         '
-        Me.ButtonLaporanPdf.BackColor = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
-        Me.ButtonLaporanPdf.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
-        Me.ButtonLaporanPdf.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.ButtonLaporanPdf.FlatAppearance.BorderSize = 0
-        Me.ButtonLaporanPdf.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
-        Me.ButtonLaporanPdf.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.ButtonLaporanPdf.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.ButtonLaporanPdf.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.ButtonLaporanPdf.ForeColor = System.Drawing.Color.White
-        Me.ButtonLaporanPdf.Image = CType(resources.GetObject("ButtonLaporanPdf.Image"), System.Drawing.Image)
-        Me.ButtonLaporanPdf.Location = New System.Drawing.Point(538, 147)
-        Me.ButtonLaporanPdf.Name = "ButtonLaporanPdf"
-        Me.ButtonLaporanPdf.Size = New System.Drawing.Size(178, 35)
-        Me.ButtonLaporanPdf.TabIndex = 572
-        Me.ButtonLaporanPdf.Text = "Download Laporan"
-        Me.ButtonLaporanPdf.TextAlign = System.Drawing.ContentAlignment.MiddleRight
-        Me.ButtonLaporanPdf.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-        Me.ButtonLaporanPdf.UseVisualStyleBackColor = False
+        Me.CheckBoxDownloadLaporanTindakan.AutoSize = True
+        Me.CheckBoxDownloadLaporanTindakan.Location = New System.Drawing.Point(548, 51)
+        Me.CheckBoxDownloadLaporanTindakan.Name = "CheckBoxDownloadLaporanTindakan"
+        Me.CheckBoxDownloadLaporanTindakan.Size = New System.Drawing.Size(178, 19)
+        Me.CheckBoxDownloadLaporanTindakan.TabIndex = 573
+        Me.CheckBoxDownloadLaporanTindakan.Text = "Download Laporan Tindakan"
+        Me.CheckBoxDownloadLaporanTindakan.UseVisualStyleBackColor = True
         '
         'ReportLogPaketTindakan
         '
@@ -412,4 +424,5 @@ Partial Class ReportLogPaketTindakan
     Friend WithEvents ButtonClearData As System.Windows.Forms.Button
     Friend WithEvents CheckBoxFilterTanggal As System.Windows.Forms.CheckBox
     Friend WithEvents ButtonLaporanPdf As System.Windows.Forms.Button
+    Friend WithEvents CheckBoxDownloadLaporanTindakan As System.Windows.Forms.CheckBox
 End Class
