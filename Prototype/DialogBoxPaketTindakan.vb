@@ -193,6 +193,12 @@ Public Class DialogBoxPaketTindakan
         query.AppendLine("WHERE ")
         query.AppendLine("    TPT.DeletedBy IS NULL ")
 
+        ' 🔥 filter masa aktif paket
+        query.AppendLine("    AND ( ")
+        query.AppendLine("        GETDATE() >= ISNULL(TPT.TanggalMulaiPaket, GETDATE()) ")
+        query.AppendLine("        AND GETDATE() <= ISNULL(TPT.TanggalAkhirPaket, GETDATE()) ")
+        query.AppendLine("    ) ")
+
         If NoRM <> "" Then
             query.AppendLine("    AND TPT.NoRekamMedis = '" & NoRM & "' ")
         End If

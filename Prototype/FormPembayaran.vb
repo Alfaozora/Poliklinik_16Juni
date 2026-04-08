@@ -2693,6 +2693,7 @@ Public Class FormPembayaran
         ' Set report berdasarkan jenis proses
         Select Case JenisProses
             Case "Preview"
+                'Report.RunDesigner()
                 Report.ShowPreview()
             Case "Cetak"
                 'Report.RunDesigner()
