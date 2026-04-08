@@ -58,6 +58,15 @@ Public Class DialogBoxPaketTindakan
     Private Sub PencarianPaket()
         Try
             If ValidasiPencarian() = True Then
+
+                Dim kodeVoucher As String = ""
+
+                If TypeOf ComboBoxPaketTindakan.SelectedValue Is DataRowView Then
+                    kodeVoucher = CType(ComboBoxPaketTindakan.SelectedValue, DataRowView)("KodeVoucher").ToString()
+                Else
+                    kodeVoucher = ComboBoxPaketTindakan.SelectedValue.ToString()
+                End If
+
                 Dim queryBuilder As New StringBuilder()
 
                 ' Query Paket Reguler
@@ -68,7 +77,7 @@ Public Class DialogBoxPaketTindakan
                 queryBuilder.AppendLine("       tblHeader.HargaNett, tblHeader.Kuota AS Kuota,") ' Kuota dari tblHeader
                 queryBuilder.AppendLine("       tblHeader.Penjamin, tblHeader.KodeVoucher")
                 queryBuilder.AppendLine("FROM TransaksiPaketTindakan tblHeader")
-                queryBuilder.AppendLine("WHERE tblHeader.KodeVoucher = '" & TextBoxKodeVoucher.Text & "'")
+                queryBuilder.AppendLine("WHERE tblHeader.KodeVoucher = '" & kodeVoucher & "'")
                 queryBuilder.AppendLine("      AND (GETDATE() BETWEEN ISNULL(tblHeader.TanggalMulaiPaket, GETDATE())")
                 queryBuilder.AppendLine("      AND ISNULL(tblHeader.TanggalAkhirPaket, GETDATE()))")
                 queryBuilder.AppendLine("      AND tblHeader.DeletedDate IS NULL")
@@ -87,7 +96,7 @@ Public Class DialogBoxPaketTindakan
                 queryBuilder.AppendLine("FROM TransaksiPaketTindakanDetail AS tblDetail")
                 queryBuilder.AppendLine("     INNER JOIN TransaksiPaketTindakan AS tblHeader")
                 queryBuilder.AppendLine("     ON tblDetail.PaketID = tblHeader.PaketID AND tblDetail.KodeVoucher = tblHeader.KodeVoucher")
-                queryBuilder.AppendLine("WHERE tblHeader.KodeVoucher = '" & TextBoxKodeVoucher.Text & "'")
+                queryBuilder.AppendLine("WHERE tblHeader.KodeVoucher = '" & kodeVoucher & "'")
                 queryBuilder.AppendLine("      AND (GETDATE() BETWEEN ISNULL(tblHeader.TanggalMulaiPaket, GETDATE())")
                 queryBuilder.AppendLine("      AND ISNULL(tblHeader.TanggalAkhirPaket, GETDATE()))")
                 queryBuilder.AppendLine("      AND tblHeader.DeletedDate IS NULL")
@@ -130,17 +139,182 @@ Public Class DialogBoxPaketTindakan
     End Sub
 
     Function ValidasiPencarian() As Boolean
-        If TextBoxKodeVoucher.Text = "" Then
-            MsgBox("Kode Voucher Tidak Boleh Kosong.", MsgBoxStyle.Critical, "Warning!")
+        If ComboBoxPaketTindakan.SelectedValue Is Nothing OrElse ComboBoxPaketTindakan.SelectedIndex = -1 Then
+            MsgBox("Silakan pilih paket terlebih dahulu.", MsgBoxStyle.Critical, "Warning!")
+            ComboBoxPaketTindakan.Focus()
             Return False
         End If
 
         Return True
     End Function
 
+    Public NoRM As String
+
+    Private dtPasienCache As DataTable
+
+    Private Sub LoadCachePasien()
+
+        Dim query As New StringBuilder()
+
+        query.AppendLine("SELECT NoRekamMedis, Nama ")
+        query.AppendLine("FROM MasterPasien ")
+        query.AppendLine("WHERE DeletedBy IS NULL ")
+
+        dtPasienCache = ReadSQL(query.ToString())
+
+    End Sub
+
+    Private Sub SetupAutoCompletePasien()
+
+        Dim autoSource As New AutoCompleteStringCollection()
+
+        For Each row As DataRow In dtPasienCache.Rows
+            ' Format bebas (biar enak dicari)
+            autoSource.Add(row("Nama").ToString() & " - " & row("NoRekamMedis").ToString())
+        Next
+
+        With TextBoxRMPasien
+            .AutoCompleteMode = AutoCompleteMode.SuggestAppend
+            .AutoCompleteSource = AutoCompleteSource.CustomSource
+            .AutoCompleteCustomSource = autoSource
+        End With
+
+    End Sub
+
+    Private Function LoadComboPaket(ByVal NoRM As String) As DataTable
+
+        Dim tblResult As New DataTable
+        Dim query As New StringBuilder()
+
+        query.AppendLine("SELECT DISTINCT ")
+        query.AppendLine("    TPT.NamaPaket AS NamaPaket, ")
+        query.AppendLine("    TPT.KodeVoucher ")
+        query.AppendLine("FROM TransaksiPaketTindakan TPT ")
+        query.AppendLine("WHERE ")
+        query.AppendLine("    TPT.DeletedBy IS NULL ")
+
+        If NoRM <> "" Then
+            query.AppendLine("    AND TPT.NoRekamMedis = '" & NoRM & "' ")
+        End If
+
+        query.AppendLine("    AND ( ")
+
+        ' Paket Reguler
+        query.AppendLine("        (TPT.JenisPaket = 'Paket Reguler' AND ISNULL(TPT.Kuota, 0) > 0) ")
+
+        query.AppendLine("        OR ")
+
+        ' Paket Per-Tindakan
+        query.AppendLine("        ( ")
+        query.AppendLine("            TPT.JenisPaket = 'Paket Per-Tindakan' ")
+        query.AppendLine("            AND EXISTS ( ")
+        query.AppendLine("                SELECT 1 ")
+        query.AppendLine("                FROM TransaksiPaketTindakanDetail TPTD ")
+        query.AppendLine("                WHERE ")
+        query.AppendLine("                    TPTD.KodeVoucher = TPT.KodeVoucher ")
+        query.AppendLine("                    AND ISNULL(TPTD.KuotaTindakan, 0) > 0 ")
+        query.AppendLine("            ) ")
+        query.AppendLine("        ) ")
+
+        query.AppendLine("    ) ")
+
+        tblResult = ReadSQL(query.ToString())
+        Return tblResult
+
+    End Function
+
+    Private Sub CheckBoxPaketLain_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckBoxPaketLain.CheckedChanged
+
+        If CheckBoxPaketLain.Checked Then
+            TextBoxRMPasien.Enabled = True
+            TextBoxRMPasien.Clear()
+
+        Else
+            TextBoxRMPasien.Enabled = False
+            TextBoxRMPasien.Text = NoRM
+
+            ' reload paket pasien sendiri
+            Dim dt As DataTable = LoadComboPaket(NoRM)
+
+            With ComboBoxPaketTindakan
+                .DataSource = dt
+                .DisplayMember = "NamaPaket"
+                .ValueMember = "KodeVoucher"
+                .SelectedIndex = -1
+            End With
+        End If
+    End Sub
+
+    Private Function GetNoRMFromTextbox() As String
+
+        If TextBoxRMPasien.Text.Contains(" - ") Then
+            Dim parts = TextBoxRMPasien.Text.Split(New String() {" - "}, StringSplitOptions.None)
+            Return parts(1).Trim()
+        End If
+
+        Return TextBoxRMPasien.Text.Trim()
+
+    End Function
+
+    Private Sub TextBoxRMPasien_KeyDown(ByVal sender As Object, ByVal e As KeyEventArgs) Handles TextBoxRMPasien.KeyDown
+
+        If CheckBoxPaketLain.Checked = False Then Exit Sub
+
+        If e.KeyCode = Keys.Enter Then
+
+            Dim noRM As String = GetNoRMFromTextbox()
+
+            If noRM <> "" Then
+
+                Dim dt As DataTable = LoadComboPaket(noRM)
+
+                If dt.Rows.Count = 0 Then
+                    MsgBox("Pasien tidak memiliki paket aktif")
+                    ComboBoxPaketTindakan.DataSource = Nothing
+                    Exit Sub
+                End If
+
+                With ComboBoxPaketTindakan
+                    .DataSource = dt
+                    .DisplayMember = "NamaPaket"
+                    .ValueMember = "KodeVoucher"
+                    .SelectedIndex = -1
+                End With
+
+            Else
+                MsgBox("No RM tidak valid")
+            End If
+
+        End If
+
+    End Sub
+
     Private Sub DialogBoxPaketTindakan_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         TextBoxKodeVoucher.Focus()
         TextBoxKodeVoucher.ResetText()
+
+        LoadCachePasien()
+        SetupAutoCompletePasien()
+
+        TextBoxRMPasien.Enabled = False
+        CheckBoxPaketLain.Checked = False
+
+        If String.IsNullOrEmpty(NoRM) Then
+            MsgBox("No RM tidak ditemukan!")
+            Me.Close()
+            Exit Sub
+        End If
+
+        TextBoxRMPasien.Text = NoRM
+
+        Dim dt As DataTable = LoadComboPaket(NoRM)
+
+        With ComboBoxPaketTindakan
+            .DataSource = dt
+            .DisplayMember = "NamaPaket"
+            .ValueMember = "KodeVoucher"
+            .SelectedIndex = -1
+        End With
 
         SetDataGrid()
     End Sub
@@ -196,4 +370,27 @@ Public Class DialogBoxPaketTindakan
     Public Sub SetForm(ByVal NamaForm As String)
         formInput = NamaForm
     End Sub
+
+    'Private Sub TextBoxRMPasien_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TextBoxRMPasien.TextChanged
+    '    If CheckBoxPaketLain.Checked = False Then Exit Sub
+
+    '    ' 🔥 tahan kalau format belum lengkap
+    '    If TextBoxRMPasien.Text.Split("-").Length < 2 Then Exit Sub
+
+    '    Dim noRM As String = GetNoRMFromTextbox()
+
+    '    If noRM <> "" Then
+
+    '        Dim dt As DataTable = LoadComboPaket(noRM)
+
+    '        With ComboBoxPaketTindakan
+    '            .DataSource = dt
+    '            .DisplayMember = "NamaPaket"
+    '            .ValueMember = "KodeVoucher"
+    '            .SelectedIndex = -1
+    '        End With
+
+    '    End If
+
+    'End Sub
 End Class

@@ -1,3 +1,8 @@
+Verison : 2.0.0.57 (08 Maret 2026)
+# [New Feature] Penambahan laporan penggunaan paket Tindakan
+# [New Feature] Penambahan laporan tindakan
+# [Usability Improvement] Meyesuaikan pencarian potong paket agar tidak scan lagi
+
 Verison : 2.0.0.56 (26 Februari 2026)
 # [New Feature] Penambahan API Untuk integrasi dengan Alat InBody
 # [New Feature] Penambahan API Untuk integrasi dengan Informed Consent
@@ -7,7 +12,6 @@ Verison : 2.0.0.56 (26 Februari 2026)
 # [New Feature] Penambahan Download Excel pada Laporan Kunjungan
 # [Usability Improvement] Menambahkan Kategori Tindakan dan Alat pada Master Tindakan
 # [Usability Improvement] Menambahkan Fitur Tanpa Tanggal di Riwayat Penggunaan Paket
-# [Usability Improvement] Menambahkan Fitur Download Excel di Riwayat Penggunaan Paket
 # [Bug Fix] Memperbaiki Bug saat menampilkan Rekap Pendapatan Klinik
 
 Version : 2.0.0.55 (29 Desember 2025)

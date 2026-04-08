@@ -13272,9 +13272,44 @@ Public Class FormRekamMedisDokter
         End Try
     End Function
 
+    Private Function IsUserAllowed(ByVal userName As String) As Boolean
+
+        Dim query As New StringBuilder()
+
+        query.AppendLine("SELECT GroupID ")
+        query.AppendLine("FROM Users ")
+        query.AppendLine("WHERE UserID = '" & userInput & "' ")
+        query.AppendLine("AND UserLocked = 0 ")
+
+        Dim dt As DataTable = ReadSQL(query.ToString())
+
+        If dt.Rows.Count = 0 Then Return False
+
+        Dim groupUser As String = dt.Rows(0)("GroupID").ToString()
+
+        If groupUser.Contains("Dokter") OrElse userName = "Admin" Then
+            Return True
+        End If
+
+        Return False
+
+    End Function
+
     Private Sub ButtonScanQR_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonScanQR.Click
-        DialogBoxPaketTindakan.SetForm("Perencanaan Tindakan")
-        DialogBoxPaketTindakan.ShowDialog()
+
+        Dim currentUser As String = PoliKlinik.Lbluser.Text
+
+        If Not IsUserAllowed(currentUser) Then
+            MsgBox("Akses ditolak! Hanya user Dokter yang dapat memotong paket tindakan.", MsgBoxStyle.Critical, "Warning!")
+            Exit Sub
+        End If
+
+        Dim frm As New DialogBoxPaketTindakan
+        frm.SetForm("Perencanaan Tindakan")
+        frm.NoRM = idPasien
+
+        frm.ShowDialog()
+
     End Sub
 
     Private Sub ProsesVoucherTindakan(ByVal kode As String, ByVal jenis As String, ByVal nilai As Decimal, Optional ByVal isTindakan As Boolean = False, Optional ByVal kodeTindakanVoucher As String = "")
