@@ -273,6 +273,7 @@ Partial Class PoliKlinik
         Me.TimerShutdown = New System.Windows.Forms.Timer(Me.components)
         Me.TimerKirimReminderWA = New System.Windows.Forms.Timer(Me.components)
         Me.TimerBirthday = New System.Windows.Forms.Timer(Me.components)
+        Me.TripleDSToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip.SuspendLayout()
         Me.StatusStrip.SuspendLayout()
         Me.SuspendLayout()
@@ -1459,7 +1460,7 @@ Partial Class PoliKlinik
         '
         'PrototypeToolStripMenuItem
         '
-        Me.PrototypeToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FormMasterPasienToolStripMenuItem, Me.FormPendaftaranToolStripMenuItem, Me.FormPembayaranToolStripMenuItem, Me.FormRekamMedisDokterToolStripMenuItem, Me.CariTransaksiToolStripMenuItem, Me.PencarianObatToolStripMenuItem})
+        Me.PrototypeToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.FormMasterPasienToolStripMenuItem, Me.FormPendaftaranToolStripMenuItem, Me.FormPembayaranToolStripMenuItem, Me.FormRekamMedisDokterToolStripMenuItem, Me.CariTransaksiToolStripMenuItem, Me.PencarianObatToolStripMenuItem, Me.TripleDSToolStripMenuItem})
         Me.PrototypeToolStripMenuItem.Name = "PrototypeToolStripMenuItem"
         Me.PrototypeToolStripMenuItem.Size = New System.Drawing.Size(238, 22)
         Me.PrototypeToolStripMenuItem.Text = "Prototype"
@@ -2000,6 +2001,12 @@ Partial Class PoliKlinik
         '
         Me.TimerBirthday.Interval = 300000
         '
+        'TripleDSToolStripMenuItem
+        '
+        Me.TripleDSToolStripMenuItem.Name = "TripleDSToolStripMenuItem"
+        Me.TripleDSToolStripMenuItem.Size = New System.Drawing.Size(232, 22)
+        Me.TripleDSToolStripMenuItem.Text = "TripleDS"
+        '
         'PoliKlinik
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -2274,4 +2281,5 @@ Partial Class PoliKlinik
     Friend WithEvents TimerBirthday As System.Windows.Forms.Timer
     Friend WithEvents SettingWhatsAppToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents PersetujuanPenerimaanBarangToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents TripleDSToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 End Class

@@ -3261,3 +3261,4 @@ C:\Users\admin\Documents\GitHub\Poliklinik_16Juni\obj\Debug\PoliKlinik_Net2.Togg
 C:\Users\admin\Documents\GitHub\Poliklinik_16Juni\obj\Debug\PoliKlinik_Net2.FormICPaket.resources
 C:\Users\admin\Documents\GitHub\Poliklinik_16Juni\obj\Debug\PoliKlinik_Net2.FormPenerimaanBarang.resources
 C:\Users\admin\Documents\GitHub\Poliklinik_16Juni\obj\Debug\PoliKlinik_Net2.FormPreOrderCartridge.resources
+C:\Users\admin\Documents\GitHub\Poliklinik_16Juni\obj\Debug\PoliKlinik_Net2.TripleDES.resources

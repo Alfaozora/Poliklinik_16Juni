@@ -1580,4 +1580,9 @@ Public Class PoliKlinik
         FormPenerimaanBarang.Show()
         FormPenerimaanBarang.Focus()
     End Sub
+
+    Private Sub TripleDSToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TripleDSToolStripMenuItem.Click
+        TripleDES.Show()
+        TripleDES.Focus()
+    End Sub
 End Class

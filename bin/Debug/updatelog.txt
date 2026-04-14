@@ -2,6 +2,11 @@ Verison : 2.0.0.57 (08 Maret 2026)
 # [New Feature] Penambahan laporan penggunaan paket Tindakan
 # [New Feature] Penambahan laporan tindakan
 # [Usability Improvement] Meyesuaikan pencarian potong paket agar tidak scan lagi
+# [Bug Fix] Fix Bug Laporan Closed/Unclosed Klinik tidak bisa ditarik.
+----------------------------------------------------------------------------------
+# [New Feature] Penambahan Pasien MCU ke Database InBody
+# [Usability Imporvement] Isi otomatis Weight dan Height saat klik nilai normal pemeriksaan fisik online
+# [New Feature] Cetak hasil Inbody di Form Lab
 
 Verison : 2.0.0.56 (26 Februari 2026)
 # [New Feature] Penambahan API Untuk integrasi dengan Alat InBody

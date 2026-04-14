@@ -186,43 +186,37 @@ Public Class DialogBoxPaketTindakan
         Dim tblResult As New DataTable
         Dim query As New StringBuilder()
 
-        query.AppendLine("SELECT DISTINCT ")
-        query.AppendLine("    TPT.NamaPaket AS NamaPaket, ")
+        query.AppendLine("SELECT ")
+        query.AppendLine("    TPT.PaketID, ")
+        query.AppendLine("    TPT.NamaPaket + ' (' + TPT.KodeVoucher + ')' AS NamaPaket, ")
         query.AppendLine("    TPT.KodeVoucher ")
         query.AppendLine("FROM TransaksiPaketTindakan TPT ")
-        query.AppendLine("WHERE ")
-        query.AppendLine("    TPT.DeletedBy IS NULL ")
+        query.AppendLine("WHERE TPT.DeletedBy IS NULL ")
 
-        ' 🔥 filter masa aktif paket
-        query.AppendLine("    AND ( ")
-        query.AppendLine("        GETDATE() >= ISNULL(TPT.TanggalMulaiPaket, GETDATE()) ")
-        query.AppendLine("        AND GETDATE() <= ISNULL(TPT.TanggalAkhirPaket, GETDATE()) ")
-        query.AppendLine("    ) ")
+        query.AppendLine("AND ( ")
+        query.AppendLine("    GETDATE() >= ISNULL(TPT.TanggalMulaiPaket, GETDATE()) ")
+        query.AppendLine("    AND GETDATE() <= ISNULL(TPT.TanggalAkhirPaket, GETDATE()) ")
+        query.AppendLine(") ")
 
         If NoRM <> "" Then
-            query.AppendLine("    AND TPT.NoRekamMedis = '" & NoRM & "' ")
+            query.AppendLine("AND TPT.NoRekamMedis = '" & NoRM & "' ")
         End If
 
-        query.AppendLine("    AND ( ")
-
-        ' Paket Reguler
-        query.AppendLine("        (TPT.JenisPaket = 'Paket Reguler' AND ISNULL(TPT.Kuota, 0) > 0) ")
-
-        query.AppendLine("        OR ")
-
-        ' Paket Per-Tindakan
-        query.AppendLine("        ( ")
-        query.AppendLine("            TPT.JenisPaket = 'Paket Per-Tindakan' ")
-        query.AppendLine("            AND EXISTS ( ")
-        query.AppendLine("                SELECT 1 ")
-        query.AppendLine("                FROM TransaksiPaketTindakanDetail TPTD ")
-        query.AppendLine("                WHERE ")
-        query.AppendLine("                    TPTD.KodeVoucher = TPT.KodeVoucher ")
-        query.AppendLine("                    AND ISNULL(TPTD.KuotaTindakan, 0) > 0 ")
-        query.AppendLine("            ) ")
+        query.AppendLine("AND ( ")
+        query.AppendLine("    (TPT.JenisPaket = 'Paket Reguler' AND ISNULL(TPT.Kuota, 0) > 0) ")
+        query.AppendLine("    OR ")
+        query.AppendLine("    ( ")
+        query.AppendLine("        TPT.JenisPaket = 'Paket Per-Tindakan' ")
+        query.AppendLine("        AND EXISTS ( ")
+        query.AppendLine("            SELECT 1 ")
+        query.AppendLine("            FROM TransaksiPaketTindakanDetail TPTD ")
+        query.AppendLine("            WHERE TPTD.KodeVoucher = TPT.KodeVoucher ")
+        query.AppendLine("            AND ISNULL(TPTD.KuotaTindakan, 0) > 0 ")
         query.AppendLine("        ) ")
-
         query.AppendLine("    ) ")
+        query.AppendLine(") ")
+
+        query.AppendLine("ORDER BY TPT.TanggalMulaiPaket DESC, TPT.KodeVoucher DESC ")
 
         tblResult = ReadSQL(query.ToString())
         Return tblResult

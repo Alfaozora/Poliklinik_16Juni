@@ -495,6 +495,7 @@ Public Class FormPembatalanTransaksi
                         ' Tambah Kuota Paket Tindakan
                         WriteSQL("UPDATE TransaksiPaketTindakan SET Kuota = Kuota + 1 WHERE KodeVoucher IN (SELECT KodeVoucher FROM LogPenggunaanPaket WHERE NoTransaksi IN ('" & rowTransaksi("No Transaksi") & "'))", 4)
                         WriteSQL("UPDATE LogPenggunaanPaket SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() WHERE NoTransaksi = '" & rowTransaksi("No Transaksi") & "' AND DeletedDate IS NULL", 4)
+                        WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBY = '" & userInput & "', DeletedDate = GETDATE() WHERE TransPoliID = '" & rowTransaksi("ID").ToString() & "'", 4)
                     End If
 
                     ' Insert Data TransaksiCancel
