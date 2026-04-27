@@ -30,6 +30,7 @@ Partial Class FormCetakBarcode
         Me.txtindakanid = New System.Windows.Forms.TextBox
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
+        Me.CheckBoxInbody = New System.Windows.Forms.CheckBox
         Me.rdNonMCU = New System.Windows.Forms.RadioButton
         Me.rdMCU = New System.Windows.Forms.RadioButton
         Me.cbtabung = New System.Windows.Forms.CheckBox
@@ -54,7 +55,6 @@ Partial Class FormCetakBarcode
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage1 = New System.Windows.Forms.TabPage
         Me.TabPage2 = New System.Windows.Forms.TabPage
-        Me.CheckBoxInbody = New System.Windows.Forms.CheckBox
         Me.Label8 = New System.Windows.Forms.Label
         Me.cmbkodetransaksi = New System.Windows.Forms.ComboBox
         Me.txNoUrut2 = New System.Windows.Forms.TextBox
@@ -142,6 +142,17 @@ Partial Class FormCetakBarcode
         Me.GroupBox1.Size = New System.Drawing.Size(784, 73)
         Me.GroupBox1.TabIndex = 150
         Me.GroupBox1.TabStop = False
+        '
+        'CheckBoxInbody
+        '
+        Me.CheckBoxInbody.AutoSize = True
+        Me.CheckBoxInbody.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.CheckBoxInbody.Location = New System.Drawing.Point(250, 41)
+        Me.CheckBoxInbody.Name = "CheckBoxInbody"
+        Me.CheckBoxInbody.Size = New System.Drawing.Size(63, 19)
+        Me.CheckBoxInbody.TabIndex = 248
+        Me.CheckBoxInbody.Text = "InBody"
+        Me.CheckBoxInbody.UseVisualStyleBackColor = True
         '
         'rdNonMCU
         '
@@ -424,17 +435,6 @@ Partial Class FormCetakBarcode
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "MCU (Multiple Barcode)"
         Me.TabPage2.UseVisualStyleBackColor = True
-        '
-        'CheckBoxInbody
-        '
-        Me.CheckBoxInbody.AutoSize = True
-        Me.CheckBoxInbody.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.CheckBoxInbody.Location = New System.Drawing.Point(250, 41)
-        Me.CheckBoxInbody.Name = "CheckBoxInbody"
-        Me.CheckBoxInbody.Size = New System.Drawing.Size(63, 19)
-        Me.CheckBoxInbody.TabIndex = 248
-        Me.CheckBoxInbody.Text = "InBody"
-        Me.CheckBoxInbody.UseVisualStyleBackColor = True
         '
         'Label8
         '

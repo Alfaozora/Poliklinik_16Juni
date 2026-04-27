@@ -3393,6 +3393,16 @@ Module Test
     '    End Try
     'End Function
 
+    Private Function GenerateSignature(ByVal data As String, ByVal apiKey As String) As String
+        Dim raw As String = data & apiKey
+        Dim bytes As Byte() = Encoding.UTF8.GetBytes(raw)
+
+        Using sha As SHA256 = SHA256.Create()
+            Dim hash As Byte() = sha.ComputeHash(bytes)
+            Return BitConverter.ToString(hash).Replace("-", "").ToLower()
+        End Using
+    End Function
+
     Public Function InsertDataAPIRM(ByVal json As String, ByVal url As String) As String
         Try
             ServicePointManager.Expect100Continue = True
@@ -3401,8 +3411,90 @@ Module Test
             Dim client As New Net.WebClient()
             client.Encoding = Encoding.UTF8
 
+            Dim API_KEY As String = "M1tR4M3D1c@rECaH4Y42025"
+            Dim encrypted As String = Newtonsoft.Json.Linq.JObject.Parse(json)("payload").ToString()
+
+            Dim signature As String = GenerateSignature(encrypted, API_KEY)
+
             client.Headers.Clear()
             client.Headers.Add("Content-Type", "application/json")
+            client.Headers.Add("Accept", "application/json")
+            client.Headers.Add("X-API-KEY", API_KEY)
+            client.Headers.Add("X-SIGNATURE", signature)
+            client.Headers.Add("User-Agent", "PostmanRuntime/7.36.0")
+
+            Dim response As String = client.UploadString(url, "POST", json)
+
+            Return response
+
+        Catch ex As WebException
+            If ex.Response IsNot Nothing Then
+                Using sr As New StreamReader(ex.Response.GetResponseStream())
+                    Return sr.ReadToEnd()
+                End Using
+            End If
+
+            Return "{""metaData"":{""code"":500},""message"":""" & ex.Message & """}"
+        End Try
+    End Function
+
+    Public Function InsertDataAPIRMInformConsent(ByVal json As String, ByVal url As String) As String
+        Try
+            ServicePointManager.Expect100Continue = True
+            ServicePointManager.SecurityProtocol = CType(3072, SecurityProtocolType)
+
+            Dim client As New Net.WebClient()
+            client.Encoding = Encoding.UTF8
+
+            Dim API_KEY As String = "M1tR4M3D1c@rECaH4Y42025"
+            Dim obj As JObject = Nothing
+
+            Try
+                obj = JObject.Parse(json)
+            Catch ex As Exception
+                Throw New Exception("JSON tidak valid: " & ex.Message)
+            End Try
+
+            If obj Is Nothing OrElse obj("payload") Is Nothing Then
+                Throw New Exception("Payload kosong / format salah")
+            End If
+
+            Dim encrypted As String = obj("payload").ToString()
+
+            Dim signature As String = GenerateSignature(encrypted, API_KEY)
+
+            client.Headers.Clear()
+            client.Headers.Add("Content-Type", "application/json")
+            client.Headers.Add("Accept", "application/json")
+            client.Headers.Add("X-API-KEY", API_KEY)
+            client.Headers.Add("X-SIGNATURE", signature)
+            client.Headers.Add("User-Agent", "PostmanRuntime/7.36.0")
+
+            Dim response As String = client.UploadString(url, "POST", json)
+
+            Return response
+
+        Catch ex As WebException
+            If ex.Response IsNot Nothing Then
+                Using sr As New StreamReader(ex.Response.GetResponseStream())
+                    Return sr.ReadToEnd()
+                End Using
+            End If
+
+            Return "{""metaData"":{""code"":500},""message"":""" & ex.Message & """}"
+        End Try
+    End Function
+
+    Public Function InsertDataAPIRMUrlEncode(ByVal json As String, ByVal url As String) As String
+        Try
+            ServicePointManager.Expect100Continue = True
+            ServicePointManager.SecurityProtocol = CType(3072, SecurityProtocolType)
+
+            Dim client As New Net.WebClient()
+            client.Encoding = Encoding.UTF8
+
+            client.Headers.Clear()
+            client.Headers.Add("Content-Type", "application/x-www-form-urlencoded")
             client.Headers.Add("Accept", "application/json")
             client.Headers.Add("X-API-KEY", "M1tR4M3D1c@rECaH4Y42025")
 
@@ -3422,7 +3514,6 @@ Module Test
             Return "{""metaData"":{""code"":500},""message"":""" & ex.Message & """}"
         End Try
     End Function
-
 
     Public Function GetDataAPIRM(ByVal uri As String) As String
         Try

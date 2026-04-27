@@ -73,6 +73,23 @@ Public Class FormPembayaran
     Private _jenisVoucher As String = ""
     Private _nilaiVoucher As Decimal = 0
 
+    Function EncryptAES(ByVal plainText As String, ByVal key As String) As String
+        Dim aes As New RijndaelManaged()
+        aes.Key = Encoding.UTF8.GetBytes(key.PadRight(32)) ' 256-bit
+        aes.IV = Encoding.UTF8.GetBytes(key.Substring(0, 16))
+
+        Dim encryptor = aes.CreateEncryptor(aes.Key, aes.IV)
+
+        Using ms As New MemoryStream()
+            Using cs As New CryptoStream(ms, encryptor, CryptoStreamMode.Write)
+                Using sw As New StreamWriter(cs)
+                    sw.Write(plainText)
+                End Using
+            End Using
+            Return Convert.ToBase64String(ms.ToArray())
+        End Using
+    End Function
+
     Public Property DataDictionary() As Dictionary(Of String, Object)
         Get
             Return _dataDictionary
@@ -998,13 +1015,23 @@ Public Class FormPembayaran
             payload.Add("tanggal_transaksi", Now.ToString("yyyy-MM-dd HH:mm:ss"))
             payload.Add("nama_kasir", userInput)
 
-
             Dim jsonParam As String = JsonConvert.SerializeObject(payload)
 
-            Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName='ws_RM'")
-            Dim urlApi As String = baseURL & "api/invoice/store"
+            Dim secretKey As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_payloadEnkrip'")
 
-            Dim response As String = InsertDataAPIRM(jsonParam, urlApi)
+            Dim encrypted As String = EncryptAES(jsonParam, secretKey)
+
+            If String.IsNullOrEmpty(encrypted) Then
+                MsgBox("Encrypt gagal!")
+                Exit Sub
+            End If
+
+            Dim postData As String = "{""payload"":""" & encrypted & """}"
+
+            Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName='ws_RM'")
+            Dim urlApi As String = baseURL & "api/invoice/store/dev"
+
+            Dim response As String = InsertDataAPIRM(postData, urlApi)
 
             If response Is Nothing OrElse response.Trim = "" Then
                 Throw New Exception("Response kosong dari server")
@@ -1444,10 +1471,21 @@ Public Class FormPembayaran
 
                     Dim jsonParam As String = JsonConvert.SerializeObject(payload)
 
-                    Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
-                    Dim urlWebService As String = baseURL & "api/lumiera-luzelle/treatment-package"
+                    Dim secretKey As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_payloadEnkrip'")
 
-                    Dim responseApi As String = InsertDataAPIRM(jsonParam, urlWebService)
+                    Dim encrypted As String = EncryptAES(jsonParam, secretKey)
+
+                    If String.IsNullOrEmpty(encrypted) Then
+                        MsgBox("Encrypt gagal!")
+                        Exit Sub
+                    End If
+
+                    Dim postData As String = "{""payload"":""" & encrypted & """}"
+
+                    Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+                    Dim urlWebService As String = baseURL & "api/lumiera-luzelle/treatment-package/dev"
+
+                    Dim responseApi As String = InsertDataAPIRMInformConsent(postData, urlWebService)
 
                     If responseApi.ToLower().Contains("""success"":true") Then
                         MsgBox("Paket berhasil terkirim ke API: " & _nomorUrutTransaksi)

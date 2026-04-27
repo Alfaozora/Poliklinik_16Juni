@@ -307,9 +307,78 @@ Public Class ReportPendapatanKlinik
         Return Thasil
     End Function
 
+    Private Function GetDataLaporanPendapatanVoucher() As DataTable
+        ' Ambil tanggal dari DateTimePicker
+        Dim tglAwal As String = Format(TglAwalTransaksiLaporanPendapatan.Value, "yyyy-MM-dd")
+        Dim tglAkhir As String = Format(TglAkhirTransaksiLaporanPendapatan.Value, "yyyy-MM-dd")
+
+        ' Filter Poli
+        Dim filterPoli As String = ""
+        If ComboBoxPoliTujuanLaporanPendapatan.Text <> "SEMUA TRANSAKSI" Then
+            filterPoli = " AND TD.JenisPoli = '" & ComboBoxPoliTujuanLaporanPendapatan.Text & "'"
+        End If
+
+        ' Query utama
+        Dim query As String = "SELECT " & _
+                "TD.NoUrut AS [Nomor Transaksi], " & _
+                "TD.JenisPoli AS [Poli], " & _
+                "TP.TglPoli AS [Tanggal], " & _
+                "MP.Nama, " & _
+                "TPD.NamaTindakan AS [Pemeriksaan], " & _
+                "MV.NamaVoucher, " & _
+                "MV.Nilai AS [Nominal], " & _
+                "TPD.KodeVoucher, " & _
+                "TPD.NettBayar AS [Sisa Bayar] " & _
+            "FROM TransaksiDetail TD " & _
+                "INNER JOIN MasterPasien MP ON TD.IDInternet = MP.NoRekamMedis " & _
+                "INNER JOIN TransaksiPoli TP ON TD.NoTransaksi = TP.TransPoliID " & _
+                "INNER JOIN TransaksiPoliDetail TPD ON TP.TransPoliID = TPD.TransPoliID " & _
+                "INNER JOIN MasterVoucher MV ON TPD.KodeVoucher = MV.KodeVoucher " & _
+            "WHERE Convert(Of Date, TP.TglPoli)(BETWEEN) '" & tglAwal & "' AND '" & tglAkhir & "' " & _
+        "AND TPD.KodeVoucher IS NOT NULL " & _
+        "AND TPD.DeletedBy IS NULL  '" & filterPoli & "' " & _
+        "ORDER BY TP.TglPoli"
+
+        Return ReadSQL(query)
+    End Function
+
+    Private Sub ViewDataLaporanPendapatanVoucher()
+        Try
+            Dim dt As DataTable = GetDataLaporanPendapatanVoucher()
+
+            If dt.Rows.Count > 0 Then
+                GridControlLaporanPendapatan.DataSource = dt
+
+                ' Disable control (samakan dengan versi normal)
+                TglAwalTransaksiLaporanPendapatan.Enabled = False
+                TglAkhirTransaksiLaporanPendapatan.Enabled = False
+                ComboBoxPoliTujuanLaporanPendapatan.Enabled = False
+                ButtonFindPerusahaanLaporanPendapatan.Enabled = False
+                ButtonViewDataPendapatan.Enabled = False
+                CheckBoxTagihan.Enabled = False
+                CheckBoxTunai.Enabled = False
+                CheckBoxCard.Enabled = False
+                CheckBoxDebet.Enabled = False
+                CheckBoxTransaksiNolRupiah.Enabled = False
+                CheckBoxVoucher.Enabled = False
+
+            Else
+                MessageBox.Show("Tidak Ada Data Voucher.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            End If
+
+        Catch ex As Exception
+            MessageBox.Show("Error Voucher: " & ex.Message)
+        End Try
+    End Sub
+
     Private Sub ButtonViewDataPendapatan_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonViewDataPendapatan.Click
         Try
-            ViewDataLaporanPendapatan()
+            If CheckBoxVoucher.Checked Then
+                ViewDataLaporanPendapatanVoucher()
+            Else
+                ViewDataLaporanPendapatan()
+            End If
+
         Catch ex As Exception
             MessageBox.Show("Terjadi kesalahan: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
@@ -1808,5 +1877,30 @@ Public Class ReportPendapatanKlinik
 
     Private Sub ButtonKirimUlangJurnal_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonKirimUlangJurnal.Click
         SendingJurnal(TextBoxNoTagihan.Text)
+    End Sub
+
+    Private Sub CheckBoxVoucher_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckBoxVoucher.CheckedChanged
+        If CheckBoxVoucher.Checked = True Then
+            CheckBoxTagihan.Checked = False
+            CheckBoxTunai.Checked = False
+            CheckBoxDebet.Checked = False
+            CheckBoxCard.Checked = False
+        End If
+    End Sub
+
+    Private Sub CheckBoxTagihan_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckBoxTagihan.CheckedChanged
+        If CheckBoxTagihan.Checked Then CheckBoxVoucher.Checked = False
+    End Sub
+
+    Private Sub CheckBoxTunai_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckBoxTunai.CheckedChanged
+        If CheckBoxTunai.Checked Then CheckBoxVoucher.Checked = False
+    End Sub
+
+    Private Sub CheckBoxDebet_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckBoxDebet.CheckedChanged
+        If CheckBoxDebet.Checked Then CheckBoxVoucher.Checked = False
+    End Sub
+
+    Private Sub CheckBoxCard_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CheckBoxCard.CheckedChanged
+        If CheckBoxCard.Checked Then CheckBoxVoucher.Checked = False
     End Sub
 End Class

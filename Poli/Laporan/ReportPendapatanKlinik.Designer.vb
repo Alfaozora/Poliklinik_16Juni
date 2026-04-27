@@ -40,6 +40,7 @@ Partial Class ReportPendapatanKlinik
         Me.ButtonCetakLaporanPendapatan = New System.Windows.Forms.Button
         Me.ButtonClearDataLaporanPendapatan = New System.Windows.Forms.Button
         Me.SplitContainerLaporanPendapatanHeader = New System.Windows.Forms.SplitContainer
+        Me.CheckBoxVoucher = New System.Windows.Forms.CheckBox
         Me.CheckBoxTransaksiNolRupiah = New System.Windows.Forms.CheckBox
         Me.CheckBoxCard = New System.Windows.Forms.CheckBox
         Me.CheckBoxDebet = New System.Windows.Forms.CheckBox
@@ -404,6 +405,7 @@ Partial Class ReportPendapatanKlinik
         'SplitContainerLaporanPendapatanHeader.Panel1
         '
         Me.SplitContainerLaporanPendapatanHeader.Panel1.BackColor = System.Drawing.Color.White
+        Me.SplitContainerLaporanPendapatanHeader.Panel1.Controls.Add(Me.CheckBoxVoucher)
         Me.SplitContainerLaporanPendapatanHeader.Panel1.Controls.Add(Me.CheckBoxTransaksiNolRupiah)
         Me.SplitContainerLaporanPendapatanHeader.Panel1.Controls.Add(Me.CheckBoxCard)
         Me.SplitContainerLaporanPendapatanHeader.Panel1.Controls.Add(Me.CheckBoxDebet)
@@ -431,6 +433,18 @@ Partial Class ReportPendapatanKlinik
         Me.SplitContainerLaporanPendapatanHeader.SplitterDistance = 250
         Me.SplitContainerLaporanPendapatanHeader.SplitterWidth = 1
         Me.SplitContainerLaporanPendapatanHeader.TabIndex = 462
+        '
+        'CheckBoxVoucher
+        '
+        Me.CheckBoxVoucher.AutoSize = True
+        Me.CheckBoxVoucher.Font = New System.Drawing.Font("Segoe UI", 9.75!)
+        Me.CheckBoxVoucher.Location = New System.Drawing.Point(430, 79)
+        Me.CheckBoxVoucher.Name = "CheckBoxVoucher"
+        Me.CheckBoxVoucher.Size = New System.Drawing.Size(74, 21)
+        Me.CheckBoxVoucher.TabIndex = 572
+        Me.CheckBoxVoucher.Tag = ""
+        Me.CheckBoxVoucher.Text = "Voucher"
+        Me.CheckBoxVoucher.UseVisualStyleBackColor = True
         '
         'CheckBoxTransaksiNolRupiah
         '
@@ -1692,4 +1706,5 @@ Partial Class ReportPendapatanKlinik
     Friend WithEvents ButtonKirimUlangJurnal As System.Windows.Forms.Button
     Friend WithEvents TextBoxNoTagihan As System.Windows.Forms.TextBox
     Friend WithEvents CheckBoxTransaksiNolRupiah As System.Windows.Forms.CheckBox
+    Friend WithEvents CheckBoxVoucher As System.Windows.Forms.CheckBox
 End Class
