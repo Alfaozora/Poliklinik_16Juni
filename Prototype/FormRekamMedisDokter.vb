@@ -2202,11 +2202,23 @@ Public Class FormRekamMedisDokter
                     """id_tindakan"":""" & TextBoxTindakanID.Text & """" & _
                     "}"
 
+                Dim jsonConsent As String = jsonParam
+
+                Dim secretKey As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_payloadEnkrip'")
+
+                Dim encryptedPerTindakan As String = EncryptAES(jsonConsent, secretKey)
+
+                If String.IsNullOrEmpty(encryptedPerTindakan) Then
+                    MsgBox("Encrypt gagal!")
+                    Exit Sub
+                End If
+
+                Dim postData As String = "{""payload"": """ & encryptedPerTindakan & """} "
+
                 Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
 
-                Dim urlWebService As String = baseURL & "api/lumiera-luzelle/persetujuan-treatment"
-
-                Dim responseApi As String = InsertDataAPIRM(jsonParam, urlWebService)
+                Dim urlWebService As String = baseURL & "api/lumiera-luzelle/persetujuan-treatment/dev"
+                Dim responseApi As String = InsertDataAPIRM(postData, urlWebService)
 
                 Dim dtReminder As DataTable = ReadSQL("SELECT Reminder, Hari FROM MasterTindakan WHERE TindakanID = '" & TextBoxTindakanID.Text & "'")
 
@@ -9836,9 +9848,9 @@ Public Class FormRekamMedisDokter
 
         Dim secretKeyPerTindakan As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_payloadEnkrip'")
 
-        Dim encryptedPerTindakan As String = EncryptAES(jsonConsent, secretKey)
+        Dim encryptedPerTindakan As String = EncryptAES(jsonConsent, secretKeyPerTindakan)
 
-        If String.IsNullOrEmpty(encrypted) Then
+        If String.IsNullOrEmpty(encryptedPerTindakan) Then
             MsgBox("Encrypt gagal!")
             Exit Sub
         End If
@@ -9914,12 +9926,9 @@ Public Class FormRekamMedisDokter
                 End If
 
                 Dim postData As String = "{""payload"":""" & encryptedTindakan & """} "
-
-
                 Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
 
                 Dim urlWebService As String = baseURL & "api/lumiera-luzelle/persetujuan-treatment/delete/dev"
-
                 Dim responseApi As String = InsertDataAPIRM(postData, urlWebService)
 
                 If responseApi.ToLower().Contains("""success"":true") Then

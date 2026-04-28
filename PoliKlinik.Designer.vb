@@ -145,6 +145,7 @@ Partial Class PoliKlinik
         Me.PembatalanTransaksiToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.RepairTransaksiTindakanDetailToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.AutoSendingWhatsappEmailToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.WaBlastToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MiscToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MasterPaketToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.DesignReportToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -197,6 +198,7 @@ Partial Class PoliKlinik
         Me.FormRekamMedisDokterToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.CariTransaksiToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.PencarianObatToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.TripleDSToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.Prototype2ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.KasirPoliToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.PopupTindakanToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -273,7 +275,6 @@ Partial Class PoliKlinik
         Me.TimerShutdown = New System.Windows.Forms.Timer(Me.components)
         Me.TimerKirimReminderWA = New System.Windows.Forms.Timer(Me.components)
         Me.TimerBirthday = New System.Windows.Forms.Timer(Me.components)
-        Me.TripleDSToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip.SuspendLayout()
         Me.StatusStrip.SuspendLayout()
         Me.SuspendLayout()
@@ -1123,7 +1124,7 @@ Partial Class PoliKlinik
         '
         'ToolToolStripMenuItem
         '
-        Me.ToolToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ChangePasswordToolStripMenuItem1, Me.CetakKartuToolStripMenuItem1, Me.PembatalanTransaksiToolStripMenuItem, Me.RepairTransaksiTindakanDetailToolStripMenuItem, Me.AutoSendingWhatsappEmailToolStripMenuItem})
+        Me.ToolToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ChangePasswordToolStripMenuItem1, Me.CetakKartuToolStripMenuItem1, Me.PembatalanTransaksiToolStripMenuItem, Me.RepairTransaksiTindakanDetailToolStripMenuItem, Me.AutoSendingWhatsappEmailToolStripMenuItem, Me.WaBlastToolStripMenuItem})
         Me.ToolToolStripMenuItem.Font = New System.Drawing.Font("Arial", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ToolToolStripMenuItem.Name = "ToolToolStripMenuItem"
         Me.ToolToolStripMenuItem.Size = New System.Drawing.Size(43, 20)
@@ -1162,6 +1163,13 @@ Partial Class PoliKlinik
         Me.AutoSendingWhatsappEmailToolStripMenuItem.Name = "AutoSendingWhatsappEmailToolStripMenuItem"
         Me.AutoSendingWhatsappEmailToolStripMenuItem.Size = New System.Drawing.Size(262, 22)
         Me.AutoSendingWhatsappEmailToolStripMenuItem.Text = "Auto Sending Whatsapp/Email"
+        '
+        'WaBlastToolStripMenuItem
+        '
+        Me.WaBlastToolStripMenuItem.Name = "WaBlastToolStripMenuItem"
+        Me.WaBlastToolStripMenuItem.Size = New System.Drawing.Size(262, 22)
+        Me.WaBlastToolStripMenuItem.Tag = "0706"
+        Me.WaBlastToolStripMenuItem.Text = "Wa Blast"
         '
         'MiscToolStripMenuItem
         '
@@ -1500,6 +1508,12 @@ Partial Class PoliKlinik
         Me.PencarianObatToolStripMenuItem.Name = "PencarianObatToolStripMenuItem"
         Me.PencarianObatToolStripMenuItem.Size = New System.Drawing.Size(232, 22)
         Me.PencarianObatToolStripMenuItem.Text = "Pencarian Obat"
+        '
+        'TripleDSToolStripMenuItem
+        '
+        Me.TripleDSToolStripMenuItem.Name = "TripleDSToolStripMenuItem"
+        Me.TripleDSToolStripMenuItem.Size = New System.Drawing.Size(232, 22)
+        Me.TripleDSToolStripMenuItem.Text = "TripleDS"
         '
         'Prototype2ToolStripMenuItem
         '
@@ -2001,12 +2015,6 @@ Partial Class PoliKlinik
         '
         Me.TimerBirthday.Interval = 300000
         '
-        'TripleDSToolStripMenuItem
-        '
-        Me.TripleDSToolStripMenuItem.Name = "TripleDSToolStripMenuItem"
-        Me.TripleDSToolStripMenuItem.Size = New System.Drawing.Size(232, 22)
-        Me.TripleDSToolStripMenuItem.Text = "TripleDS"
-        '
         'PoliKlinik
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -2282,4 +2290,5 @@ Partial Class PoliKlinik
     Friend WithEvents SettingWhatsAppToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents PersetujuanPenerimaanBarangToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents TripleDSToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents WaBlastToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 End Class

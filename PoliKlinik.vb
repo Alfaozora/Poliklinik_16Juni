@@ -1585,4 +1585,9 @@ Public Class PoliKlinik
         TripleDES.Show()
         TripleDES.Focus()
     End Sub
+
+    Private Sub WaBlastToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles WaBlastToolStripMenuItem.Click
+        FormWABlast.Show()
+        FormWABlast.Focus()
+    End Sub
 End Class

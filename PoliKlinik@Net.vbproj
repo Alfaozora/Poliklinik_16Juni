@@ -855,6 +855,12 @@
     <Compile Include="Prototype\FormRiwayatKunjungan.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Prototype\FormWABlast.Designer.vb">
+      <DependentUpon>FormWABlast.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormWABlast.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Prototype\KYC.Designer.vb">
       <DependentUpon>KYC.vb</DependentUpon>
     </Compile>
@@ -1701,6 +1707,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormRiwayatKunjungan.resx">
       <DependentUpon>FormRiwayatKunjungan.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormWABlast.resx">
+      <DependentUpon>FormWABlast.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\KYC.resx">
       <DependentUpon>KYC.vb</DependentUpon>
