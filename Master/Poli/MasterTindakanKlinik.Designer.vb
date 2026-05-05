@@ -688,11 +688,12 @@ Partial Class MasterTindakanKlinik
         Me.Label41.Name = "Label41"
         Me.Label41.Size = New System.Drawing.Size(78, 17)
         Me.Label41.TabIndex = 582
-        Me.Label41.Text = "Kali / Shoot"
+        Me.Label41.Text = "Shoot / Kali"
         '
         'NumericShootPerTindakan
         '
         Me.NumericShootPerTindakan.Location = New System.Drawing.Point(12, 152)
+        Me.NumericShootPerTindakan.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
         Me.NumericShootPerTindakan.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.NumericShootPerTindakan.Name = "NumericShootPerTindakan"
         Me.NumericShootPerTindakan.Size = New System.Drawing.Size(58, 23)
@@ -2565,7 +2566,7 @@ Partial Class MasterTindakanKlinik
         'NumericKuotaMinimumCartridge
         '
         Me.NumericKuotaMinimumCartridge.Location = New System.Drawing.Point(194, 178)
-        Me.NumericKuotaMinimumCartridge.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
+        Me.NumericKuotaMinimumCartridge.Maximum = New Decimal(New Integer() {1000000, 0, 0, 0})
         Me.NumericKuotaMinimumCartridge.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.NumericKuotaMinimumCartridge.Name = "NumericKuotaMinimumCartridge"
         Me.NumericKuotaMinimumCartridge.Size = New System.Drawing.Size(77, 23)
@@ -2637,7 +2638,7 @@ Partial Class MasterTindakanKlinik
         'NumericKuotaAwalCartridge
         '
         Me.NumericKuotaAwalCartridge.Location = New System.Drawing.Point(194, 144)
-        Me.NumericKuotaAwalCartridge.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
+        Me.NumericKuotaAwalCartridge.Maximum = New Decimal(New Integer() {50000000, 0, 0, 0})
         Me.NumericKuotaAwalCartridge.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.NumericKuotaAwalCartridge.Name = "NumericKuotaAwalCartridge"
         Me.NumericKuotaAwalCartridge.Size = New System.Drawing.Size(77, 23)

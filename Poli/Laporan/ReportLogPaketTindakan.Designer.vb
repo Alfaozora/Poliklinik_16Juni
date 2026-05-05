@@ -26,6 +26,9 @@ Partial Class ReportLogPaketTindakan
         Me.PanelTop = New System.Windows.Forms.Panel
         Me.btnClose = New System.Windows.Forms.Button
         Me.Panel1 = New System.Windows.Forms.Panel
+        Me.ComboBoxPoli = New System.Windows.Forms.ComboBox
+        Me.Label3 = New System.Windows.Forms.Label
+        Me.CheckBoxDownloadLaporanTindakan = New System.Windows.Forms.CheckBox
         Me.ButtonLaporanPdf = New System.Windows.Forms.Button
         Me.CheckBoxFilterTanggal = New System.Windows.Forms.CheckBox
         Me.ButtonClearData = New System.Windows.Forms.Button
@@ -45,7 +48,8 @@ Partial Class ReportLogPaketTindakan
         Me.SplitContainerRiwayatPaket = New System.Windows.Forms.SplitContainer
         Me.GridControlRiwayatPaket = New DevExpress.XtraGrid.GridControl
         Me.GridViewRiwayatPaket = New DevExpress.XtraGrid.Views.Grid.GridView
-        Me.CheckBoxDownloadLaporanTindakan = New System.Windows.Forms.CheckBox
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox
+        Me.CheckBoxDownload10Tindakan = New System.Windows.Forms.CheckBox
         Me.PanelTop.SuspendLayout()
         Me.Panel1.SuspendLayout()
         Me.Panel9.SuspendLayout()
@@ -54,6 +58,7 @@ Partial Class ReportLogPaketTindakan
         Me.SplitContainerRiwayatPaket.SuspendLayout()
         CType(Me.GridControlRiwayatPaket, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.GridViewRiwayatPaket, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
         'PanelTop
@@ -83,9 +88,10 @@ Partial Class ReportLogPaketTindakan
         'Panel1
         '
         Me.Panel1.BackColor = System.Drawing.Color.Transparent
-        Me.Panel1.Controls.Add(Me.CheckBoxDownloadLaporanTindakan)
+        Me.Panel1.Controls.Add(Me.GroupBox1)
+        Me.Panel1.Controls.Add(Me.ComboBoxPoli)
+        Me.Panel1.Controls.Add(Me.Label3)
         Me.Panel1.Controls.Add(Me.ButtonLaporanPdf)
-        Me.Panel1.Controls.Add(Me.CheckBoxFilterTanggal)
         Me.Panel1.Controls.Add(Me.ButtonClearData)
         Me.Panel1.Controls.Add(Me.TextBoxNamaRekamMedis)
         Me.Panel1.Controls.Add(Me.Panel9)
@@ -101,8 +107,38 @@ Partial Class ReportLogPaketTindakan
         Me.Panel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.Panel1.Location = New System.Drawing.Point(0, 0)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(1000, 200)
+        Me.Panel1.Size = New System.Drawing.Size(1000, 220)
         Me.Panel1.TabIndex = 6
+        '
+        'ComboBoxPoli
+        '
+        Me.ComboBoxPoli.FormattingEnabled = True
+        Me.ComboBoxPoli.ItemHeight = 15
+        Me.ComboBoxPoli.Items.AddRange(New Object() {"POLI FISIOTERAPI", "POLI HBOT", "POLI KECANTIKAN"})
+        Me.ComboBoxPoli.Location = New System.Drawing.Point(205, 78)
+        Me.ComboBoxPoli.Name = "ComboBoxPoli"
+        Me.ComboBoxPoli.Size = New System.Drawing.Size(327, 23)
+        Me.ComboBoxPoli.TabIndex = 575
+        '
+        'Label3
+        '
+        Me.Label3.AutoSize = True
+        Me.Label3.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label3.Location = New System.Drawing.Point(137, 78)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(30, 17)
+        Me.Label3.TabIndex = 574
+        Me.Label3.Text = "Poli"
+        '
+        'CheckBoxDownloadLaporanTindakan
+        '
+        Me.CheckBoxDownloadLaporanTindakan.AutoSize = True
+        Me.CheckBoxDownloadLaporanTindakan.Location = New System.Drawing.Point(15, 47)
+        Me.CheckBoxDownloadLaporanTindakan.Name = "CheckBoxDownloadLaporanTindakan"
+        Me.CheckBoxDownloadLaporanTindakan.Size = New System.Drawing.Size(121, 19)
+        Me.CheckBoxDownloadLaporanTindakan.TabIndex = 573
+        Me.CheckBoxDownloadLaporanTindakan.Text = "Laporan Tindakan"
+        Me.CheckBoxDownloadLaporanTindakan.UseVisualStyleBackColor = True
         '
         'ButtonLaporanPdf
         '
@@ -116,9 +152,9 @@ Partial Class ReportLogPaketTindakan
         Me.ButtonLaporanPdf.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
         Me.ButtonLaporanPdf.ForeColor = System.Drawing.Color.White
         Me.ButtonLaporanPdf.Image = CType(resources.GetObject("ButtonLaporanPdf.Image"), System.Drawing.Image)
-        Me.ButtonLaporanPdf.Location = New System.Drawing.Point(538, 147)
+        Me.ButtonLaporanPdf.Location = New System.Drawing.Point(538, 174)
         Me.ButtonLaporanPdf.Name = "ButtonLaporanPdf"
-        Me.ButtonLaporanPdf.Size = New System.Drawing.Size(178, 35)
+        Me.ButtonLaporanPdf.Size = New System.Drawing.Size(199, 35)
         Me.ButtonLaporanPdf.TabIndex = 572
         Me.ButtonLaporanPdf.Text = "Download Laporan"
         Me.ButtonLaporanPdf.TextAlign = System.Drawing.ContentAlignment.MiddleRight
@@ -128,7 +164,7 @@ Partial Class ReportLogPaketTindakan
         'CheckBoxFilterTanggal
         '
         Me.CheckBoxFilterTanggal.AutoSize = True
-        Me.CheckBoxFilterTanggal.Location = New System.Drawing.Point(548, 26)
+        Me.CheckBoxFilterTanggal.Location = New System.Drawing.Point(15, 22)
         Me.CheckBoxFilterTanggal.Name = "CheckBoxFilterTanggal"
         Me.CheckBoxFilterTanggal.Size = New System.Drawing.Size(103, 19)
         Me.CheckBoxFilterTanggal.TabIndex = 571
@@ -147,7 +183,7 @@ Partial Class ReportLogPaketTindakan
         Me.ButtonClearData.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
         Me.ButtonClearData.ForeColor = System.Drawing.Color.White
         Me.ButtonClearData.Image = Global.PoliKlinik_Net2.My.Resources.Resources.icons8_clear_24
-        Me.ButtonClearData.Location = New System.Drawing.Point(205, 147)
+        Me.ButtonClearData.Location = New System.Drawing.Point(205, 174)
         Me.ButtonClearData.Name = "ButtonClearData"
         Me.ButtonClearData.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.ButtonClearData.Size = New System.Drawing.Size(125, 35)
@@ -163,7 +199,7 @@ Partial Class ReportLogPaketTindakan
         Me.TextBoxNamaRekamMedis.Cursor = System.Windows.Forms.Cursors.No
         Me.TextBoxNamaRekamMedis.Enabled = False
         Me.TextBoxNamaRekamMedis.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextBoxNamaRekamMedis.Location = New System.Drawing.Point(205, 116)
+        Me.TextBoxNamaRekamMedis.Location = New System.Drawing.Point(205, 143)
         Me.TextBoxNamaRekamMedis.Name = "TextBoxNamaRekamMedis"
         Me.TextBoxNamaRekamMedis.Size = New System.Drawing.Size(327, 25)
         Me.TextBoxNamaRekamMedis.TabIndex = 567
@@ -174,7 +210,7 @@ Partial Class ReportLogPaketTindakan
         Me.Panel9.BackColor = System.Drawing.Color.Transparent
         Me.Panel9.Controls.Add(Me.RadioButtonOptionPaketPerTindakan)
         Me.Panel9.Controls.Add(Me.RadioButtonOptionPaketReguler)
-        Me.Panel9.Location = New System.Drawing.Point(205, 54)
+        Me.Panel9.Location = New System.Drawing.Point(205, 41)
         Me.Panel9.Name = "Panel9"
         Me.Panel9.Size = New System.Drawing.Size(327, 25)
         Me.Panel9.TabIndex = 565
@@ -208,7 +244,7 @@ Partial Class ReportLogPaketTindakan
         Me.Label54.AutoSize = True
         Me.Label54.BackColor = System.Drawing.Color.Transparent
         Me.Label54.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label54.Location = New System.Drawing.Point(357, 29)
+        Me.Label54.Location = New System.Drawing.Point(357, 16)
         Me.Label54.Name = "Label54"
         Me.Label54.Size = New System.Drawing.Size(24, 15)
         Me.Label54.TabIndex = 547
@@ -220,7 +256,7 @@ Partial Class ReportLogPaketTindakan
         Me.TglAkhirTransaksi.CustomFormat = "dd-MMM-yyyy"
         Me.TglAkhirTransaksi.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TglAkhirTransaksi.Format = System.Windows.Forms.DateTimePickerFormat.Custom
-        Me.TglAkhirTransaksi.Location = New System.Drawing.Point(382, 23)
+        Me.TglAkhirTransaksi.Location = New System.Drawing.Point(382, 10)
         Me.TglAkhirTransaksi.Name = "TglAkhirTransaksi"
         Me.TglAkhirTransaksi.Size = New System.Drawing.Size(150, 25)
         Me.TglAkhirTransaksi.TabIndex = 546
@@ -231,7 +267,7 @@ Partial Class ReportLogPaketTindakan
         Me.TglAwalTransaksi.CustomFormat = "dd-MMM-yyyy"
         Me.TglAwalTransaksi.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TglAwalTransaksi.Format = System.Windows.Forms.DateTimePickerFormat.Custom
-        Me.TglAwalTransaksi.Location = New System.Drawing.Point(205, 23)
+        Me.TglAwalTransaksi.Location = New System.Drawing.Point(205, 10)
         Me.TglAwalTransaksi.Name = "TglAwalTransaksi"
         Me.TglAwalTransaksi.Size = New System.Drawing.Size(150, 25)
         Me.TglAwalTransaksi.TabIndex = 545
@@ -248,7 +284,7 @@ Partial Class ReportLogPaketTindakan
         Me.ButtonCariPasien.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
         Me.ButtonCariPasien.ForeColor = System.Drawing.Color.White
         Me.ButtonCariPasien.Image = Global.PoliKlinik_Net2.My.Resources.Resources.icons8_search_16
-        Me.ButtonCariPasien.Location = New System.Drawing.Point(336, 85)
+        Me.ButtonCariPasien.Location = New System.Drawing.Point(336, 112)
         Me.ButtonCariPasien.Name = "ButtonCariPasien"
         Me.ButtonCariPasien.RightToLeft = System.Windows.Forms.RightToLeft.Yes
         Me.ButtonCariPasien.Size = New System.Drawing.Size(34, 25)
@@ -262,7 +298,7 @@ Partial Class ReportLogPaketTindakan
         Me.TextBoxNomorRekamMedis.Cursor = System.Windows.Forms.Cursors.No
         Me.TextBoxNomorRekamMedis.Enabled = False
         Me.TextBoxNomorRekamMedis.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextBoxNomorRekamMedis.Location = New System.Drawing.Point(205, 85)
+        Me.TextBoxNomorRekamMedis.Location = New System.Drawing.Point(205, 112)
         Me.TextBoxNomorRekamMedis.Name = "TextBoxNomorRekamMedis"
         Me.TextBoxNomorRekamMedis.Size = New System.Drawing.Size(125, 25)
         Me.TextBoxNomorRekamMedis.TabIndex = 528
@@ -272,7 +308,7 @@ Partial Class ReportLogPaketTindakan
         '
         Me.Label10.AutoSize = True
         Me.Label10.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label10.Location = New System.Drawing.Point(80, 88)
+        Me.Label10.Location = New System.Drawing.Point(80, 115)
         Me.Label10.Name = "Label10"
         Me.Label10.Size = New System.Drawing.Size(87, 17)
         Me.Label10.TabIndex = 518
@@ -290,7 +326,7 @@ Partial Class ReportLogPaketTindakan
         Me.ButtonSearchRiwayatPaket.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
         Me.ButtonSearchRiwayatPaket.ForeColor = System.Drawing.Color.White
         Me.ButtonSearchRiwayatPaket.Image = Global.PoliKlinik_Net2.My.Resources.Resources.icons8_view_24
-        Me.ButtonSearchRiwayatPaket.Location = New System.Drawing.Point(336, 147)
+        Me.ButtonSearchRiwayatPaket.Location = New System.Drawing.Point(336, 174)
         Me.ButtonSearchRiwayatPaket.Name = "ButtonSearchRiwayatPaket"
         Me.ButtonSearchRiwayatPaket.Size = New System.Drawing.Size(196, 35)
         Me.ButtonSearchRiwayatPaket.TabIndex = 511
@@ -303,7 +339,7 @@ Partial Class ReportLogPaketTindakan
         '
         Me.Label2.AutoSize = True
         Me.Label2.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label2.Location = New System.Drawing.Point(77, 57)
+        Me.Label2.Location = New System.Drawing.Point(77, 44)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(90, 17)
         Me.Label2.TabIndex = 508
@@ -314,7 +350,7 @@ Partial Class ReportLogPaketTindakan
         Me.Label1.AutoSize = True
         Me.Label1.BackColor = System.Drawing.Color.Transparent
         Me.Label1.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label1.Location = New System.Drawing.Point(83, 27)
+        Me.Label1.Location = New System.Drawing.Point(83, 14)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(84, 17)
         Me.Label1.TabIndex = 450
@@ -339,7 +375,7 @@ Partial Class ReportLogPaketTindakan
         Me.SplitContainerRiwayatPaket.Panel2.AutoScroll = True
         Me.SplitContainerRiwayatPaket.Panel2.Controls.Add(Me.GridControlRiwayatPaket)
         Me.SplitContainerRiwayatPaket.Size = New System.Drawing.Size(1000, 540)
-        Me.SplitContainerRiwayatPaket.SplitterDistance = 200
+        Me.SplitContainerRiwayatPaket.SplitterDistance = 220
         Me.SplitContainerRiwayatPaket.SplitterWidth = 5
         Me.SplitContainerRiwayatPaket.TabIndex = 462
         '
@@ -351,7 +387,7 @@ Partial Class ReportLogPaketTindakan
         Me.GridControlRiwayatPaket.Location = New System.Drawing.Point(0, 0)
         Me.GridControlRiwayatPaket.MainView = Me.GridViewRiwayatPaket
         Me.GridControlRiwayatPaket.Name = "GridControlRiwayatPaket"
-        Me.GridControlRiwayatPaket.Size = New System.Drawing.Size(1000, 335)
+        Me.GridControlRiwayatPaket.Size = New System.Drawing.Size(1000, 315)
         Me.GridControlRiwayatPaket.TabIndex = 187
         Me.GridControlRiwayatPaket.ViewCollection.AddRange(New DevExpress.XtraGrid.Views.Base.BaseView() {Me.GridViewRiwayatPaket})
         '
@@ -363,15 +399,27 @@ Partial Class ReportLogPaketTindakan
         Me.GridViewRiwayatPaket.OptionsView.ShowGroupPanel = False
         Me.GridViewRiwayatPaket.PaintStyleName = "Office2003"
         '
-        'CheckBoxDownloadLaporanTindakan
+        'GroupBox1
         '
-        Me.CheckBoxDownloadLaporanTindakan.AutoSize = True
-        Me.CheckBoxDownloadLaporanTindakan.Location = New System.Drawing.Point(548, 51)
-        Me.CheckBoxDownloadLaporanTindakan.Name = "CheckBoxDownloadLaporanTindakan"
-        Me.CheckBoxDownloadLaporanTindakan.Size = New System.Drawing.Size(178, 19)
-        Me.CheckBoxDownloadLaporanTindakan.TabIndex = 573
-        Me.CheckBoxDownloadLaporanTindakan.Text = "Download Laporan Tindakan"
-        Me.CheckBoxDownloadLaporanTindakan.UseVisualStyleBackColor = True
+        Me.GroupBox1.Controls.Add(Me.CheckBoxDownload10Tindakan)
+        Me.GroupBox1.Controls.Add(Me.CheckBoxFilterTanggal)
+        Me.GroupBox1.Controls.Add(Me.CheckBoxDownloadLaporanTindakan)
+        Me.GroupBox1.Location = New System.Drawing.Point(538, 10)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(199, 158)
+        Me.GroupBox1.TabIndex = 576
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "Fungsi"
+        '
+        'CheckBoxDownload10Tindakan
+        '
+        Me.CheckBoxDownload10Tindakan.AutoSize = True
+        Me.CheckBoxDownload10Tindakan.Location = New System.Drawing.Point(15, 72)
+        Me.CheckBoxDownload10Tindakan.Name = "CheckBoxDownload10Tindakan"
+        Me.CheckBoxDownload10Tindakan.Size = New System.Drawing.Size(147, 19)
+        Me.CheckBoxDownload10Tindakan.TabIndex = 574
+        Me.CheckBoxDownload10Tindakan.Text = "10 Tindakan Terbanyak"
+        Me.CheckBoxDownload10Tindakan.UseVisualStyleBackColor = True
         '
         'ReportLogPaketTindakan
         '
@@ -399,6 +447,8 @@ Partial Class ReportLogPaketTindakan
         Me.SplitContainerRiwayatPaket.ResumeLayout(False)
         CType(Me.GridControlRiwayatPaket, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.GridViewRiwayatPaket, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox1.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -425,4 +475,8 @@ Partial Class ReportLogPaketTindakan
     Friend WithEvents CheckBoxFilterTanggal As System.Windows.Forms.CheckBox
     Friend WithEvents ButtonLaporanPdf As System.Windows.Forms.Button
     Friend WithEvents CheckBoxDownloadLaporanTindakan As System.Windows.Forms.CheckBox
+    Friend WithEvents ComboBoxPoli As System.Windows.Forms.ComboBox
+    Friend WithEvents Label3 As System.Windows.Forms.Label
+    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    Friend WithEvents CheckBoxDownload10Tindakan As System.Windows.Forms.CheckBox
 End Class

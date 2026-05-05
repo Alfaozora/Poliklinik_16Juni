@@ -3225,9 +3225,9 @@ Public Class FormRekamMedisDokter
                     End If
                 End If
 
-                'If statusBPJS = True AndAlso CheckBridgingPcareActive() = True Then SaveKunjunganBPJS() ' Save PCare BPJS
+                If statusBPJS = True AndAlso CheckBridgingPcareActive() = True Then SaveKunjunganBPJS() ' Save PCare BPJS
 
-                If statusBPJS = True AndAlso CheckBridgingPcareActive() = True Then SavePendaftaranBPJS()
+                'If statusBPJS = True AndAlso CheckBridgingPcareActive() = True Then SavePendaftaranBPJS()
 
                 Dim sql As String = "SELECT TD.NoAntreanHyu, MP.NoNIK " & _
                     "FROM TransaksiDetail TD " & _

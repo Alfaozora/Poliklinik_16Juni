@@ -233,8 +233,14 @@ Public Class ReportLogPaketTindakan
         queryStringHeader.AppendLine("       AND tblPaket.KodeVoucher = tblPaketDetail.KodeVoucher ")
         queryStringHeader.AppendLine("INNER JOIN MasterPasien tblPasien ")
         queryStringHeader.AppendLine("       ON tblPasien.NoRekamMedis = tblPaket.NoRekamMedis ")
+        queryStringHeader.AppendLine("INNER JOIN TransaksiDetail TD ")
+        queryStringHeader.AppendLine("       ON TD.NoUrut = tblPaket.NoTransaksi ")
         queryStringHeader.AppendLine("WHERE tblPaket.JenisPaket = 'Paket Per-Tindakan' ")
         queryStringHeader.AppendLine("AND tblPaket.DeletedDate IS NULL ")
+
+        If ComboBoxPoli.Text <> "" Then
+            queryStringHeader.AppendLine("AND TD.JenisPoli = '" & ComboBoxPoli.Text & "' ")
+        End If
 
         ' Filter No RM
         If TextBoxNomorRekamMedis.Text <> "" Then
@@ -261,8 +267,14 @@ Public Class ReportLogPaketTindakan
         queryStringDetail.AppendLine("    AND tblLog.PaketID = tblPaket.PaketID")
         queryStringDetail.AppendLine("INNER JOIN MasterPasien tblPasien ")
         queryStringDetail.AppendLine("    ON tblLog.NoRekamMedis = tblPasien.NoRekamMedis")
+        queryStringDetail.AppendLine("INNER JOIN TransaksiDetail TD ")
+        queryStringDetail.AppendLine("       ON TD.NoUrut = tblPaket.NoTransaksi ")
         queryStringDetail.AppendLine("WHERE tblPaket.JenisPaket = 'Paket Per-Tindakan' ")
         queryStringDetail.AppendLine("AND tblLog.DeletedDate IS NULL ")
+
+        If ComboBoxPoli.Text <> "" Then
+            queryStringDetail.AppendLine("AND TD.JenisPoli = '" & ComboBoxPoli.Text & "' ")
+        End If
 
         ' Filter No RM
         If TextBoxNomorRekamMedis.Text <> "" Then
@@ -377,6 +389,12 @@ Public Class ReportLogPaketTindakan
     End Function
 
     Private Sub ButtonSearchRiwayatPaket_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonSearchRiwayatPaket.Click
+        If ComboBoxPoli.Text.Trim() = "" Or ComboBoxPoli.SelectedIndex = -1 Then
+            MsgBox("Silakan pilih Jenis Poli terlebih dahulu!", MsgBoxStyle.Exclamation, "Validasi")
+            ComboBoxPoli.Focus()
+            Exit Sub
+        End If
+
         If RadioButtonOptionPaketReguler.Checked = True Then
             SearchDataRiwayatPaketReguler()
         ElseIf RadioButtonOptionPaketPerTindakan.Checked = True Then
@@ -501,9 +519,17 @@ Public Class ReportLogPaketTindakan
         query.AppendLine("LEFT JOIN MasterPasien tblPasien ")
         query.AppendLine("    ON tblPasien.NoRekamMedis = tblPaket.NoRekamMedis ")
 
+        'Filter Poli
+        query.AppendLine("INNER JOIN TransaksiDetail TD ")
+        query.AppendLine("    ON TD.NoUrut = tblPaket.NoTransaksi ")
+
         query.AppendLine("WHERE tblPaket.JenisPaket = 'Paket Reguler' ")
         query.AppendLine("AND tblPaket.DeletedDate IS NULL ")
         query.AppendLine("AND tblLog.DeletedDate IS NULL ")
+
+        If ComboBoxPoli.Text <> "" Then
+            query.AppendLine("AND TD.JenisPoli = '" & ComboBoxPoli.Text & "' ")
+        End If
 
         If TextBoxNomorRekamMedis.Text <> "" Then
             query.AppendLine("AND tblPaket.NoRekamMedis = '" & TextBoxNomorRekamMedis.Text & "'")
@@ -682,12 +708,14 @@ Public Class ReportLogPaketTindakan
             Format(TglAkhirTransaksi.Value, "yyyy-MM-dd") & "')")
         End If
 
-        ' 🔥 TAMBAHKAN DI SINI
-        query.AppendLine("AND EXISTS (")
-        query.AppendLine("    SELECT 1 FROM TransaksiPaketTindakan h ")
-        query.AppendLine("    WHERE h.PaketID = tblLog.PaketID ")
-        query.AppendLine("    AND h.KodeVoucher = tblLog.KodeVoucher")
-        query.AppendLine(")")
+
+        If ComboBoxPoli.Text <> "" Then
+            query.AppendLine("AND EXISTS (")
+            query.AppendLine("    SELECT 1 FROM TransaksiDetail TD ")
+            query.AppendLine("    WHERE TD.NoUrut = tblLog.NoTransaksi ")
+            query.AppendLine("    AND TD.JenisPoli = '" & ComboBoxPoli.Text & "'")
+            query.AppendLine(")")
+        End If
 
         query.AppendLine("ORDER BY tblLog.PaketID, tblLog.KodeVoucher")
 
@@ -801,6 +829,7 @@ Public Class ReportLogPaketTindakan
         query.AppendLine("DECLARE @TglAwal DATE = '" & Format(tglTransaksiAwal, "yyyy-MM-dd") & "'")
         query.AppendLine("DECLARE @TglAkhir DATE = '" & Format(tglTransaksiAkhir, "yyyy-MM-dd") & "'")
         query.AppendLine("DECLARE @PakaiFilterTanggal BIT = " & pakaiFilterTanggal)
+        query.AppendLine("DECLARE @JenisPoli VARCHAR(50) = '" & ComboBoxPoli.Text & "'")
 
         query.AppendLine("SELECT ")
         query.AppendLine("    TD.JenisPoli,")
@@ -852,6 +881,7 @@ Public Class ReportLogPaketTindakan
         query.AppendLine("    LPP.DeletedBy IS NULL")
         query.AppendLine("    AND (@NoRM = '' OR LPP.NoRekamMedis = @NoRM)")
         query.AppendLine("    AND MPT.JenisPaket = 'Paket Reguler'")
+        query.AppendLine("    AND (@JenisPoli = '' OR TD.JenisPoli = @JenisPoli)")
 
         query.AppendLine("GROUP BY ")
         query.AppendLine("    TD.JenisPoli,")
@@ -890,6 +920,8 @@ Public Class ReportLogPaketTindakan
 
         Dim tblResult As New DataTable
         Dim query As New StringBuilder()
+
+        query.AppendLine("DECLARE @JenisPoli VARCHAR(50) = '" & ComboBoxPoli.Text & "'")
 
         query.AppendLine("SELECT ")
         query.AppendLine("    TD.JenisPoli,")
@@ -946,6 +978,7 @@ Public Class ReportLogPaketTindakan
 
         query.AppendLine("WHERE LPP.DeletedBy IS NULL")
         query.AppendLine("AND ('" & NoRM & "' = '' OR LPP.NoRekamMedis = '" & NoRM & "')")
+        query.AppendLine("AND (@JenisPoli = '' OR TD.JenisPoli = @JenisPoli)")
 
         ' 🔥 FILTER TANGGAL (AMAN & FIX BUG 1 HARI)
         If Not CheckBoxFilterTanggal.Checked Then
@@ -1096,6 +1129,7 @@ Public Class ReportLogPaketTindakan
         query.AppendLine("DECLARE @TglAwal DATE = '" & Format(tglTransaksiAwal, "yyyy-MM-dd") & "'")
         query.AppendLine("DECLARE @TglAkhir DATE = '" & Format(tglTransaksiAkhir, "yyyy-MM-dd") & "'")
         query.AppendLine("DECLARE @PakaiFilterTanggal BIT = " & pakaiFilterTanggal)
+        query.AppendLine("DECLARE @JenisPoli VARCHAR(50) = '" & ComboBoxPoli.Text.Trim.ToUpper & "'")
 
         query.AppendLine("SELECT")
         query.AppendLine("    TP.NoUrut,")
@@ -1125,7 +1159,7 @@ Public Class ReportLogPaketTindakan
         query.AppendLine("WHERE")
         query.AppendLine("    TPD.JenisTindakan NOT LIKE '%Konsultasi%'")
         query.AppendLine("    AND TPD.JenisTindakan <> '-'")
-
+        query.AppendLine("    AND (@JenisPoli = '' OR TD.JenisPoli = @JenisPoli)")
         query.AppendLine("    AND (")
         query.AppendLine("        @PakaiFilterTanggal = 0")
         query.AppendLine("        OR (TPD.transaksitime >= @TglAwal")
@@ -1246,9 +1280,127 @@ Public Class ReportLogPaketTindakan
 
     End Sub
 
+    Private Function Laporan10TindakanTerbanyak() As DataTable
+
+        If String.IsNullOrEmpty(ComboBoxPoli.Text) Then
+            MessageBox.Show("Poli wajib dipilih sebelum menampilkan laporan.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            ComboBoxPoli.Focus()
+            Exit Function
+        End If
+
+        Dim tglAwal As Date = TglAwalTransaksi.Value
+        Dim tglAkhir As Date = TglAkhirTransaksi.Value
+
+        Dim tblResult As New DataTable
+        Dim query As New StringBuilder()
+
+        ' 🔥 Checkbox:
+        ' dicentang = semua tanggal (0)
+        ' tidak dicentang = pakai filter (1)
+        Dim pakaiFilterTanggal As Integer = If(CheckBoxFilterTanggal.Checked, 0, 1)
+
+        ' =========================
+        ' PARAMETER
+        ' =========================
+        query.AppendLine("DECLARE @JenisPoli VARCHAR(50) = '" & ComboBoxPoli.Text.Trim.ToUpper & "'")
+        query.AppendLine("DECLARE @TglAwal DATE = '" & Format(tglAwal, "yyyy-MM-dd") & "'")
+        query.AppendLine("DECLARE @TglAkhir DATE = '" & Format(tglAkhir, "yyyy-MM-dd") & "'")
+        query.AppendLine("DECLARE @PakaiFilterTanggal BIT = " & pakaiFilterTanggal)
+
+        ' =========================
+        ' QUERY
+        ' =========================
+        query.AppendLine("SELECT TOP 10")
+        query.AppendLine("    TPD.TindakanID,")
+        query.AppendLine("    TPD.NamaTindakan,")
+        query.AppendLine("    TD.JenisPoli,")
+        query.AppendLine("    COUNT(DISTINCT TP.NoUrut + '-' + CAST(TPD.TindakanID AS VARCHAR)) AS Jumlah")
+
+        query.AppendLine("FROM TransaksiPoli TP")
+
+        query.AppendLine("INNER JOIN TransaksiPoliDetail TPD")
+        query.AppendLine("    ON TP.TransPoliID = TPD.TransPoliID")
+
+        query.AppendLine("INNER JOIN TransaksiDetail TD")
+        query.AppendLine("    ON TD.NoUrut = TP.NoUrut")
+
+        query.AppendLine("WHERE")
+        query.AppendLine("    TPD.JenisTindakan NOT LIKE '%Konsultasi%'")
+        query.AppendLine("    AND TPD.JenisTindakan <> '-'")
+
+        ' 🔥 FILTER POLI
+        query.AppendLine("    AND (@JenisPoli = '' OR TD.JenisPoli = @JenisPoli)")
+
+        ' 🔥 FILTER TANGGAL (AMAN)
+        query.AppendLine("    AND (")
+        query.AppendLine("        @PakaiFilterTanggal = 0")
+        query.AppendLine("        OR (TPD.transaksitime >= @TglAwal")
+        query.AppendLine("            AND TPD.transaksitime < DATEADD(DAY, 1, @TglAkhir))")
+        query.AppendLine("    )")
+
+        query.AppendLine("GROUP BY")
+        query.AppendLine("    TPD.TindakanID,")
+        query.AppendLine("    TD.JenisPoli,")
+        query.AppendLine("    TPD.NamaTindakan")
+
+        query.AppendLine("ORDER BY")
+        query.AppendLine("    COUNT(*) DESC")
+
+        ' =========================
+        ' EKSEKUSI
+        ' =========================
+        ' MsgBox(query.ToString()) ' debug kalau perlu
+
+        tblResult = ReadSQL(query.ToString())
+
+        ' TAMBAH KOLOM NO (ranking)
+        If Not tblResult.Columns.Contains("No") Then
+            tblResult.Columns.Add("No", GetType(Integer))
+        End If
+
+        tblResult.DefaultView.Sort = "Jumlah DESC"
+        tblResult = tblResult.DefaultView.ToTable()
+        Dim rowNumber As Integer = 1
+
+        For Each row As DataRow In tblResult.Rows
+            row("No") = rowNumber
+            rowNumber += 1
+        Next
+
+        Report = New XtraReport
+        Report = XtraReport.FromFile(Application.StartupPath & "\Reports\LaporanTindakanTerbanyak.repx", True)
+
+        Dim stringTglAwal As String = Format(tglAwal, "dd MMMM yyyy")
+        Dim stringTglAkhir As String = Format(tglAkhir, "dd MMMM yyyy")
+
+        Report.Bands.Item(BandKind.ReportHeader).Controls("xrLabelJudulLaporan").Text = "Laporan 10 Tindakan Terbanyak"
+
+        'If ComboBoxPoli.Text <> "" Then
+        '    Report.Bands.Item(BandKind.ReportHeader).Controls("xrLabelSubJudul").Text = "Poli: " & ComboBoxPoli.Text
+        'Else
+        '    Report.Bands.Item(BandKind.ReportHeader).Controls("xrLabelSubJudul").Text = "Semua Poli"
+        'End If
+
+        If CheckBoxFilterTanggal.Checked Then
+            Report.Bands.Item(BandKind.ReportHeader).Controls("xrLabelTanggalLaporan").Text = "Semua Tanggal"
+        Else
+            Report.Bands.Item(BandKind.ReportHeader).Controls("xrLabelTanggalLaporan").Text = stringTglAwal & " - " & stringTglAkhir
+        End If
+
+        Report.Bands.Item(BandKind.PageFooter).Controls("xrLabelInfoCetak").Text = Format(DateAndTime.Now, "dd-MMM-yyyy HH:mm:ss") & " By " & userInput
+
+        Report.DataSource = tblResult
+        'Report.RunDesigner()
+        Report.ShowPreview()
+
+        Return tblResult
+    End Function
+
     Private Sub ButtonLaporanPdf_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonLaporanPdf.Click
         If CheckBoxDownloadLaporanTindakan.Checked Then
             LaporanTindakan()
+        ElseIf CheckBoxDownload10Tindakan.Checked Then
+            Laporan10TindakanTerbanyak()
         Else
             LaporanRiwayatPaket()
         End If
