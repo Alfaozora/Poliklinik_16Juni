@@ -51,11 +51,17 @@ Partial Class FormKodeVoucher
         Me.Label2 = New System.Windows.Forms.Label
         Me.TextBoxNamaVoc = New System.Windows.Forms.TextBox
         Me.Label1 = New System.Windows.Forms.Label
-        Me.DataGridView1 = New System.Windows.Forms.DataGridView
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
+        Me.SplitContainer2 = New System.Windows.Forms.SplitContainer
+        Me.DataGridView1 = New System.Windows.Forms.DataGridView
+        Me.ButtonNext = New System.Windows.Forms.Button
+        Me.ButtonPrev = New System.Windows.Forms.Button
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
+        Me.SplitContainer2.Panel1.SuspendLayout()
+        Me.SplitContainer2.Panel2.SuspendLayout()
+        Me.SplitContainer2.SuspendLayout()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -99,8 +105,8 @@ Partial Class FormKodeVoucher
         '
         'SplitContainer1.Panel2
         '
-        Me.SplitContainer1.Panel2.Controls.Add(Me.DataGridView1)
-        Me.SplitContainer1.Size = New System.Drawing.Size(950, 455)
+        Me.SplitContainer1.Panel2.Controls.Add(Me.SplitContainer2)
+        Me.SplitContainer1.Size = New System.Drawing.Size(1021, 455)
         Me.SplitContainer1.SplitterDistance = 180
         Me.SplitContainer1.SplitterWidth = 5
         Me.SplitContainer1.TabIndex = 0
@@ -389,6 +395,25 @@ Partial Class FormKodeVoucher
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "Nama Voucher"
         '
+        'SplitContainer2
+        '
+        Me.SplitContainer2.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.SplitContainer2.Location = New System.Drawing.Point(0, 0)
+        Me.SplitContainer2.Name = "SplitContainer2"
+        Me.SplitContainer2.Orientation = System.Windows.Forms.Orientation.Horizontal
+        '
+        'SplitContainer2.Panel1
+        '
+        Me.SplitContainer2.Panel1.Controls.Add(Me.DataGridView1)
+        '
+        'SplitContainer2.Panel2
+        '
+        Me.SplitContainer2.Panel2.Controls.Add(Me.ButtonPrev)
+        Me.SplitContainer2.Panel2.Controls.Add(Me.ButtonNext)
+        Me.SplitContainer2.Size = New System.Drawing.Size(1021, 270)
+        Me.SplitContainer2.SplitterDistance = 234
+        Me.SplitContainer2.TabIndex = 0
+        '
         'DataGridView1
         '
         Me.DataGridView1.AllowUserToAddRows = False
@@ -399,14 +424,44 @@ Partial Class FormKodeVoucher
         Me.DataGridView1.Location = New System.Drawing.Point(0, 0)
         Me.DataGridView1.Name = "DataGridView1"
         Me.DataGridView1.ReadOnly = True
-        Me.DataGridView1.Size = New System.Drawing.Size(950, 270)
-        Me.DataGridView1.TabIndex = 0
+        Me.DataGridView1.Size = New System.Drawing.Size(1021, 234)
+        Me.DataGridView1.TabIndex = 1
+        '
+        'ButtonNext
+        '
+        Me.ButtonNext.Anchor = System.Windows.Forms.AnchorStyles.Right
+        Me.ButtonNext.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonNext.FlatAppearance.BorderSize = 0
+        Me.ButtonNext.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(180, Byte), Integer))
+        Me.ButtonNext.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonNext.ForeColor = System.Drawing.Color.White
+        Me.ButtonNext.Location = New System.Drawing.Point(935, 3)
+        Me.ButtonNext.Name = "ButtonNext"
+        Me.ButtonNext.Size = New System.Drawing.Size(63, 23)
+        Me.ButtonNext.TabIndex = 523
+        Me.ButtonNext.Text = "Next >"
+        Me.ButtonNext.UseVisualStyleBackColor = False
+        '
+        'ButtonPrev
+        '
+        Me.ButtonPrev.Anchor = System.Windows.Forms.AnchorStyles.Right
+        Me.ButtonPrev.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonPrev.FlatAppearance.BorderSize = 0
+        Me.ButtonPrev.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(180, Byte), Integer))
+        Me.ButtonPrev.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonPrev.ForeColor = System.Drawing.Color.White
+        Me.ButtonPrev.Location = New System.Drawing.Point(866, 3)
+        Me.ButtonPrev.Name = "ButtonPrev"
+        Me.ButtonPrev.Size = New System.Drawing.Size(63, 23)
+        Me.ButtonPrev.TabIndex = 524
+        Me.ButtonPrev.Text = "< Prev"
+        Me.ButtonPrev.UseVisualStyleBackColor = False
         '
         'FormKodeVoucher
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(950, 455)
+        Me.ClientSize = New System.Drawing.Size(1021, 455)
         Me.Controls.Add(Me.SplitContainer1)
         Me.Name = "FormKodeVoucher"
         Me.Text = "FormKodeVoucher"
@@ -414,6 +469,9 @@ Partial Class FormKodeVoucher
         Me.SplitContainer1.Panel1.PerformLayout()
         Me.SplitContainer1.Panel2.ResumeLayout(False)
         Me.SplitContainer1.ResumeLayout(False)
+        Me.SplitContainer2.Panel1.ResumeLayout(False)
+        Me.SplitContainer2.Panel2.ResumeLayout(False)
+        Me.SplitContainer2.ResumeLayout(False)
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
@@ -443,8 +501,11 @@ Partial Class FormKodeVoucher
     Friend WithEvents Label10 As System.Windows.Forms.Label
     Friend WithEvents TextBoxTindakan As System.Windows.Forms.TextBox
     Friend WithEvents ButtonFind As System.Windows.Forms.Button
-    Friend WithEvents DataGridView1 As System.Windows.Forms.DataGridView
     Friend WithEvents ButtonGenerateVoc As System.Windows.Forms.Button
     Friend WithEvents Label11 As System.Windows.Forms.Label
     Friend WithEvents ComboBoxJenisPemakaian As System.Windows.Forms.ComboBox
+    Friend WithEvents ButtonNext As System.Windows.Forms.Button
+    Friend WithEvents SplitContainer2 As System.Windows.Forms.SplitContainer
+    Friend WithEvents DataGridView1 As System.Windows.Forms.DataGridView
+    Friend WithEvents ButtonPrev As System.Windows.Forms.Button
 End Class

@@ -698,6 +698,7 @@ Partial Class MasterTindakanKlinik
         Me.NumericShootPerTindakan.Name = "NumericShootPerTindakan"
         Me.NumericShootPerTindakan.Size = New System.Drawing.Size(58, 23)
         Me.NumericShootPerTindakan.TabIndex = 580
+        Me.NumericShootPerTindakan.ThousandsSeparator = True
         Me.NumericShootPerTindakan.Value = New Decimal(New Integer() {1, 0, 0, 0})
         '
         'CheckBoxPakaiAlat
@@ -2571,6 +2572,7 @@ Partial Class MasterTindakanKlinik
         Me.NumericKuotaMinimumCartridge.Name = "NumericKuotaMinimumCartridge"
         Me.NumericKuotaMinimumCartridge.Size = New System.Drawing.Size(77, 23)
         Me.NumericKuotaMinimumCartridge.TabIndex = 654
+        Me.NumericKuotaMinimumCartridge.ThousandsSeparator = True
         Me.NumericKuotaMinimumCartridge.Value = New Decimal(New Integer() {1, 0, 0, 0})
         '
         'Label58
@@ -2643,6 +2645,7 @@ Partial Class MasterTindakanKlinik
         Me.NumericKuotaAwalCartridge.Name = "NumericKuotaAwalCartridge"
         Me.NumericKuotaAwalCartridge.Size = New System.Drawing.Size(77, 23)
         Me.NumericKuotaAwalCartridge.TabIndex = 646
+        Me.NumericKuotaAwalCartridge.ThousandsSeparator = True
         Me.NumericKuotaAwalCartridge.Value = New Decimal(New Integer() {1, 0, 0, 0})
         '
         'Label52

@@ -1508,8 +1508,6 @@ Public Class FormRekamMedisDokter
         TextBoxNamaTindakan.ResetText()
         TextBoxJenisTindakan.ResetText()
         TextBoxBiayaTindakan.ResetText()
-        TextBoxDiskonTindakan.ResetText()
-        TextBoxLabel.Text = "Rp"
         CheckBoxInformedConsent.Checked = False
         SplitContainerTindakan.Panel2Collapsed = True
     End Sub
@@ -2063,11 +2061,7 @@ Public Class FormRekamMedisDokter
                 Dim biayaAsli As Decimal = 0
                 Decimal.TryParse(Trow("BiayaTindakan").ToString(), biayaAsli)
 
-                ' 🔑 Simpan biaya asli
-                LabelBiaya.Text = biayaAsli.ToString("N0")
-
                 ' --- Reset diskon & nett ---
-                TextBoxDiskonTindakan.Text = "0"
                 TextBoxBiayaTindakan.Text = biayaAsli.ToString("N0")
 
                 ' --- Reset voucher ---
@@ -2118,7 +2112,6 @@ Public Class FormRekamMedisDokter
             Dim discPersenTindakan As Decimal = 0
             Dim nettBayar As Decimal = 0
 
-            Decimal.TryParse(LabelBiaya.Text.Replace(",", ""), biayaAsli)
             If voucherJenis.Trim().ToUpper() = "NOMINAL" Then
                 ' NOMINAL → simpan ke DiscPersenTindakan
                 discPersenTindakan = voucherNilai
@@ -13810,9 +13803,6 @@ Public Class FormRekamMedisDokter
             End If
         End If
 
-        ' Hitung diskon
-        HitungDiskonTindakan()
-
         MessageBox.Show("Voucher berhasil diterapkan.", "Informasi")
     End Sub
 
@@ -13832,44 +13822,6 @@ Public Class FormRekamMedisDokter
     '    TextBoxBiayaTindakan.Text = (biaya - diskon).ToString("N0")
     'End Sub
 
-    Private Sub HitungDiskonTindakan()
-        Dim biayaAsli As Decimal = 0
-        Decimal.TryParse(LabelBiaya.Text.Replace(",", ""), biayaAsli)
-
-        Dim diskonNominal As Decimal = 0
-        If voucherJenis = "NOMINAL" Then
-            'Diskon langsung nominal
-            diskonNominal = voucherNilai
-
-            ' TAMPILKAN NOMINAL
-            TextBoxDiskonTindakan.Text = diskonNominal.ToString("N0")
-
-        ElseIf voucherJenis = "PERCENT" Then
-            'Diskon persen
-            diskonNominal = biayaAsli * voucherNilai / 100
-
-            ' TAMPILKAN PERSEN SAJA
-            TextBoxDiskonTindakan.Text = voucherNilai.ToString("N0")
-            TextBoxLabel.Text = "%"
-        End If
-
-        ' Safety
-        If diskonNominal > biayaAsli Then diskonNominal = biayaAsli
-
-        ' Nett bayar
-        Dim nettBayar As Decimal = biayaAsli - diskonNominal
-        If nettBayar < 0 Then nettBayar = 0
-
-        TextBoxBiayaTindakan.Text = nettBayar.ToString("N0")
-
-    End Sub
-
-    Private Sub ButtonVoucher_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonVoucher.Click
-        Dim f As New PopUpVoucher()
-        f.NoRekamMedis = idPasien
-        AddHandler f.VoucherDipilih, AddressOf ProsesVoucherTindakan
-        f.ShowDialog()
-    End Sub
 
     Private Function GetKuotaSisaAlat(ByVal alatID As String) As Integer
 

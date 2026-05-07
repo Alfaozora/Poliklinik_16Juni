@@ -1590,4 +1590,9 @@ Public Class PoliKlinik
         FormWABlast.Show()
         FormWABlast.Focus()
     End Sub
+
+    Private Sub BirthdaySenderToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BirthdaySenderToolStripMenuItem.Click
+        FormBirthdaySender.Show()
+        FormBirthdaySender.Focus()
+    End Sub
 End Class

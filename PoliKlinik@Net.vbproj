@@ -514,6 +514,12 @@
     <Compile Include="Prototype\FormBandingGambar.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Prototype\FormBirthdaySender.Designer.vb">
+      <DependentUpon>FormBirthdaySender.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormBirthdaySender.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Prototype\FormICPaket.Designer.vb">
       <DependentUpon>FormICPaket.vb</DependentUpon>
     </Compile>
@@ -1521,6 +1527,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormBandingGambar.resx">
       <DependentUpon>FormBandingGambar.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormBirthdaySender.resx">
+      <DependentUpon>FormBirthdaySender.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormICPaket.resx">
       <DependentUpon>FormICPaket.vb</DependentUpon>

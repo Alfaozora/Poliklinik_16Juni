@@ -736,14 +736,9 @@ Me.DataGridViewObat = New System.Windows.Forms.DataGridView
 Me.TabTindakan = New System.Windows.Forms.TabPage
 Me.SplitContainerTabTindakan = New System.Windows.Forms.SplitContainer
 Me.SplitContainerTindakan = New System.Windows.Forms.SplitContainer
-Me.LabelBiaya = New System.Windows.Forms.Label
-Me.ButtonVoucher = New System.Windows.Forms.Button
-Me.TextBoxDiskonTindakan = New System.Windows.Forms.TextBox
-Me.Label353 = New System.Windows.Forms.Label
-Me.TextBoxLabel = New System.Windows.Forms.TextBox
+Me.LabelPenjaminAsuransiLain = New System.Windows.Forms.Label
 Me.ButtonScanQR = New System.Windows.Forms.Button
 Me.Panel26 = New System.Windows.Forms.Panel
-Me.LabelPenjaminAsuransiLain = New System.Windows.Forms.Label
 Me.RadioButtonPenjaminAsuransiLain = New System.Windows.Forms.RadioButton
 Me.RadioButtonPenjaminUmum = New System.Windows.Forms.RadioButton
 Me.CheckBoxInformedConsent = New System.Windows.Forms.CheckBox
@@ -1268,6 +1263,8 @@ Me.TextBox73 = New System.Windows.Forms.TextBox
 Me.Label330 = New System.Windows.Forms.Label
 Me.TextBox74 = New System.Windows.Forms.TextBox
 Me.Label334 = New System.Windows.Forms.Label
+Me.Label353 = New System.Windows.Forms.Label
+Me.TextBoxQty = New System.Windows.Forms.TextBox
 Me.PanelTop.SuspendLayout
 Me.PanelSide.SuspendLayout
 Me.TabControlMenuUtama.SuspendLayout
@@ -10456,13 +10453,11 @@ Me.SplitContainerTindakan.Name = "SplitContainerTindakan"
 '
 'SplitContainerTindakan.Panel1
 '
-Me.SplitContainerTindakan.Panel1.Controls.Add(Me.LabelBiaya)
-Me.SplitContainerTindakan.Panel1.Controls.Add(Me.ButtonVoucher)
-Me.SplitContainerTindakan.Panel1.Controls.Add(Me.TextBoxDiskonTindakan)
+Me.SplitContainerTindakan.Panel1.Controls.Add(Me.TextBoxQty)
 Me.SplitContainerTindakan.Panel1.Controls.Add(Me.Label353)
-Me.SplitContainerTindakan.Panel1.Controls.Add(Me.TextBoxLabel)
 Me.SplitContainerTindakan.Panel1.Controls.Add(Me.ButtonScanQR)
 Me.SplitContainerTindakan.Panel1.Controls.Add(Me.Panel26)
+Me.SplitContainerTindakan.Panel1.Controls.Add(Me.CheckBoxInformedConsent)
 Me.SplitContainerTindakan.Panel1.Controls.Add(Me.ButtonSimpanTindakan)
 Me.SplitContainerTindakan.Panel1.Controls.Add(Me.Label246)
 Me.SplitContainerTindakan.Panel1.Controls.Add(Me.ButtonFindTindakan)
@@ -10489,74 +10484,16 @@ Me.SplitContainerTindakan.Size = New System.Drawing.Size(811, 200)
 Me.SplitContainerTindakan.SplitterDistance = 500
 Me.SplitContainerTindakan.TabIndex = 0
 '
-'LabelBiaya
+'LabelPenjaminAsuransiLain
 '
-Me.LabelBiaya.AutoSize = true
-Me.LabelBiaya.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-Me.LabelBiaya.Location = New System.Drawing.Point(394, 139)
-Me.LabelBiaya.Name = "LabelBiaya"
-Me.LabelBiaya.Size = New System.Drawing.Size(35, 17)
-Me.LabelBiaya.TabIndex = 537
-Me.LabelBiaya.Text = "Nett"
-Me.LabelBiaya.Visible = false
-'
-'ButtonVoucher
-'
-Me.ButtonVoucher.BackColor = System.Drawing.Color.FromArgb(CType(CType(0,Byte),Integer), CType(CType(100,Byte),Integer), CType(CType(200,Byte),Integer))
-Me.ButtonVoucher.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
-Me.ButtonVoucher.Cursor = System.Windows.Forms.Cursors.Hand
-Me.ButtonVoucher.FlatAppearance.BorderSize = 0
-Me.ButtonVoucher.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0,Byte),Integer), CType(CType(100,Byte),Integer), CType(CType(200,Byte),Integer))
-Me.ButtonVoucher.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81,Byte),Integer), CType(CType(168,Byte),Integer), CType(CType(255,Byte),Integer))
-Me.ButtonVoucher.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-Me.ButtonVoucher.Font = New System.Drawing.Font("Arial", 9!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
-Me.ButtonVoucher.ForeColor = System.Drawing.Color.White
-Me.ButtonVoucher.Location = New System.Drawing.Point(349, 12)
-Me.ButtonVoucher.Name = "ButtonVoucher"
-Me.ButtonVoucher.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-Me.ButtonVoucher.Size = New System.Drawing.Size(99, 26)
-Me.ButtonVoucher.TabIndex = 535
-Me.ButtonVoucher.Text = "Voucher"
-Me.ButtonVoucher.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-Me.ButtonVoucher.UseVisualStyleBackColor = false
-'
-'TextBoxDiskonTindakan
-'
-Me.TextBoxDiskonTindakan.BackColor = System.Drawing.Color.White
-Me.TextBoxDiskonTindakan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-Me.TextBoxDiskonTindakan.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
-Me.TextBoxDiskonTindakan.ForeColor = System.Drawing.Color.Black
-Me.TextBoxDiskonTindakan.Location = New System.Drawing.Point(162, 137)
-Me.TextBoxDiskonTindakan.Name = "TextBoxDiskonTindakan"
-Me.TextBoxDiskonTindakan.ReadOnly = true
-Me.TextBoxDiskonTindakan.Size = New System.Drawing.Size(75, 25)
-Me.TextBoxDiskonTindakan.TabIndex = 535
-Me.TextBoxDiskonTindakan.TabStop = false
-'
-'Label353
-'
-Me.Label353.AutoSize = true
-Me.Label353.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-Me.Label353.Location = New System.Drawing.Point(68, 139)
-Me.Label353.Name = "Label353"
-Me.Label353.Size = New System.Drawing.Size(49, 17)
-Me.Label353.TabIndex = 534
-Me.Label353.Text = "Diskon"
-'
-'TextBoxLabel
-'
-Me.TextBoxLabel.BackColor = System.Drawing.Color.FromArgb(CType(CType(223,Byte),Integer), CType(CType(240,Byte),Integer), CType(CType(216,Byte),Integer))
-Me.TextBoxLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-Me.TextBoxLabel.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-Me.TextBoxLabel.ForeColor = System.Drawing.Color.Black
-Me.TextBoxLabel.Location = New System.Drawing.Point(123, 137)
-Me.TextBoxLabel.Name = "TextBoxLabel"
-Me.TextBoxLabel.ReadOnly = true
-Me.TextBoxLabel.Size = New System.Drawing.Size(40, 25)
-Me.TextBoxLabel.TabIndex = 536
-Me.TextBoxLabel.TabStop = false
-Me.TextBoxLabel.Text = "Rp"
-Me.TextBoxLabel.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+Me.LabelPenjaminAsuransiLain.AutoEllipsis = true
+Me.LabelPenjaminAsuransiLain.BackColor = System.Drawing.Color.Transparent
+Me.LabelPenjaminAsuransiLain.Font = New System.Drawing.Font("Segoe UI Semibold", 8.25!, System.Drawing.FontStyle.Bold)
+Me.LabelPenjaminAsuransiLain.Location = New System.Drawing.Point(160, 25)
+Me.LabelPenjaminAsuransiLain.Name = "LabelPenjaminAsuransiLain"
+Me.LabelPenjaminAsuransiLain.Size = New System.Drawing.Size(179, 23)
+Me.LabelPenjaminAsuransiLain.TabIndex = 534
+Me.LabelPenjaminAsuransiLain.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
 '
 'ButtonScanQR
 '
@@ -10586,23 +10523,11 @@ Me.Panel26.Controls.Add(Me.LabelPenjaminAsuransiLain)
 Me.Panel26.Controls.Add(Me.ButtonCariPenjaminAsuransiLain)
 Me.Panel26.Controls.Add(Me.RadioButtonPenjaminAsuransiLain)
 Me.Panel26.Controls.Add(Me.RadioButtonPenjaminUmum)
-Me.Panel26.Controls.Add(Me.CheckBoxInformedConsent)
 Me.Panel26.Font = New System.Drawing.Font("Segoe UI Semibold", 9!, System.Drawing.FontStyle.Bold)
 Me.Panel26.Location = New System.Drawing.Point(123, 75)
 Me.Panel26.Name = "Panel26"
-Me.Panel26.Size = New System.Drawing.Size(335, 56)
+Me.Panel26.Size = New System.Drawing.Size(374, 56)
 Me.Panel26.TabIndex = 532
-'
-'LabelPenjaminAsuransiLain
-'
-Me.LabelPenjaminAsuransiLain.AutoEllipsis = true
-Me.LabelPenjaminAsuransiLain.BackColor = System.Drawing.Color.Transparent
-Me.LabelPenjaminAsuransiLain.Font = New System.Drawing.Font("Segoe UI Semibold", 8.25!, System.Drawing.FontStyle.Bold)
-Me.LabelPenjaminAsuransiLain.Location = New System.Drawing.Point(146, 25)
-Me.LabelPenjaminAsuransiLain.Name = "LabelPenjaminAsuransiLain"
-Me.LabelPenjaminAsuransiLain.Size = New System.Drawing.Size(179, 26)
-Me.LabelPenjaminAsuransiLain.TabIndex = 534
-Me.LabelPenjaminAsuransiLain.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
 '
 'RadioButtonPenjaminAsuransiLain
 '
@@ -10635,7 +10560,7 @@ Me.CheckBoxInformedConsent.Cursor = System.Windows.Forms.Cursors.No
 Me.CheckBoxInformedConsent.Enabled = false
 Me.CheckBoxInformedConsent.Font = New System.Drawing.Font("Segoe UI Semibold", 9!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
 Me.CheckBoxInformedConsent.ForeColor = System.Drawing.SystemColors.ControlText
-Me.CheckBoxInformedConsent.Location = New System.Drawing.Point(176, 4)
+Me.CheckBoxInformedConsent.Location = New System.Drawing.Point(360, 18)
 Me.CheckBoxInformedConsent.Name = "CheckBoxInformedConsent"
 Me.CheckBoxInformedConsent.Size = New System.Drawing.Size(122, 19)
 Me.CheckBoxInformedConsent.TabIndex = 530
@@ -10720,7 +10645,7 @@ Me.TextBoxBiayaTindakan.BackColor = System.Drawing.Color.White
 Me.TextBoxBiayaTindakan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
 Me.TextBoxBiayaTindakan.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
 Me.TextBoxBiayaTindakan.ForeColor = System.Drawing.Color.Black
-Me.TextBoxBiayaTindakan.Location = New System.Drawing.Point(320, 137)
+Me.TextBoxBiayaTindakan.Location = New System.Drawing.Point(162, 137)
 Me.TextBoxBiayaTindakan.Name = "TextBoxBiayaTindakan"
 Me.TextBoxBiayaTindakan.ReadOnly = true
 Me.TextBoxBiayaTindakan.Size = New System.Drawing.Size(68, 25)
@@ -10754,7 +10679,7 @@ Me.TextBoxTindakanID.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
 '
 Me.Label52.AutoSize = true
 Me.Label52.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-Me.Label52.Location = New System.Drawing.Point(237, 139)
+Me.Label52.Location = New System.Drawing.Point(79, 139)
 Me.Label52.Name = "Label52"
 Me.Label52.Size = New System.Drawing.Size(40, 17)
 Me.Label52.TabIndex = 434
@@ -10766,7 +10691,7 @@ Me.TextBox16.BackColor = System.Drawing.Color.FromArgb(CType(CType(223,Byte),Int
 Me.TextBox16.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
 Me.TextBox16.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
 Me.TextBox16.ForeColor = System.Drawing.Color.Black
-Me.TextBox16.Location = New System.Drawing.Point(281, 137)
+Me.TextBox16.Location = New System.Drawing.Point(123, 137)
 Me.TextBox16.Name = "TextBox16"
 Me.TextBox16.ReadOnly = true
 Me.TextBox16.Size = New System.Drawing.Size(40, 25)
@@ -17230,6 +17155,29 @@ Me.Label334.Size = New System.Drawing.Size(62, 17)
 Me.Label334.TabIndex = 556
 Me.Label334.Text = "No Surat"
 '
+'Label353
+'
+Me.Label353.AutoSize = true
+Me.Label353.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+Me.Label353.Location = New System.Drawing.Point(240, 139)
+Me.Label353.Name = "Label353"
+Me.Label353.Size = New System.Drawing.Size(30, 17)
+Me.Label353.TabIndex = 534
+Me.Label353.Text = "Qty"
+'
+'TextBoxQty
+'
+Me.TextBoxQty.BackColor = System.Drawing.Color.White
+Me.TextBoxQty.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+Me.TextBoxQty.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
+Me.TextBoxQty.ForeColor = System.Drawing.Color.Black
+Me.TextBoxQty.Location = New System.Drawing.Point(276, 137)
+Me.TextBoxQty.Name = "TextBoxQty"
+Me.TextBoxQty.ReadOnly = true
+Me.TextBoxQty.Size = New System.Drawing.Size(68, 25)
+Me.TextBoxQty.TabIndex = 535
+Me.TextBoxQty.TabStop = false
+'
 'FormRekamMedisDokter
 '
 Me.AutoScaleDimensions = New System.Drawing.SizeF(7!, 15!)
@@ -18596,7 +18544,6 @@ End Sub
     Friend WithEvents RadioButtonPenjaminAsuransiLain As System.Windows.Forms.RadioButton
     Friend WithEvents ButtonCariPenjaminAsuransiLain As System.Windows.Forms.Button
     Friend WithEvents ComboBox1 As System.Windows.Forms.ComboBox
-    Friend WithEvents LabelPenjaminAsuransiLain As System.Windows.Forms.Label
     Friend WithEvents TextBoxJenisTindakan As System.Windows.Forms.TextBox
     Friend WithEvents RadioButtonPenjaminMandiriInhealth As System.Windows.Forms.RadioButton
     Friend WithEvents RadioButtonPenjaminBPJS As System.Windows.Forms.RadioButton
@@ -18858,14 +18805,12 @@ End Sub
     Friend WithEvents RadioButtonPerTindakan As System.Windows.Forms.RadioButton
     Friend WithEvents RadioButtonReguler As System.Windows.Forms.RadioButton
     Friend WithEvents RadioButtonCekStik As System.Windows.Forms.RadioButton
-    Friend WithEvents ButtonVoucher As System.Windows.Forms.Button
-    Friend WithEvents TextBoxDiskonTindakan As System.Windows.Forms.TextBox
-    Friend WithEvents Label353 As System.Windows.Forms.Label
-    Friend WithEvents TextBoxLabel As System.Windows.Forms.TextBox
-    Friend WithEvents LabelBiaya As System.Windows.Forms.Label
     Friend WithEvents Label354 As System.Windows.Forms.Label
     Friend WithEvents GroupBox7 As System.Windows.Forms.GroupBox
     Friend WithEvents Label365 As System.Windows.Forms.Label
     Friend WithEvents ButtonCekHasilInbody As System.Windows.Forms.Button
     Friend WithEvents ComboBoxTanggalInbody As System.Windows.Forms.ComboBox
+    Friend WithEvents LabelPenjaminAsuransiLain As System.Windows.Forms.Label
+    Friend WithEvents TextBoxQty As System.Windows.Forms.TextBox
+    Friend WithEvents Label353 As System.Windows.Forms.Label
 End Class

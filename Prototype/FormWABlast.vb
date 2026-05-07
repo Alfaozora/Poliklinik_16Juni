@@ -292,6 +292,8 @@ Public Class FormWABlast
             ProgressBar1.Minimum = 0
             Dim total As Integer = 0
 
+            Dim rnd As New Random()
+
             For Each row As DataGridViewRow In dgvData.Rows
                 If Not row.IsNewRow Then
                     If Not IsDBNull(row.Cells("Status").Value) Then
@@ -356,8 +358,13 @@ Public Class FormWABlast
                 LabelStatus.Text = "Mengirim ke: " & nama & " " & ProgressBar1.Value & " / " & ProgressBar1.Maximum
                 Application.DoEvents()
 
-                Dim rnd As New Random()
-                Threading.Thread.Sleep(rnd.Next(5000, 10000))
+                Dim delay As Integer = Rnd.Next(15000, 60000)
+                Threading.Thread.Sleep(delay)
+
+                If ProgressBar1.Value Mod 15 = 0 Then
+                    Dim cooldown As Integer = Rnd.Next(180000, 300000)
+                    Threading.Thread.Sleep(cooldown)
+                End If
             Next
 
             ProgressBar1.Value = ProgressBar1.Maximum

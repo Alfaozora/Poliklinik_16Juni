@@ -1,11 +1,13 @@
 ﻿Public Class FormKodeVoucher
     Private userInput As String = PoliKlinik.Lbluser.Text
 
+    Private currentPage As Integer = 1
+
     Private Sub FormKodeVoucher_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Me.MdiParent = PoliKlinik
         Me.Dock = DockStyle.Fill
         Me.WindowState = FormWindowState.Maximized
-        LoadVoucher()
+        LoadVoucher(currentPage)
     End Sub
 
     Private Sub TextBoxMinVoc_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles TextBoxMinVoc.KeyPress
@@ -172,29 +174,26 @@
 
         MsgBox("Data voucher berhasil disimpan.", MsgBoxStyle.Information)
         ResetForm()
-        LoadVoucher()
+        LoadVoucher(currentPage)
     End Sub
 
-    Private Sub LoadVoucher()
-        Dim sql As String = "" & _
-            "SELECT " & _
-                "MV.NamaVoucher, " & _
-                "MV.KodeVoucher, " & _
-                "MV.Tipe, " & _
-                "MV.Nilai, " & _
-                "MV.MinTransaksi, " & _
-                "MV.TanggalMulai, " & _
-                "MV.TanggalAkhir, " & _
-                "MV.JumlahMaks, " & _
-                "MV.JumlahTerpakai, " & _
-                "MV.Status, " & _
-                "MV.KodeTindakan, " & _
-                "MV.CreatedDate, " & _
-                "MV.CreatedBy, " & _
-                "MV.TipePemakaian " & _
-            "FROM MasterVoucher MV " & _
-            "WHERE(MV.DeletedBy Is NULL) " & _
-            "ORDER BY MV.CreatedDate DESC"
+    Private Sub LoadVoucher(ByVal page As Integer)
+        Dim pageSize As Integer = 20
+        Dim startRow As Integer = (page - 1) * pageSize + 1
+        Dim endRow As Integer = page * pageSize
+
+        Dim sql As String = ""
+        sql &= "WITH VoucherCTE AS ("
+        sql &= " SELECT MV.NamaVoucher, MV.KodeVoucher, MV.Tipe, MV.Nilai, "
+        sql &= " MV.MinTransaksi, MV.TanggalMulai, MV.TanggalAkhir, MV.JumlahMaks, "
+        sql &= " MV.JumlahTerpakai, MV.Status, MV.KodeTindakan, MV.CreatedDate, "
+        sql &= " MV.CreatedBy, MV.TipePemakaian, "
+        sql &= " ROW_NUMBER() OVER (ORDER BY MV.CreatedDate DESC) AS RowNum "
+        sql &= " FROM MasterVoucher MV "
+        sql &= " WHERE MV.DeletedBy IS NULL "
+        sql &= ") "
+        sql &= "SELECT * FROM VoucherCTE "
+        sql &= "WHERE RowNum BETWEEN " & startRow & " AND " & endRow
 
         Dim dt As DataTable = ReadSQL(sql)
 
@@ -211,7 +210,9 @@
         dt.Columns.Add("Terpakai", GetType(String))
         dt.Columns.Add("Status Voucher", GetType(String))
         dt.Columns.Add("Nama Tindakan", GetType(String))
-        dt.Columns.Add("Tipe Pemakaian", GetType(String))
+        If Not dt.Columns.Contains("Tipe Pemakaian") Then
+            dt.Columns.Add("Tipe Pemakaian", GetType(String))
+        End If
 
         For Each row As DataRow In dt.Rows
             Dim nama As String = If(IsDBNull(row("NamaVoucher")), "", row("NamaVoucher").ToString())
@@ -292,6 +293,7 @@
             row("Nama Tindakan") = namaTindakanGabung
         Next
 
+        DataGridView1.Columns.Clear()
         DataGridView1.DataSource = dt
 
         ' --- Tambahkan tombol hapus ---
@@ -347,7 +349,7 @@
         End With
     End Sub
 
-    Private Sub DataGridView1_CellContentClick(ByVal sender As Object, ByVal e As DataGridViewCellEventArgs) Handles DataGridView1.CellContentClick
+    Private Sub DataGridView1_CellContentClick(ByVal sender As Object, ByVal e As DataGridViewCellEventArgs)
         ' Pastikan kolom yang diklik adalah tombol "Hapus"
         If e.RowIndex >= 0 AndAlso DataGridView1.Columns(e.ColumnIndex).Name = "Hapus" Then
             Dim kodeVoucher As String = DataGridView1.Rows(e.RowIndex).Cells("Kode Voucher").Value.ToString()
@@ -367,7 +369,7 @@
                     MessageBox.Show("Data voucher berhasil dihapus.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
 
                     ' Refresh DataGridView
-                    LoadVoucher()
+                    LoadVoucher(currentPage)
                 Catch ex As Exception
                     MessageBox.Show("Terjadi kesalahan saat menghapus data: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
                 End Try
@@ -461,7 +463,19 @@
 
             MsgBox(count & " voucher berhasil digenerate.", MsgBoxStyle.Information)
             ResetForm()
-            LoadVoucher()
+            LoadVoucher(currentPage)
+        End If
+    End Sub
+
+    Private Sub ButtonNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonNext.Click
+        currentPage += 1
+        LoadVoucher(currentPage)
+    End Sub
+
+    Private Sub ButtonPrev_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonPrev.Click
+        If currentPage > 1 Then
+            currentPage -= 1
+            LoadVoucher(currentPage)
         End If
     End Sub
 End Class
