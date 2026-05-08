@@ -1,11 +1,14 @@
-Verison : 2.0.0.57 ()
+Verison : 2.0.0.57 (08 Mei 2026)
 # [New Feature] Penambahan laporan penggunaan paket Tindakan
 # [New Feature] Penambahan laporan Tindakan
 # [New Feature] Penambahan laporan 10 Tindakan Terbanyak
 # [New Feature] Pemfilteran berdasarkan Poli pada Laporan Riwayat paket dan Tindakan
 # [New Feature] Penambahan Fitur WA Blast
+# [New Feature] Penambahan Qty copy untuk Tindakan lebih dari 1
 # [Usability Improvement] Meyesuaikan pencarian potong paket agar tidak scan lagi
+# [Usability Improvement] Menghapus Fitur Voucher pada Form Perencanaan
 # [Usability Improvement] Menambahkan Range Number pada Master Alat
+# [Usability Improvement] Penggunaan Enkripsi payload dan signature pada keamanan API
 # [Bug Fix] Fix Bug Laporan Closed/Unclosed Klinik tidak bisa ditarik.
 ----------------------------------------------------------------------------------
 # [New Feature] Penambahan Pasien MCU ke Database InBody

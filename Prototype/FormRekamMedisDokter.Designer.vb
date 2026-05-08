@@ -736,9 +736,11 @@ Me.DataGridViewObat = New System.Windows.Forms.DataGridView
 Me.TabTindakan = New System.Windows.Forms.TabPage
 Me.SplitContainerTabTindakan = New System.Windows.Forms.SplitContainer
 Me.SplitContainerTindakan = New System.Windows.Forms.SplitContainer
-Me.LabelPenjaminAsuransiLain = New System.Windows.Forms.Label
+Me.TextBoxQty = New System.Windows.Forms.TextBox
+Me.Label353 = New System.Windows.Forms.Label
 Me.ButtonScanQR = New System.Windows.Forms.Button
 Me.Panel26 = New System.Windows.Forms.Panel
+Me.LabelPenjaminAsuransiLain = New System.Windows.Forms.Label
 Me.RadioButtonPenjaminAsuransiLain = New System.Windows.Forms.RadioButton
 Me.RadioButtonPenjaminUmum = New System.Windows.Forms.RadioButton
 Me.CheckBoxInformedConsent = New System.Windows.Forms.CheckBox
@@ -1263,8 +1265,6 @@ Me.TextBox73 = New System.Windows.Forms.TextBox
 Me.Label330 = New System.Windows.Forms.Label
 Me.TextBox74 = New System.Windows.Forms.TextBox
 Me.Label334 = New System.Windows.Forms.Label
-Me.Label353 = New System.Windows.Forms.Label
-Me.TextBoxQty = New System.Windows.Forms.TextBox
 Me.PanelTop.SuspendLayout
 Me.PanelSide.SuspendLayout
 Me.TabControlMenuUtama.SuspendLayout
@@ -10484,16 +10484,29 @@ Me.SplitContainerTindakan.Size = New System.Drawing.Size(811, 200)
 Me.SplitContainerTindakan.SplitterDistance = 500
 Me.SplitContainerTindakan.TabIndex = 0
 '
-'LabelPenjaminAsuransiLain
+'TextBoxQty
 '
-Me.LabelPenjaminAsuransiLain.AutoEllipsis = true
-Me.LabelPenjaminAsuransiLain.BackColor = System.Drawing.Color.Transparent
-Me.LabelPenjaminAsuransiLain.Font = New System.Drawing.Font("Segoe UI Semibold", 8.25!, System.Drawing.FontStyle.Bold)
-Me.LabelPenjaminAsuransiLain.Location = New System.Drawing.Point(160, 25)
-Me.LabelPenjaminAsuransiLain.Name = "LabelPenjaminAsuransiLain"
-Me.LabelPenjaminAsuransiLain.Size = New System.Drawing.Size(179, 23)
-Me.LabelPenjaminAsuransiLain.TabIndex = 534
-Me.LabelPenjaminAsuransiLain.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+Me.TextBoxQty.BackColor = System.Drawing.Color.White
+Me.TextBoxQty.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+Me.TextBoxQty.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
+Me.TextBoxQty.ForeColor = System.Drawing.Color.Black
+Me.TextBoxQty.Location = New System.Drawing.Point(276, 137)
+Me.TextBoxQty.Name = "TextBoxQty"
+Me.TextBoxQty.Size = New System.Drawing.Size(56, 25)
+Me.TextBoxQty.TabIndex = 535
+Me.TextBoxQty.TabStop = false
+Me.TextBoxQty.Text = "1"
+Me.TextBoxQty.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+'
+'Label353
+'
+Me.Label353.AutoSize = true
+Me.Label353.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+Me.Label353.Location = New System.Drawing.Point(240, 139)
+Me.Label353.Name = "Label353"
+Me.Label353.Size = New System.Drawing.Size(30, 17)
+Me.Label353.TabIndex = 534
+Me.Label353.Text = "Qty"
 '
 'ButtonScanQR
 '
@@ -10528,6 +10541,17 @@ Me.Panel26.Location = New System.Drawing.Point(123, 75)
 Me.Panel26.Name = "Panel26"
 Me.Panel26.Size = New System.Drawing.Size(374, 56)
 Me.Panel26.TabIndex = 532
+'
+'LabelPenjaminAsuransiLain
+'
+Me.LabelPenjaminAsuransiLain.AutoEllipsis = true
+Me.LabelPenjaminAsuransiLain.BackColor = System.Drawing.Color.Transparent
+Me.LabelPenjaminAsuransiLain.Font = New System.Drawing.Font("Segoe UI Semibold", 8.25!, System.Drawing.FontStyle.Bold)
+Me.LabelPenjaminAsuransiLain.Location = New System.Drawing.Point(160, 25)
+Me.LabelPenjaminAsuransiLain.Name = "LabelPenjaminAsuransiLain"
+Me.LabelPenjaminAsuransiLain.Size = New System.Drawing.Size(179, 23)
+Me.LabelPenjaminAsuransiLain.TabIndex = 534
+Me.LabelPenjaminAsuransiLain.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
 '
 'RadioButtonPenjaminAsuransiLain
 '
@@ -17154,29 +17178,6 @@ Me.Label334.Name = "Label334"
 Me.Label334.Size = New System.Drawing.Size(62, 17)
 Me.Label334.TabIndex = 556
 Me.Label334.Text = "No Surat"
-'
-'Label353
-'
-Me.Label353.AutoSize = true
-Me.Label353.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-Me.Label353.Location = New System.Drawing.Point(240, 139)
-Me.Label353.Name = "Label353"
-Me.Label353.Size = New System.Drawing.Size(30, 17)
-Me.Label353.TabIndex = 534
-Me.Label353.Text = "Qty"
-'
-'TextBoxQty
-'
-Me.TextBoxQty.BackColor = System.Drawing.Color.White
-Me.TextBoxQty.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-Me.TextBoxQty.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
-Me.TextBoxQty.ForeColor = System.Drawing.Color.Black
-Me.TextBoxQty.Location = New System.Drawing.Point(276, 137)
-Me.TextBoxQty.Name = "TextBoxQty"
-Me.TextBoxQty.ReadOnly = true
-Me.TextBoxQty.Size = New System.Drawing.Size(68, 25)
-Me.TextBoxQty.TabIndex = 535
-Me.TextBoxQty.TabStop = false
 '
 'FormRekamMedisDokter
 '

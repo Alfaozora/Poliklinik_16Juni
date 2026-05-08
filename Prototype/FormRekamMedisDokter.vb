@@ -1510,6 +1510,7 @@ Public Class FormRekamMedisDokter
         TextBoxBiayaTindakan.ResetText()
         CheckBoxInformedConsent.Checked = False
         SplitContainerTindakan.Panel2Collapsed = True
+        TextBoxQty.Text = 1
     End Sub
 
     Private Sub ClearTabRujukan()
@@ -2106,6 +2107,16 @@ Public Class FormRekamMedisDokter
             ' Get data poli
             Dim trowPoli As DataRow = tblsRekamMedis.Rows(0)
 
+            Dim qtyTindakan As Integer = 1
+            If IsNumeric(TextBoxQty.Text) AndAlso CInt(TextBoxQty.Text) > 0 Then
+                qtyTindakan = CInt(TextBoxQty.Text)
+            End If
+
+            If qtyTindakan > 20 Then
+                MsgBox("Qty terlalu besar!", MsgBoxStyle.Exclamation)
+                Exit Sub
+            End If
+
             Dim biayaAsli As Decimal = 0
             Dim discNominal As Decimal = 0
             Dim discTindakan As Decimal = 0
@@ -2157,34 +2168,33 @@ Public Class FormRekamMedisDokter
             End If
 
             If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
-                ' Insert ke tabel TransaksiPoliDetail
-                Dim sqlInsertDetail As String = _
-                    "INSERT INTO TransaksiPoliDetail (" & _
-                    "TransPoliID, TindakanID, NamaTindakan, JenisTindakan, " & _
-                    "BiayaTindakan, DiscTindakan, DiscPersenTindakan, NettBayar, KodeVoucher, " & _
-                    "Penjamin, GroupBayar, StatusPembayaran, CreatedBy, CreatedDate) VALUES (" & _
-                    "'" & trowPoli("TransPoliID") & "', " & _
-                    "'" & TextBoxTindakanID.Text & "', " & _
-                    "'" & TextBoxNamaTindakan.Text.Replace("'", "''") & "', " & _
-                    "'" & TextBoxJenisTindakan.Text & "', " & _
-                    biayaAsli & ", " & _
-                    discTindakan & ", " & _
-                    discPersenTindakan & ", " & _
-                    nettBayar & ", " & _
-                    "'" & voucherKode.Replace("'", "''") & "', " & _
-                    "'" & penjaminTindakan & "', '', 'PENDING', '" & userInput & "', GETDATE()" & _
-                    "); SELECT SCOPE_IDENTITY();"
 
-                Dim transPoliIDDetail As Integer = CInt(ReadSQLScalar(sqlInsertDetail))
+                For i As Integer = 1 To qtyTindakan
 
-                If TextBoxTindakanID.Text <> "" Then
+                    ' Insert ke tabel TransaksiPoliDetail
+                    Dim sqlInsertDetail As String = _
+                        "INSERT INTO TransaksiPoliDetail (" & _
+                        "TransPoliID, TindakanID, NamaTindakan, JenisTindakan, " & _
+                        "BiayaTindakan, DiscTindakan, NettBayar, " & _
+                        "Penjamin, GroupBayar, StatusPembayaran, CreatedBy, CreatedDate) VALUES (" & _
+                        "'" & trowPoli("TransPoliID") & "', " & _
+                        "'" & TextBoxTindakanID.Text & "', " & _
+                        "'" & TextBoxNamaTindakan.Text.Replace("'", "''") & "', " & _
+                        "'" & TextBoxJenisTindakan.Text & "', " & _
+                        CDbl(TextBoxBiayaTindakan.Text) & ", 0," & _
+                        CDbl(TextBoxBiayaTindakan.Text) & ", " & _
+                        "'" & penjaminTindakan & "', '', 'PENDING', '" & userInput & "', GETDATE()" & _
+                        "); SELECT SCOPE_IDENTITY();"
 
-                    Dim tindakanID As Integer = CInt(TextBoxTindakanID.Text)
-                    Dim qtyTindakan As Integer = 1
+                    Dim transPoliIDDetail As Integer = CInt(ReadSQLScalar(sqlInsertDetail))
 
-                    ProsesPemotonganKuotaAlat(transPoliIDDetail.ToString(), tindakanID.ToString(), qtyTindakan)
+                    If TextBoxTindakanID.Text <> "" Then
+                        Dim tindakanID As Integer = CInt(TextBoxTindakanID.Text)
+                        ProsesPemotonganKuotaAlat(transPoliIDDetail.ToString(), tindakanID.ToString(), qtyTindakan)
 
-                End If
+                    End If
+                Next
+
 
                 Dim jsonParam As String = _
                     "{" & _
@@ -2198,7 +2208,6 @@ Public Class FormRekamMedisDokter
                 Dim jsonConsent As String = jsonParam
 
                 Dim secretKey As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_payloadEnkrip'")
-
                 Dim encryptedPerTindakan As String = EncryptAES(jsonConsent, secretKey)
 
                 If String.IsNullOrEmpty(encryptedPerTindakan) Then
@@ -2207,9 +2216,7 @@ Public Class FormRekamMedisDokter
                 End If
 
                 Dim postData As String = "{""payload"": """ & encryptedPerTindakan & """} "
-
                 Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
-
                 Dim urlWebService As String = baseURL & "api/lumiera-luzelle/persetujuan-treatment/dev"
                 Dim responseApi As String = InsertDataAPIRM(postData, urlWebService)
 
@@ -2259,7 +2266,6 @@ Public Class FormRekamMedisDokter
 
             ' Refresh Grid
             LoadGridTindakanPoli()
-
             SaveDetailTindakan()
             ClearTabTindakan()
         Else
@@ -2931,7 +2937,7 @@ Public Class FormRekamMedisDokter
                                  """TglLahir"":""" & Format(tglLahir, "yyyy-MM-dd") & """," & _
                                  """JenisKelamin"":""" & jenisKelamin & """}"
 
-            Dim response As String = InsertDataAPIRM(json, baseUrl & "api/pasien/store")
+            Dim response As String = InsertDataAPIRMOld(json, baseUrl & "api/pasien/store")
 
             Dim result As JObject = JObject.Parse(response)
 
@@ -3237,7 +3243,7 @@ Public Class FormRekamMedisDokter
                 Dim nomorAntrean As String = If(IsDBNull(tbl.Rows(0)("NoAntreanHyu")), "", tbl.Rows(0)("NoAntreanHyu").ToString())
                 Dim nomorNIK As String = If(IsDBNull(tbl.Rows(0)("NoNIK")), "", tbl.Rows(0)("NoNIK").ToString())
 
-                If SendPCareDataV3(nomorNIK, nomorAntrean, "dilayani", "poli") = False Then Exit Sub
+                'If SendPCareDataV3(nomorNIK, nomorAntrean, "dilayani", "poli") = False Then Exit Sub
 
                 If noKunjunganBPJS.Length > 0 Then
                     MsgBox("Data berhasil disimpan." & vbCr & vbLf & "No kunjungan PCare : " & noKunjunganBPJS & "", MsgBoxStyle.Information, "Success!")
@@ -6836,11 +6842,11 @@ Public Class FormRekamMedisDokter
             Dim nomorNIK As String = If(IsDBNull(tbl.Rows(0)("NoNIK")), "", tbl.Rows(0)("NoNIK").ToString())
             Dim isExist As Boolean = CheckSQL("SELECT 1 FROM TransaksiObat WHERE NoTransaksi = '" & idTransaksi & "'")
 
-            If isExist Then
-                If SendPCareDataV3(nomorNIK, nomorAntrean, "menunggu_obat", "farmasi") = False Then Exit Sub
-            Else
-                If SendPCareDataV3(nomorNIK, nomorAntrean, "selesai", "selesai") = False Then Exit Sub
-            End If
+            'If isExist Then
+            '    If SendPCareDataV3(nomorNIK, nomorAntrean, "menunggu_obat", "farmasi") = False Then Exit Sub
+            'Else
+            '    If SendPCareDataV3(nomorNIK, nomorAntrean, "selesai", "selesai") = False Then Exit Sub
+            'End If
 
             ' ===================== Kirim ke PCare Jika BPJS =====================
             If statusBPJS AndAlso CheckBridgingPcareActive() Then

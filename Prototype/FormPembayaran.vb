@@ -2457,36 +2457,36 @@ Public Class FormPembayaran
             filterAwal = "AND Awal = '0'"
         End If
 
-        'Dim queryAwal As String = "" & _
-        '     "SELECT " & _
-        '         "TindakanID, " & _
-        '         "MAX(NamaTindakan) AS Tindakan, " & _
-        '         "MAX(JenisTindakan) AS Jenis, " & _
-        '         "MAX(BiayaTindakan) AS [Biaya Tindakan], " & _
-        '         "COUNT(*) AS Qty, " & _
-        '         "SUM(BiayaTindakan) AS SubTotal, " & _
-        '         "MAX(DiscTindakan) AS Diskon, " & _
-        '         "SUM(BiayaTindakan - ISNULL(DiscTindakan, 0)) AS NettBayar " & _
-        '     "FROM TransaksiPoliDetail " & _
-        '     "WHERE TransPoliID = '" & transPoliID & "' " & _
-        '         "AND DeletedBy IS NULL " & _
-        '         filterAwal & " " & _
-        '     "GROUP BY TindakanID"
-
         Dim queryAwal As String = "" & _
-            "SELECT " & _
-            "TindakanID, " & _
-            "NamaTindakan AS Tindakan, " & _
-            "JenisTindakan AS Jenis, " & _
-            "BiayaTindakan AS [Biaya Tindakan], " & _
-            "DiscTindakan AS Diskon, " & _
-            "1 AS Qty, " & _
-            "(BiayaTindakan - ISNULL(DiscTindakan, 0)) AS NettBayar, " & _
-            "(BiayaTindakan - ISNULL(DiscTindakan, 0)) AS SubTotal " & _
-            "FROM TransaksiPoliDetail " & _
-            "WHERE TransPoliID = '" & transPoliID & "' " & _
-            "AND DeletedBy IS NULL " & _
-            filterAwal
+             "SELECT " & _
+                 "TindakanID, " & _
+                 "MAX(NamaTindakan) AS Tindakan, " & _
+                 "MAX(JenisTindakan) AS Jenis, " & _
+                 "MAX(BiayaTindakan) AS [Biaya Tindakan], " & _
+                 "COUNT(*) AS Qty, " & _
+                 "SUM(BiayaTindakan) AS SubTotal, " & _
+                 "MAX(DiscTindakan) AS Diskon, " & _
+                 "SUM(BiayaTindakan - ISNULL(DiscTindakan, 0)) AS NettBayar " & _
+             "FROM TransaksiPoliDetail " & _
+             "WHERE TransPoliID = '" & transPoliID & "' " & _
+                 "AND DeletedBy IS NULL " & _
+                 filterAwal & " " & _
+             "GROUP BY TindakanID"
+
+        'Dim queryAwal As String = "" & _
+        '    "SELECT " & _
+        '    "TindakanID, " & _
+        '    "NamaTindakan AS Tindakan, " & _
+        '    "JenisTindakan AS Jenis, " & _
+        '    "BiayaTindakan AS [Biaya Tindakan], " & _
+        '    "DiscTindakan AS Diskon, " & _
+        '    "1 AS Qty, " & _
+        '    "(BiayaTindakan - ISNULL(DiscTindakan, 0)) AS NettBayar, " & _
+        '    "(BiayaTindakan - ISNULL(DiscTindakan, 0)) AS SubTotal " & _
+        '    "FROM TransaksiPoliDetail " & _
+        '    "WHERE TransPoliID = '" & transPoliID & "' " & _
+        '    "AND DeletedBy IS NULL " & _
+        '    filterAwal
 
         ' Eksekusi query ke DataTable
         Dim tblTindakan As DataTable = ReadSQL(queryAwal)
