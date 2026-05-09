@@ -72,6 +72,8 @@ Public Class FormInputInformedConsent
         Me.CenterToScreen()
     End Sub
 
+    Private hargaAwal As Decimal = 0
+
     Public Sub SetForm(ByRef Form As String, ByRef tbls As DataTable, ByRef txTindakanID As String, ByRef txStatusPersetujuan As Boolean, ByRef txJenisTransaksi As String)
         Me.BringToFront()
         TForm = Form
@@ -88,6 +90,10 @@ Public Class FormInputInformedConsent
         SetAwal()
         SetClear()
         SetData()
+
+
+        Decimal.TryParse(TextBoxBiayaTindakan.Text, hargaAwal)
+        TextBoxQty.Text = "1"
     End Sub
 
     Private Sub SetClear()
@@ -205,7 +211,7 @@ Public Class FormInputInformedConsent
         Try
             If ValidasiPostInformedConsent() = True Then
                 Dim Trow As DataRow = tblsRekamMedis.Rows(0)
-                Dim urlWebService As String = "https://mmc-online.mitramedicare.com/api/lumiera-luzelle/ic"
+                Dim urlWebService As String = "http://mmc-online.mitramedicare.com/api/lumiera-luzelle/ic"
                 Dim parameter As String = ""
                 Dim uri_message As String = ""
 
@@ -271,7 +277,7 @@ Public Class FormInputInformedConsent
 
                 uri_message = urlWebService
 
-                Dim response As String = InsertDataAPIRM(parameter, uri_message)
+                Dim response As String = InsertDataAPIRMOld(parameter, uri_message)
 
                 Dim jsonObj As JObject = JObject.Parse(response)
 
@@ -551,5 +557,32 @@ Public Class FormInputInformedConsent
 
             PanelDetailSaksiPasien.Visible = True
         End If
+    End Sub
+
+    Private Sub ButtonKalkulasi_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonKalkulasi.Click
+        Try
+            Dim qty As Integer = 1
+
+            Integer.TryParse(TextBoxQty.Text, qty)
+
+            ' Hitung total
+            Dim total As Decimal = hargaAwal * qty
+
+            ' Tampilkan hasil ke textbox biaya
+            'TextBoxBiayaTindakan.Text = total.ToString("N0")
+            TextBoxBiayaTindakan.Text = total.ToString()
+
+        Catch ex As Exception
+            MsgBox(ex.Message)
+        End Try
+    End Sub
+
+    Private Sub ButtonReset_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonReset.Click
+        TextBoxQty.Text = "1"
+
+        ' Kembalikan harga awal
+        'TextBoxBiayaTindakan.Text = hargaAwal.ToString("N0")
+
+        TextBoxBiayaTindakan.Text = hargaAwal.ToString()
     End Sub
 End Class

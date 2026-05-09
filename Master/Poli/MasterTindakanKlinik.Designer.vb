@@ -198,16 +198,16 @@ Partial Class MasterTindakanKlinik
         Me.TextBoxNamaAlat = New System.Windows.Forms.TextBox
         Me.Label43 = New System.Windows.Forms.Label
         Me.TabPage2 = New System.Windows.Forms.TabPage
+        Me.NumericKuotaMinimumCartridge = New System.Windows.Forms.TextBox
+        Me.NumericKuotaAwalCartridge = New System.Windows.Forms.TextBox
         Me.ButtonPreOrder = New System.Windows.Forms.Button
         Me.Label38 = New System.Windows.Forms.Label
-        Me.NumericKuotaMinimumCartridge = New System.Windows.Forms.NumericUpDown
         Me.Label58 = New System.Windows.Forms.Label
         Me.ComboBoxNamaAlat = New System.Windows.Forms.ComboBox
         Me.Label50 = New System.Windows.Forms.Label
         Me.TextBoxKuotaTotalCartridge = New System.Windows.Forms.TextBox
         Me.Label51 = New System.Windows.Forms.Label
         Me.TextBoxKodeCartridge = New System.Windows.Forms.TextBox
-        Me.NumericKuotaAwalCartridge = New System.Windows.Forms.NumericUpDown
         Me.Label52 = New System.Windows.Forms.Label
         Me.TextBoxKuotaSisaCartridge = New System.Windows.Forms.TextBox
         Me.Label53 = New System.Windows.Forms.Label
@@ -276,8 +276,6 @@ Partial Class MasterTindakanKlinik
         Me.TabPage1.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
         Me.TabPage2.SuspendLayout()
-        CType(Me.NumericKuotaMinimumCartridge, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.NumericKuotaAwalCartridge, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DataGridViewAlat, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.Panel9.SuspendLayout()
         Me.SuspendLayout()
@@ -2504,16 +2502,16 @@ Partial Class MasterTindakanKlinik
         'TabPage2
         '
         Me.TabPage2.BackColor = System.Drawing.Color.White
+        Me.TabPage2.Controls.Add(Me.NumericKuotaMinimumCartridge)
+        Me.TabPage2.Controls.Add(Me.NumericKuotaAwalCartridge)
         Me.TabPage2.Controls.Add(Me.ButtonPreOrder)
         Me.TabPage2.Controls.Add(Me.Label38)
-        Me.TabPage2.Controls.Add(Me.NumericKuotaMinimumCartridge)
         Me.TabPage2.Controls.Add(Me.Label58)
         Me.TabPage2.Controls.Add(Me.ComboBoxNamaAlat)
         Me.TabPage2.Controls.Add(Me.Label50)
         Me.TabPage2.Controls.Add(Me.TextBoxKuotaTotalCartridge)
         Me.TabPage2.Controls.Add(Me.Label51)
         Me.TabPage2.Controls.Add(Me.TextBoxKodeCartridge)
-        Me.TabPage2.Controls.Add(Me.NumericKuotaAwalCartridge)
         Me.TabPage2.Controls.Add(Me.Label52)
         Me.TabPage2.Controls.Add(Me.TextBoxKuotaSisaCartridge)
         Me.TabPage2.Controls.Add(Me.Label53)
@@ -2531,6 +2529,30 @@ Partial Class MasterTindakanKlinik
         Me.TabPage2.Size = New System.Drawing.Size(749, 222)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Cardtridge"
+        '
+        'NumericKuotaMinimumCartridge
+        '
+        Me.NumericKuotaMinimumCartridge.BackColor = System.Drawing.Color.White
+        Me.NumericKuotaMinimumCartridge.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.NumericKuotaMinimumCartridge.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
+        Me.NumericKuotaMinimumCartridge.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.NumericKuotaMinimumCartridge.Location = New System.Drawing.Point(194, 178)
+        Me.NumericKuotaMinimumCartridge.MaxLength = 5000000
+        Me.NumericKuotaMinimumCartridge.Name = "NumericKuotaMinimumCartridge"
+        Me.NumericKuotaMinimumCartridge.Size = New System.Drawing.Size(93, 23)
+        Me.NumericKuotaMinimumCartridge.TabIndex = 658
+        '
+        'NumericKuotaAwalCartridge
+        '
+        Me.NumericKuotaAwalCartridge.BackColor = System.Drawing.Color.White
+        Me.NumericKuotaAwalCartridge.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.NumericKuotaAwalCartridge.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
+        Me.NumericKuotaAwalCartridge.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.NumericKuotaAwalCartridge.Location = New System.Drawing.Point(194, 144)
+        Me.NumericKuotaAwalCartridge.MaxLength = 50000000
+        Me.NumericKuotaAwalCartridge.Name = "NumericKuotaAwalCartridge"
+        Me.NumericKuotaAwalCartridge.Size = New System.Drawing.Size(93, 23)
+        Me.NumericKuotaAwalCartridge.TabIndex = 657
         '
         'ButtonPreOrder
         '
@@ -2563,17 +2585,6 @@ Partial Class MasterTindakanKlinik
         Me.Label38.Size = New System.Drawing.Size(106, 17)
         Me.Label38.TabIndex = 655
         Me.Label38.Text = "Kuota Minimum"
-        '
-        'NumericKuotaMinimumCartridge
-        '
-        Me.NumericKuotaMinimumCartridge.Location = New System.Drawing.Point(194, 178)
-        Me.NumericKuotaMinimumCartridge.Maximum = New Decimal(New Integer() {1000000, 0, 0, 0})
-        Me.NumericKuotaMinimumCartridge.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
-        Me.NumericKuotaMinimumCartridge.Name = "NumericKuotaMinimumCartridge"
-        Me.NumericKuotaMinimumCartridge.Size = New System.Drawing.Size(77, 23)
-        Me.NumericKuotaMinimumCartridge.TabIndex = 654
-        Me.NumericKuotaMinimumCartridge.ThousandsSeparator = True
-        Me.NumericKuotaMinimumCartridge.Value = New Decimal(New Integer() {1, 0, 0, 0})
         '
         'Label58
         '
@@ -2611,6 +2622,7 @@ Partial Class MasterTindakanKlinik
         Me.TextBoxKuotaTotalCartridge.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.TextBoxKuotaTotalCartridge.Font = New System.Drawing.Font("Segoe UI", 9.0!)
         Me.TextBoxKuotaTotalCartridge.Location = New System.Drawing.Point(383, 144)
+        Me.TextBoxKuotaTotalCartridge.MaxLength = 50000000
         Me.TextBoxKuotaTotalCartridge.Name = "TextBoxKuotaTotalCartridge"
         Me.TextBoxKuotaTotalCartridge.ReadOnly = True
         Me.TextBoxKuotaTotalCartridge.Size = New System.Drawing.Size(77, 23)
@@ -2637,17 +2649,6 @@ Partial Class MasterTindakanKlinik
         Me.TextBoxKodeCartridge.Size = New System.Drawing.Size(207, 23)
         Me.TextBoxKodeCartridge.TabIndex = 648
         '
-        'NumericKuotaAwalCartridge
-        '
-        Me.NumericKuotaAwalCartridge.Location = New System.Drawing.Point(194, 144)
-        Me.NumericKuotaAwalCartridge.Maximum = New Decimal(New Integer() {50000000, 0, 0, 0})
-        Me.NumericKuotaAwalCartridge.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
-        Me.NumericKuotaAwalCartridge.Name = "NumericKuotaAwalCartridge"
-        Me.NumericKuotaAwalCartridge.Size = New System.Drawing.Size(77, 23)
-        Me.NumericKuotaAwalCartridge.TabIndex = 646
-        Me.NumericKuotaAwalCartridge.ThousandsSeparator = True
-        Me.NumericKuotaAwalCartridge.Value = New Decimal(New Integer() {1, 0, 0, 0})
-        '
         'Label52
         '
         Me.Label52.AutoSize = True
@@ -2665,6 +2666,7 @@ Partial Class MasterTindakanKlinik
         Me.TextBoxKuotaSisaCartridge.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.TextBoxKuotaSisaCartridge.Font = New System.Drawing.Font("Segoe UI", 9.0!)
         Me.TextBoxKuotaSisaCartridge.Location = New System.Drawing.Point(383, 178)
+        Me.TextBoxKuotaSisaCartridge.MaxLength = 50000000
         Me.TextBoxKuotaSisaCartridge.Name = "TextBoxKuotaSisaCartridge"
         Me.TextBoxKuotaSisaCartridge.ReadOnly = True
         Me.TextBoxKuotaSisaCartridge.Size = New System.Drawing.Size(77, 23)
@@ -2687,6 +2689,7 @@ Partial Class MasterTindakanKlinik
         Me.TextBoxKuotaTerpakaiCartridge.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.TextBoxKuotaTerpakaiCartridge.Font = New System.Drawing.Font("Segoe UI", 9.0!)
         Me.TextBoxKuotaTerpakaiCartridge.Location = New System.Drawing.Point(570, 144)
+        Me.TextBoxKuotaTerpakaiCartridge.MaxLength = 50000000
         Me.TextBoxKuotaTerpakaiCartridge.Name = "TextBoxKuotaTerpakaiCartridge"
         Me.TextBoxKuotaTerpakaiCartridge.ReadOnly = True
         Me.TextBoxKuotaTerpakaiCartridge.Size = New System.Drawing.Size(77, 23)
@@ -2978,8 +2981,6 @@ Partial Class MasterTindakanKlinik
         Me.GroupBox3.PerformLayout()
         Me.TabPage2.ResumeLayout(False)
         Me.TabPage2.PerformLayout()
-        CType(Me.NumericKuotaMinimumCartridge, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.NumericKuotaAwalCartridge, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DataGridViewAlat, System.ComponentModel.ISupportInitialize).EndInit()
         Me.Panel9.ResumeLayout(False)
         Me.ResumeLayout(False)
@@ -3165,7 +3166,6 @@ Partial Class MasterTindakanKlinik
     Friend WithEvents TextBoxKuotaTotalCartridge As System.Windows.Forms.TextBox
     Friend WithEvents Label51 As System.Windows.Forms.Label
     Friend WithEvents TextBoxKodeCartridge As System.Windows.Forms.TextBox
-    Friend WithEvents NumericKuotaAwalCartridge As System.Windows.Forms.NumericUpDown
     Friend WithEvents Label52 As System.Windows.Forms.Label
     Friend WithEvents TextBoxKuotaSisaCartridge As System.Windows.Forms.TextBox
     Friend WithEvents Label53 As System.Windows.Forms.Label
@@ -3186,6 +3186,7 @@ Partial Class MasterTindakanKlinik
     Friend WithEvents Label37 As System.Windows.Forms.Label
     Friend WithEvents DataGridViewAlatTindakan As System.Windows.Forms.DataGridView
     Friend WithEvents Label38 As System.Windows.Forms.Label
-    Friend WithEvents NumericKuotaMinimumCartridge As System.Windows.Forms.NumericUpDown
     Friend WithEvents ButtonPreOrder As System.Windows.Forms.Button
+    Friend WithEvents NumericKuotaMinimumCartridge As System.Windows.Forms.TextBox
+    Friend WithEvents NumericKuotaAwalCartridge As System.Windows.Forms.TextBox
 End Class

@@ -3436,7 +3436,7 @@ Module Test
             If ex.Response IsNot Nothing Then
                 Using responseStream As Stream = ex.Response.GetResponseStream()
                     Using reader As New StreamReader(responseStream)
-                        Return reader.ReadToEnd() ' <-- jangan bungkus pakai [ ]
+                        Return reader.ReadToEnd()
                     End Using
                 End Using
             Else

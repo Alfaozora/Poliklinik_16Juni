@@ -1520,7 +1520,7 @@ Public Class MasterTindakanKlinik
     End Sub
 
     Private Sub HitungKuotaSisa()
-        Dim kuotaTotal As Integer = CInt(NumericKuotaAwalCartridge.Value)
+        Dim kuotaTotal As Integer = CInt(NumericKuotaAwalCartridge.Text)
         Dim kuotaTerpakai As Integer = 0
 
         Integer.TryParse(TextBoxKuotaTerpakaiCartridge.Text, kuotaTerpakai)
@@ -1559,8 +1559,8 @@ Public Class MasterTindakanKlinik
         TextBoxNamaCartridge.Text = ""
 
         ' Reset kuota
-        NumericKuotaAwalCartridge.Value = 1
-        NumericKuotaMinimumCartridge.Value = 1
+        NumericKuotaAwalCartridge.Text = 1
+        NumericKuotaMinimumCartridge.Text = 1
         TextBoxKuotaTerpakaiCartridge.Text = "0"
         TextBoxKuotaSisaCartridge.Text = "0"
         TextBoxKuotaTotalCartridge.Text = "0"
@@ -1754,8 +1754,8 @@ Public Class MasterTindakanKlinik
 
         Dim statusAktif As Integer = If(CheckBoxCartridge.Checked, 1, 0)
 
-        Dim kuotaAwal As Integer = CInt(NumericKuotaAwalCartridge.Value)
-        Dim kuotaMinimum As Integer = CInt(NumericKuotaMinimumCartridge.Value)
+        Dim kuotaAwal As Integer = CInt(NumericKuotaAwalCartridge.Text)
+        Dim kuotaMinimum As Integer = CInt(NumericKuotaMinimumCartridge.Text)
 
         Dim alatID As Integer = CInt(ComboBoxNamaAlat.SelectedValue)
 
@@ -1807,8 +1807,8 @@ Public Class MasterTindakanKlinik
 
         ' Ambil kuota terpakai lama
         Dim kuotaTerpakai As Integer = CInt(TextBoxKuotaTerpakaiCartridge.Text)
-        Dim kuotaAwalBaru As Integer = CInt(NumericKuotaAwalCartridge.Value)
-        Dim kuotaMinimum As Integer = CInt(NumericKuotaMinimumCartridge.Value)
+        Dim kuotaAwalBaru As Integer = CInt(NumericKuotaAwalCartridge.Text)
+        Dim kuotaMinimum As Integer = CInt(NumericKuotaMinimumCartridge.Text)
 
         Dim alatID As Integer = CInt(ComboBoxNamaAlat.SelectedValue)
 
@@ -2001,8 +2001,8 @@ Public Class MasterTindakanKlinik
         TextBoxKodeCartridge.Text = row("KodeCartridge").ToString()
         TextBoxNamaCartridge.Text = row("NamaCartridge").ToString()
 
-        NumericKuotaAwalCartridge.Value = kuotaAwal
-        NumericKuotaMinimumCartridge.Value = kuotaMinimum
+        NumericKuotaAwalCartridge.Text = kuotaAwal
+        NumericKuotaMinimumCartridge.Text = kuotaMinimum
         TextBoxKuotaTotalCartridge.Text = kuotaTotal.ToString()
         TextBoxKuotaTerpakaiCartridge.Text = kuotaTerpakai.ToString()
         TextBoxKuotaSisaCartridge.Text = kuotaSisa.ToString()
