@@ -1502,6 +1502,23 @@ Public Class ReportPendapatanKlinik
             Next
 
             GridControlRekapInvoice.DataSource = rowTable
+
+            Dim view As DevExpress.XtraGrid.Views.Grid.GridView = GridViewRekapInvoice
+
+            view.BeginUpdate()
+
+            view.OptionsView.RowAutoHeight = True
+            view.OptionsView.ShowAutoFilterRow = False
+            view.OptionsView.ColumnAutoWidth = False
+
+            view.Columns("pemeriksaan").AppearanceCell.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap
+            view.Columns("pemeriksaan").AppearanceCell.Options.UseTextOptions = True
+
+            view.Columns("pemeriksaan").ColumnEdit = New DevExpress.XtraEditors.Repository.RepositoryItemMemoEdit()
+
+            view.EndUpdate()
+
+            view.BestFitColumns()
         Else
             MessageBox.Show("Tidak Ada Data.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End If
@@ -1526,54 +1543,156 @@ Public Class ReportPendapatanKlinik
     End Sub
 
     Function GetDataRekapTagihanPoliUmum(ByRef NomorInvoice As String) As DataTable
+
         ' Set Tabel Result
         Dim tblResult As New DataTable
 
         Dim queryBuilder As New StringBuilder()
 
-        queryBuilder.AppendLine("DECLARE @NoInvoicePembayaran NVARCHAR(50) = '" & NomorInvoice & "'") ' Menggunakan parameter
+        queryBuilder.AppendLine("DECLARE @NoInvoicePembayaran NVARCHAR(50) = '" & NomorInvoice & "'")
+
         queryBuilder.AppendLine("SELECT ROW_NUMBER() OVER (PARTITION BY tblDetail.JenisPoli, tblBayar.JenisBayar, tblBayar.CompanyTagihan, tblBayar.mesin ")
         queryBuilder.AppendLine("ORDER BY tblPoli.TglPoli, tblPoli.NoUrut) AS NomorUrutTransaksi, ")
+
         queryBuilder.AppendLine("tblBayar.TransPoliIDBayar AS 'ID', tblPoli.NoUrut AS 'No Transaksi', ")
-        queryBuilder.AppendLine("CONVERT(DATE, tblPoli.TglPoli) AS 'Tgl Transaksi', tblDetail.JenisPoli, tblBayar.DataListTindakan, ")
+        queryBuilder.AppendLine("CONVERT(DATE, tblPoli.TglPoli) AS 'Tgl Transaksi', ")
+        queryBuilder.AppendLine("tblDetail.JenisPoli, tblBayar.DataListTindakan, ")
+
         queryBuilder.AppendLine("tblPasien.Nama, CONVERT(DATE, tblPasien.TglLahir) AS 'Tgl Lahir', ")
-        queryBuilder.AppendLine("tblPasien.NoRekamMedis, tblBayar.JenisBayar, tblBayar.CompanyTagihan, ")
+        queryBuilder.AppendLine("tblPasien.NoRekamMedis, ")
+
+        queryBuilder.AppendLine("tblBayar.JenisBayar, tblBayar.CompanyTagihan, ")
         queryBuilder.AppendLine("tblBayar.kartu AS 'JenisKartu', tblBayar.mesin AS 'JenisMesin', ")
-        queryBuilder.AppendLine("tblDetail.JenisTransaksi, tblBayar.JumlahBayar - tblBayar.Kembali AS TotalBayar, ")
+
+        queryBuilder.AppendLine("tblDetail.JenisTransaksi, ")
+        queryBuilder.AppendLine("(tblBayar.JumlahBayar - tblBayar.Kembali) AS TotalBayar, ")
+
         queryBuilder.AppendLine("tblPoli.RekapID, tblBayar.NoInvoicePembayaran, tblBayar.JenisKasir ")
+
         queryBuilder.AppendLine("FROM ( ")
+
+        ' =========================
+        ' TRANSAKSI BAYAR
+        ' =========================
         queryBuilder.AppendLine("    SELECT tb.TransPoliIDBayar, tb.TransPoliID, ")
-        queryBuilder.AppendLine("    STUFF((SELECT ', ' + ISNULL(tblTindakan.NamaTindakan, '') ")
-        queryBuilder.AppendLine("           FROM TransaksiPoliDetail tblTindakan ")
-        queryBuilder.AppendLine("           WHERE tblTindakan.Awal = '0' AND tblTindakan.TransPoliID = tb.TransPoliID ")
-        queryBuilder.AppendLine("           FOR XML PATH (''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS DataListTindakan, ")
-        queryBuilder.AppendLine("    tb.JenisBayar, CASE WHEN tb.JenisBayar = 'TAGIHAN' THEN tb.NoJenisBayar ELSE '' END AS 'CompanyTagihan', ")
-        queryBuilder.AppendLine("    tb.JumlahBayar, tb.Kembali, tb.kartu, tb.mesin, tb.NoInvoicePembayaran, 'Transaksi Tindakan' AS JenisKasir ")
+
+        queryBuilder.AppendLine("    STUFF(( ")
+        queryBuilder.AppendLine("        SELECT CHAR(13) + CHAR(10) + ")
+        queryBuilder.AppendLine("               d.NamaTindakan + ' x' + CAST(d.Qty AS VARCHAR) ")
+        queryBuilder.AppendLine("        FROM ( ")
+        queryBuilder.AppendLine("            SELECT tblTindakan.NamaTindakan, COUNT(*) AS Qty ")
+        queryBuilder.AppendLine("            FROM TransaksiPoliDetail tblTindakan ")
+        queryBuilder.AppendLine("            WHERE tblTindakan.Awal = '0' ")
+        queryBuilder.AppendLine("              AND tblTindakan.TransPoliID = tb.TransPoliID ")
+        queryBuilder.AppendLine("            GROUP BY tblTindakan.NamaTindakan ")
+        queryBuilder.AppendLine("        ) d ")
+        queryBuilder.AppendLine("        FOR XML PATH(''), TYPE ")
+        queryBuilder.AppendLine("    ).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS DataListTindakan, ")
+
+        queryBuilder.AppendLine("    tb.JenisBayar, ")
+        queryBuilder.AppendLine("    CASE WHEN tb.JenisBayar = 'TAGIHAN' THEN tb.NoJenisBayar ELSE '' END AS CompanyTagihan, ")
+        queryBuilder.AppendLine("    tb.JumlahBayar, tb.Kembali, tb.kartu, tb.mesin, tb.NoInvoicePembayaran, ")
+        queryBuilder.AppendLine("    'Transaksi Tindakan' AS JenisKasir ")
+
         queryBuilder.AppendLine("    FROM TransaksiPoliBayar tb ")
         queryBuilder.AppendLine("    WHERE tb.JumlahBayar > 0 ")
-        queryBuilder.AppendLine("    AND tb.NoInvoicePembayaran = @NoInvoicePembayaran ")
+        queryBuilder.AppendLine("      AND tb.NoInvoicePembayaran = @NoInvoicePembayaran ")
+
         queryBuilder.AppendLine("    UNION ALL ")
+
+        ' =========================
+        ' TRANSAKSI AWAL
+        ' =========================
         queryBuilder.AppendLine("    SELECT tba.TransPoliIDBayar, tba.TransPoliID, ")
-        queryBuilder.AppendLine("    STUFF((SELECT ', ' + ISNULL(tblTindakan.NamaTindakan, '') ")
-        queryBuilder.AppendLine("           FROM TransaksiPoliDetail tblTindakan ")
-        queryBuilder.AppendLine("           WHERE tblTindakan.Awal = '1' AND tblTindakan.TransPoliID = tba.TransPoliID ")
-        queryBuilder.AppendLine("           FOR XML PATH (''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS DataListTindakan, ")
-        queryBuilder.AppendLine("    tba.JenisBayar, CASE WHEN tba.JenisBayar = 'TAGIHAN' THEN tba.NoJenisBayar ELSE '' END AS 'CompanyTagihan', ")
-        queryBuilder.AppendLine("    tba.JumlahBayar, tba.Kembali, tba.kartu, tba.mesin, tba.NoInvoicePembayaran, 'Transaksi Awal' AS JenisKasir ")
+
+        queryBuilder.AppendLine("    STUFF(( ")
+        queryBuilder.AppendLine("        SELECT CHAR(13) + CHAR(10) + ")
+        queryBuilder.AppendLine("               d.NamaTindakan + ' x' + CAST(d.Qty AS VARCHAR) ")
+        queryBuilder.AppendLine("        FROM ( ")
+        queryBuilder.AppendLine("            SELECT tblTindakan.NamaTindakan, COUNT(*) AS Qty ")
+        queryBuilder.AppendLine("            FROM TransaksiPoliDetail tblTindakan ")
+        queryBuilder.AppendLine("            WHERE tblTindakan.Awal = '1' ")
+        queryBuilder.AppendLine("              AND tblTindakan.TransPoliID = tba.TransPoliID ")
+        queryBuilder.AppendLine("            GROUP BY tblTindakan.NamaTindakan ")
+        queryBuilder.AppendLine("        ) d ")
+        queryBuilder.AppendLine("        FOR XML PATH(''), TYPE ")
+        queryBuilder.AppendLine("    ).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS DataListTindakan, ")
+
+        queryBuilder.AppendLine("    tba.JenisBayar, ")
+        queryBuilder.AppendLine("    CASE WHEN tba.JenisBayar = 'TAGIHAN' THEN tba.NoJenisBayar ELSE '' END AS CompanyTagihan, ")
+        queryBuilder.AppendLine("    tba.JumlahBayar, tba.Kembali, tba.kartu, tba.mesin, tba.NoInvoicePembayaran, ")
+        queryBuilder.AppendLine("    'Transaksi Awal' AS JenisKasir ")
+
         queryBuilder.AppendLine("    FROM TransaksiPoliBayarAwal tba ")
         queryBuilder.AppendLine("    WHERE tba.JumlahBayar > 0 ")
-        queryBuilder.AppendLine("    AND tba.NoInvoicePembayaran = @NoInvoicePembayaran ")
+        queryBuilder.AppendLine("      AND tba.NoInvoicePembayaran = @NoInvoicePembayaran ")
+
         queryBuilder.AppendLine(") AS tblBayar ")
+
         queryBuilder.AppendLine("LEFT JOIN TransaksiPoli tblPoli ON tblBayar.TransPoliID = tblPoli.TransPoliID ")
         queryBuilder.AppendLine("LEFT JOIN TransaksiDetail tblDetail ON tblPoli.NoUrut = tblDetail.NoUrut ")
         queryBuilder.AppendLine("LEFT JOIN MasterPasien tblPasien ON tblPoli.IDInternet = tblPasien.NoRekamMedis ")
+
         queryBuilder.AppendLine("WHERE tblDetail.DeletedDate IS NULL ")
+
         queryBuilder.AppendLine("ORDER BY tblBayar.JenisBayar, tblDetail.JenisPoli;")
 
         tblResult = ReadSQL(queryBuilder.ToString())
 
         Return tblResult
+
     End Function
+
+    'OLD
+    'Function GetDataRekapTagihanPoliUmum(ByRef NomorInvoice As String) As DataTable
+    '    ' Set Tabel Result
+    '    Dim tblResult As New DataTable
+
+    '    Dim queryBuilder As New StringBuilder()
+
+    '    queryBuilder.AppendLine("DECLARE @NoInvoicePembayaran NVARCHAR(50) = '" & NomorInvoice & "'") ' Menggunakan parameter
+    '    queryBuilder.AppendLine("SELECT ROW_NUMBER() OVER (PARTITION BY tblDetail.JenisPoli, tblBayar.JenisBayar, tblBayar.CompanyTagihan, tblBayar.mesin ")
+    '    queryBuilder.AppendLine("ORDER BY tblPoli.TglPoli, tblPoli.NoUrut) AS NomorUrutTransaksi, ")
+    '    queryBuilder.AppendLine("tblBayar.TransPoliIDBayar AS 'ID', tblPoli.NoUrut AS 'No Transaksi', ")
+    '    queryBuilder.AppendLine("CONVERT(DATE, tblPoli.TglPoli) AS 'Tgl Transaksi', tblDetail.JenisPoli, tblBayar.DataListTindakan, ")
+    '    queryBuilder.AppendLine("tblPasien.Nama, CONVERT(DATE, tblPasien.TglLahir) AS 'Tgl Lahir', ")
+    '    queryBuilder.AppendLine("tblPasien.NoRekamMedis, tblBayar.JenisBayar, tblBayar.CompanyTagihan, ")
+    '    queryBuilder.AppendLine("tblBayar.kartu AS 'JenisKartu', tblBayar.mesin AS 'JenisMesin', ")
+    '    queryBuilder.AppendLine("tblDetail.JenisTransaksi, tblBayar.JumlahBayar - tblBayar.Kembali AS TotalBayar, ")
+    '    queryBuilder.AppendLine("tblPoli.RekapID, tblBayar.NoInvoicePembayaran, tblBayar.JenisKasir ")
+    '    queryBuilder.AppendLine("FROM ( ")
+    '    queryBuilder.AppendLine("    SELECT tb.TransPoliIDBayar, tb.TransPoliID, ")
+    '    queryBuilder.AppendLine("    STUFF((SELECT ', ' + ISNULL(tblTindakan.NamaTindakan, '') ")
+    '    queryBuilder.AppendLine("           FROM TransaksiPoliDetail tblTindakan ")
+    '    queryBuilder.AppendLine("           WHERE tblTindakan.Awal = '0' AND tblTindakan.TransPoliID = tb.TransPoliID ")
+    '    queryBuilder.AppendLine("           FOR XML PATH (''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS DataListTindakan, ")
+    '    queryBuilder.AppendLine("    tb.JenisBayar, CASE WHEN tb.JenisBayar = 'TAGIHAN' THEN tb.NoJenisBayar ELSE '' END AS 'CompanyTagihan', ")
+    '    queryBuilder.AppendLine("    tb.JumlahBayar, tb.Kembali, tb.kartu, tb.mesin, tb.NoInvoicePembayaran, 'Transaksi Tindakan' AS JenisKasir ")
+    '    queryBuilder.AppendLine("    FROM TransaksiPoliBayar tb ")
+    '    queryBuilder.AppendLine("    WHERE tb.JumlahBayar > 0 ")
+    '    queryBuilder.AppendLine("    AND tb.NoInvoicePembayaran = @NoInvoicePembayaran ")
+    '    queryBuilder.AppendLine("    UNION ALL ")
+    '    queryBuilder.AppendLine("    SELECT tba.TransPoliIDBayar, tba.TransPoliID, ")
+    '    queryBuilder.AppendLine("    STUFF((SELECT ', ' + ISNULL(tblTindakan.NamaTindakan, '') ")
+    '    queryBuilder.AppendLine("           FROM TransaksiPoliDetail tblTindakan ")
+    '    queryBuilder.AppendLine("           WHERE tblTindakan.Awal = '1' AND tblTindakan.TransPoliID = tba.TransPoliID ")
+    '    queryBuilder.AppendLine("           FOR XML PATH (''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS DataListTindakan, ")
+    '    queryBuilder.AppendLine("    tba.JenisBayar, CASE WHEN tba.JenisBayar = 'TAGIHAN' THEN tba.NoJenisBayar ELSE '' END AS 'CompanyTagihan', ")
+    '    queryBuilder.AppendLine("    tba.JumlahBayar, tba.Kembali, tba.kartu, tba.mesin, tba.NoInvoicePembayaran, 'Transaksi Awal' AS JenisKasir ")
+    '    queryBuilder.AppendLine("    FROM TransaksiPoliBayarAwal tba ")
+    '    queryBuilder.AppendLine("    WHERE tba.JumlahBayar > 0 ")
+    '    queryBuilder.AppendLine("    AND tba.NoInvoicePembayaran = @NoInvoicePembayaran ")
+    '    queryBuilder.AppendLine(") AS tblBayar ")
+    '    queryBuilder.AppendLine("LEFT JOIN TransaksiPoli tblPoli ON tblBayar.TransPoliID = tblPoli.TransPoliID ")
+    '    queryBuilder.AppendLine("LEFT JOIN TransaksiDetail tblDetail ON tblPoli.NoUrut = tblDetail.NoUrut ")
+    '    queryBuilder.AppendLine("LEFT JOIN MasterPasien tblPasien ON tblPoli.IDInternet = tblPasien.NoRekamMedis ")
+    '    queryBuilder.AppendLine("WHERE tblDetail.DeletedDate IS NULL ")
+    '    queryBuilder.AppendLine("ORDER BY tblBayar.JenisBayar, tblDetail.JenisPoli;")
+
+    '    tblResult = ReadSQL(queryBuilder.ToString())
+
+    '    Return tblResult
+    'End Function
 
     Function GetDataRekapTagihanPoliGigi(ByRef NomorInvoice As String) As DataTable
         ' Set Tabel Result

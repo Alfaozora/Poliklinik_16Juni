@@ -1,4 +1,8 @@
-Verison : 2.0.0.57 (08 Mei 2026)
+Version : 2.0.0.58 ()
+# [New Feature] Penambahan Qty untuk Informed Consent
+# [Usability Improvement] Group by Tindakan + Qty pada Rekap Tagihan
+
+Version : 2.0.0.57 (08 Mei 2026)
 # [New Feature] Penambahan laporan penggunaan paket Tindakan
 # [New Feature] Penambahan laporan Tindakan
 # [New Feature] Penambahan laporan 10 Tindakan Terbanyak
@@ -15,7 +19,7 @@ Verison : 2.0.0.57 (08 Mei 2026)
 # [Usability Imporvement] Isi otomatis Weight dan Height saat klik nilai normal pemeriksaan fisik online
 # [New Feature] Cetak hasil Inbody di Form Lab
 
-Verison : 2.0.0.56 (26 Februari 2026)
+Version : 2.0.0.56 (26 Februari 2026)
 # [New Feature] Penambahan API Untuk integrasi dengan Alat InBody
 # [New Feature] Penambahan API Untuk integrasi dengan Informed Consent
 # [New Feature] Penambahan API Untuk integrasi dengan Kirim Alat
