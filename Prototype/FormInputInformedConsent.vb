@@ -141,7 +141,7 @@ Public Class FormInputInformedConsent
                 ComboBoxTujuanTindakan.Items.Add(Trow("KeteranganInformasi"))
             ElseIf Trow("NamaInformasi") = "Risiko" Then
                 ComboBoxResiko.Items.Add(Trow("KeteranganInformasi"))
-            ElseIf Trow("NamaInformasi") = "Komplikasi " Then
+            ElseIf Trow("NamaInformasi") = "Komplikasi" Then
                 ComboBoxKomplikasi.Items.Add(Trow("KeteranganInformasi"))
             ElseIf Trow("NamaInformasi") = "Prognosis" Then
                 ComboBoxPrognosa.Items.Add(Trow("KeteranganInformasi"))
@@ -239,6 +239,10 @@ Public Class FormInputInformedConsent
                     statusSaksiPasien = "true"
                 End If
 
+                Dim tataCaraClean As String = ComboBoxTataCara.Text.Replace(vbCr, "").Replace(vbLf, " ")
+                Dim alamatClean As String = Trow("DomisiliAlamat").ToString().Replace(vbCr, "").Replace(vbLf, " ")
+                Dim dasarDiagnosisClean As String = TextBoxDasarDiagnosa.Text.Replace(vbCr, "").Replace(vbLf, " ")
+
                 parameter = "{" & _
                     """nama"":""" & Trow("Nama") & """," & _
                     """no_rm"":""" & Trow("IDInternet") & """," & _
@@ -246,7 +250,7 @@ Public Class FormInputInformedConsent
                     """no_nik"":""" & Trow("NoNIK") & """," & _
                     """umur"":""" & HitungUsia(Trow("TglLahir")) & """," & _
                     """sex"":""" & Trow("JenisKelamin") & """," & _
-                    """alamat"":""" & Trow("DomisiliAlamat") & """," & _
+                    """alamat"":""" & alamatClean & """," & _
                     """no_transaksi"":""" & Trow("NoUrut") & """," & _
                     """tgl"":""" & Format(Trow("TglTransaksi"), "yyyy-MM-dd") & """," & _
                     """perawatan"":""" & TextBoxNamaTindakan.Text & """," & _
@@ -254,11 +258,11 @@ Public Class FormInputInformedConsent
                     """kode_dokter"":""" & Trow("KodeDokter") & """," & _
                     """perawat"":""" & Trow("NamaPerawat") & """," & _
                     """ket_diagnosis"":""" & TextBoxDiagnosa.Text & """," & _
-                    """dasar_diagnosis"":""" & TextBoxDasarDiagnosa.Text & """," & _
+                    """dasar_diagnosis"":""" & dasarDiagnosisClean & """," & _
                     """id_tindakan"":""" & tindakanID & """," & _
                     """ket_tindakan"":""" & TextBoxNamaTindakan.Text & """," & _
                     """indikasi_tindakan"":""" & ComboBoxIndikasiTindakan.Text & """," & _
-                    """tata_cara"":""" & ComboBoxTataCara.Text & """," & _
+                    """tata_cara"":""" & tataCaraClean & """," & _
                     """tujuan_tindakan"":""" & ComboBoxTujuanTindakan.Text & """," & _
                     """risiko"":""" & ComboBoxResiko.Text & """," & _
                     """komplikasi"":""" & ComboBoxKomplikasi.Text & """," & _
@@ -274,6 +278,11 @@ Public Class FormInputInformedConsent
                     """kode_voucher"":""" & voucher & """," & _
                     """status_transaksi"":""pending""" & _
                 "}"
+                'Dim logPath As String = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) & "\debug_api_log.txt"
+                'System.IO.File.WriteAllText(logPath, "Data dikirim pada: " & Now.ToString() & vbCrLf & parameter)
+                'MsgBox("Log tersimpan di: " & logPath)
+
+                'MsgBox(parameter, MsgBoxStyle.Information, "Cek Format JSON")
 
                 uri_message = urlWebService
 

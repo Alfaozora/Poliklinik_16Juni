@@ -23,10 +23,10 @@ Partial Class ReportDaftarKunjunganPesien
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(ReportDaftarKunjunganPesien))
-        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle17 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle18 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle19 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle20 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Me.PanelTop = New System.Windows.Forms.Panel
         Me.btnClose = New System.Windows.Forms.Button
         Me.Panel1 = New System.Windows.Forms.Panel
@@ -49,6 +49,7 @@ Partial Class ReportDaftarKunjunganPesien
         Me.ComboBoxBulan = New System.Windows.Forms.ComboBox
         Me.SplitContainer3 = New System.Windows.Forms.SplitContainer
         Me.DataGridViewDaftarKunjungan = New System.Windows.Forms.DataGridView
+        Me.RadioButtonBirthday = New System.Windows.Forms.RadioButton
         Me.PanelTop.SuspendLayout()
         Me.Panel1.SuspendLayout()
         Me.PanelKeadaanUmumMenuPemeriksaanAwal.SuspendLayout()
@@ -113,7 +114,7 @@ Partial Class ReportDaftarKunjunganPesien
         Me.PanelKeadaanUmumMenuPemeriksaanAwal.Font = New System.Drawing.Font("Segoe UI", 9.75!)
         Me.PanelKeadaanUmumMenuPemeriksaanAwal.Location = New System.Drawing.Point(41, 11)
         Me.PanelKeadaanUmumMenuPemeriksaanAwal.Name = "PanelKeadaanUmumMenuPemeriksaanAwal"
-        Me.PanelKeadaanUmumMenuPemeriksaanAwal.Size = New System.Drawing.Size(632, 211)
+        Me.PanelKeadaanUmumMenuPemeriksaanAwal.Size = New System.Drawing.Size(628, 211)
         Me.PanelKeadaanUmumMenuPemeriksaanAwal.TabIndex = 521
         '
         'ButtonDownloadExcel
@@ -210,12 +211,13 @@ Partial Class ReportDaftarKunjunganPesien
         'Panel2
         '
         Me.Panel2.BackColor = System.Drawing.Color.Transparent
+        Me.Panel2.Controls.Add(Me.RadioButtonBirthday)
         Me.Panel2.Controls.Add(Me.RadioButtonKunjunganSehat)
         Me.Panel2.Controls.Add(Me.RadioButtonKunjunganSakit)
         Me.Panel2.Font = New System.Drawing.Font("Segoe UI", 9.75!)
         Me.Panel2.Location = New System.Drawing.Point(148, 3)
         Me.Panel2.Name = "Panel2"
-        Me.Panel2.Size = New System.Drawing.Size(258, 25)
+        Me.Panel2.Size = New System.Drawing.Size(333, 25)
         Me.Panel2.TabIndex = 525
         '
         'RadioButtonKunjunganSehat
@@ -353,53 +355,64 @@ Partial Class ReportDaftarKunjunganPesien
         '
         Me.DataGridViewDaftarKunjungan.AllowUserToAddRows = False
         Me.DataGridViewDaftarKunjungan.AllowUserToDeleteRows = False
-        DataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.DataGridViewDaftarKunjungan.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle1
+        DataGridViewCellStyle17.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.DataGridViewDaftarKunjungan.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle17
         Me.DataGridViewDaftarKunjungan.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells
         Me.DataGridViewDaftarKunjungan.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells
         Me.DataGridViewDaftarKunjungan.BackgroundColor = System.Drawing.Color.White
         Me.DataGridViewDaftarKunjungan.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.DataGridViewDaftarKunjungan.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None
         Me.DataGridViewDaftarKunjungan.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None
-        DataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(CType(CType(37, Byte), Integer), CType(CType(160, Byte), Integer), CType(CType(218, Byte), Integer))
-        DataGridViewCellStyle2.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        DataGridViewCellStyle2.ForeColor = System.Drawing.Color.White
-        DataGridViewCellStyle2.Padding = New System.Windows.Forms.Padding(3)
-        DataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
-        Me.DataGridViewDaftarKunjungan.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle2
+        DataGridViewCellStyle18.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle18.BackColor = System.Drawing.Color.FromArgb(CType(CType(37, Byte), Integer), CType(CType(160, Byte), Integer), CType(CType(218, Byte), Integer))
+        DataGridViewCellStyle18.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        DataGridViewCellStyle18.ForeColor = System.Drawing.Color.White
+        DataGridViewCellStyle18.Padding = New System.Windows.Forms.Padding(3)
+        DataGridViewCellStyle18.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle18.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle18.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
+        Me.DataGridViewDaftarKunjungan.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle18
         Me.DataGridViewDaftarKunjungan.ColumnHeadersHeight = 40
-        DataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle3.BackColor = System.Drawing.Color.White
-        DataGridViewCellStyle3.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        DataGridViewCellStyle3.ForeColor = System.Drawing.Color.Black
-        DataGridViewCellStyle3.Padding = New System.Windows.Forms.Padding(3)
-        DataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.FromArgb(CType(CType(186, Byte), Integer), CType(CType(191, Byte), Integer), CType(CType(149, Byte), Integer))
-        DataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.Black
-        DataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
-        Me.DataGridViewDaftarKunjungan.DefaultCellStyle = DataGridViewCellStyle3
+        DataGridViewCellStyle19.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle19.BackColor = System.Drawing.Color.White
+        DataGridViewCellStyle19.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        DataGridViewCellStyle19.ForeColor = System.Drawing.Color.Black
+        DataGridViewCellStyle19.Padding = New System.Windows.Forms.Padding(3)
+        DataGridViewCellStyle19.SelectionBackColor = System.Drawing.Color.FromArgb(CType(CType(186, Byte), Integer), CType(CType(191, Byte), Integer), CType(CType(149, Byte), Integer))
+        DataGridViewCellStyle19.SelectionForeColor = System.Drawing.Color.Black
+        DataGridViewCellStyle19.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
+        Me.DataGridViewDaftarKunjungan.DefaultCellStyle = DataGridViewCellStyle19
         Me.DataGridViewDaftarKunjungan.Dock = System.Windows.Forms.DockStyle.Fill
         Me.DataGridViewDaftarKunjungan.EnableHeadersVisualStyles = False
         Me.DataGridViewDaftarKunjungan.Location = New System.Drawing.Point(0, 0)
         Me.DataGridViewDaftarKunjungan.Name = "DataGridViewDaftarKunjungan"
         Me.DataGridViewDaftarKunjungan.ReadOnly = True
-        DataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control
-        DataGridViewCellStyle4.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        DataGridViewCellStyle4.ForeColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
-        DataGridViewCellStyle4.Padding = New System.Windows.Forms.Padding(3)
-        DataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
-        Me.DataGridViewDaftarKunjungan.RowHeadersDefaultCellStyle = DataGridViewCellStyle4
+        DataGridViewCellStyle20.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle20.BackColor = System.Drawing.SystemColors.Control
+        DataGridViewCellStyle20.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        DataGridViewCellStyle20.ForeColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
+        DataGridViewCellStyle20.Padding = New System.Windows.Forms.Padding(3)
+        DataGridViewCellStyle20.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle20.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle20.WrapMode = System.Windows.Forms.DataGridViewTriState.[True]
+        Me.DataGridViewDaftarKunjungan.RowHeadersDefaultCellStyle = DataGridViewCellStyle20
         Me.DataGridViewDaftarKunjungan.RowHeadersVisible = False
         Me.DataGridViewDaftarKunjungan.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders
         Me.DataGridViewDaftarKunjungan.RowTemplate.Height = 35
         Me.DataGridViewDaftarKunjungan.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
         Me.DataGridViewDaftarKunjungan.Size = New System.Drawing.Size(1000, 310)
         Me.DataGridViewDaftarKunjungan.TabIndex = 517
+        '
+        'RadioButtonBirthday
+        '
+        Me.RadioButtonBirthday.AutoSize = True
+        Me.RadioButtonBirthday.Font = New System.Drawing.Font("Segoe UI", 9.75!)
+        Me.RadioButtonBirthday.Location = New System.Drawing.Point(256, 3)
+        Me.RadioButtonBirthday.Name = "RadioButtonBirthday"
+        Me.RadioButtonBirthday.Size = New System.Drawing.Size(73, 21)
+        Me.RadioButtonBirthday.TabIndex = 530
+        Me.RadioButtonBirthday.Text = "Birthday"
+        Me.RadioButtonBirthday.UseVisualStyleBackColor = True
         '
         'ReportDaftarKunjunganPesien
         '
@@ -452,4 +465,5 @@ Partial Class ReportDaftarKunjunganPesien
     Friend WithEvents TextBoxNomorTransaksi As System.Windows.Forms.TextBox
     Friend WithEvents ButtonCariPeserta As System.Windows.Forms.Button
     Friend WithEvents ButtonDownloadExcel As System.Windows.Forms.Button
+    Friend WithEvents RadioButtonBirthday As System.Windows.Forms.RadioButton
 End Class

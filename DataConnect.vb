@@ -1557,109 +1557,142 @@ Module Test
         _Kamus.Add(100, " Seratus")
     End Sub
 
-    Public Function Terbilang(ByVal Bilangan As Double) As String
-        Dim sRet As String = ""
-        Dim sMinus As String = ""
-        Dim BilCacah As Double = 0
-        Dim BilPecahan As Integer = 0
-
-
-        InitializeKamus()
-
-        Try
-            If Bilangan < 0 Then sMinus = "Minus "
-
-            Dim grp() As String = Split(Math.Abs(Bilangan).ToString(System.Globalization.NumberFormatInfo.CurrentInfo), System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator)
-            If grp.Length > 1 Then
-                BilCacah = CDbl(grp(0))
-                BilPecahan = CInt(grp(1))
-            Else
-                BilCacah = Bilangan
-            End If
-
-            Dim triple() As String = Split(BilCacah.ToString("#,##0", System.Globalization.NumberFormatInfo.CurrentInfo), System.Globalization.NumberFormatInfo.CurrentInfo.NumberGroupSeparator)
-            Array.Reverse(triple)
-
-            For i As Integer = triple.Length - 1 To 0 Step -1
-                sRet = sRet & BacaGroupAngka(triple(i), False, IIf(i > 5, i - 5 + 1, i))
-            Next
-
-            If BilPecahan > 0 Then
-                sRet = sRet & " Koma" & BacaGroupAngka(BilPecahan, True)
-            End If
-
-            sRet = sMinus & sRet
-
-        Catch ex As Exception
-            MsgBox(ex.Message, vbOKOnly, "Parsing Bilangan")
-
-        End Try
-
-        _Kamus.Clear()
-        _Kamus = Nothing
-
-        Return sRet.Trim
+    Public Function Terbilang(ByVal angka As Double) As String
+        Dim bilangan As Long = CLng(angka)
+        Return Trim(BacaAngka(bilangan))
     End Function
 
-    Private Function BacaGroupAngka(ByVal Angka As Integer, _
-                                    Optional ByVal IsPecahan As Boolean = False, _
-                                    Optional ByVal iGroup As Byte = 0) As String
-        Dim sRet As String = ""
-        Dim sAngka As String = Angka.ToString("000")
+    Private Function BacaAngka(ByVal n As Long) As String
+        Dim satuan() As String = {"", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"}
 
-        Select Case IsPecahan
-            Case True
-                Try
-                    For i As Integer = 0 To sAngka.Length - 1
-                        If CInt(sAngka.Substring(i, 1)) = 0 Then
-                            sRet = sRet & "Nol"
-                        Else
-                            sRet = sRet & _Kamus(CInt(sAngka.Substring(i, 1)))
-                        End If
-                    Next
-                Catch ex As Exception
-                    MsgBox(ex.Message, vbOKOnly, "Baca Pecahan")
-                End Try
-            Case Else
-                Try
-                    If Angka = 1 And iGroup = 1 Then
-                        sRet = " Seribu"
-                    ElseIf _Kamus.ContainsKey(Angka) Then
-                        sRet = _Kamus(Angka) & _ArGroup(iGroup)
-                    Else
-                        Dim Satuan As String = _Kamus(CInt(sAngka.Substring(2, 1)))
-                        Dim puluhan As String = ""
-                        Dim ratusan As String = ""
+        Dim hasil As String = ""
 
-                        If _Kamus.ContainsKey(CInt(sAngka.Substring(1, 2))) Then
-                            puluhan = _Kamus(CInt(sAngka.Substring(1, 2)))
-                        Else
-                            If CInt(sAngka.Substring(1, 1)) = 0 Then
-                                puluhan = Satuan
-                            ElseIf CInt(sAngka.Substring(1, 1)) = 1 Then
-                                puluhan = Satuan & " Belas"
-                            Else
-                                puluhan = _Kamus(CInt(sAngka.Substring(1, 1))) & " Puluh" & Satuan
-                            End If
-                        End If
+        If n < 12 Then
+            hasil = " " & satuan(n)
+        ElseIf n < 20 Then
+            hasil = BacaAngka(n - 10) & " Belas"
+        ElseIf n < 100 Then
+            hasil = BacaAngka(n \ 10) & " Puluh" & BacaAngka(n Mod 10)
+        ElseIf n < 200 Then
+            hasil = " Seratus" & BacaAngka(n - 100)
+        ElseIf n < 1000 Then
+            hasil = BacaAngka(n \ 100) & " Ratus" & BacaAngka(n Mod 100)
+        ElseIf n < 1000000 Then
+            hasil = BacaAngka(n \ 1000) & " Ribu" & BacaAngka(n Mod 1000)
+        ElseIf n < 1000000000 Then
+            hasil = BacaAngka(n \ 1000000) & " Juta" & BacaAngka(n Mod 1000000)
+        ElseIf n < 1000000000000 Then
+            hasil = BacaAngka(n \ 1000000000) & " Milyar" & BacaAngka(n Mod 1000000000)
+        Else
+            hasil = BacaAngka(n \ 1000000000000) & " Triliun" & BacaAngka(n Mod 1000000000000)
+        End If
 
-                        If CInt(sAngka.Substring(0, 1)) = 0 Then
-                            ratusan = puluhan
-                        ElseIf CInt(sAngka.Substring(0, 1)) = 1 Then
-                            ratusan = " Seratus" & puluhan
-                        Else
-                            ratusan = _Kamus(CInt(sAngka.Substring(0, 1))) & " Ratus" & puluhan
-                        End If
-
-                        sRet = ratusan & _ArGroup(iGroup)
-                    End If
-                Catch ex As Exception
-                    MsgBox(ex.Message, vbOKOnly, "Baca Bilangan Bulat")
-                End Try
-        End Select
-
-        Return sRet
+        Return hasil
     End Function
+
+    'Public Function Terbilang(ByVal Bilangan As Double) As String
+    '    Dim sRet As String = ""
+    '    Dim sMinus As String = ""
+    '    Dim BilCacah As Double = 0
+    '    Dim BilPecahan As Integer = 0
+
+
+    '    InitializeKamus()
+
+    '    Try
+    '        If Bilangan < 0 Then sMinus = "Minus "
+
+    '        Dim grp() As String = Split(Math.Abs(Bilangan).ToString(System.Globalization.NumberFormatInfo.CurrentInfo), System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator)
+    '        If grp.Length > 1 Then
+    '            BilCacah = CDbl(grp(0))
+    '            BilPecahan = CInt(grp(1))
+    '        Else
+    '            BilCacah = Bilangan
+    '        End If
+
+    '        Dim triple() As String = Split(BilCacah.ToString("#,##0", System.Globalization.NumberFormatInfo.CurrentInfo), System.Globalization.NumberFormatInfo.CurrentInfo.NumberGroupSeparator)
+    '        Array.Reverse(triple)
+
+    '        For i As Integer = triple.Length - 1 To 0 Step -1
+    '            sRet = sRet & BacaGroupAngka(triple(i), False, IIf(i > 5, i - 5 + 1, i))
+    '        Next
+
+    '        If BilPecahan > 0 Then
+    '            sRet = sRet & " Koma" & BacaGroupAngka(BilPecahan, True)
+    '        End If
+
+    '        sRet = sMinus & sRet
+
+    '    Catch ex As Exception
+    '        MsgBox(ex.Message, vbOKOnly, "Parsing Bilangan")
+
+    '    End Try
+
+    '    _Kamus.Clear()
+    '    _Kamus = Nothing
+
+    '    Return sRet.Trim
+    'End Function
+
+    'Private Function BacaGroupAngka(ByVal Angka As Integer, _
+    '                                Optional ByVal IsPecahan As Boolean = False, _
+    '                                Optional ByVal iGroup As Byte = 0) As String
+    '    Dim sRet As String = ""
+    '    Dim sAngka As String = Angka.ToString("000")
+
+    '    Select Case IsPecahan
+    '        Case True
+    '            Try
+    '                For i As Integer = 0 To sAngka.Length - 1
+    '                    If CInt(sAngka.Substring(i, 1)) = 0 Then
+    '                        sRet = sRet & "Nol"
+    '                    Else
+    '                        sRet = sRet & _Kamus(CInt(sAngka.Substring(i, 1)))
+    '                    End If
+    '                Next
+    '            Catch ex As Exception
+    '                MsgBox(ex.Message, vbOKOnly, "Baca Pecahan")
+    '            End Try
+    '        Case Else
+    '            Try
+    '                If Angka = 1 And iGroup = 1 Then
+    '                    sRet = " Seribu"
+    '                ElseIf _Kamus.ContainsKey(Angka) Then
+    '                    sRet = _Kamus(Angka) & _ArGroup(iGroup)
+    '                Else
+    '                    Dim Satuan As String = _Kamus(CInt(sAngka.Substring(2, 1)))
+    '                    Dim puluhan As String = ""
+    '                    Dim ratusan As String = ""
+
+    '                    If _Kamus.ContainsKey(CInt(sAngka.Substring(1, 2))) Then
+    '                        puluhan = _Kamus(CInt(sAngka.Substring(1, 2)))
+    '                    Else
+    '                        If CInt(sAngka.Substring(1, 1)) = 0 Then
+    '                            puluhan = Satuan
+    '                        ElseIf CInt(sAngka.Substring(1, 1)) = 1 Then
+    '                            puluhan = Satuan & " Belas"
+    '                        Else
+    '                            puluhan = _Kamus(CInt(sAngka.Substring(1, 1))) & " Puluh" & Satuan
+    '                        End If
+    '                    End If
+
+    '                    If CInt(sAngka.Substring(0, 1)) = 0 Then
+    '                        ratusan = puluhan
+    '                    ElseIf CInt(sAngka.Substring(0, 1)) = 1 Then
+    '                        ratusan = " Seratus" & puluhan
+    '                    Else
+    '                        ratusan = _Kamus(CInt(sAngka.Substring(0, 1))) & " Ratus" & puluhan
+    '                    End If
+
+    '                    sRet = ratusan & _ArGroup(iGroup)
+    '                End If
+    '            Catch ex As Exception
+    '                MsgBox(ex.Message, vbOKOnly, "Baca Bilangan Bulat")
+    '            End Try
+    '    End Select
+
+    '    Return sRet
+    'End Function
 
     Function ReadMySQL(ByVal Txt As String) As DataTable
         Dim Dttable As New DataTable

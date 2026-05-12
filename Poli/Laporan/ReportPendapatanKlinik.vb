@@ -1288,7 +1288,8 @@ Public Class ReportPendapatanKlinik
             newRowHeader("NomorInvoice") = rowHeader("notagihancompany").ToString()
             newRowHeader("NamaPerusahaan") = splitPerusahaan(0).ToString.Trim.ToUpper()
             newRowHeader("TglTTD") = Ttempat & ", " & Format(DateAndTime.Now, "dd") & " " & BulanIndonesia(Format(DateAndTime.Now, "MM")) & " " & Format(DateAndTime.Now, "yyyy")
-            newRowHeader("KeteranganNominal") = "Terbilang : " & Terbilang(rowHeader("totaltagihan").ToString()) & " Rupiah"
+            'newRowHeader("KeteranganNominal") = "Terbilang : " & Terbilang(rowHeader("totaltagihan").ToString()) & " Rupiah"
+            newRowHeader("KeteranganNominal") = "Terbilang : " & Terbilang(CLng(rowHeader("totaltagihan"))) & " Rupiah"
 
             ' Get Nama User TTD
             Dim userTTD As String = ReadSQLNIK("SELECT UserNama FROM Users WHERE UserID = '" & rowHeader("createby").ToString() & "'")
