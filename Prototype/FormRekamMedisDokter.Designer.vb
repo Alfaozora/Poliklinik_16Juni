@@ -759,6 +759,7 @@ Me.Label58 = New System.Windows.Forms.Label
 Me.TextBoxTindakanID = New System.Windows.Forms.TextBox
 Me.Label52 = New System.Windows.Forms.Label
 Me.TextBox16 = New System.Windows.Forms.TextBox
+Me.TextBoxFlagPerencanaan = New System.Windows.Forms.TextBox
 Me.RadioButtonPenjaminMandiriInhealth = New System.Windows.Forms.RadioButton
 Me.TextBoxJenisTindakan = New System.Windows.Forms.TextBox
 Me.Button5 = New System.Windows.Forms.Button
@@ -1269,7 +1270,6 @@ Me.TextBox73 = New System.Windows.Forms.TextBox
 Me.Label330 = New System.Windows.Forms.Label
 Me.TextBox74 = New System.Windows.Forms.TextBox
 Me.Label334 = New System.Windows.Forms.Label
-Me.TextBoxFlag = New System.Windows.Forms.TextBox
 Me.PanelTop.SuspendLayout
 Me.PanelSide.SuspendLayout
 Me.TabControlMenuUtama.SuspendLayout
@@ -10518,6 +10518,7 @@ Me.SplitContainerTindakan.Name = "SplitContainerTindakan"
 '
 'SplitContainerTindakan.Panel1
 '
+Me.SplitContainerTindakan.Panel1.Controls.Add(Me.TextBoxFlagPerencanaan)
 Me.SplitContainerTindakan.Panel1.Controls.Add(Me.ButtonSimpanPerencanaan)
 Me.SplitContainerTindakan.Panel1.Controls.Add(Me.TextBoxQty)
 Me.SplitContainerTindakan.Panel1.Controls.Add(Me.Label353)
@@ -10537,7 +10538,6 @@ Me.SplitContainerTindakan.Panel1.Controls.Add(Me.TextBox16)
 '
 'SplitContainerTindakan.Panel2
 '
-Me.SplitContainerTindakan.Panel2.Controls.Add(Me.TextBoxFlag)
 Me.SplitContainerTindakan.Panel2.Controls.Add(Me.RadioButtonPenjaminMandiriInhealth)
 Me.SplitContainerTindakan.Panel2.Controls.Add(Me.TextBoxJenisTindakan)
 Me.SplitContainerTindakan.Panel2.Controls.Add(Me.Button5)
@@ -10809,6 +10809,20 @@ Me.TextBox16.TabIndex = 513
 Me.TextBox16.TabStop = false
 Me.TextBox16.Text = "Rp"
 Me.TextBox16.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+'
+'TextBoxFlagPerencanaan
+'
+Me.TextBoxFlagPerencanaan.BackColor = System.Drawing.Color.White
+Me.TextBoxFlagPerencanaan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+Me.TextBoxFlagPerencanaan.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
+Me.TextBoxFlagPerencanaan.ForeColor = System.Drawing.Color.Black
+Me.TextBoxFlagPerencanaan.Location = New System.Drawing.Point(411, 138)
+Me.TextBoxFlagPerencanaan.Name = "TextBoxFlagPerencanaan"
+Me.TextBoxFlagPerencanaan.Size = New System.Drawing.Size(25, 25)
+Me.TextBoxFlagPerencanaan.TabIndex = 536
+Me.TextBoxFlagPerencanaan.TabStop = false
+Me.TextBoxFlagPerencanaan.Text = "0"
+Me.TextBoxFlagPerencanaan.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
 '
 'RadioButtonPenjaminMandiriInhealth
 '
@@ -17252,20 +17266,6 @@ Me.Label334.Size = New System.Drawing.Size(62, 17)
 Me.Label334.TabIndex = 556
 Me.Label334.Text = "No Surat"
 '
-'TextBoxFlag
-'
-Me.TextBoxFlag.BackColor = System.Drawing.Color.White
-Me.TextBoxFlag.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-Me.TextBoxFlag.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
-Me.TextBoxFlag.ForeColor = System.Drawing.Color.Black
-Me.TextBoxFlag.Location = New System.Drawing.Point(17, 169)
-Me.TextBoxFlag.Name = "TextBoxFlag"
-Me.TextBoxFlag.Size = New System.Drawing.Size(25, 25)
-Me.TextBoxFlag.TabIndex = 536
-Me.TextBoxFlag.TabStop = false
-Me.TextBoxFlag.Text = "0"
-Me.TextBoxFlag.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-'
 'FormRekamMedisDokter
 '
 Me.AutoScaleDimensions = New System.Drawing.SizeF(7!, 15!)
@@ -18906,5 +18906,5 @@ End Sub
     Friend WithEvents ListViewPerencanaan As System.Windows.Forms.ListView
     Friend WithEvents Label355 As System.Windows.Forms.Label
     Friend WithEvents ButtonPotongPerencanaan As System.Windows.Forms.Button
-    Friend WithEvents TextBoxFlag As System.Windows.Forms.TextBox
+    Friend WithEvents TextBoxFlagPerencanaan As System.Windows.Forms.TextBox
 End Class
