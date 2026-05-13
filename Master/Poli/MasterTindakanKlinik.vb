@@ -396,7 +396,7 @@ Public Class MasterTindakanKlinik
             Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
             Dim urlWebService As String = baseURL & "api/paket-tindakan"
 
-            Dim responseApi As String = InsertDataAPIRM(jsonParam, urlWebService)
+            Dim responseApi As String = InsertDataAPIRMOld(jsonParam, urlWebService)
 
             If responseApi.Contains("success") Then
                 WriteSQL("UPDATE MasterPaketTindakan SET IsSync = 1 WHERE PaketID = '" & reffID & "'", 4)
@@ -461,7 +461,7 @@ Public Class MasterTindakanKlinik
             Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
             Dim urlWebService As String = baseURL & "api/paket-tindakan" ' bisa sama endpoint
 
-            Dim responseApi As String = InsertDataAPIRM(jsonParam, urlWebService)
+            Dim responseApi As String = InsertDataAPIRMOld(jsonParam, urlWebService)
 
             If responseApi.Contains("success") Then
                 WriteSQL("UPDATE MasterPaketTindakan SET IsSync = 1 WHERE PaketID = '" & reffID & "'", 4)

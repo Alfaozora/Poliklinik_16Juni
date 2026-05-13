@@ -195,7 +195,7 @@ Module ModuleInformedConsent
 
     'End Function
 
-    Public Function ValidasiInformedConsentPaket(ByVal noRm As String, ByVal idTindakan As String, ByVal kodeVoucher As String, ByVal userInput As String) As Boolean
+    Public Function ValidasiInformedConsentPaket(ByVal noRm As String, ByVal idTindakan As String, ByVal kodeVoucherPaket As String, ByVal userInput As String) As Boolean
 
         Dim statusInformedConsent As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'SettingInformedConsent'")
 
@@ -243,7 +243,7 @@ Module ModuleInformedConsent
                     If CBool(wajibICDetail) Then
 
                         ' 🔥 Kirim TindakanIDDetail (bukan idPaket)
-                        Dim urlWebService As String = baseURL & "api/lumiera-luzelle/ic/paket/" & kodeVoucher & "/" & tindakanIDDetail
+                        Dim urlWebService As String = baseURL & "api/lumiera-luzelle/ic/paket/" & kodeVoucherPaket & "/" & tindakanIDDetail
 
                         Dim response As String = GetDataAPIRM(urlWebService)
                         Dim json As JObject = JObject.Parse(response)
@@ -265,7 +265,13 @@ Module ModuleInformedConsent
             ' ===================================
             ' PAKET REGULER
             ' ===================================
+            'MsgBox("Mulai validasi paket..." & vbCrLf & _
+            '       "PaketID : " & idTindakan & vbCrLf & _
+            '       "KodeVoucher : " & kodeVoucherPaket)
+
             Dim jsonDetailReguler As String = ReadSQLNIK("SELECT DetailTindakan FROM TransaksiPaketTindakan WHERE PaketID = '" & idTindakan & "'")
+
+            'MsgBox("JSON Detail Tindakan :" & vbCrLf & jsonDetailReguler)
 
             If String.IsNullOrEmpty(jsonDetailReguler) Then
                 MsgBox("Detail tindakan paket tidak ditemukan.", MsgBoxStyle.Exclamation, "Warning")
@@ -274,30 +280,43 @@ Module ModuleInformedConsent
 
             Dim arrReg As JArray = JArray.Parse(jsonDetailReguler)
 
+            'MsgBox("Jumlah detail tindakan : " & arrReg.Count)
+
             For Each item As JObject In arrReg
+                'MsgBox("Item JSON :" & vbCrLf & item.ToString())
 
                 Dim tindakanIDDetail As String = item("TindakanID").ToString()
+
+                'MsgBox("TindakanID Detail : " & tindakanIDDetail)
 
                 ' Cek apakah tindakan ini wajib IC
                 Dim wajibICDetail As String = ReadSQLNIK("SELECT ISNULL(StatusInformedConsent,0) FROM MasterTindakan WHERE TindakanID = '" & tindakanIDDetail & "'")
 
+                'MsgBox("Status Informed Consent : " & wajibICDetail)
+
                 If CBool(wajibICDetail) Then
-
+                    'MsgBox("Tindakan WAJIB informed consent")
                     ' 🔥 Kirim TindakanIDDetail (bukan idPaket)
-                    Dim urlWebService As String = baseURL & "api/lumiera-luzelle/ic/paket/" & kodeVoucher & "/" & tindakanIDDetail
-                    'MsgBox(urlWebService)
+                    Dim urlWebService As String = baseURL & "api/lumiera-luzelle/ic/paket/" & kodeVoucherPaket & "/" & tindakanIDDetail
+                    'MsgBox("URL Web Service :" & vbCrLf & urlWebService)
                     Dim response As String = GetDataAPIRM(urlWebService)
+                    'MsgBox("Response API :" & vbCrLf & response)
                     Dim json As JObject = JObject.Parse(response)
-
+                    'MsgBox("Status API : " & json("status").ToString())
                     If json("status").ToString() <> "success" Then
+                        'MsgBox("Message API :" & vbCrLf & json("message").ToString())
                         MsgBox(json("message").ToString(), MsgBoxStyle.Exclamation, "Warning")
                         Return False
+                    Else
+                        MsgBox("Validasi informed consent SUCCESS")
                     End If
+                Else
 
+                    'MsgBox("Tindakan TIDAK wajib informed consent")
                 End If
 
             Next
-
+            'MsgBox("Semua validasi selesai SUCCESS")
             Return True
         Catch ex As Exception
             MsgBox("Gagal validasi informed consent:" & vbCrLf & ex.Message, MsgBoxStyle.Critical, "ERROR")

@@ -546,7 +546,7 @@ Public Class FormPendaftaranAwal
         TabControlMenu1.Enabled = False
 
         ButtonTambahTindakan.Visible = True
-        ButtonScanQR.Visible = True
+        ButtonScanQR.Visible = False
         ButtonTambahPaket.Visible = False
 
         ' Clear Footer
@@ -1681,7 +1681,7 @@ Public Class FormPendaftaranAwal
                 TabControlMenu1.Enabled = True
 
                 ButtonTambahTindakan.Visible = True
-                ButtonScanQR.Visible = True
+                ButtonScanQR.Visible = False
                 ButtonTambahPaket.Visible = False
             End If
         Catch ex As Exception
@@ -3065,7 +3065,7 @@ Public Class FormPendaftaranAwal
                 End If
 
                 ButtonTambahTindakan.Visible = True
-                ButtonScanQR.Visible = True
+                ButtonScanQR.Visible = False
                 ButtonTambahPaket.Visible = False
 
                 ' Visible Tab Pemeriksaan Fisik

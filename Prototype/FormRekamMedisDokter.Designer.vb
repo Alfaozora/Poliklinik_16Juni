@@ -735,7 +735,12 @@ Me.TextBoxKeteranganCatatanObat = New System.Windows.Forms.TextBox
 Me.DataGridViewObat = New System.Windows.Forms.DataGridView
 Me.TabTindakan = New System.Windows.Forms.TabPage
 Me.SplitContainerTabTindakan = New System.Windows.Forms.SplitContainer
+Me.Label355 = New System.Windows.Forms.Label
+Me.Panel30 = New System.Windows.Forms.Panel
+Me.ButtonPotongPerencanaan = New System.Windows.Forms.Button
+Me.ListViewPerencanaan = New System.Windows.Forms.ListView
 Me.SplitContainerTindakan = New System.Windows.Forms.SplitContainer
+Me.ButtonSimpanPerencanaan = New System.Windows.Forms.Button
 Me.TextBoxQty = New System.Windows.Forms.TextBox
 Me.Label353 = New System.Windows.Forms.Label
 Me.ButtonScanQR = New System.Windows.Forms.Button
@@ -757,7 +762,6 @@ Me.TextBox16 = New System.Windows.Forms.TextBox
 Me.RadioButtonPenjaminMandiriInhealth = New System.Windows.Forms.RadioButton
 Me.TextBoxJenisTindakan = New System.Windows.Forms.TextBox
 Me.Button5 = New System.Windows.Forms.Button
-Me.ComboBox1 = New System.Windows.Forms.ComboBox
 Me.Button4 = New System.Windows.Forms.Button
 Me.RadioButtonPenjaminBPJS = New System.Windows.Forms.RadioButton
 Me.Label55 = New System.Windows.Forms.Label
@@ -1265,6 +1269,7 @@ Me.TextBox73 = New System.Windows.Forms.TextBox
 Me.Label330 = New System.Windows.Forms.Label
 Me.TextBox74 = New System.Windows.Forms.TextBox
 Me.Label334 = New System.Windows.Forms.Label
+Me.TextBoxFlag = New System.Windows.Forms.TextBox
 Me.PanelTop.SuspendLayout
 Me.PanelSide.SuspendLayout
 Me.TabControlMenuUtama.SuspendLayout
@@ -1426,6 +1431,7 @@ Me.TabTindakan.SuspendLayout
 Me.SplitContainerTabTindakan.Panel1.SuspendLayout
 Me.SplitContainerTabTindakan.Panel2.SuspendLayout
 Me.SplitContainerTabTindakan.SuspendLayout
+Me.Panel30.SuspendLayout
 Me.SplitContainerTindakan.Panel1.SuspendLayout
 Me.SplitContainerTindakan.Panel2.SuspendLayout
 Me.SplitContainerTindakan.SuspendLayout
@@ -10433,6 +10439,8 @@ Me.SplitContainerTabTindakan.Orientation = System.Windows.Forms.Orientation.Hori
 'SplitContainerTabTindakan.Panel1
 '
 Me.SplitContainerTabTindakan.Panel1.AutoScroll = true
+Me.SplitContainerTabTindakan.Panel1.Controls.Add(Me.Label355)
+Me.SplitContainerTabTindakan.Panel1.Controls.Add(Me.Panel30)
 Me.SplitContainerTabTindakan.Panel1.Controls.Add(Me.SplitContainerTindakan)
 Me.SplitContainerTabTindakan.Panel1.Controls.Add(Me.Label245)
 '
@@ -10445,6 +10453,63 @@ Me.SplitContainerTabTindakan.SplitterDistance = 275
 Me.SplitContainerTabTindakan.SplitterWidth = 5
 Me.SplitContainerTabTindakan.TabIndex = 492
 '
+'Label355
+'
+Me.Label355.AutoSize = true
+Me.Label355.Font = New System.Drawing.Font("Segoe UI", 12!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
+Me.Label355.Location = New System.Drawing.Point(844, 15)
+Me.Label355.Name = "Label355"
+Me.Label355.Size = New System.Drawing.Size(218, 21)
+Me.Label355.TabIndex = 523
+Me.Label355.Text = "PERENCANAAN TINDAKAN"
+'
+'Panel30
+'
+Me.Panel30.Controls.Add(Me.ButtonPotongPerencanaan)
+Me.Panel30.Controls.Add(Me.ListViewPerencanaan)
+Me.Panel30.Location = New System.Drawing.Point(838, 39)
+Me.Panel30.Name = "Panel30"
+Me.Panel30.Size = New System.Drawing.Size(436, 216)
+Me.Panel30.TabIndex = 522
+'
+'ButtonPotongPerencanaan
+'
+Me.ButtonPotongPerencanaan.BackColor = System.Drawing.Color.FromArgb(CType(CType(0,Byte),Integer), CType(CType(100,Byte),Integer), CType(CType(200,Byte),Integer))
+Me.ButtonPotongPerencanaan.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
+Me.ButtonPotongPerencanaan.Cursor = System.Windows.Forms.Cursors.Hand
+Me.ButtonPotongPerencanaan.FlatAppearance.BorderSize = 0
+Me.ButtonPotongPerencanaan.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0,Byte),Integer), CType(CType(100,Byte),Integer), CType(CType(200,Byte),Integer))
+Me.ButtonPotongPerencanaan.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81,Byte),Integer), CType(CType(168,Byte),Integer), CType(CType(255,Byte),Integer))
+Me.ButtonPotongPerencanaan.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+Me.ButtonPotongPerencanaan.Font = New System.Drawing.Font("Arial", 9!, System.Drawing.FontStyle.Bold)
+Me.ButtonPotongPerencanaan.ForeColor = System.Drawing.Color.White
+Me.ButtonPotongPerencanaan.Location = New System.Drawing.Point(10, 183)
+Me.ButtonPotongPerencanaan.Name = "ButtonPotongPerencanaan"
+Me.ButtonPotongPerencanaan.RightToLeft = System.Windows.Forms.RightToLeft.No
+Me.ButtonPotongPerencanaan.Size = New System.Drawing.Size(151, 25)
+Me.ButtonPotongPerencanaan.TabIndex = 538
+Me.ButtonPotongPerencanaan.Text = "Gunakan Perencanaan"
+Me.ButtonPotongPerencanaan.UseVisualStyleBackColor = false
+'
+'ListViewPerencanaan
+'
+Me.ListViewPerencanaan.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom)  _
+            Or System.Windows.Forms.AnchorStyles.Left)  _
+            Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
+Me.ListViewPerencanaan.AutoArrange = false
+Me.ListViewPerencanaan.CheckBoxes = true
+Me.ListViewPerencanaan.Cursor = System.Windows.Forms.Cursors.Hand
+Me.ListViewPerencanaan.Font = New System.Drawing.Font("Segoe UI Semibold", 9!, System.Drawing.FontStyle.Bold)
+Me.ListViewPerencanaan.FullRowSelect = true
+Me.ListViewPerencanaan.GridLines = true
+Me.ListViewPerencanaan.HoverSelection = true
+Me.ListViewPerencanaan.Location = New System.Drawing.Point(10, 8)
+Me.ListViewPerencanaan.Name = "ListViewPerencanaan"
+Me.ListViewPerencanaan.Size = New System.Drawing.Size(419, 169)
+Me.ListViewPerencanaan.TabIndex = 456
+Me.ListViewPerencanaan.UseCompatibleStateImageBehavior = false
+Me.ListViewPerencanaan.View = System.Windows.Forms.View.Details
+'
 'SplitContainerTindakan
 '
 Me.SplitContainerTindakan.FixedPanel = System.Windows.Forms.FixedPanel.Panel1
@@ -10453,6 +10518,7 @@ Me.SplitContainerTindakan.Name = "SplitContainerTindakan"
 '
 'SplitContainerTindakan.Panel1
 '
+Me.SplitContainerTindakan.Panel1.Controls.Add(Me.ButtonSimpanPerencanaan)
 Me.SplitContainerTindakan.Panel1.Controls.Add(Me.TextBoxQty)
 Me.SplitContainerTindakan.Panel1.Controls.Add(Me.Label353)
 Me.SplitContainerTindakan.Panel1.Controls.Add(Me.ButtonScanQR)
@@ -10471,18 +10537,38 @@ Me.SplitContainerTindakan.Panel1.Controls.Add(Me.TextBox16)
 '
 'SplitContainerTindakan.Panel2
 '
+Me.SplitContainerTindakan.Panel2.Controls.Add(Me.TextBoxFlag)
 Me.SplitContainerTindakan.Panel2.Controls.Add(Me.RadioButtonPenjaminMandiriInhealth)
 Me.SplitContainerTindakan.Panel2.Controls.Add(Me.TextBoxJenisTindakan)
 Me.SplitContainerTindakan.Panel2.Controls.Add(Me.Button5)
-Me.SplitContainerTindakan.Panel2.Controls.Add(Me.ComboBox1)
 Me.SplitContainerTindakan.Panel2.Controls.Add(Me.Button4)
 Me.SplitContainerTindakan.Panel2.Controls.Add(Me.RadioButtonPenjaminBPJS)
 Me.SplitContainerTindakan.Panel2.Controls.Add(Me.Label55)
 Me.SplitContainerTindakan.Panel2.Controls.Add(Me.Panel7)
 Me.SplitContainerTindakan.Panel2.Controls.Add(Me.ButtonInputInformedConsent)
-Me.SplitContainerTindakan.Size = New System.Drawing.Size(811, 200)
+Me.SplitContainerTindakan.Size = New System.Drawing.Size(810, 216)
 Me.SplitContainerTindakan.SplitterDistance = 500
 Me.SplitContainerTindakan.TabIndex = 0
+'
+'ButtonSimpanPerencanaan
+'
+Me.ButtonSimpanPerencanaan.BackColor = System.Drawing.Color.FromArgb(CType(CType(0,Byte),Integer), CType(CType(192,Byte),Integer), CType(CType(0,Byte),Integer))
+Me.ButtonSimpanPerencanaan.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+Me.ButtonSimpanPerencanaan.Cursor = System.Windows.Forms.Cursors.Hand
+Me.ButtonSimpanPerencanaan.FlatAppearance.BorderSize = 0
+Me.ButtonSimpanPerencanaan.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0,Byte),Integer), CType(CType(100,Byte),Integer), CType(CType(200,Byte),Integer))
+Me.ButtonSimpanPerencanaan.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81,Byte),Integer), CType(CType(168,Byte),Integer), CType(CType(255,Byte),Integer))
+Me.ButtonSimpanPerencanaan.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+Me.ButtonSimpanPerencanaan.Font = New System.Drawing.Font("Arial", 9!, System.Drawing.FontStyle.Bold)
+Me.ButtonSimpanPerencanaan.ForeColor = System.Drawing.Color.White
+Me.ButtonSimpanPerencanaan.Location = New System.Drawing.Point(287, 169)
+Me.ButtonSimpanPerencanaan.Name = "ButtonSimpanPerencanaan"
+Me.ButtonSimpanPerencanaan.RightToLeft = System.Windows.Forms.RightToLeft.No
+Me.ButtonSimpanPerencanaan.Size = New System.Drawing.Size(161, 25)
+Me.ButtonSimpanPerencanaan.TabIndex = 536
+Me.ButtonSimpanPerencanaan.Text = "Simpan Perencanaan"
+Me.ButtonSimpanPerencanaan.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+Me.ButtonSimpanPerencanaan.UseVisualStyleBackColor = false
 '
 'TextBoxQty
 '
@@ -10547,9 +10633,9 @@ Me.Panel26.TabIndex = 532
 Me.LabelPenjaminAsuransiLain.AutoEllipsis = true
 Me.LabelPenjaminAsuransiLain.BackColor = System.Drawing.Color.Transparent
 Me.LabelPenjaminAsuransiLain.Font = New System.Drawing.Font("Segoe UI Semibold", 8.25!, System.Drawing.FontStyle.Bold)
-Me.LabelPenjaminAsuransiLain.Location = New System.Drawing.Point(160, 25)
+Me.LabelPenjaminAsuransiLain.Location = New System.Drawing.Point(152, 28)
 Me.LabelPenjaminAsuransiLain.Name = "LabelPenjaminAsuransiLain"
-Me.LabelPenjaminAsuransiLain.Size = New System.Drawing.Size(179, 23)
+Me.LabelPenjaminAsuransiLain.Size = New System.Drawing.Size(196, 23)
 Me.LabelPenjaminAsuransiLain.TabIndex = 534
 Me.LabelPenjaminAsuransiLain.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
 '
@@ -10602,10 +10688,10 @@ Me.ButtonSimpanTindakan.FlatAppearance.MouseOverBackColor = System.Drawing.Color
 Me.ButtonSimpanTindakan.FlatStyle = System.Windows.Forms.FlatStyle.Flat
 Me.ButtonSimpanTindakan.Font = New System.Drawing.Font("Arial", 9!, System.Drawing.FontStyle.Bold)
 Me.ButtonSimpanTindakan.ForeColor = System.Drawing.Color.White
-Me.ButtonSimpanTindakan.Location = New System.Drawing.Point(123, 168)
+Me.ButtonSimpanTindakan.Location = New System.Drawing.Point(123, 169)
 Me.ButtonSimpanTindakan.Name = "ButtonSimpanTindakan"
 Me.ButtonSimpanTindakan.RightToLeft = System.Windows.Forms.RightToLeft.No
-Me.ButtonSimpanTindakan.Size = New System.Drawing.Size(325, 25)
+Me.ButtonSimpanTindakan.Size = New System.Drawing.Size(158, 25)
 Me.ButtonSimpanTindakan.TabIndex = 452
 Me.ButtonSimpanTindakan.Text = "Simpan Data"
 Me.ButtonSimpanTindakan.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
@@ -10742,7 +10828,7 @@ Me.TextBoxJenisTindakan.BackColor = System.Drawing.Color.FromArgb(CType(CType(22
 Me.TextBoxJenisTindakan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
 Me.TextBoxJenisTindakan.Cursor = System.Windows.Forms.Cursors.No
 Me.TextBoxJenisTindakan.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
-Me.TextBoxJenisTindakan.Location = New System.Drawing.Point(17, 161)
+Me.TextBoxJenisTindakan.Location = New System.Drawing.Point(17, 131)
 Me.TextBoxJenisTindakan.Name = "TextBoxJenisTindakan"
 Me.TextBoxJenisTindakan.ReadOnly = true
 Me.TextBoxJenisTindakan.Size = New System.Drawing.Size(242, 25)
@@ -10769,19 +10855,6 @@ Me.Button5.Text = "Surgical Safety Checklist"
 Me.Button5.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
 Me.Button5.UseVisualStyleBackColor = false
 Me.Button5.Visible = false
-'
-'ComboBox1
-'
-Me.ComboBox1.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
-Me.ComboBox1.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource
-Me.ComboBox1.Font = New System.Drawing.Font("Segoe UI", 9.75!)
-Me.ComboBox1.FormattingEnabled = true
-Me.ComboBox1.Items.AddRange(New Object() {"Tanpa Asuransi / Umum", "BPJS / JKN", "Mandiri Inhealth", "Asuransi Lain"})
-Me.ComboBox1.Location = New System.Drawing.Point(37, 202)
-Me.ComboBox1.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-Me.ComboBox1.Name = "ComboBox1"
-Me.ComboBox1.Size = New System.Drawing.Size(274, 25)
-Me.ComboBox1.TabIndex = 532
 '
 'Button4
 '
@@ -17179,6 +17252,20 @@ Me.Label334.Size = New System.Drawing.Size(62, 17)
 Me.Label334.TabIndex = 556
 Me.Label334.Text = "No Surat"
 '
+'TextBoxFlag
+'
+Me.TextBoxFlag.BackColor = System.Drawing.Color.White
+Me.TextBoxFlag.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+Me.TextBoxFlag.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
+Me.TextBoxFlag.ForeColor = System.Drawing.Color.Black
+Me.TextBoxFlag.Location = New System.Drawing.Point(17, 169)
+Me.TextBoxFlag.Name = "TextBoxFlag"
+Me.TextBoxFlag.Size = New System.Drawing.Size(25, 25)
+Me.TextBoxFlag.TabIndex = 536
+Me.TextBoxFlag.TabStop = false
+Me.TextBoxFlag.Text = "0"
+Me.TextBoxFlag.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+'
 'FormRekamMedisDokter
 '
 Me.AutoScaleDimensions = New System.Drawing.SizeF(7!, 15!)
@@ -17419,6 +17506,7 @@ Me.SplitContainerTabTindakan.Panel1.ResumeLayout(false)
 Me.SplitContainerTabTindakan.Panel1.PerformLayout
 Me.SplitContainerTabTindakan.Panel2.ResumeLayout(false)
 Me.SplitContainerTabTindakan.ResumeLayout(false)
+Me.Panel30.ResumeLayout(false)
 Me.SplitContainerTindakan.Panel1.ResumeLayout(false)
 Me.SplitContainerTindakan.Panel1.PerformLayout
 Me.SplitContainerTindakan.Panel2.ResumeLayout(false)
@@ -18544,7 +18632,6 @@ End Sub
     Friend WithEvents RadioButtonPenjaminUmum As System.Windows.Forms.RadioButton
     Friend WithEvents RadioButtonPenjaminAsuransiLain As System.Windows.Forms.RadioButton
     Friend WithEvents ButtonCariPenjaminAsuransiLain As System.Windows.Forms.Button
-    Friend WithEvents ComboBox1 As System.Windows.Forms.ComboBox
     Friend WithEvents TextBoxJenisTindakan As System.Windows.Forms.TextBox
     Friend WithEvents RadioButtonPenjaminMandiriInhealth As System.Windows.Forms.RadioButton
     Friend WithEvents RadioButtonPenjaminBPJS As System.Windows.Forms.RadioButton
@@ -18814,4 +18901,10 @@ End Sub
     Friend WithEvents LabelPenjaminAsuransiLain As System.Windows.Forms.Label
     Friend WithEvents TextBoxQty As System.Windows.Forms.TextBox
     Friend WithEvents Label353 As System.Windows.Forms.Label
+    Friend WithEvents Panel30 As System.Windows.Forms.Panel
+    Friend WithEvents ButtonSimpanPerencanaan As System.Windows.Forms.Button
+    Friend WithEvents ListViewPerencanaan As System.Windows.Forms.ListView
+    Friend WithEvents Label355 As System.Windows.Forms.Label
+    Friend WithEvents ButtonPotongPerencanaan As System.Windows.Forms.Button
+    Friend WithEvents TextBoxFlag As System.Windows.Forms.TextBox
 End Class

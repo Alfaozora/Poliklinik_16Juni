@@ -254,6 +254,8 @@ Public Class FormRekamMedisDokter
 
             '# Load Surat Persetujuan
 
+            '#Load Tindakan Perencanaan
+            LoadGridPerencanaan()
 
             '# Set Timer Notification
             TimerNotifikasi.Interval = 1000 ' berkedip setiap 1000ms (1 detik)
@@ -2112,7 +2114,7 @@ Public Class FormRekamMedisDokter
                 qtyTindakan = CInt(TextBoxQty.Text)
             End If
 
-            If qtyTindakan > 20 Then
+            If qtyTindakan > 15 Then
                 MsgBox("Qty terlalu besar!", MsgBoxStyle.Exclamation)
                 Exit Sub
             End If
@@ -2272,6 +2274,152 @@ Public Class FormRekamMedisDokter
             ' Refresh Grid
             LoadGridTindakanPoli()
         End If
+    End Sub
+
+    Private Sub ButtonSimpanPerencanaan_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonSimpanPerencanaan.Click
+        'MsgBox("Fitur masih dalam tahap pengembangan", MsgBoxStyle.Information)
+        ' 1. Validasi input
+        If ValidasiDataTindakanPoli() = True Then
+
+            ' 2. Ambil nilai Qty (Default 1)
+            Dim qtyRencana As Integer = 1
+            If IsNumeric(TextBoxQty.Text) AndAlso CInt(TextBoxQty.Text) > 0 Then
+                qtyRencana = CInt(TextBoxQty.Text)
+            End If
+
+            ' Safety check (opsional, disamakan dengan fungsi sebelumnya)
+            If qtyRencana > 15 Then
+                MsgBox("Qty perencanaan terlalu besar!", MsgBoxStyle.Exclamation)
+                Exit Sub
+            End If
+
+            ' 3. Menentukan Penjamin
+            Dim penjaminTindakan As String = ""
+            If RadioButtonPenjaminUmum.Checked = True Then
+                penjaminTindakan = RadioButtonPenjaminUmum.Text
+            ElseIf RadioButtonPenjaminAsuransiLain.Checked = True Then
+                penjaminTindakan = LabelPenjaminAsuransiLain.Text
+            End If
+
+            ' 4. Menyiapkan variabel biaya
+            Dim biayaTindakan As Decimal = 0
+            If IsNumeric(TextBoxBiayaTindakan.Text) Then
+                biayaTindakan = CDbl(TextBoxBiayaTindakan.Text)
+            End If
+
+            Dim discTindakan As Decimal = 0
+            Dim nettBayar As Decimal = biayaTindakan - discTindakan
+
+            ' 5. Eksekusi Query dalam Looping berdasarkan Qty
+            Try
+                For i As Integer = 1 To qtyRencana
+                    Dim sqlInsertPerencanaan As String = _
+                        "INSERT INTO TransaksiTindakanPerencanaan (" & _
+                        "NoRM, NoTransaksi, TindakanID, NamaTindakan, JenisTindakan, " & _
+                        "BiayaTindakan, DiscTindakan, NettBayar, Penjamin, " & _
+                        "StatusPembayaran, StatusDipakai, CreatedBy, CreatedDate) VALUES (" & _
+                        "'" & idPasien & "', " & _
+                        "'" & idTransaksi & "', " & _
+                        "'" & TextBoxTindakanID.Text & "', " & _
+                        "'" & TextBoxNamaTindakan.Text.Replace("'", "''") & "', " & _
+                        "'" & TextBoxJenisTindakan.Text & "', " & _
+                        biayaTindakan & ", " & _
+                        discTindakan & ", " & _
+                        nettBayar & ", " & _
+                        "'" & penjaminTindakan & "', " & _
+                        "'PENDING', " & _
+                        "0, " & _
+                        "'" & userInput & "', " & _
+                        "GETDATE())"
+
+                    ' Eksekusi insert per baris
+                    WriteSQL(sqlInsertPerencanaan, 4)
+                Next
+
+                MsgBox(qtyRencana & " Perencanaan tindakan berhasil disimpan.", MsgBoxStyle.Information, "Success!")
+
+                ' 6. Refresh Grid dan bersihkan form
+                LoadGridPerencanaan() ' Buka komentar ini jika Anda punya fungsi load grid
+                ClearTabTindakan()
+
+            Catch ex As Exception
+                MsgBox("Gagal menyimpan perencanaan: " & ex.Message, MsgBoxStyle.Critical, "Error")
+            End Try
+
+        End If
+    End Sub
+
+    Sub LoadGridPerencanaan()
+        ' 1. Bersihkan item dan kolom
+        ListViewPerencanaan.Items.Clear()
+        ListViewPerencanaan.Columns.Clear()
+
+        ' 2. Setup properti ListView
+        ListViewPerencanaan.View = View.Details
+        ListViewPerencanaan.FullRowSelect = True
+        ListViewPerencanaan.GridLines = True
+        ListViewPerencanaan.CheckBoxes = True
+
+        ' 3. Setup Kolom
+        ' Kolom Index 0 khusus untuk Checkbox (lebarnya cukup 50 saja)
+        ListViewPerencanaan.Columns.Add("Pilih", 50, HorizontalAlignment.Center)
+
+        ' Kolom data sesungguhnya bergeser ke kanan
+        ListViewPerencanaan.Columns.Add("Nama Tindakan", 190)
+        ListViewPerencanaan.Columns.Add("Biaya per Tindakan", 120)
+        ListViewPerencanaan.Columns.Add("Qty", 60, HorizontalAlignment.Center)
+
+        ' 4. Query data
+        Dim sql As String = _
+            "SELECT TindakanID, NamaTindakan, BiayaTindakan, COUNT(*) AS Qty " & _
+            "FROM TransaksiTindakanPerencanaan " & _
+            "WHERE NoRM = '" & idPasien & "' AND StatusDipakai = 0 " & _
+            "GROUP BY TindakanID, NamaTindakan, BiayaTindakan"
+
+        Dim dtRencana As DataTable = ReadSQL(sql)
+
+        ' 5. Looping data 
+        For Each row As DataRow In dtRencana.Rows
+            ' Kolom 0 (Pilih): Kita isi string kosong ("") agar hanya ada Checkbox tanpa teks
+            Dim lvi As New ListViewItem("")
+
+            ' Simpan TindakanID di properti Tag (tetap tersembunyi dan aman)
+            lvi.Tag = row("TindakanID").ToString()
+
+            ' Kolom 1: Nama Tindakan
+            lvi.SubItems.Add(row("NamaTindakan").ToString())
+
+            ' Kolom 2: Biaya Tindakan
+            Dim biaya As Decimal = CDbl(row("BiayaTindakan"))
+            lvi.SubItems.Add(biaya.ToString("N0"))
+
+            ' Kolom 3: Qty
+            lvi.SubItems.Add(row("Qty").ToString())
+
+            ' Tambahkan ke ListView
+            ListViewPerencanaan.Items.Add(lvi)
+        Next
+    End Sub
+
+    Private Sub ListViewPerencanaan_ItemCheck(ByVal sender As Object, ByVal e As System.Windows.Forms.ItemCheckEventArgs) Handles ListViewPerencanaan.ItemCheck
+
+        ' 1. Cek apakah user sedang mencoba MENCENTANG item (perubahan status menjadi Checked)
+        If e.NewValue = CheckState.Checked Then
+
+            ' 2. Periksa apakah sudah ada item lain yang sedang dicentang di dalam ListView
+            If ListViewPerencanaan.CheckedItems.Count > 0 Then
+
+                ' 3. Jika sudah ada, BATALKAN centangan yang baru saja diklik user
+                e.NewValue = CheckState.Unchecked
+
+                ' 4. Tampilkan pesan peringatan agar perawat/dokter mengerti kenapa tidak bisa dicentang
+                MsgBox("Anda hanya bisa memilih satu tindakan dalam satu waktu." & vbCrLf & _
+                       "Silakan hilangkan centang pada tindakan yang sedang aktif terlebih dahulu.", _
+                       MsgBoxStyle.Exclamation, "Peringatan")
+            End If
+
+        End If
+
     End Sub
 
     Private Sub SaveDetailTindakan()
@@ -13366,8 +13514,9 @@ Public Class FormRekamMedisDokter
             If rowPaket IsNot Nothing AndAlso rowPaket.Length > 0 Then
                 For Each row As DataRow In rowPaket
                     Dim idPaket As String = row("PaketID").ToString()
+                    Dim kodeVoucherPaket As String = row("KodeVoucher").ToString()
 
-                    If Not ValidasiInformedConsentPaket(idPasien, idPaket, kodeVoucher, userInput) Then
+                    If Not ValidasiInformedConsentPaket(idPasien, idPaket, kodeVoucherPaket, userInput) Then
 
                         Dim jawab As DialogResult = MsgBox( _
                             "Informed Consent belum ditandatangani." & vbCrLf & _
@@ -13387,7 +13536,7 @@ Public Class FormRekamMedisDokter
 
                                 Dim frmIC As New FormInputInformedConsent
 
-                                frmIC.KodeVoucher = kodeVoucher
+                                frmIC.KodeVoucher = kodeVoucherPaket
 
                                 frmIC.SetForm( _
                                     "RekamMedisPerencanaanTindakan", _
@@ -14047,6 +14196,85 @@ Public Class FormRekamMedisDokter
 
         Catch ex As Exception
             MessageBox.Show("Gagal membuka hasil Inbody: " & ex.Message)
+        End Try
+    End Sub
+
+    Private Sub ButtonPotongPerencanaan_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonPotongPerencanaan.Click
+        ' 1. Validasi: Pastikan ada item yang dicentang
+        If ListViewPerencanaan.CheckedItems.Count = 0 Then
+            MsgBox("Pilih minimal satu tindakan perencanaan yang akan dieksekusi!", MsgBoxStyle.Exclamation, "Peringatan")
+            Exit Sub
+        End If
+
+        ' Konfirmasi ke user
+        If MsgBox("Apakah Anda yakin ingin mengeksekusi rencana tindakan yang dipilih ke tagihan hari ini?", MsgBoxStyle.Question + MsgBoxStyle.YesNo, "Konfirmasi") = MsgBoxResult.No Then
+            Exit Sub
+        End If
+
+        Try
+            ' 2. Ambil data TransPoliID (Sama seperti logika simpan tindakan Anda sebelumnya)
+            Dim trowPoli As DataRow = tblsRekamMedis.Rows(0)
+            Dim transPoliID As String = trowPoli("TransPoliID").ToString()
+
+            ' 3. Menentukan Penjamin untuk hari ini
+            Dim penjaminTindakan As String = ""
+            If RadioButtonPenjaminUmum.Checked = True Then
+                penjaminTindakan = RadioButtonPenjaminUmum.Text
+            ElseIf RadioButtonPenjaminAsuransiLain.Checked = True Then
+                penjaminTindakan = LabelPenjaminAsuransiLain.Text
+            End If
+
+            ' 4. Looping untuk setiap baris yang DICENTANG di ListView
+            For Each item As ListViewItem In ListViewPerencanaan.CheckedItems
+                ' Ambil data dari ListView
+                Dim tindakanID As String = item.Tag.ToString() ' Mengambil ID dari property Tag
+                Dim namaTindakan As String = item.SubItems(1).Text
+                Dim biayaTindakan As Decimal = CDbl(item.SubItems(2).Text)
+
+                ' Ambil Jenis Tindakan dari master atau perencanaan (karena tidak ditampilkan di ListView)
+                Dim jenisTindakan As String = ReadSQLNIK("SELECT TOP 1 JenisTindakan FROM TransaksiTindakanPerencanaan WHERE TindakanID = '" & tindakanID & "'")
+
+
+                ' --- A. INSERT KE TRANSAKSI POLI DETAIL (Tagihan riil) ---
+                Dim sqlInsertDetail As String = _
+                    "INSERT INTO TransaksiPoliDetail (" & _
+                    "TransPoliID, TindakanID, NamaTindakan, JenisTindakan, " & _
+                    "BiayaTindakan, DiscTindakan, NettBayar, " & _
+                    "Penjamin, GroupBayar, StatusPembayaran, CreatedBy, CreatedDate) VALUES (" & _
+                    "'" & transPoliID & "', " & _
+                    "'" & tindakanID & "', " & _
+                    "'" & namaTindakan.Replace("'", "''") & "', " & _
+                    "'" & jenisTindakan & "', " & _
+                    biayaTindakan & ", 0, " & biayaTindakan & ", " & _
+                    "'" & penjaminTindakan & "', '', 'PENDING', '" & userInput & "', GETDATE()" & _
+                    "); SELECT SCOPE_IDENTITY();"
+
+                ' Eksekusi Insert dan ambil ID barunya
+                Dim transPoliIDDetail As Integer = CInt(ReadSQLScalar(sqlInsertDetail))
+
+                ' --- B. POTONG KUOTA ALAT ---
+                ProsesPemotonganKuotaAlat(transPoliIDDetail.ToString(), tindakanID, 1)
+
+                ' --- C. UPDATE STATUS PERENCANAAN MENJADI DIPAKAI ---
+                ' Menggunakan TOP (1) agar memotong 1 baris perencanaan saja per putaran loop
+                Dim sqlUpdateRencana As String = _
+                    "UPDATE TOP (1) TransaksiTindakanPerencanaan " & _
+                    "SET StatusDipakai = 1 " & _
+                    "WHERE NoRM = '" & idPasien & "' " & _
+                    "AND TindakanID = '" & tindakanID & "' " & _
+                    "AND StatusDipakai = 0"
+
+                WriteSQL(sqlUpdateRencana, 4)
+            Next
+
+            MsgBox("Perencanaan tindakan berhasil dieksekusi dan masuk ke tagihan!", MsgBoxStyle.Information, "Sukses")
+
+            ' 6. Refresh data di layar
+            LoadGridPerencanaan() ' Refresh sisa perencanaan (yang sudah dipakai akan otomatis hilang)
+            LoadGridTindakanPoli() ' Refresh tagihan hari ini agar tindakan yang baru masuk terlihat
+
+        Catch ex As Exception
+            MsgBox("Terjadi kesalahan saat mengeksekusi perencanaan: " & ex.Message, MsgBoxStyle.Critical, "Error")
         End Try
     End Sub
 End Class
