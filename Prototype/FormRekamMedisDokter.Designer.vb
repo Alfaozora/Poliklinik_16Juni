@@ -740,6 +740,7 @@ Me.Panel30 = New System.Windows.Forms.Panel
 Me.ButtonPotongPerencanaan = New System.Windows.Forms.Button
 Me.ListViewPerencanaan = New System.Windows.Forms.ListView
 Me.SplitContainerTindakan = New System.Windows.Forms.SplitContainer
+Me.TextBoxFlagPerencanaan = New System.Windows.Forms.TextBox
 Me.ButtonSimpanPerencanaan = New System.Windows.Forms.Button
 Me.TextBoxQty = New System.Windows.Forms.TextBox
 Me.Label353 = New System.Windows.Forms.Label
@@ -759,7 +760,6 @@ Me.Label58 = New System.Windows.Forms.Label
 Me.TextBoxTindakanID = New System.Windows.Forms.TextBox
 Me.Label52 = New System.Windows.Forms.Label
 Me.TextBox16 = New System.Windows.Forms.TextBox
-Me.TextBoxFlagPerencanaan = New System.Windows.Forms.TextBox
 Me.RadioButtonPenjaminMandiriInhealth = New System.Windows.Forms.RadioButton
 Me.TextBoxJenisTindakan = New System.Windows.Forms.TextBox
 Me.Button5 = New System.Windows.Forms.Button
@@ -10550,6 +10550,21 @@ Me.SplitContainerTindakan.Size = New System.Drawing.Size(810, 216)
 Me.SplitContainerTindakan.SplitterDistance = 500
 Me.SplitContainerTindakan.TabIndex = 0
 '
+'TextBoxFlagPerencanaan
+'
+Me.TextBoxFlagPerencanaan.BackColor = System.Drawing.Color.White
+Me.TextBoxFlagPerencanaan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+Me.TextBoxFlagPerencanaan.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
+Me.TextBoxFlagPerencanaan.ForeColor = System.Drawing.Color.Black
+Me.TextBoxFlagPerencanaan.Location = New System.Drawing.Point(411, 138)
+Me.TextBoxFlagPerencanaan.Name = "TextBoxFlagPerencanaan"
+Me.TextBoxFlagPerencanaan.Size = New System.Drawing.Size(25, 25)
+Me.TextBoxFlagPerencanaan.TabIndex = 536
+Me.TextBoxFlagPerencanaan.TabStop = false
+Me.TextBoxFlagPerencanaan.Text = "0"
+Me.TextBoxFlagPerencanaan.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+Me.TextBoxFlagPerencanaan.Visible = false
+'
 'ButtonSimpanPerencanaan
 '
 Me.ButtonSimpanPerencanaan.BackColor = System.Drawing.Color.FromArgb(CType(CType(0,Byte),Integer), CType(CType(192,Byte),Integer), CType(CType(0,Byte),Integer))
@@ -10809,20 +10824,6 @@ Me.TextBox16.TabIndex = 513
 Me.TextBox16.TabStop = false
 Me.TextBox16.Text = "Rp"
 Me.TextBox16.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-'
-'TextBoxFlagPerencanaan
-'
-Me.TextBoxFlagPerencanaan.BackColor = System.Drawing.Color.White
-Me.TextBoxFlagPerencanaan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-Me.TextBoxFlagPerencanaan.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
-Me.TextBoxFlagPerencanaan.ForeColor = System.Drawing.Color.Black
-Me.TextBoxFlagPerencanaan.Location = New System.Drawing.Point(411, 138)
-Me.TextBoxFlagPerencanaan.Name = "TextBoxFlagPerencanaan"
-Me.TextBoxFlagPerencanaan.Size = New System.Drawing.Size(25, 25)
-Me.TextBoxFlagPerencanaan.TabIndex = 536
-Me.TextBoxFlagPerencanaan.TabStop = false
-Me.TextBoxFlagPerencanaan.Text = "0"
-Me.TextBoxFlagPerencanaan.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
 '
 'RadioButtonPenjaminMandiriInhealth
 '

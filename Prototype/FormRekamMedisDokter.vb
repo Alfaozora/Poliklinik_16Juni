@@ -10072,7 +10072,7 @@ Public Class FormRekamMedisDokter
 
             If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
                 Dim tblDetail As DataTable = ReadSQL( _
-                    "SELECT TindakanID, ISNULL(PaketID,0) AS PaketID " & _
+                    "SELECT TindakanID, ISNULL(PaketID,0) AS PaketID, ISNULL(Perencanaan, 0) AS Perencanaan " & _
                     "FROM TransaksiPoliDetail " & _
                     "WHERE TransPoliIDDetail = '" & idTindakanDetail & "'")
 
@@ -10084,9 +10084,27 @@ Public Class FormRekamMedisDokter
                 Dim idTindakan As String = tblDetail.Rows(0)("TindakanID").ToString()
                 Dim paketID As String = tblDetail.Rows(0)("PaketID").ToString().Trim()
 
+                Dim strPerencanaan As String = tblDetail.Rows(0)("Perencanaan").ToString().ToUpper()
+                Dim isPerencanaan As Boolean = False
+                If strPerencanaan = "1" Or strPerencanaan = "TRUE" Or strPerencanaan = "Y" Then
+                    isPerencanaan = True
+                End If
+
                 ' Soft delete hanya baris yang dipilih
                 WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
                          "WHERE TransPoliIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
+
+                If isPerencanaan = True Then
+                    ' Gunakan TOP (1) agar mengembalikan tepat 1 kuota perencanaan saja
+                    Dim sqlRevertRencana As String = _
+                        "UPDATE TOP (1) TransaksiTindakanPerencanaan " & _
+                        "SET StatusDipakai = 0, TglDipakai = NULL " & _
+                        "WHERE NoRM = '" & idPasien & "' " & _
+                        "AND TindakanID = '" & idTindakan & "' " & _
+                        "AND StatusDipakai = 1"
+
+                    WriteSQL(sqlRevertRencana, 4)
+                End If
 
                 VoidPemakaianAlatByDetail(idTindakanDetail)
 
@@ -10350,6 +10368,7 @@ Public Class FormRekamMedisDokter
 
                 SaveDetailTindakan()
                 LoadGridTindakanPoli()
+                LoadGridPerencanaan()
             End If
 
 
