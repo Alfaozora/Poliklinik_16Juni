@@ -32,8 +32,10 @@ Partial Class FormAdjustmentAlat
         Me.TextBoxSaldoFisik = New System.Windows.Forms.TextBox
         Me.ButtonKalkulasi = New System.Windows.Forms.Button
         Me.Label5 = New System.Windows.Forms.Label
-        Me.TextBox1 = New System.Windows.Forms.TextBox
+        Me.TextBoxKeterangan = New System.Windows.Forms.TextBox
         Me.ButtonSimpan = New System.Windows.Forms.Button
+        Me.TextBoxSelisih = New System.Windows.Forms.TextBox
+        Me.Label6 = New System.Windows.Forms.Label
         Me.SuspendLayout()
         '
         'Label1
@@ -86,9 +88,11 @@ Partial Class FormAdjustmentAlat
         '
         'TextBoxSaldoSistem
         '
+        Me.TextBoxSaldoSistem.BackColor = System.Drawing.SystemColors.Control
         Me.TextBoxSaldoSistem.Location = New System.Drawing.Point(108, 101)
         Me.TextBoxSaldoSistem.Multiline = True
         Me.TextBoxSaldoSistem.Name = "TextBoxSaldoSistem"
+        Me.TextBoxSaldoSistem.ReadOnly = True
         Me.TextBoxSaldoSistem.Size = New System.Drawing.Size(207, 25)
         Me.TextBoxSaldoSistem.TabIndex = 657
         '
@@ -100,7 +104,7 @@ Partial Class FormAdjustmentAlat
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(62, 15)
         Me.Label4.TabIndex = 658
-        Me.Label4.Text = "Saldo FIsik"
+        Me.Label4.Text = "Saldo Fisik"
         '
         'TextBoxSaldoFisik
         '
@@ -128,19 +132,19 @@ Partial Class FormAdjustmentAlat
         '
         Me.Label5.AutoSize = True
         Me.Label5.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label5.Location = New System.Drawing.Point(12, 219)
+        Me.Label5.Location = New System.Drawing.Point(12, 259)
         Me.Label5.Name = "Label5"
         Me.Label5.Size = New System.Drawing.Size(67, 15)
         Me.Label5.TabIndex = 661
         Me.Label5.Text = "Keterangan"
         '
-        'TextBox1
+        'TextBoxKeterangan
         '
-        Me.TextBox1.Location = New System.Drawing.Point(107, 217)
-        Me.TextBox1.Multiline = True
-        Me.TextBox1.Name = "TextBox1"
-        Me.TextBox1.Size = New System.Drawing.Size(207, 86)
-        Me.TextBox1.TabIndex = 662
+        Me.TextBoxKeterangan.Location = New System.Drawing.Point(107, 257)
+        Me.TextBoxKeterangan.Multiline = True
+        Me.TextBoxKeterangan.Name = "TextBoxKeterangan"
+        Me.TextBoxKeterangan.Size = New System.Drawing.Size(207, 86)
+        Me.TextBoxKeterangan.TabIndex = 662
         '
         'ButtonSimpan
         '
@@ -149,21 +153,42 @@ Partial Class FormAdjustmentAlat
         Me.ButtonSimpan.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonSimpan.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ButtonSimpan.ForeColor = System.Drawing.Color.White
-        Me.ButtonSimpan.Location = New System.Drawing.Point(107, 321)
+        Me.ButtonSimpan.Location = New System.Drawing.Point(107, 361)
         Me.ButtonSimpan.Name = "ButtonSimpan"
         Me.ButtonSimpan.Size = New System.Drawing.Size(208, 23)
         Me.ButtonSimpan.TabIndex = 663
         Me.ButtonSimpan.Text = "Simpan"
         Me.ButtonSimpan.UseVisualStyleBackColor = False
         '
+        'TextBoxSelisih
+        '
+        Me.TextBoxSelisih.Location = New System.Drawing.Point(107, 218)
+        Me.TextBoxSelisih.Multiline = True
+        Me.TextBoxSelisih.Name = "TextBoxSelisih"
+        Me.TextBoxSelisih.ReadOnly = True
+        Me.TextBoxSelisih.Size = New System.Drawing.Size(207, 25)
+        Me.TextBoxSelisih.TabIndex = 664
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label6.Location = New System.Drawing.Point(12, 220)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(40, 15)
+        Me.Label6.TabIndex = 665
+        Me.Label6.Text = "Selisih"
+        '
         'FormAdjustmentAlat
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.White
-        Me.ClientSize = New System.Drawing.Size(327, 385)
+        Me.ClientSize = New System.Drawing.Size(327, 401)
+        Me.Controls.Add(Me.Label6)
+        Me.Controls.Add(Me.TextBoxSelisih)
         Me.Controls.Add(Me.ButtonSimpan)
-        Me.Controls.Add(Me.TextBox1)
+        Me.Controls.Add(Me.TextBoxKeterangan)
         Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.ButtonKalkulasi)
         Me.Controls.Add(Me.TextBoxSaldoFisik)
@@ -190,6 +215,8 @@ Partial Class FormAdjustmentAlat
     Friend WithEvents TextBoxSaldoFisik As System.Windows.Forms.TextBox
     Friend WithEvents ButtonKalkulasi As System.Windows.Forms.Button
     Friend WithEvents Label5 As System.Windows.Forms.Label
-    Friend WithEvents TextBox1 As System.Windows.Forms.TextBox
+    Friend WithEvents TextBoxKeterangan As System.Windows.Forms.TextBox
     Friend WithEvents ButtonSimpan As System.Windows.Forms.Button
+    Friend WithEvents TextBoxSelisih As System.Windows.Forms.TextBox
+    Friend WithEvents Label6 As System.Windows.Forms.Label
 End Class

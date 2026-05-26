@@ -2217,6 +2217,19 @@ Public Class MasterTindakanKlinik
               " AND LPA.IsVoid = 0 " & _
               " AND LPA.Status = 1 " & _
               " AND LPA.TglPemakaian BETWEEN @TglAwal AND @TglAkhir " & _
+              " UNION ALL " & _
+              " SELECT " & _
+              " LA.TglAdjustment, " & _
+              " 'ADJUSTMENT', " & _
+              " 'Penyesuaian - ' + ISNULL(LA.Keterangan, ''), " & _
+              " CASE WHEN LA.QtyAdjustment > 0 THEN LA.QtyAdjustment ELSE 0 END, " & _
+              " CASE WHEN LA.QtyAdjustment < 0 THEN ABS(LA.QtyAdjustment) ELSE 0 END, " & _
+              " MC.CartridgeID, " & _
+              " 0 " & _
+              " FROM LogAdjustmentCartridge LA " & _
+              " INNER JOIN MasterCartridge MC ON MC.CartridgeID = LA.CartridgeID " & _
+              " WHERE MC.AlatID = @AlatID " & _
+              " AND LA.TglAdjustment BETWEEN @TglAwal AND @TglAkhir " & _
               " ) " & _
               " SELECT " & _
               " L1.Tanggal, " & _
@@ -2274,6 +2287,10 @@ Public Class MasterTindakanKlinik
             "    WHERE MC.AlatID=@AlatID " & _
             "    AND LPA.Status=1 " & _
             "    AND LPA.IsVoid=0) " & _
+            " + (SELECT ISNULL(SUM(LA.QtyAdjustment),0) " & _
+            "    FROM LogAdjustmentCartridge LA " & _
+            "    INNER JOIN MasterCartridge MC ON MC.CartridgeID=LA.CartridgeID " & _
+            "    WHERE MC.AlatID=@AlatID) " & _
             ") AS SaldoAkhir"
 
         Dim dtSummary As DataTable = ReadSQL(sqlSummary)
@@ -2293,6 +2310,7 @@ Public Class MasterTindakanKlinik
         ' Load report dari file
         Dim report As New DevExpress.XtraReports.UI.XtraReport
         report = XtraReport.FromFile(Application.StartupPath + "\reports\RiwayatTransaksiAlat.repx", True)
+
         ' ========================================================
         ' 1. VARIABEL REPORT HEADER (Untuk Info Alat & Tanggal)
         ' ========================================================
@@ -2334,7 +2352,6 @@ Public Class MasterTindakanKlinik
         End If
 
         report.DataSource = dt
-
 
         'report.RunDesigner()
         report.ShowPreview()
