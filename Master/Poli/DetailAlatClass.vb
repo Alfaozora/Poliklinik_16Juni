@@ -5,5 +5,6 @@
     Public CartridgeID As Integer
     Public NamaCartridge As String
     Public Shoot As Integer
+    Public HargaBeli As Decimal
 
 End Class

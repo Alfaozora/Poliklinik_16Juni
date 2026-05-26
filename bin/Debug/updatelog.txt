@@ -1,8 +1,10 @@
 Version : 2.0.0.58 ()
 # [New Feature] Penambahan Qty untuk Informed Consent
 # [New Feature] Laporan ulang tahun pasien pada menu Daftar Kunjungan pasien
+# [New Feature] Penambahan Perencanaan Tindakan
 # [Usability Improvement] Group by Tindakan + Qty pada Rekap Tagihan
 # [Usability Improvement] Meperbaiki Terbilang pada Rekap Invoice
+# [Bug Fix] Memperbaiki NominalBHP pada Rekap Fee Practitioner
 
 Version : 2.0.0.57 (08 Mei 2026)
 # [New Feature] Penambahan laporan penggunaan paket Tindakan

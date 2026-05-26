@@ -1591,7 +1591,7 @@ Public Class FormPembayaran
                               "AND NamaTindakan = '" & Trow("Tindakan").ToString().Replace("'", "''") & "' " & _
                               "AND JenisTindakan = '" & Trow("Jenis").ToString().Replace("'", "''") & "'", 4)
 
-                        
+
                         ' ===============================
                         ' FINALISASI PEMAKAIAN ALAT
                         ' ===============================

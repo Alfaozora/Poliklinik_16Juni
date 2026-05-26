@@ -746,6 +746,7 @@ Public Class MasterTindakanKlinik
             ' Clear Field
             TextBoxPersentaseFeePerusahaan.Text = "0"
             TextBoxPersentaseFeeKaryawan.Text = "0"
+            TextBoxPersentaseFeePerawat.Text = "0"
             TextBoxNominalFee.Text = "0"
             TextBoxFeeDokterTambahan.Text = "0"
             TextBoxFeePerawatTambahan.Text = "0"
@@ -812,7 +813,8 @@ Public Class MasterTindakanKlinik
                 item.NamaAlat, _
                 item.CartridgeID, _
                 item.NamaCartridge, _
-                item.Shoot)
+                item.Shoot, _
+                item.HargaBeli)
 
         Next
 
@@ -893,6 +895,7 @@ Public Class MasterTindakanKlinik
         ' Set Value
         If IsDBNull(rowTindakan("PersentaseFeePerusahaan")) = False Then TextBoxPersentaseFeePerusahaan.Text = rowTindakan("PersentaseFeePerusahaan")
         If IsDBNull(rowTindakan("PersentaseFeeKaryawan")) = False Then TextBoxPersentaseFeeKaryawan.Text = rowTindakan("PersentaseFeeKaryawan")
+        If IsDBNull(rowTindakan("PersentaseFeePerawat")) = False Then TextBoxPersentaseFeePerawat.Text = rowTindakan("PersentaseFeePerawat")
         If IsDBNull(rowTindakan("FeePerTindakan")) = False Then TextBoxNominalFee.Text = Splitmoney(rowTindakan("FeePerTindakan"))
         If IsDBNull(rowTindakan("MaksimalBHP")) = False Then TextBoxMaksimalBHP_Tindakan.Text = Splitmoney(rowTindakan("MaksimalBHP"))
 
@@ -924,6 +927,7 @@ Public Class MasterTindakanKlinik
         TextBoxMaksimalBHP_Tindakan.Text = "0"
         TextBoxPersentaseFeePerusahaan.Text = "0"
         TextBoxPersentaseFeeKaryawan.Text = "0"
+        TextBoxPersentaseFeePerawat.Text = "0"
         TextBoxNominalFee.Text = "0"
 
         For i As Integer = 0 To CheckedListBoxPoli.Items.Count - 1
@@ -991,7 +995,8 @@ Public Class MasterTindakanKlinik
                 .NamaAlat = row("NamaAlat"), _
                 .CartridgeID = row("CartridgeID"), _
                 .NamaCartridge = row("NamaCartridge"), _
-                .Shoot = row("Shoot") _
+                .Shoot = row("Shoot"), _
+                .HargaBeli = row("HargaBeli") _
             })
 
         Next
@@ -1067,9 +1072,9 @@ Public Class MasterTindakanKlinik
         If TextBoxTindakanID.Text = "" Then
             ' Insert Data Baru 
             If RadioButtonPoliUmum.Checked = True Then
-                WriteSQL("INSERT INTO MasterTindakan ([NamaTindakan], [JenisTindakan], [BiayaTindakan], [JenisDokter], [CreatedDate], [CreatedBy], [StatusFeeTindakan], [StatusBHP], [StatusPersentaseFee], [StatusNominalFee], [PersentaseFeePerusahaan], [PersentaseFeeKaryawan], [FeePerTindakan], [FeeDokter], [FeePerawat], [StatusFeeKonsultasi], [MaksimalBHP], [StatusInformedConsent], [TindakanInformedConsent], [Hari], [Reminder], [PoliTujuan], [Kategori], [DetailAlat]) " & _
+                WriteSQL("INSERT INTO MasterTindakan ([NamaTindakan], [JenisTindakan], [BiayaTindakan], [JenisDokter], [CreatedDate], [CreatedBy], [StatusFeeTindakan], [StatusBHP], [StatusPersentaseFee], [StatusNominalFee], [PersentaseFeePerusahaan], [PersentaseFeeKaryawan], [PersentaseFeePerawat], [FeePerTindakan], [FeeDokter], [FeePerawat], [StatusFeeKonsultasi], [MaksimalBHP], [StatusInformedConsent], [TindakanInformedConsent], [Hari], [Reminder], [PoliTujuan], [Kategori], [DetailAlat]) " & _
                          "VALUES('" & TextBoxNamaTindakan.Text & "','" & ComboBoxGroupJenisTindakan.Text & "'," & CInt(TextBoxBiayaTindakan.Text) & ", '" & jenisPelaksana & "', GETDATE(), '" & userInput & "', '" & statusFee & "', '" & statusBHP & "', '" & statusPersentase & "', " & _
-                         "'" & statusNominal & "', '" & CDbl(TextBoxPersentaseFeePerusahaan.Text) & "', '" & CDbl(TextBoxPersentaseFeeKaryawan.Text) & "', '" & CDbl(TextBoxNominalFee.Text) & "', '" & CDbl(TextBoxFeeDokterTambahan.Text) & "', '" & CDbl(TextBoxFeePerawatTambahan.Text) & "', '" & statusFeeKonsultasi & "', '" & CDbl(TextBoxMaksimalBHP_Tindakan.Text) & "', '" & statusInformedConsent & "', '" & ComboBoxInformedConsent.Text & "', '" & hari & "', " & statusReminder & ", '" & poliGabung & "', '" & kategori & "', '" & detailAlat & "')", 4)
+                         "'" & statusNominal & "', '" & CDbl(TextBoxPersentaseFeePerusahaan.Text) & "', '" & CDbl(TextBoxPersentaseFeeKaryawan.Text) & "', '" & CDbl(TextBoxPersentaseFeePerawat.Text) & "', '" & CDbl(TextBoxNominalFee.Text) & "', '" & CDbl(TextBoxFeeDokterTambahan.Text) & "', '" & CDbl(TextBoxFeePerawatTambahan.Text) & "', '" & statusFeeKonsultasi & "', '" & CDbl(TextBoxMaksimalBHP_Tindakan.Text) & "', '" & statusInformedConsent & "', '" & ComboBoxInformedConsent.Text & "', '" & hari & "', " & statusReminder & ", '" & poliGabung & "', '" & kategori & "', '" & detailAlat & "')", 4)
             ElseIf RadioButtonPoliGigi.Checked = True Then
                 WriteSQL("INSERT INTO MasterTindakanGigi ([NamaTindakan], [JenisTindakan], [BiayaTindakan], [JenisDokter], [CreatedDate], [CreatedBy], [StatusFeeTindakan], [StatusBHP], [StatusPersentaseFee], [StatusNominalFee], [PersentaseFeePerusahaan], [PersentaseFeeKaryawan], [FeePerTindakan], [FeeDokter], [FeePerawat], [StatusFeeKonsultasi], [MaksimalBHP], [StatusInformedConsent], [TindakanInformedConsent], [Hari], [Reminder], [PoliTujuan]) " & _
                      "VALUES('" & TextBoxNamaTindakan.Text & "', '" & ComboBoxGroupJenisTindakan.Text & "', " & CInt(TextBoxBiayaTindakan.Text) & ", '" & jenisPelaksana & "', GETDATE(), '" & userInput & "', '" & statusFee & "', '" & statusBHP & "', '" & statusPersentase & "', " & _
@@ -1092,6 +1097,7 @@ Public Class MasterTindakanKlinik
                               "StatusNominalFee = '" & statusNominal & "'," & _
                               "PersentaseFeePerusahaan = '" & CDbl(TextBoxPersentaseFeePerusahaan.Text) & "'," & _
                               "PersentaseFeeKaryawan = '" & CDbl(TextBoxPersentaseFeeKaryawan.Text) & "'," & _
+                              "PersentaseFeePerawat = '" & CDbl(TextBoxPersentaseFeePerawat.Text) & "'," & _
                               "FeePerTindakan = '" & CDbl(TextBoxNominalFee.Text) & "'," & _
                               "FeeDokter = '" & CDbl(TextBoxFeeDokterTambahan.Text) & "'," & _
                               "FeePerawat = '" & CDbl(TextBoxFeePerawatTambahan.Text) & "'," & _
@@ -1269,14 +1275,17 @@ Public Class MasterTindakanKlinik
         If RadioButtonOpsiPersentase.Checked = True Then
             TextBoxPersentaseFeePerusahaan.Enabled = True
             TextBoxPersentaseFeeKaryawan.Enabled = True
+            TextBoxPersentaseFeePerawat.Enabled = True
             TextBoxNominalFee.Enabled = False
             TextBoxNominalFee.Text = "0"
         ElseIf RadioButtonOpsiNominal.Checked = True Then
             TextBoxPersentaseFeePerusahaan.Enabled = False
             TextBoxPersentaseFeeKaryawan.Enabled = False
+            TextBoxPersentaseFeePerawat.Enabled = False
             TextBoxNominalFee.Enabled = True
             TextBoxPersentaseFeeKaryawan.Text = "0"
             TextBoxPersentaseFeePerusahaan.Text = "0"
+            TextBoxPersentaseFeePerawat.Text = "0"
         End If
     End Sub
 
@@ -1393,6 +1402,7 @@ Public Class MasterTindakanKlinik
         dtDetailAlat.Columns.Add("CartridgeID", GetType(Integer))
         dtDetailAlat.Columns.Add("NamaCartridge", GetType(String))
         dtDetailAlat.Columns.Add("Shoot", GetType(Integer))
+        dtDetailAlat.Columns.Add("HargaBeli", GetType(Decimal))
 
         DataGridViewAlatTindakan.DataSource = dtDetailAlat
 
@@ -1428,6 +1438,15 @@ Public Class MasterTindakanKlinik
         Dim cartridgeID As Integer = CInt(ComboBoxCartridgeTindakan.SelectedValue)
         Dim namaCartridge As String = ComboBoxCartridgeTindakan.Text
 
+        ' --- MULAI PENGAMBILAN & PERHITUNGAN HARGA BELI ---
+        ' Ambil row yang sedang dipilih di ComboBox Cartridge
+        Dim drv As DataRowView = DirectCast(ComboBoxCartridgeTindakan.SelectedItem, DataRowView)
+        Dim hargaBeliSatuan As Decimal = CDec(drv("HargaBeli"))
+
+        ' Kalikan harga beli satuan dengan jumlah shoot
+        Dim totalHargaBeli As Decimal = hargaBeliSatuan * shoot
+        ' --- AKHIR PENGAMBILAN & PERHITUNGAN HARGA BELI ---
+
         ' ===== CEK DUPLIKAT =====
         For Each row As DataRow In dtDetailAlat.Rows
             If CInt(row("CartridgeID")) = cartridgeID Then
@@ -1437,7 +1456,7 @@ Public Class MasterTindakanKlinik
         Next
 
         ' ===== TAMBAH KE GRID =====
-        dtDetailAlat.Rows.Add(alatID, namaAlat, cartridgeID, namaCartridge, shoot)
+        dtDetailAlat.Rows.Add(alatID, namaAlat, cartridgeID, namaCartridge, shoot, totalHargaBeli)
 
         NumericShootPerTindakan.Value = 1
         ComboBoxCartridgeTindakan.SelectedIndex = -1
@@ -1564,6 +1583,7 @@ Public Class MasterTindakanKlinik
         TextBoxKuotaTerpakaiCartridge.Text = "0"
         TextBoxKuotaSisaCartridge.Text = "0"
         TextBoxKuotaTotalCartridge.Text = "0"
+        TextBoxHargaBeli.Text = "0"
 
         ' Status aktif default ON
         CheckBoxCartridge.Checked = True
@@ -1757,6 +1777,14 @@ Public Class MasterTindakanKlinik
         Dim kuotaAwal As Integer = CInt(NumericKuotaAwalCartridge.Text)
         Dim kuotaMinimum As Integer = CInt(NumericKuotaMinimumCartridge.Text)
 
+        ' Mengambil nilai harga beli dari textbox. Jika kosong/bukan angka, default ke 0
+        Dim hargaBeli As Decimal = 0
+        If Not Decimal.TryParse(TextBoxHargaBeli.Text, hargaBeli) Then
+            hargaBeli = 0
+            ' Anda bisa mengganti "hargaBeli = 0" dengan MsgBox peringatan 
+            ' dan "Exit Sub" jika harga beli wajib diisi.
+        End If
+
         Dim alatID As Integer = CInt(ComboBoxNamaAlat.SelectedValue)
 
         If TextBoxKodeCartridge.Text = "" Or TextBoxNamaCartridge.Text = "" Then
@@ -1765,7 +1793,7 @@ Public Class MasterTindakanKlinik
         End If
 
         WriteSQL("INSERT INTO MasterCartridge " & _
-                 "(KodeCartridge, NamaCartridge, KuotaTotal, KuotaTerpakai, IsAktif, CreatedAt, CreatedBy, KuotaAwal, KuotaMinimum, AlatID) " & _
+                 "(KodeCartridge, NamaCartridge, KuotaTotal, KuotaTerpakai, IsAktif, CreatedAt, CreatedBy, KuotaAwal, KuotaMinimum, AlatID, HargaBeli) " & _
                  "VALUES (" & _
                  "'" & TextBoxKodeCartridge.Text.Replace("'", "''") & "', " & _
                  "'" & TextBoxNamaCartridge.Text.Replace("'", "''") & "', " & _
@@ -1776,7 +1804,8 @@ Public Class MasterTindakanKlinik
                  "'" & userInput & "', " & _
                  kuotaAwal & ", " & _
                  kuotaMinimum & ", " & _
-                 alatID & ")", 4)
+                 alatID & ", " & _
+                 hargaBeli & ")", 4)
 
         MsgBox("Berhasil menyimpan data cartridge.", MsgBoxStyle.Information, "Success!")
 
@@ -1812,6 +1841,11 @@ Public Class MasterTindakanKlinik
 
         Dim alatID As Integer = CInt(ComboBoxNamaAlat.SelectedValue)
 
+        Dim hargaBeli As Decimal = 0
+        If Not Decimal.TryParse(TextBoxHargaBeli.Text, hargaBeli) Then
+            hargaBeli = 0
+        End If
+
         If TextBoxKodeCartridge.Text = "" Or TextBoxNamaCartridge.Text = "" Then
             MsgBox("Kode dan Nama cartridge wajib diisi")
             Exit Sub
@@ -1834,6 +1868,7 @@ Public Class MasterTindakanKlinik
         parameterUpdate = "KodeCartridge = '" & TextBoxKodeCartridge.Text.Replace("'", "''") & "', " & _
                           "NamaCartridge = '" & TextBoxNamaCartridge.Text.Replace("'", "''") & "', " & _
                           "AlatID = " & alatID & ", " & _
+                          "HargaBeli = " & hargaBeli & ", " & _
                           "KuotaMinimum = " & kuotaMinimum & ", " & _
                           "IsAktif = " & statusAktif & ", " & _
                           "UpdatedAt = GETDATE(), " & _
@@ -1991,6 +2026,11 @@ Public Class MasterTindakanKlinik
         Dim kuotaTerpakai As Integer = If(IsDBNull(row("KuotaTerpakai")), 0, CInt(row("KuotaTerpakai")))
         Dim kuotaMinimum As Integer = If(IsDBNull(row("KuotaMinimum")), 0, CInt(row("KuotaMinimum")))
 
+        ' --- MULAI PENAMBAHAN HARGA BELI ---
+        ' Mengambil nilai HargaBeli dari database, jika Null maka set ke 0
+        Dim hargaBeli As Decimal = If(IsDBNull(row("HargaBeli")), 0D, CDec(row("HargaBeli")))
+        ' --- AKHIR PENAMBAHAN HARGA BELI ---
+
         Dim kuotaSisa As Integer = kuotaTotal - kuotaTerpakai
 
         ' =============================
@@ -2001,8 +2041,13 @@ Public Class MasterTindakanKlinik
         TextBoxKodeCartridge.Text = row("KodeCartridge").ToString()
         TextBoxNamaCartridge.Text = row("NamaCartridge").ToString()
 
-        NumericKuotaAwalCartridge.Text = kuotaAwal
-        NumericKuotaMinimumCartridge.Text = kuotaMinimum
+        ' --- MEMASUKKAN NILAI HARGA BELI KE TEXTBOX ---
+        ' Anda bisa menggunakan format tertentu, misal hargaBeli.ToString("N0") untuk pemisah ribuan
+        TextBoxHargaBeli.Text = Math.Round(hargaBeli, 0).ToString()
+        ' ----------------------------------------------
+
+        NumericKuotaAwalCartridge.Text = kuotaAwal.ToString()
+        NumericKuotaMinimumCartridge.Text = kuotaMinimum.ToString()
         TextBoxKuotaTotalCartridge.Text = kuotaTotal.ToString()
         TextBoxKuotaTerpakaiCartridge.Text = kuotaTerpakai.ToString()
         TextBoxKuotaSisaCartridge.Text = kuotaSisa.ToString()
@@ -2064,7 +2109,7 @@ Public Class MasterTindakanKlinik
     Private Sub LoadCartridgeByAlat(ByVal alatID As Integer)
 
         Dim sql As String = _
-            "SELECT CartridgeID, NamaCartridge " & _
+            "SELECT CartridgeID, NamaCartridge, ISNULL(HargaBeli, 0) AS HargaBeli " & _
             "FROM MasterCartridge " & _
             "WHERE AlatID = " & alatID & " " & _
             "AND IsAktif = 1 " & _
@@ -2147,19 +2192,21 @@ Public Class MasterTindakanKlinik
               " MA.NamaAlat + ' - ' + MC.NamaCartridge AS Keterangan, " & _
               " MC.KuotaAwal AS Debet, " & _
               " 0 AS Kredit, " & _
-              " MC.CartridgeID " & _
+              " MC.CartridgeID, " & _
+              " ISNULL(MC.HargaBeli, 0) AS HargaBeli " & _
               " FROM MasterCartridge MC " & _
               " INNER JOIN MasterAlat MA ON MA.AlatID = MC.AlatID " & _
               " WHERE MA.AlatID = @AlatID " & _
               " UNION ALL " & _
               " SELECT " & _
               " LPA.TglPemakaian, " & _
-              " 'PEMAKAIAN', " & _
+              " CAST(TP.NoUrut AS VARCHAR(50)), " & _
               " TPD.NamaTindakan + ' - ' + MP.Nama + " & _
               " ' | ' + MC.NamaCartridge, " & _
               " 0, " & _
               " LPA.ShootDipakai, " & _
-              " MC.CartridgeID " & _
+              " MC.CartridgeID, " & _
+              " ISNULL(LPA.HargaBeli, 0) " & _
               " FROM LogPemakaianAlat LPA " & _
               " INNER JOIN MasterCartridge MC ON MC.CartridgeID = LPA.CartridgeID " & _
               " INNER JOIN MasterAlat MA ON MA.AlatID = MC.AlatID " & _
@@ -2180,11 +2227,26 @@ Public Class MasterTindakanKlinik
               " (SELECT SUM(L2.Debet - L2.Kredit) " & _
               "  FROM Ledger L2 " & _
               "  WHERE L2.CartridgeID = L1.CartridgeID " & _
-              "  AND L2.Tanggal <= L1.Tanggal) AS Saldo " & _
+              "  AND L2.Tanggal <= L1.Tanggal) AS Saldo, " & _
+              " L1.HargaBeli " & _
               " FROM Ledger L1 " & _
               " ORDER BY L1.CartridgeID, L1.Tanggal"
 
         Dim dt As DataTable = ReadSQL(sql)
+
+        If dt.Rows.Count = 0 Then
+            MsgBox("Tidak ada data riwayat alat.", MsgBoxStyle.Information)
+            Exit Sub
+        End If
+
+        ' ========================================================
+        ' ⭐ MENGHITUNG TOTAL DARI DATATABLE
+        ' ========================================================
+        Dim totalDebet As Decimal = If(IsDBNull(dt.Compute("SUM(Debet)", "")), 0, CDec(dt.Compute("SUM(Debet)", "")))
+        Dim totalKredit As Decimal = If(IsDBNull(dt.Compute("SUM(Kredit)", "")), 0, CDec(dt.Compute("SUM(Kredit)", "")))
+        Dim totalHargaBeli As Decimal = If(IsDBNull(dt.Compute("SUM(HargaBeli)", "")), 0, CDec(dt.Compute("SUM(HargaBeli)", "")))
+        Dim totalSaldo As Decimal = totalDebet - totalKredit
+        ' ========================================================
 
         Dim sqlSummary As String = ""
         sqlSummary = _
@@ -2228,28 +2290,51 @@ Public Class MasterTindakanKlinik
             saldoAkhir = CInt(dtSummary.Rows(0)("SaldoAkhir"))
         End If
 
-        If dt.Rows.Count = 0 Then
-            MsgBox("Tidak ada data riwayat alat.", MsgBoxStyle.Information)
-            Exit Sub
-        End If
-
         ' Load report dari file
         Dim report As New DevExpress.XtraReports.UI.XtraReport
         report = XtraReport.FromFile(Application.StartupPath + "\reports\RiwayatTransaksiAlat.repx", True)
-        report.Bands.Item(BandKind.ReportHeader).Controls("lblNamaAlat").Text = namaAlat
-        report.Bands.Item(BandKind.ReportHeader).Controls("lblKodeAlat").Text = TextBoxKodeAlat.Text
-        Dim gh As GroupHeaderBand = CType(report.Bands("GroupHeader3"), GroupHeaderBand)
+        ' ========================================================
+        ' 1. VARIABEL REPORT HEADER (Untuk Info Alat & Tanggal)
+        ' ========================================================
+        Dim bandHeader As ReportHeaderBand = CType(report.Bands(BandKind.ReportHeader), ReportHeaderBand)
+        If bandHeader IsNot Nothing Then
+            bandHeader.Controls("lblNamaAlat").Text = namaAlat
+            bandHeader.Controls("lblKodeAlat").Text = TextBoxKodeAlat.Text
+            bandHeader.Controls("lbltanggal").Text = stringTglTransaksiAwal & " - " & stringTglTransaksiAkhir
+        End If
 
-        gh.Controls("saldoAwal").Text = Format(kuotaAwal, "#,##0")
-        gh.Controls("totalTopUp").Text = Format(totalTopUp, "#,##0")
-        gh.Controls("totalPemakaian").Text = Format(totalPakai, "#,##0")
-        gh.Controls("saldoAkhir").Text = Format(saldoAkhir, "#,##0")
+        ' ========================================================
+        ' 2. VARIABEL GROUP HEADER (Untuk Summary Header)
+        ' ========================================================
+        Dim bandGroup As GroupHeaderBand = CType(report.Bands("GroupHeader3"), GroupHeaderBand)
+        If bandGroup IsNot Nothing Then
+            bandGroup.Controls("saldoAwal").Text = Format(kuotaAwal, "#,##0")
+            bandGroup.Controls("totalTopUp").Text = Format(totalTopUp, "#,##0")
+            bandGroup.Controls("totalPemakaian").Text = Format(totalPakai, "#,##0")
+            bandGroup.Controls("saldoAkhir").Text = Format(saldoAkhir, "#,##0")
+        End If
 
+        ' ========================================================
+        ' 3. VARIABEL PAGE FOOTER (Untuk Info Cetak)
+        ' ========================================================
+        Dim bandPageFooter As PageFooterBand = CType(report.Bands(BandKind.PageFooter), PageFooterBand)
+        If bandPageFooter IsNot Nothing Then
+            bandPageFooter.Controls("lblprinted").Text = Format(DateAndTime.Now, "dd-MMM-yyyy HH:mm:ss") & " By " & userInput
+        End If
 
-        report.Bands.Item(BandKind.PageFooter).Controls("lblprinted").Text = Format(DateAndTime.Now, "dd-MMM-yyyy HH:mm:ss") & " By " & userInput
-        report.Bands.Item(BandKind.ReportHeader).Controls("lbltanggal").Text = stringTglTransaksiAwal & " - " & stringTglTransaksiAkhir
+        ' ========================================================
+        ' 4. VARIABEL REPORT FOOTER (Untuk Total Keseluruhan)
+        ' ========================================================
+        Dim bandReportFooter As ReportFooterBand = CType(report.Bands(BandKind.ReportFooter), ReportFooterBand)
+        If bandReportFooter IsNot Nothing Then
+            If bandReportFooter.Controls("lblTotalDebet") IsNot Nothing Then bandReportFooter.Controls("lblTotalDebet").Text = Format(totalDebet, "#,##0")
+            If bandReportFooter.Controls("lblTotalKredit") IsNot Nothing Then bandReportFooter.Controls("lblTotalKredit").Text = Format(totalKredit, "#,##0")
+            If bandReportFooter.Controls("lblTotalHargaBeli") IsNot Nothing Then bandReportFooter.Controls("lblTotalHargaBeli").Text = Format(totalHargaBeli, "#,##0")
+            If bandReportFooter.Controls("lblTotalSaldo") IsNot Nothing Then bandReportFooter.Controls("lblTotalSaldo").Text = Format(totalSaldo, "#,##0")
+        End If
 
         report.DataSource = dt
+
 
         'report.RunDesigner()
         report.ShowPreview()

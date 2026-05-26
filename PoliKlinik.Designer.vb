@@ -146,6 +146,7 @@ Partial Class PoliKlinik
         Me.RepairTransaksiTindakanDetailToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.AutoSendingWhatsappEmailToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.WaBlastToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.BirthdaySenderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MiscToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MasterPaketToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.DesignReportToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -275,7 +276,7 @@ Partial Class PoliKlinik
         Me.TimerShutdown = New System.Windows.Forms.Timer(Me.components)
         Me.TimerKirimReminderWA = New System.Windows.Forms.Timer(Me.components)
         Me.TimerBirthday = New System.Windows.Forms.Timer(Me.components)
-        Me.BirthdaySenderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.AdjustmentAlatToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip.SuspendLayout()
         Me.StatusStrip.SuspendLayout()
         Me.SuspendLayout()
@@ -470,7 +471,7 @@ Partial Class PoliKlinik
         '
         'PoliToolStripMenuItem1
         '
-        Me.PoliToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PembayaranPoliToolStripMenuItem, Me.PendapatanKlinikToolStripMenuItem1, Me.KapitasiKlinikToolStripMenuItem, Me.LaporanKlinikToolStripMenuItem, Me.LaporanToolStripMenuItem, Me.RekapPendapatanToolStripMenuItem, Me.ReservasiDanReminderToolStripMenuItem, Me.PersetujuanPenerimaanBarangToolStripMenuItem})
+        Me.PoliToolStripMenuItem1.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.PembayaranPoliToolStripMenuItem, Me.PendapatanKlinikToolStripMenuItem1, Me.KapitasiKlinikToolStripMenuItem, Me.LaporanKlinikToolStripMenuItem, Me.LaporanToolStripMenuItem, Me.RekapPendapatanToolStripMenuItem, Me.ReservasiDanReminderToolStripMenuItem, Me.PersetujuanPenerimaanBarangToolStripMenuItem, Me.AdjustmentAlatToolStripMenuItem})
         Me.PoliToolStripMenuItem1.Font = New System.Drawing.Font("Arial", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.PoliToolStripMenuItem1.Name = "PoliToolStripMenuItem1"
         Me.PoliToolStripMenuItem1.Size = New System.Drawing.Size(52, 20)
@@ -1171,6 +1172,12 @@ Partial Class PoliKlinik
         Me.WaBlastToolStripMenuItem.Size = New System.Drawing.Size(262, 22)
         Me.WaBlastToolStripMenuItem.Tag = "0706"
         Me.WaBlastToolStripMenuItem.Text = "Wa Blast"
+        '
+        'BirthdaySenderToolStripMenuItem
+        '
+        Me.BirthdaySenderToolStripMenuItem.Name = "BirthdaySenderToolStripMenuItem"
+        Me.BirthdaySenderToolStripMenuItem.Size = New System.Drawing.Size(262, 22)
+        Me.BirthdaySenderToolStripMenuItem.Text = "Birthday Sender"
         '
         'MiscToolStripMenuItem
         '
@@ -2016,11 +2023,11 @@ Partial Class PoliKlinik
         '
         Me.TimerBirthday.Interval = 300000
         '
-        'BirthdaySenderToolStripMenuItem
+        'AdjustmentAlatToolStripMenuItem
         '
-        Me.BirthdaySenderToolStripMenuItem.Name = "BirthdaySenderToolStripMenuItem"
-        Me.BirthdaySenderToolStripMenuItem.Size = New System.Drawing.Size(262, 22)
-        Me.BirthdaySenderToolStripMenuItem.Text = "Birthday Sender"
+        Me.AdjustmentAlatToolStripMenuItem.Name = "AdjustmentAlatToolStripMenuItem"
+        Me.AdjustmentAlatToolStripMenuItem.Size = New System.Drawing.Size(263, 22)
+        Me.AdjustmentAlatToolStripMenuItem.Text = "Adjustment Alat"
         '
         'PoliKlinik
         '
@@ -2299,4 +2306,5 @@ Partial Class PoliKlinik
     Friend WithEvents TripleDSToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents WaBlastToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents BirthdaySenderToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents AdjustmentAlatToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 End Class

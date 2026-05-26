@@ -1595,4 +1595,9 @@ Public Class PoliKlinik
         FormBirthdaySender.Show()
         FormBirthdaySender.Focus()
     End Sub
+
+    Private Sub AdjustmentAlatToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AdjustmentAlatToolStripMenuItem.Click
+        FormAdjustmentAlat.Show()
+        FormAdjustmentAlat.Focus()
+    End Sub
 End Class

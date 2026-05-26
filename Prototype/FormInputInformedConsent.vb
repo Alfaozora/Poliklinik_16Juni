@@ -164,11 +164,11 @@ Public Class FormInputInformedConsent
             For Each Trow2 As DataRow In tblsRekamMedis.Rows
                 idTransaksi = Trow2("NoUrut")
 
-                If Trow2("KeluhanTambahan") <> "-" And Trow2("KeluhanTambahan") <> "" Then
-                    TextBoxDasarDiagnosa.Text = Trow2("KeluhanUtama") & ", " & Trow2("KeluhanTambahan")
-                Else
-                    TextBoxDasarDiagnosa.Text = Trow2("KeluhanUtama")
-                End If
+                'If Trow2("KeluhanTambahan") <> "-" And Trow2("KeluhanTambahan") <> "" Then
+                '    TextBoxDasarDiagnosa.Text = Trow2("KeluhanUtama") & ", " & Trow2("KeluhanTambahan")
+                'Else
+                '    TextBoxDasarDiagnosa.Text = Trow2("KeluhanUtama")
+                'End If
             Next
         End If
 

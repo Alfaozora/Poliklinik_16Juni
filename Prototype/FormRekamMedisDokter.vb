@@ -2215,7 +2215,7 @@ Public Class FormRekamMedisDokter
 
                     If TextBoxTindakanID.Text <> "" Then
                         Dim tindakanID As Integer = CInt(TextBoxTindakanID.Text)
-                        ProsesPemotonganKuotaAlat(transPoliIDDetail.ToString(), tindakanID.ToString(), 1)
+                        ProsesPemotonganKuotaAlat(transPoliIDDetail.ToString(), tindakanID.ToString(), 1, 0)
                     End If
 
                     If TextBoxFlagPerencanaan.Text = "1" Then
@@ -13888,6 +13888,15 @@ Public Class FormRekamMedisDokter
                      "'" & rowTindakan("KodeVoucher").ToString() & "', " & _
                      "'" & rowTindakan("Penjamin").ToString() & "', " & _
                      feeDokter & ", " & feePerawat & ")", 4)
+
+                ' Cari ID dari TransaksiPoliDetail yang baru saja di-insert
+                Dim transPoliIDDetail As String = ReadSQLNIK("SELECT TOP 1 TransPoliIDDetail FROM TransaksiPoliDetail WHERE TransPoliID = '" & transPoliId & "' AND TindakanID = '" & tindakan.TindakanID & "' ORDER BY TransPoliIDDetail DESC")
+
+                If transPoliIDDetail <> "" Then
+                    ' Panggil proses pemotongan (Qty diasumsikan 1 per tindakan yang di-insert)
+                    ProsesPemotonganKuotaAlat(transPoliIDDetail, tindakan.TindakanID, 1, 1)
+                End If
+
             Next
 
             ' Tambahkan khusus untuk Paket Reguler (jika ditemukan)
@@ -13926,6 +13935,14 @@ Public Class FormRekamMedisDokter
                              "'" & kodeVoucher & "', " & _
                              "'" & penjamin & "', " & _
                              feeDokter & ", " & feePerawat & ")", 4)
+
+                    Dim transPoliIDDetailReguler As String = ReadSQLNIK("SELECT TOP 1 TransPoliIDDetail FROM TransaksiPoliDetail WHERE TransPoliID = '" & transPoliId & "' AND TindakanID = '" & tindakan.TindakanID & "' ORDER BY TransPoliIDDetail DESC")
+
+                    If transPoliIDDetailReguler <> "" Then
+                        ' Panggil proses pemotongan (Qty diasumsikan 1 per tindakan yang di-insert)
+                        ProsesPemotonganKuotaAlat(transPoliIDDetailReguler, tindakan.TindakanID, 1, 1)
+                    End If
+
                 Next
             End If
 
@@ -14087,28 +14104,21 @@ Public Class FormRekamMedisDokter
     Private Sub ProsesPemotonganKuotaAlat( _
     ByVal transPoliIDDetail As String, _
     ByVal tindakanID As String, _
-    ByVal qtyTindakan As Integer)
+    ByVal qtyTindakan As Integer, _
+    Optional ByVal statusPemakaian As Integer = 0)
 
         Dim json As String = GetDetailTindakanJSON(tindakanID)
-
         If json = "" Then Exit Sub
 
         Dim list As List(Of DetailAlatClass)
-
         list = Newtonsoft.Json.JsonConvert.DeserializeObject(Of List(Of DetailAlatClass))(json)
-
         If list Is Nothing Then Exit Sub
 
         Dim dbTran As New DBTransaction
-
         Try
-
             dbTran.BeginTransaction()
-
             Dim item As DetailAlatClass
-
             For Each item In list
-
                 Dim totalShoot As Integer = item.Shoot * qtyTindakan
 
                 ' ======================
@@ -14125,21 +14135,31 @@ Public Class FormRekamMedisDokter
                 ' ======================
                 ' LOG PEMAKAIAN
                 ' ======================
+                'dbTran.Execute( _
+                '     "INSERT INTO LogPemakaianAlat " & _
+                '     "(TransaksiDetailID, AlatID, CartridgeID, ShootDipakai, TglPemakaian, UserInput, Status) VALUES (" & _
+                '     transPoliIDDetail & "," & _
+                '     item.AlatID & "," & _
+                '     item.CartridgeID & "," & _
+                '     totalShoot & ",GETDATE(),'" & userInput & "',0)")
+
+                Dim stringHargaBeli As String = item.HargaBeli.ToString().Replace(",", ".")
+
                 dbTran.Execute( _
                      "INSERT INTO LogPemakaianAlat " & _
                      "(TransaksiDetailID, AlatID, CartridgeID, ShootDipakai, TglPemakaian, UserInput, Status) VALUES (" & _
                      transPoliIDDetail & "," & _
                      item.AlatID & "," & _
                      item.CartridgeID & "," & _
-                     totalShoot & ",GETDATE(),'" & userInput & "',0)")
+                     totalShoot & ",GETDATE(),'" & userInput & "'," & statusPemakaian & ", " & stringHargaBeli & ")")
 
                 ' ======================
                 ' UPDATE CARTRIDGE
                 ' ======================
-                'dbTran.Execute( _
-                '    "UPDATE MasterCartridge SET " & _
-                '    "KuotaTerpakai = KuotaTerpakai + " & totalShoot & " " & _
-                '    "WHERE CartridgeID = " & item.CartridgeID)
+                dbTran.Execute( _
+                    "UPDATE MasterCartridge SET " & _
+                    "KuotaTerpakai = KuotaTerpakai + " & totalShoot & " " & _
+                    "WHERE CartridgeID = " & item.CartridgeID)
 
             Next
 

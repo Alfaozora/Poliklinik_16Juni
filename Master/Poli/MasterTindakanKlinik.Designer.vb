@@ -68,6 +68,8 @@ Partial Class MasterTindakanKlinik
         Me.RadioButtonAktifFee = New System.Windows.Forms.RadioButton
         Me.RadioButtonNonAktifFee = New System.Windows.Forms.RadioButton
         Me.Label12 = New System.Windows.Forms.Label
+        Me.TextBoxPersentaseFeePerawat = New System.Windows.Forms.TextBox
+        Me.Label42 = New System.Windows.Forms.Label
         Me.Panel7 = New System.Windows.Forms.Panel
         Me.TextBox10 = New System.Windows.Forms.TextBox
         Me.TextBox11 = New System.Windows.Forms.TextBox
@@ -76,6 +78,7 @@ Partial Class MasterTindakanKlinik
         Me.RadioButton3 = New System.Windows.Forms.RadioButton
         Me.RadioButton4 = New System.Windows.Forms.RadioButton
         Me.Label31 = New System.Windows.Forms.Label
+        Me.Label47 = New System.Windows.Forms.Label
         Me.Panel6 = New System.Windows.Forms.Panel
         Me.TextBox4 = New System.Windows.Forms.TextBox
         Me.TextBox6 = New System.Windows.Forms.TextBox
@@ -198,6 +201,10 @@ Partial Class MasterTindakanKlinik
         Me.TextBoxNamaAlat = New System.Windows.Forms.TextBox
         Me.Label43 = New System.Windows.Forms.Label
         Me.TabPage2 = New System.Windows.Forms.TabPage
+        Me.Label49 = New System.Windows.Forms.Label
+        Me.TextBox17 = New System.Windows.Forms.TextBox
+        Me.Label48 = New System.Windows.Forms.Label
+        Me.TextBoxHargaBeli = New System.Windows.Forms.TextBox
         Me.NumericKuotaMinimumCartridge = New System.Windows.Forms.TextBox
         Me.NumericKuotaAwalCartridge = New System.Windows.Forms.TextBox
         Me.ButtonPreOrder = New System.Windows.Forms.Button
@@ -598,7 +605,7 @@ Partial Class MasterTindakanKlinik
         Me.DataGridViewAlatTindakan.AllowUserToDeleteRows = False
         Me.DataGridViewAlatTindakan.BackgroundColor = System.Drawing.Color.White
         Me.DataGridViewAlatTindakan.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DataGridViewAlatTindakan.Location = New System.Drawing.Point(716, 301)
+        Me.DataGridViewAlatTindakan.Location = New System.Drawing.Point(808, 301)
         Me.DataGridViewAlatTindakan.Name = "DataGridViewAlatTindakan"
         Me.DataGridViewAlatTindakan.Size = New System.Drawing.Size(428, 130)
         Me.DataGridViewAlatTindakan.TabIndex = 579
@@ -613,7 +620,7 @@ Partial Class MasterTindakanKlinik
         Me.GroupBox2.Controls.Add(Me.Label41)
         Me.GroupBox2.Controls.Add(Me.NumericShootPerTindakan)
         Me.GroupBox2.Controls.Add(Me.CheckBoxPakaiAlat)
-        Me.GroupBox2.Location = New System.Drawing.Point(537, 293)
+        Me.GroupBox2.Location = New System.Drawing.Point(629, 293)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(174, 215)
         Me.GroupBox2.TabIndex = 578
@@ -715,7 +722,7 @@ Partial Class MasterTindakanKlinik
         Me.ComboBoxKategori.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBoxKategori.FormattingEnabled = True
         Me.ComboBoxKategori.Items.AddRange(New Object() {"Face", "Hair", "Body", "IV"})
-        Me.ComboBoxKategori.Location = New System.Drawing.Point(537, 259)
+        Me.ComboBoxKategori.Location = New System.Drawing.Point(629, 259)
         Me.ComboBoxKategori.Name = "ComboBoxKategori"
         Me.ComboBoxKategori.Size = New System.Drawing.Size(174, 25)
         Me.ComboBoxKategori.TabIndex = 576
@@ -724,7 +731,7 @@ Partial Class MasterTindakanKlinik
         '
         Me.Label34.AutoSize = True
         Me.Label34.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label34.Location = New System.Drawing.Point(534, 238)
+        Me.Label34.Location = New System.Drawing.Point(626, 238)
         Me.Label34.Name = "Label34"
         Me.Label34.Size = New System.Drawing.Size(118, 17)
         Me.Label34.TabIndex = 575
@@ -733,7 +740,7 @@ Partial Class MasterTindakanKlinik
         'CheckedListBoxPoli
         '
         Me.CheckedListBoxPoli.FormattingEnabled = True
-        Me.CheckedListBoxPoli.Location = New System.Drawing.Point(537, 139)
+        Me.CheckedListBoxPoli.Location = New System.Drawing.Point(629, 139)
         Me.CheckedListBoxPoli.Name = "CheckedListBoxPoli"
         Me.CheckedListBoxPoli.ScrollAlwaysVisible = True
         Me.CheckedListBoxPoli.Size = New System.Drawing.Size(174, 94)
@@ -744,7 +751,7 @@ Partial Class MasterTindakanKlinik
         Me.GroupBox1.Controls.Add(Me.Label33)
         Me.GroupBox1.Controls.Add(Me.TextBoxHariReminder)
         Me.GroupBox1.Controls.Add(Me.CheckBoxReminder)
-        Me.GroupBox1.Location = New System.Drawing.Point(537, 17)
+        Me.GroupBox1.Location = New System.Drawing.Point(629, 17)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(174, 116)
         Me.GroupBox1.TabIndex = 573
@@ -842,8 +849,11 @@ Partial Class MasterTindakanKlinik
         '
         'SplitContainerFeeTindakan.Panel2
         '
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.TextBoxPersentaseFeePerawat)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label42)
         Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Panel7)
         Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label31)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label47)
         Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Panel6)
         Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label28)
         Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.TextBoxPersentaseFeeKaryawan)
@@ -864,7 +874,7 @@ Partial Class MasterTindakanKlinik
         Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label22)
         Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Panel4)
         Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label13)
-        Me.SplitContainerFeeTindakan.Size = New System.Drawing.Size(521, 320)
+        Me.SplitContainerFeeTindakan.Size = New System.Drawing.Size(604, 320)
         Me.SplitContainerFeeTindakan.SplitterDistance = 31
         Me.SplitContainerFeeTindakan.SplitterWidth = 1
         Me.SplitContainerFeeTindakan.TabIndex = 567
@@ -912,6 +922,27 @@ Partial Class MasterTindakanKlinik
         Me.Label12.Size = New System.Drawing.Size(148, 17)
         Me.Label12.TabIndex = 563
         Me.Label12.Text = "Aktifkan Fee Tindakan?"
+        '
+        'TextBoxPersentaseFeePerawat
+        '
+        Me.TextBoxPersentaseFeePerawat.BackColor = System.Drawing.Color.White
+        Me.TextBoxPersentaseFeePerawat.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxPersentaseFeePerawat.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxPersentaseFeePerawat.Location = New System.Drawing.Point(525, 34)
+        Me.TextBoxPersentaseFeePerawat.Name = "TextBoxPersentaseFeePerawat"
+        Me.TextBoxPersentaseFeePerawat.Size = New System.Drawing.Size(50, 23)
+        Me.TextBoxPersentaseFeePerawat.TabIndex = 594
+        '
+        'Label42
+        '
+        Me.Label42.AutoSize = True
+        Me.Label42.BackColor = System.Drawing.Color.Transparent
+        Me.Label42.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.Label42.Location = New System.Drawing.Point(581, 37)
+        Me.Label42.Name = "Label42"
+        Me.Label42.Size = New System.Drawing.Size(17, 15)
+        Me.Label42.TabIndex = 593
+        Me.Label42.Text = "%"
         '
         'Panel7
         '
@@ -1006,6 +1037,16 @@ Partial Class MasterTindakanKlinik
         Me.Label31.TabIndex = 590
         Me.Label31.Text = "Fee Perawat"
         Me.Label31.Visible = False
+        '
+        'Label47
+        '
+        Me.Label47.AutoSize = True
+        Me.Label47.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.Label47.Location = New System.Drawing.Point(472, 37)
+        Me.Label47.Name = "Label47"
+        Me.Label47.Size = New System.Drawing.Size(49, 15)
+        Me.Label47.TabIndex = 592
+        Me.Label47.Text = "Perawat"
         '
         'Panel6
         '
@@ -1106,7 +1147,7 @@ Partial Class MasterTindakanKlinik
         Me.TextBoxPersentaseFeeKaryawan.BackColor = System.Drawing.Color.White
         Me.TextBoxPersentaseFeeKaryawan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.TextBoxPersentaseFeeKaryawan.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxPersentaseFeeKaryawan.Location = New System.Drawing.Point(421, 34)
+        Me.TextBoxPersentaseFeeKaryawan.Location = New System.Drawing.Point(393, 34)
         Me.TextBoxPersentaseFeeKaryawan.Name = "TextBoxPersentaseFeeKaryawan"
         Me.TextBoxPersentaseFeeKaryawan.Size = New System.Drawing.Size(50, 23)
         Me.TextBoxPersentaseFeeKaryawan.TabIndex = 587
@@ -1222,7 +1263,7 @@ Partial Class MasterTindakanKlinik
         Me.Label26.AutoSize = True
         Me.Label26.BackColor = System.Drawing.Color.Transparent
         Me.Label26.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.Label26.Location = New System.Drawing.Point(477, 36)
+        Me.Label26.Location = New System.Drawing.Point(449, 36)
         Me.Label26.Name = "Label26"
         Me.Label26.Size = New System.Drawing.Size(17, 15)
         Me.Label26.TabIndex = 576
@@ -1232,7 +1273,7 @@ Partial Class MasterTindakanKlinik
         '
         Me.Label25.AutoSize = True
         Me.Label25.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.Label25.Location = New System.Drawing.Point(357, 36)
+        Me.Label25.Location = New System.Drawing.Point(329, 36)
         Me.Label25.Name = "Label25"
         Me.Label25.Size = New System.Drawing.Size(58, 15)
         Me.Label25.TabIndex = 574
@@ -2502,6 +2543,10 @@ Partial Class MasterTindakanKlinik
         'TabPage2
         '
         Me.TabPage2.BackColor = System.Drawing.Color.White
+        Me.TabPage2.Controls.Add(Me.Label49)
+        Me.TabPage2.Controls.Add(Me.TextBox17)
+        Me.TabPage2.Controls.Add(Me.Label48)
+        Me.TabPage2.Controls.Add(Me.TextBoxHargaBeli)
         Me.TabPage2.Controls.Add(Me.NumericKuotaMinimumCartridge)
         Me.TabPage2.Controls.Add(Me.NumericKuotaAwalCartridge)
         Me.TabPage2.Controls.Add(Me.ButtonPreOrder)
@@ -2529,6 +2574,51 @@ Partial Class MasterTindakanKlinik
         Me.TabPage2.Size = New System.Drawing.Size(749, 222)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Cardtridge"
+        '
+        'Label49
+        '
+        Me.Label49.AutoSize = True
+        Me.Label49.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label49.Location = New System.Drawing.Point(636, 45)
+        Me.Label49.Name = "Label49"
+        Me.Label49.Size = New System.Drawing.Size(53, 17)
+        Me.Label49.TabIndex = 662
+        Me.Label49.Text = "/ Shoot"
+        '
+        'TextBox17
+        '
+        Me.TextBox17.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
+        Me.TextBox17.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBox17.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.TextBox17.Location = New System.Drawing.Point(501, 45)
+        Me.TextBox17.Name = "TextBox17"
+        Me.TextBox17.Size = New System.Drawing.Size(35, 23)
+        Me.TextBox17.TabIndex = 661
+        Me.TextBox17.Text = "Rp"
+        Me.TextBox17.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'Label48
+        '
+        Me.Label48.AutoSize = True
+        Me.Label48.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label48.Location = New System.Drawing.Point(425, 45)
+        Me.Label48.Name = "Label48"
+        Me.Label48.Size = New System.Drawing.Size(70, 17)
+        Me.Label48.TabIndex = 660
+        Me.Label48.Text = "Harga Beli"
+        '
+        'TextBoxHargaBeli
+        '
+        Me.TextBoxHargaBeli.BackColor = System.Drawing.Color.White
+        Me.TextBoxHargaBeli.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxHargaBeli.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
+        Me.TextBoxHargaBeli.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxHargaBeli.Location = New System.Drawing.Point(539, 45)
+        Me.TextBoxHargaBeli.Name = "TextBoxHargaBeli"
+        Me.TextBoxHargaBeli.Size = New System.Drawing.Size(91, 23)
+        Me.TextBoxHargaBeli.TabIndex = 659
+        Me.TextBoxHargaBeli.Text = "0"
+        Me.TextBoxHargaBeli.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'NumericKuotaMinimumCartridge
         '
@@ -3189,4 +3279,11 @@ Partial Class MasterTindakanKlinik
     Friend WithEvents ButtonPreOrder As System.Windows.Forms.Button
     Friend WithEvents NumericKuotaMinimumCartridge As System.Windows.Forms.TextBox
     Friend WithEvents NumericKuotaAwalCartridge As System.Windows.Forms.TextBox
+    Friend WithEvents TextBoxPersentaseFeePerawat As System.Windows.Forms.TextBox
+    Friend WithEvents Label42 As System.Windows.Forms.Label
+    Friend WithEvents Label47 As System.Windows.Forms.Label
+    Friend WithEvents TextBox17 As System.Windows.Forms.TextBox
+    Friend WithEvents Label48 As System.Windows.Forms.Label
+    Friend WithEvents TextBoxHargaBeli As System.Windows.Forms.TextBox
+    Friend WithEvents Label49 As System.Windows.Forms.Label
 End Class

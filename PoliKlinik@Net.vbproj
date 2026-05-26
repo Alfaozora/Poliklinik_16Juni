@@ -509,6 +509,12 @@
     <Compile Include="Prototype\FindRujukanTACC.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Prototype\FormAdjustmentAlat.Designer.vb">
+      <DependentUpon>FormAdjustmentAlat.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormAdjustmentAlat.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Prototype\FormBandingGambar.Designer.vb">
       <DependentUpon>FormBandingGambar.vb</DependentUpon>
     </Compile>
@@ -1525,6 +1531,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FindRujukanTACC.resx">
       <DependentUpon>FindRujukanTACC.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormAdjustmentAlat.resx">
+      <DependentUpon>FormAdjustmentAlat.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormBandingGambar.resx">
       <DependentUpon>FormBandingGambar.vb</DependentUpon>
