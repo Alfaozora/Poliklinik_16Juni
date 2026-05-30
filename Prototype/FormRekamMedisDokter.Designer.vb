@@ -17186,7 +17186,8 @@ Me.ImageListButton24.Images.SetKeyName(0, "icons8_save_24.png")
 '
 'TimerNotifikasi
 '
-Me.TimerNotifikasi.Interval = 500
+Me.TimerNotifikasi.Enabled = true
+Me.TimerNotifikasi.Interval = 5000
 '
 'DateTimePicker1
 '

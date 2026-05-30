@@ -474,14 +474,22 @@ Public Class FormMasterPasien
                 Return False
             End If
 
-            ' Cek pemakaian NIK
-            Dim tblCheckNIK As DataTable = ReadSQL("SELECT Nama, NoRekamMedis, NoID FROM MasterPasien WHERE NoNIK = '" & TextBoxNomorNIK.Text & "' AND NoRekamMedis <> '" & TextBoxNoRM.Text & "'")
-            If tblCheckNIK.Rows.Count > 0 Then
-                Dim dataNIK As DataRow = tblCheckNIK.Rows(0)
+            ' Ambil nilai tanpa spasi ekstra di awal/akhir
+            'Dim nikCek As String = TextBoxNomorNIK.Text.Trim()
+            'Dim rmCek As String = TextBoxNoRM.Text.Trim()
 
-                MsgBox("Nomor NIK sudah dipakai atas nama " & dataNIK("Nama") & " dengan nomor rekam medis " & dataNIK("NoRekamMedis") & ".", MsgBoxStyle.Critical, "Warning!")
-                Return False
-            End If
+            '' Lakukan pengecekan HANYA jika NIK diisi (bukan kosong atau tanda strip)
+            'If nikCek <> "" AndAlso nikCek <> "-" Then
+
+            '    Dim tblCheckNIK As DataTable = ReadSQL("SELECT Nama, NoRekamMedis, NoID FROM MasterPasien WHERE NoNIK = '" & nikCek & "' AND NoRekamMedis <> '" & rmCek & "'")
+
+            '    If tblCheckNIK.Rows.Count > 0 Then
+            '        Dim dataNIK As DataRow = tblCheckNIK.Rows(0)
+            '        MsgBox("Nomor NIK sudah dipakai atas nama " & dataNIK("Nama") & " dengan nomor rekam medis " & dataNIK("NoRekamMedis") & ".", MsgBoxStyle.Critical, "Warning!")
+            '        Return False
+            '    End If
+
+            'End If
         End If
 
         ' Validasi Inputan BPJS
@@ -662,6 +670,8 @@ Public Class FormMasterPasien
             Dim riwayatPenyakitKeluarga As String = TextBoxRiwayatPenyakitKeluarga.Text.Trim()
             Dim riwayatKebiasaan As String = TextBoxRiwayatKebiasaan.Text.Trim()
 
+            Dim keteranganKhusus As String = TextBoxKetKhusus.Text.Trim()
+
             ' IHS Number
             Dim noIHS As String = ""
             If IsPlaceholder(TextBoxNomorIHS) = False Then noIHS = TextBoxNomorIHS.Text
@@ -690,8 +700,8 @@ Public Class FormMasterPasien
                 noRekamMedis = generateNomorRekamMedis()
 
                 ' Input ke dalam tabel master pasien
-                Dim query As String = "INSERT INTO MasterPasien (noRekamMedis, NoDokumenRekamMedis, NoIHS, NoNIK, NoNIP, NoKartuBPJS, NoKartuInhealth, NoKartuJPK, NoKartuCahaya, Nama, TempatLahir, TglLahir, JenisKelamin, GolonganDarah, DomisiliAlamat, DomisiliRT, DomisiliRW, DomisiliKelurahan, DomisiliKecamatan, DomisiliKabupaten, DomisiliProvinsi, DomisiliKodePos, KtpAlamat, KtpRT, KtpRW, KtpKelurahan, KtpKecamatan, KtpKabupaten, KtpProvinsi, KtpKodePos, NoTelepon, NoHandphone, Email, PendidikanTerakhir, StatusPerkawinan, Agama, Kewarganegaraan, KeteranganKewarganegaraanAsing, StatusKeluarga, Pekerjaan, KontakDaruratNama, KontakDaruratAlamat, KontakDaruratNoTelepon, RiwayatPenyakitDahulu, RiwayatPenyakitKeluarga, RiwayatKebiasaan, PasienTanpaNIK, CreatedBy, CreatedDate, FotoPath) " & _
-                                      "VALUES (@noRekamMedis, @noDokumenRekamMedis, @noIHS, @noNIK, @noNIP, @noKartuBPJS, @noInhealth, @noJPK, @noCahaya, @namaPasien, @tempatLahirPasien, @tglLahirPasien, @jenisKelaminPasien, @golDarahPasien, @domisiliAlamat, @domisiliRT, @domisiliRW, @domisiliKelurahan, @domisiliKecamatan, @domisiliKabupaten, @domisiliProvinsi, @domisiliKodePos, @ktpAlamat, @ktpRT, @ktpRW, @ktpKelurahan, @ktpKecamatan, @ktpKabupaten, @ktpProvinsi, @ktpKodePos, @noTelepon, @noHandphone, @email, @pendidikanTerakhir, @statusPerkawinan, @agama, @kewarganegaraan, @kewarganegaraanKeterangan, @statusKeluarga, @pekerjaan, @kontakDaruratNama, @kontakDaruratAlamat, @kontakDaruratNoTelepon, @riwayatPenyakitDahulu, @riwayatPenyakitKeluarga, @riwayatKebiasaan, " & Convert.ToInt32(CheckBoxStatusNIK.Checked) & ", @userInput, GETDATE(), @fotoPath)"
+                Dim query As String = "INSERT INTO MasterPasien (noRekamMedis, NoDokumenRekamMedis, NoIHS, NoNIK, NoNIP, NoKartuBPJS, NoKartuInhealth, NoKartuJPK, NoKartuCahaya, Nama, TempatLahir, TglLahir, JenisKelamin, GolonganDarah, DomisiliAlamat, DomisiliRT, DomisiliRW, DomisiliKelurahan, DomisiliKecamatan, DomisiliKabupaten, DomisiliProvinsi, DomisiliKodePos, KtpAlamat, KtpRT, KtpRW, KtpKelurahan, KtpKecamatan, KtpKabupaten, KtpProvinsi, KtpKodePos, NoTelepon, NoHandphone, Email, PendidikanTerakhir, StatusPerkawinan, Agama, Kewarganegaraan, KeteranganKewarganegaraanAsing, StatusKeluarga, Pekerjaan, KontakDaruratNama, KontakDaruratAlamat, KontakDaruratNoTelepon, RiwayatPenyakitDahulu, RiwayatPenyakitKeluarga, RiwayatKebiasaan, PasienTanpaNIK, CreatedBy, CreatedDate, FotoPath, KeteranganKhusus) " & _
+                                      "VALUES (@noRekamMedis, @noDokumenRekamMedis, @noIHS, @noNIK, @noNIP, @noKartuBPJS, @noInhealth, @noJPK, @noCahaya, @namaPasien, @tempatLahirPasien, @tglLahirPasien, @jenisKelaminPasien, @golDarahPasien, @domisiliAlamat, @domisiliRT, @domisiliRW, @domisiliKelurahan, @domisiliKecamatan, @domisiliKabupaten, @domisiliProvinsi, @domisiliKodePos, @ktpAlamat, @ktpRT, @ktpRW, @ktpKelurahan, @ktpKecamatan, @ktpKabupaten, @ktpProvinsi, @ktpKodePos, @noTelepon, @noHandphone, @email, @pendidikanTerakhir, @statusPerkawinan, @agama, @kewarganegaraan, @kewarganegaraanKeterangan, @statusKeluarga, @pekerjaan, @kontakDaruratNama, @kontakDaruratAlamat, @kontakDaruratNoTelepon, @riwayatPenyakitDahulu, @riwayatPenyakitKeluarga, @riwayatKebiasaan, " & Convert.ToInt32(CheckBoxStatusNIK.Checked) & ", @userInput, GETDATE(), @fotoPath, @KeteranganKhusus)"
 
                 ' Memanggil fungsi WriteParameterizedSQL untuk eksekusi query
                 WriteParameterizedLokalSQL(query, 4, _
@@ -742,7 +752,8 @@ Public Class FormMasterPasien
                      New SqlParameter("@riwayatPenyakitKeluarga", riwayatPenyakitKeluarga), _
                      New SqlParameter("@riwayatKebiasaan", riwayatKebiasaan), _
                      New SqlParameter("@userInput", userInput), _
-                     New SqlParameter("@fotoPath", fotoPath))
+                     New SqlParameter("@fotoPath", fotoPath), _
+                     New SqlParameter("@KeteranganKhusus", keteranganKhusus))
 
                 ' Insert ke dalam tabel general consent jika ada
                 If LabelSignatureDate.Text <> "-" Then
@@ -829,7 +840,8 @@ Public Class FormMasterPasien
                                   "PasienTanpaNIK = " & Convert.ToInt32(CheckBoxStatusNIK.Checked) & ", " & _
                                   "ChangeBy = @userInput, " & _
                                   "ChangeDate = GETDATE(), " & _
-                                  "FotoPath = @fotoPath " & _
+                                  "FotoPath = @fotoPath, " & _
+                                  "KeteranganKhusus = @KeteranganKhusus " & _
                                   "WHERE NoRekamMedis = @noRekamMedis"
 
                 WriteParameterizedLokalSQL(queryUpdate, 4, _
@@ -880,7 +892,9 @@ Public Class FormMasterPasien
                      New SqlParameter("@riwayatPenyakitKeluarga", riwayatPenyakitKeluarga), _
                      New SqlParameter("@riwayatKebiasaan", riwayatKebiasaan), _
                      New SqlParameter("@userInput", userInput), _
-                     New SqlParameter("@fotoPath", fotoPath))
+                     New SqlParameter("@fotoPath", fotoPath), _
+                     New SqlParameter("@KeteranganKhusus", keteranganKhusus))
+
 
                 ' Input/Create ke dalam tabel MasterPasienBPJS
                 If noKartuBPJS.Length <> 0 AndAlso CheckBridgingPcareActive() = True Then
@@ -1110,6 +1124,8 @@ Public Class FormMasterPasien
         PictureBoxSignatureGC.Image = Nothing
         LabelSignatureDate.Text = "-"
 
+        TextBoxKetKhusus.ResetText()
+
         'Foto Pasien
         Dim defaultFotoPath As String = Application.StartupPath & "\Uploads\BlankProfile.png"
         PictureBoxFotoPasien.Image = Image.FromFile(defaultFotoPath)
@@ -1200,6 +1216,9 @@ Public Class FormMasterPasien
 
         ' Alergi
         LoadDataAlergi(Trow("NoRekamMedis"), GridControlAlergi)
+
+        'Keterangan Khusus
+        If IsDBNull(Trow("KeteranganKhusus")) = False Then TextBoxKetKhusus.Text = Trow("KeteranganKhusus")
 
         ' Riwayat Penyakit
         If IsDBNull(Trow("RiwayatPenyakitDahulu")) = False Then TextBoxRiwayatPenyakitDahulu.Text = Trow("RiwayatPenyakitDahulu")

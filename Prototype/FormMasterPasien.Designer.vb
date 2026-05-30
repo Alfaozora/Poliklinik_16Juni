@@ -41,6 +41,8 @@ Partial Class FormMasterPasien
         Me.TabControlMenu = New System.Windows.Forms.TabControl
         Me.TabPage1 = New System.Windows.Forms.TabPage
         Me.PanelLayoutMenu1TopMain = New System.Windows.Forms.Panel
+        Me.GroupBox3 = New System.Windows.Forms.GroupBox
+        Me.TextBoxKetKhusus = New System.Windows.Forms.TextBox
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
         Me.PictureBoxFotoPasien = New System.Windows.Forms.PictureBox
         Me.GroupBoxAlergiPemeriksaanAwal = New System.Windows.Forms.GroupBox
@@ -230,6 +232,7 @@ Partial Class FormMasterPasien
         Me.TabControlMenu.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.PanelLayoutMenu1TopMain.SuspendLayout()
+        Me.GroupBox3.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         CType(Me.PictureBoxFotoPasien, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBoxAlergiPemeriksaanAwal.SuspendLayout()
@@ -542,6 +545,7 @@ Partial Class FormMasterPasien
         '
         Me.PanelLayoutMenu1TopMain.AutoScroll = True
         Me.PanelLayoutMenu1TopMain.BackColor = System.Drawing.Color.White
+        Me.PanelLayoutMenu1TopMain.Controls.Add(Me.GroupBox3)
         Me.PanelLayoutMenu1TopMain.Controls.Add(Me.Button1)
         Me.PanelLayoutMenu1TopMain.Controls.Add(Me.GroupBox2)
         Me.PanelLayoutMenu1TopMain.Controls.Add(Me.GroupBoxAlergiPemeriksaanAwal)
@@ -571,6 +575,27 @@ Partial Class FormMasterPasien
         Me.PanelLayoutMenu1TopMain.Name = "PanelLayoutMenu1TopMain"
         Me.PanelLayoutMenu1TopMain.Size = New System.Drawing.Size(936, 557)
         Me.PanelLayoutMenu1TopMain.TabIndex = 6
+        '
+        'GroupBox3
+        '
+        Me.GroupBox3.Controls.Add(Me.TextBoxKetKhusus)
+        Me.GroupBox3.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Bold)
+        Me.GroupBox3.Location = New System.Drawing.Point(577, 632)
+        Me.GroupBox3.Name = "GroupBox3"
+        Me.GroupBox3.Size = New System.Drawing.Size(330, 205)
+        Me.GroupBox3.TabIndex = 535
+        Me.GroupBox3.TabStop = False
+        Me.GroupBox3.Text = "Keterangan Khusus Pasien"
+        '
+        'TextBoxKetKhusus
+        '
+        Me.TextBoxKetKhusus.BackColor = System.Drawing.SystemColors.ButtonHighlight
+        Me.TextBoxKetKhusus.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.TextBoxKetKhusus.Location = New System.Drawing.Point(17, 30)
+        Me.TextBoxKetKhusus.Multiline = True
+        Me.TextBoxKetKhusus.Name = "TextBoxKetKhusus"
+        Me.TextBoxKetKhusus.Size = New System.Drawing.Size(300, 159)
+        Me.TextBoxKetKhusus.TabIndex = 440
         '
         'GroupBox2
         '
@@ -772,7 +797,7 @@ Partial Class FormMasterPasien
         Me.GroupBox1.Controls.Add(Me.Label57)
         Me.GroupBox1.Controls.Add(Me.Label58)
         Me.GroupBox1.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Bold)
-        Me.GroupBox1.Location = New System.Drawing.Point(577, 894)
+        Me.GroupBox1.Location = New System.Drawing.Point(577, 1122)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(330, 606)
         Me.GroupBox1.TabIndex = 504
@@ -1180,7 +1205,7 @@ Partial Class FormMasterPasien
         Me.GroupBox9.Controls.Add(Me.TextBoxRiwayatPenyakitDahulu)
         Me.GroupBox9.Controls.Add(Me.Label25)
         Me.GroupBox9.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Bold)
-        Me.GroupBox9.Location = New System.Drawing.Point(577, 628)
+        Me.GroupBox9.Location = New System.Drawing.Point(577, 845)
         Me.GroupBox9.Name = "GroupBox9"
         Me.GroupBox9.Size = New System.Drawing.Size(330, 260)
         Me.GroupBox9.TabIndex = 499
@@ -2721,6 +2746,8 @@ Partial Class FormMasterPasien
         Me.TabPage1.ResumeLayout(False)
         Me.PanelLayoutMenu1TopMain.ResumeLayout(False)
         Me.PanelLayoutMenu1TopMain.PerformLayout()
+        Me.GroupBox3.ResumeLayout(False)
+        Me.GroupBox3.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
         CType(Me.PictureBoxFotoPasien, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBoxAlergiPemeriksaanAwal.ResumeLayout(False)
@@ -2970,4 +2997,6 @@ Partial Class FormMasterPasien
     Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
     Friend WithEvents PictureBoxFotoPasien As System.Windows.Forms.PictureBox
     Friend WithEvents ButtonUploadFoto As System.Windows.Forms.Button
+    Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox
+    Friend WithEvents TextBoxKetKhusus As System.Windows.Forms.TextBox
 End Class

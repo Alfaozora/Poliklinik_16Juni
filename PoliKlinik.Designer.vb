@@ -67,6 +67,7 @@ Partial Class PoliKlinik
         Me.RekapPendapatanToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.ReservasiDanReminderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.PersetujuanPenerimaanBarangToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.AdjustmentAlatToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.LabToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.TransaksiLabToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
         Me.PenggunaanStockToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -276,7 +277,6 @@ Partial Class PoliKlinik
         Me.TimerShutdown = New System.Windows.Forms.Timer(Me.components)
         Me.TimerKirimReminderWA = New System.Windows.Forms.Timer(Me.components)
         Me.TimerBirthday = New System.Windows.Forms.Timer(Me.components)
-        Me.AdjustmentAlatToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip.SuspendLayout()
         Me.StatusStrip.SuspendLayout()
         Me.SuspendLayout()
@@ -591,6 +591,13 @@ Partial Class PoliKlinik
         Me.PersetujuanPenerimaanBarangToolStripMenuItem.Size = New System.Drawing.Size(263, 22)
         Me.PersetujuanPenerimaanBarangToolStripMenuItem.Tag = "0312"
         Me.PersetujuanPenerimaanBarangToolStripMenuItem.Text = "Persetujuan Penerimaan Barang"
+        '
+        'AdjustmentAlatToolStripMenuItem
+        '
+        Me.AdjustmentAlatToolStripMenuItem.Name = "AdjustmentAlatToolStripMenuItem"
+        Me.AdjustmentAlatToolStripMenuItem.Size = New System.Drawing.Size(263, 22)
+        Me.AdjustmentAlatToolStripMenuItem.Tag = "0313"
+        Me.AdjustmentAlatToolStripMenuItem.Text = "Adjustment Alat"
         '
         'LabToolStripMenuItem
         '
@@ -2022,12 +2029,6 @@ Partial Class PoliKlinik
         'TimerBirthday
         '
         Me.TimerBirthday.Interval = 300000
-        '
-        'AdjustmentAlatToolStripMenuItem
-        '
-        Me.AdjustmentAlatToolStripMenuItem.Name = "AdjustmentAlatToolStripMenuItem"
-        Me.AdjustmentAlatToolStripMenuItem.Size = New System.Drawing.Size(263, 22)
-        Me.AdjustmentAlatToolStripMenuItem.Text = "Adjustment Alat"
         '
         'PoliKlinik
         '

@@ -599,6 +599,21 @@ Public Class FormRekamMedisDokter
         If daftarAlergiMakanan.Count > 0 Then alergiList.Add("Alergi Makanan : " & daftarAlergiMakanan.ToString())
         If daftarAlergiObat.Count > 0 Then alergiList.Add("Alergi Obat : " & daftarAlergiObat.ToString())
 
+        Dim queryKetKhusus As String = "SELECT KeteranganKhusus FROM MasterPasien WHERE NoRekamMedis = '" & idPasien & "'"
+        Dim tblPasien As DataTable = ReadSQL(queryKetKhusus)
+
+        Dim ketKhusus As String = ""
+        If tblPasien IsNot Nothing AndAlso tblPasien.Rows.Count > 0 Then
+            ' Cek apakah datanya tidak null atau kosong
+            If Not IsDBNull(tblPasien.Rows(0)("KeteranganKhusus")) Then
+                ketKhusus = tblPasien.Rows(0)("KeteranganKhusus").ToString().Trim()
+            End If
+        End If
+
+        If ketKhusus <> "" AndAlso ketKhusus <> "-" Then
+            alergiList.Add("Keterangan Khusus : " & ketKhusus)
+        End If
+
         If alergiList.Count > 0 Then ketAlergi = String.Join(vbCrLf, alergiList.ToArray())
 
         '# Start Notifikasi
@@ -611,7 +626,10 @@ Public Class FormRekamMedisDokter
             PanelNotifikasi.Visible = True
 
             '# Tampilkan alert
-            If messageBox = True Then MsgBox("Pasien memiliki alergi." & vbCrLf & ketAlergi, MsgBoxStyle.Exclamation, "Warning!")
+            If messageBox = True Then
+                ' Ubah pesan sedikit agar mencakup informasi umum/keterangan khusus
+                MsgBox("Perhatian! Pasien memiliki catatan khusus:" & vbCrLf & vbCrLf & ketAlergi, MsgBoxStyle.Exclamation, "Warning!")
+            End If
         End If
     End Sub
 
@@ -14147,7 +14165,7 @@ Public Class FormRekamMedisDokter
 
                 dbTran.Execute( _
                      "INSERT INTO LogPemakaianAlat " & _
-                     "(TransaksiDetailID, AlatID, CartridgeID, ShootDipakai, TglPemakaian, UserInput, Status) VALUES (" & _
+                     "(TransaksiDetailID, AlatID, CartridgeID, ShootDipakai, TglPemakaian, UserInput, Status, HargaBeli) VALUES (" & _
                      transPoliIDDetail & "," & _
                      item.AlatID & "," & _
                      item.CartridgeID & "," & _

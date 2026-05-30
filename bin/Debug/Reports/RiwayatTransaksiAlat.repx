@@ -1121,7 +1121,7 @@ Localization=en-US
 <width>284</width>
 <height>23</height>
 </Bounds>
-<Text id="ref-121">1 Mei 2026 - 26 Mei 2026</Text>
+<Text id="ref-121">1 Mei 2026 - 29 Mei 2026</Text>
 <NavigateUrl href="#ref-6"/>
 <Target href="#ref-6"/>
 <CanGrow>true</CanGrow>
@@ -1315,7 +1315,7 @@ Localization=en-US
 <width>250</width>
 <height>25</height>
 </Bounds>
-<Text id="ref-134">26-May-2026 11:49:56 By Admin</Text>
+<Text id="ref-134">29-May-2026 09:39:42 By Admin</Text>
 <NavigateUrl href="#ref-6"/>
 <Target href="#ref-6"/>
 <CanGrow>true</CanGrow>
@@ -1463,7 +1463,7 @@ Localization=en-US
 <width>200</width>
 <height>23</height>
 </Bounds>
-<Text id="ref-142">9,990,000</Text>
+<Text id="ref-142">9,988,000</Text>
 <NavigateUrl href="#ref-6"/>
 <Target href="#ref-6"/>
 <CanGrow>true</CanGrow>
@@ -2131,7 +2131,7 @@ Localization=en-US
 <Visible>true</Visible>
 <Tag href="#ref-6"/>
 <Dock xsi:type="a3:XRDockStyle" xmlns:a3="http://schemas.microsoft.com/clr/nsassem/DevExpress.XtraReports.UI/DevExpress.XtraReports3%2C%20Version%3D1.12.3.0%2C%20Culture%3Dneutral%2C%20PublicKeyToken%3D79868b8147b5eae4">None</Dock>
-<Name id="ref-181">blTotalHargaBeli</Name>
+<Name id="ref-181">lblTotalHargaBeli</Name>
 <Style_X_Font id="ref-182">Tahoma, 9pt, style=Bold</Style_X_Font>
 <Style_X_ForeColor href="#ref-15"/>
 <Style_X_BackColor href="#ref-16"/>
@@ -2161,7 +2161,7 @@ Localization=en-US
 <width>75</width>
 <height>25</height>
 </Bounds>
-<Text id="ref-183">10,000</Text>
+<Text id="ref-183">0</Text>
 <NavigateUrl href="#ref-6"/>
 <Target href="#ref-6"/>
 <CanGrow>true</CanGrow>
@@ -2211,7 +2211,7 @@ Localization=en-US
 <width>75</width>
 <height>25</height>
 </Bounds>
-<Text id="ref-186">9,990,000</Text>
+<Text id="ref-186">9,988,000</Text>
 <NavigateUrl href="#ref-6"/>
 <Target href="#ref-6"/>
 <CanGrow>true</CanGrow>
@@ -2261,7 +2261,7 @@ Localization=en-US
 <width>75</width>
 <height>25</height>
 </Bounds>
-<Text id="ref-189">10,000</Text>
+<Text id="ref-189">12,000</Text>
 <NavigateUrl href="#ref-6"/>
 <Target href="#ref-6"/>
 <CanGrow>true</CanGrow>
