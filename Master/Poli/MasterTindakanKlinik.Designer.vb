@@ -185,6 +185,7 @@ Partial Class MasterTindakanKlinik
         Me.SplitContainer4 = New System.Windows.Forms.SplitContainer
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage1 = New System.Windows.Forms.TabPage
+        Me.ButtonGetAlatSarpras = New System.Windows.Forms.Button
         Me.GroupBox3 = New System.Windows.Forms.GroupBox
         Me.ButtonCetakRiwayat = New System.Windows.Forms.Button
         Me.Label46 = New System.Windows.Forms.Label
@@ -201,6 +202,7 @@ Partial Class MasterTindakanKlinik
         Me.TextBoxNamaAlat = New System.Windows.Forms.TextBox
         Me.Label43 = New System.Windows.Forms.Label
         Me.TabPage2 = New System.Windows.Forms.TabPage
+        Me.ButtonGetAlatCartridge = New System.Windows.Forms.Button
         Me.Label49 = New System.Windows.Forms.Label
         Me.TextBox17 = New System.Windows.Forms.TextBox
         Me.Label48 = New System.Windows.Forms.Label
@@ -2336,6 +2338,7 @@ Partial Class MasterTindakanKlinik
         'TabPage1
         '
         Me.TabPage1.BackColor = System.Drawing.Color.White
+        Me.TabPage1.Controls.Add(Me.ButtonGetAlatSarpras)
         Me.TabPage1.Controls.Add(Me.GroupBox3)
         Me.TabPage1.Controls.Add(Me.Label40)
         Me.TabPage1.Controls.Add(Me.TextBoxKodeAlat)
@@ -2352,6 +2355,26 @@ Partial Class MasterTindakanKlinik
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "Alat"
         '
+        'ButtonGetAlatSarpras
+        '
+        Me.ButtonGetAlatSarpras.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonGetAlatSarpras.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+        Me.ButtonGetAlatSarpras.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonGetAlatSarpras.FlatAppearance.BorderSize = 0
+        Me.ButtonGetAlatSarpras.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonGetAlatSarpras.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.ButtonGetAlatSarpras.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonGetAlatSarpras.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.ButtonGetAlatSarpras.ForeColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(254, Byte), Integer))
+        Me.ButtonGetAlatSarpras.Location = New System.Drawing.Point(260, 22)
+        Me.ButtonGetAlatSarpras.Name = "ButtonGetAlatSarpras"
+        Me.ButtonGetAlatSarpras.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.ButtonGetAlatSarpras.Size = New System.Drawing.Size(67, 25)
+        Me.ButtonGetAlatSarpras.TabIndex = 635
+        Me.ButtonGetAlatSarpras.Text = "Get Alat"
+        Me.ButtonGetAlatSarpras.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.ButtonGetAlatSarpras.UseVisualStyleBackColor = False
+        '
         'GroupBox3
         '
         Me.GroupBox3.Controls.Add(Me.ButtonCetakRiwayat)
@@ -2360,7 +2383,7 @@ Partial Class MasterTindakanKlinik
         Me.GroupBox3.Controls.Add(Me.Label44)
         Me.GroupBox3.Controls.Add(Me.dtAkhir)
         Me.GroupBox3.Controls.Add(Me.dtAwal)
-        Me.GroupBox3.Location = New System.Drawing.Point(420, 22)
+        Me.GroupBox3.Location = New System.Drawing.Point(407, 53)
         Me.GroupBox3.Name = "GroupBox3"
         Me.GroupBox3.Size = New System.Drawing.Size(301, 113)
         Me.GroupBox3.TabIndex = 634
@@ -2469,7 +2492,7 @@ Partial Class MasterTindakanKlinik
         Me.CheckBoxAlatAktif.Checked = True
         Me.CheckBoxAlatAktif.CheckState = System.Windows.Forms.CheckState.Checked
         Me.CheckBoxAlatAktif.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.CheckBoxAlatAktif.Location = New System.Drawing.Point(350, 25)
+        Me.CheckBoxAlatAktif.Location = New System.Drawing.Point(425, 25)
         Me.CheckBoxAlatAktif.Name = "CheckBoxAlatAktif"
         Me.CheckBoxAlatAktif.Size = New System.Drawing.Size(51, 19)
         Me.CheckBoxAlatAktif.TabIndex = 623
@@ -2482,7 +2505,7 @@ Partial Class MasterTindakanKlinik
         Me.TextBoxAlatId.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.TextBoxAlatId.Cursor = System.Windows.Forms.Cursors.No
         Me.TextBoxAlatId.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxAlatId.Location = New System.Drawing.Point(260, 24)
+        Me.TextBoxAlatId.Location = New System.Drawing.Point(335, 24)
         Me.TextBoxAlatId.Name = "TextBoxAlatId"
         Me.TextBoxAlatId.ReadOnly = True
         Me.TextBoxAlatId.Size = New System.Drawing.Size(84, 23)
@@ -2543,6 +2566,7 @@ Partial Class MasterTindakanKlinik
         'TabPage2
         '
         Me.TabPage2.BackColor = System.Drawing.Color.White
+        Me.TabPage2.Controls.Add(Me.ButtonGetAlatCartridge)
         Me.TabPage2.Controls.Add(Me.Label49)
         Me.TabPage2.Controls.Add(Me.TextBox17)
         Me.TabPage2.Controls.Add(Me.Label48)
@@ -2574,6 +2598,26 @@ Partial Class MasterTindakanKlinik
         Me.TabPage2.Size = New System.Drawing.Size(749, 222)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Cardtridge"
+        '
+        'ButtonGetAlatCartridge
+        '
+        Me.ButtonGetAlatCartridge.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonGetAlatCartridge.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+        Me.ButtonGetAlatCartridge.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonGetAlatCartridge.FlatAppearance.BorderSize = 0
+        Me.ButtonGetAlatCartridge.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonGetAlatCartridge.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.ButtonGetAlatCartridge.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonGetAlatCartridge.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.ButtonGetAlatCartridge.ForeColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(254, Byte), Integer))
+        Me.ButtonGetAlatCartridge.Location = New System.Drawing.Point(260, 9)
+        Me.ButtonGetAlatCartridge.Name = "ButtonGetAlatCartridge"
+        Me.ButtonGetAlatCartridge.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.ButtonGetAlatCartridge.Size = New System.Drawing.Size(67, 25)
+        Me.ButtonGetAlatCartridge.TabIndex = 663
+        Me.ButtonGetAlatCartridge.Text = "Get Alat"
+        Me.ButtonGetAlatCartridge.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.ButtonGetAlatCartridge.UseVisualStyleBackColor = False
         '
         'Label49
         '
@@ -2801,7 +2845,7 @@ Partial Class MasterTindakanKlinik
         Me.CheckBoxCartridge.Checked = True
         Me.CheckBoxCartridge.CheckState = System.Windows.Forms.CheckState.Checked
         Me.CheckBoxCartridge.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.CheckBoxCartridge.Location = New System.Drawing.Point(350, 12)
+        Me.CheckBoxCartridge.Location = New System.Drawing.Point(425, 11)
         Me.CheckBoxCartridge.Name = "CheckBoxCartridge"
         Me.CheckBoxCartridge.Size = New System.Drawing.Size(51, 19)
         Me.CheckBoxCartridge.TabIndex = 640
@@ -2814,7 +2858,7 @@ Partial Class MasterTindakanKlinik
         Me.TextBoxIdCartridge.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.TextBoxIdCartridge.Cursor = System.Windows.Forms.Cursors.No
         Me.TextBoxIdCartridge.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxIdCartridge.Location = New System.Drawing.Point(260, 11)
+        Me.TextBoxIdCartridge.Location = New System.Drawing.Point(335, 10)
         Me.TextBoxIdCartridge.Name = "TextBoxIdCartridge"
         Me.TextBoxIdCartridge.ReadOnly = True
         Me.TextBoxIdCartridge.Size = New System.Drawing.Size(84, 23)
@@ -3286,4 +3330,6 @@ Partial Class MasterTindakanKlinik
     Friend WithEvents Label48 As System.Windows.Forms.Label
     Friend WithEvents TextBoxHargaBeli As System.Windows.Forms.TextBox
     Friend WithEvents Label49 As System.Windows.Forms.Label
+    Friend WithEvents ButtonGetAlatSarpras As System.Windows.Forms.Button
+    Friend WithEvents ButtonGetAlatCartridge As System.Windows.Forms.Button
 End Class

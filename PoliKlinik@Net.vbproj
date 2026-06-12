@@ -24,6 +24,7 @@
     <GenerateManifests>true</GenerateManifests>
     <SignManifests>true</SignManifests>
     <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
+    <SignAssembly>false</SignAssembly>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -39,7 +40,6 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -563,6 +563,12 @@
     <Compile Include="Prototype\FormPembayaran.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Prototype\FormPencarianAlatSarpras.Designer.vb">
+      <DependentUpon>FormPencarianAlatSarpras.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormPencarianAlatSarpras.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Prototype\FormPendaftaranAwal.Designer.vb">
       <DependentUpon>FormPendaftaranAwal.vb</DependentUpon>
     </Compile>
@@ -844,6 +850,12 @@
     <Compile Include="Prototype\FormPenerimaanBarang.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Prototype\FormPreOrderAlat.Designer.vb">
+      <DependentUpon>FormPreOrderAlat.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormPreOrderAlat.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Prototype\FormPreOrderCartridge.Designer.vb">
       <DependentUpon>FormPreOrderCartridge.vb</DependentUpon>
     </Compile>
@@ -854,6 +866,12 @@
       <DependentUpon>FormRekamMedisDokter.vb</DependentUpon>
     </Compile>
     <Compile Include="Prototype\FormRekamMedisDokter.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Prototype\FormSupplier.Designer.vb">
+      <DependentUpon>FormSupplier.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormSupplier.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Prototype\FormValidasiFaskesPasien.Designer.vb">
@@ -1559,6 +1577,9 @@
     <EmbeddedResource Include="Prototype\FormPembayaran.resx">
       <DependentUpon>FormPembayaran.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormPencarianAlatSarpras.resx">
+      <DependentUpon>FormPencarianAlatSarpras.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormPendaftaranAwal.resx">
       <DependentUpon>FormPendaftaranAwal.vb</DependentUpon>
     </EmbeddedResource>
@@ -1715,11 +1736,17 @@
     <EmbeddedResource Include="Prototype\FormPenerimaanBarang.resx">
       <DependentUpon>FormPenerimaanBarang.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormPreOrderAlat.resx">
+      <DependentUpon>FormPreOrderAlat.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormPreOrderCartridge.resx">
       <DependentUpon>FormPreOrderCartridge.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormRekamMedisDokter.resx">
       <DependentUpon>FormRekamMedisDokter.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormSupplier.resx">
+      <DependentUpon>FormSupplier.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormValidasiFaskesPasien.resx">
       <DependentUpon>FormValidasiFaskesPasien.vb</DependentUpon>

@@ -2358,6 +2358,15 @@ Public Class MasterTindakanKlinik
     End Sub
 
     Private Sub ButtonPreOrder_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonPreOrder.Click
-        FormPreOrderCartridge.ShowDialog()
+        'FormPreOrderCartridge.ShowDialog()
+        FormPreOrderAlat.ShowDialog()
+    End Sub
+
+    Private Sub ButtonGetAlatSarpras_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonGetAlatSarpras.Click
+        FormPencarianAlatSarpras.ShowDialog()
+    End Sub
+
+    Private Sub ButtonGetAlatCartridge_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonGetAlatCartridge.Click
+        FormPencarianAlatSarpras.ShowDialog()
     End Sub
 End Class

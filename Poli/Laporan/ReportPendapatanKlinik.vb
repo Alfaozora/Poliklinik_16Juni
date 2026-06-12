@@ -1579,7 +1579,7 @@ Public Class ReportPendapatanKlinik
 
         queryBuilder.AppendLine("    STUFF(( ")
         queryBuilder.AppendLine("        SELECT CHAR(13) + CHAR(10) + ")
-        queryBuilder.AppendLine("               d.NamaTindakan + ' x' + CAST(d.Qty AS VARCHAR) ")
+        queryBuilder.AppendLine("               d.NamaTindakan + ' (' + CAST(d.Qty AS VARCHAR) + 'x) ' ")
         queryBuilder.AppendLine("        FROM ( ")
         queryBuilder.AppendLine("            SELECT tblTindakan.NamaTindakan, COUNT(*) AS Qty ")
         queryBuilder.AppendLine("            FROM TransaksiPoliDetail tblTindakan ")
@@ -1608,7 +1608,7 @@ Public Class ReportPendapatanKlinik
 
         queryBuilder.AppendLine("    STUFF(( ")
         queryBuilder.AppendLine("        SELECT CHAR(13) + CHAR(10) + ")
-        queryBuilder.AppendLine("               d.NamaTindakan + ' x' + CAST(d.Qty AS VARCHAR) ")
+        queryBuilder.AppendLine("               d.NamaTindakan + ' (' + CAST(d.Qty AS VARCHAR) + 'x) ' ")
         queryBuilder.AppendLine("        FROM ( ")
         queryBuilder.AppendLine("            SELECT tblTindakan.NamaTindakan, COUNT(*) AS Qty ")
         queryBuilder.AppendLine("            FROM TransaksiPoliDetail tblTindakan ")
