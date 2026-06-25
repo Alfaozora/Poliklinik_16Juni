@@ -1600,4 +1600,9 @@ Public Class PoliKlinik
         FormAdjustmentAlat.Show()
         FormAdjustmentAlat.Focus()
     End Sub
+
+    Private Sub SimulasiBHPToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SimulasiBHPToolStripMenuItem.Click
+        FormSimulasiBHP.Show()
+        FormSimulasiBHP.Focus()
+    End Sub
 End Class

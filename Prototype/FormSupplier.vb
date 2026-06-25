@@ -44,6 +44,8 @@ Public Class FormSupplier
                 dt.Columns.Add("No. Rekening", GetType(String))
                 dt.Columns.Add("Atas Nama Rekening", GetType(String))
                 dt.Columns.Add("Metode Pembayaran", GetType(String))
+                dt.Columns.Add("Kode Bank", GetType(String))
+
 
                 Dim dataItems = jsonResult("data")
 
@@ -59,11 +61,12 @@ Public Class FormSupplier
                                 Dim rekNo As String = If(rek("supplier_rek_no").Type <> JTokenType.Null, rek("supplier_rek_no").ToString(), "-")
                                 Dim rekName As String = If(rek("supplier_rek_name").Type <> JTokenType.Null, rek("supplier_rek_name").ToString(), "-")
                                 Dim payMethod As String = If(rek("supplier_payment_method").Type <> JTokenType.Null, rek("supplier_payment_method").ToString(), "-")
+                                Dim bankCode As String = If(rek("supplier_bank").Type <> JTokenType.Null, rek("supplier_bank").ToString(), "-")
 
-                                dt.Rows.Add(supName, supAddr, bankName, rekNo, rekName, payMethod)
+                                dt.Rows.Add(supName, supAddr, bankName, rekNo, rekName, payMethod, bankCode)
                             Next
                         Else
-                            dt.Rows.Add(supName, supAddr, "-", "-", "-", "-")
+                            dt.Rows.Add(supName, supAddr, "-", "-", "-", "-", "-")
                         End If
                     Next
                 Else
@@ -135,6 +138,7 @@ Public Class FormSupplier
             Dim noRek As String = row.Cells("No. Rekening").Value.ToString()
             Dim namaRek As String = row.Cells("Atas Nama Rekening").Value.ToString()
             Dim metodeBayar As String = row.Cells("Metode Pembayaran").Value.ToString()
+            Dim bankCode As String = row.Cells("Kode Bank").Value.ToString()
 
             ' 4. Lempar nilai tersebut ke form FormPreOrderAlat
             FormPreOrderAlat.TextBoxNamaSupp.Text = namaSupplier
@@ -143,6 +147,7 @@ Public Class FormSupplier
             FormPreOrderAlat.TextBoxNoRek.Text = noRek
             FormPreOrderAlat.TextBoxNamaRek.Text = namaRek
             FormPreOrderAlat.TextBoxPay.Text = metodeBayar
+            FormPreOrderAlat.TextBoxBankCode.Text = bankCode
 
             ' 5. Tutup form pencarian supplier ini
             Me.Close()

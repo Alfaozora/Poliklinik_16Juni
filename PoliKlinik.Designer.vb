@@ -148,6 +148,7 @@ Partial Class PoliKlinik
         Me.AutoSendingWhatsappEmailToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.WaBlastToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.BirthdaySenderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.SimulasiBHPToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MiscToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MasterPaketToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.DesignReportToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -1133,7 +1134,7 @@ Partial Class PoliKlinik
         '
         'ToolToolStripMenuItem
         '
-        Me.ToolToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ChangePasswordToolStripMenuItem1, Me.CetakKartuToolStripMenuItem1, Me.PembatalanTransaksiToolStripMenuItem, Me.RepairTransaksiTindakanDetailToolStripMenuItem, Me.AutoSendingWhatsappEmailToolStripMenuItem, Me.WaBlastToolStripMenuItem, Me.BirthdaySenderToolStripMenuItem})
+        Me.ToolToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ChangePasswordToolStripMenuItem1, Me.CetakKartuToolStripMenuItem1, Me.PembatalanTransaksiToolStripMenuItem, Me.RepairTransaksiTindakanDetailToolStripMenuItem, Me.AutoSendingWhatsappEmailToolStripMenuItem, Me.WaBlastToolStripMenuItem, Me.BirthdaySenderToolStripMenuItem, Me.SimulasiBHPToolStripMenuItem})
         Me.ToolToolStripMenuItem.Font = New System.Drawing.Font("Arial", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ToolToolStripMenuItem.Name = "ToolToolStripMenuItem"
         Me.ToolToolStripMenuItem.Size = New System.Drawing.Size(43, 20)
@@ -1184,7 +1185,15 @@ Partial Class PoliKlinik
         '
         Me.BirthdaySenderToolStripMenuItem.Name = "BirthdaySenderToolStripMenuItem"
         Me.BirthdaySenderToolStripMenuItem.Size = New System.Drawing.Size(262, 22)
+        Me.BirthdaySenderToolStripMenuItem.Tag = "0707"
         Me.BirthdaySenderToolStripMenuItem.Text = "Birthday Sender"
+        '
+        'SimulasiBHPToolStripMenuItem
+        '
+        Me.SimulasiBHPToolStripMenuItem.Name = "SimulasiBHPToolStripMenuItem"
+        Me.SimulasiBHPToolStripMenuItem.Size = New System.Drawing.Size(262, 22)
+        Me.SimulasiBHPToolStripMenuItem.Tag = "0708"
+        Me.SimulasiBHPToolStripMenuItem.Text = "Simulasi BHP"
         '
         'MiscToolStripMenuItem
         '
@@ -2308,4 +2317,5 @@ Partial Class PoliKlinik
     Friend WithEvents WaBlastToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents BirthdaySenderToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents AdjustmentAlatToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents SimulasiBHPToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 End Class

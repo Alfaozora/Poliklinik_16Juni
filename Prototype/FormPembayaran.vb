@@ -2563,7 +2563,7 @@ Public Class FormPembayaran
                 Tnew("TindakanID") = rowTindakan("TindakanID").ToString()
                 Tnew("Tindakan") = rowTindakan("Tindakan")
                 Tnew("Jenis") = rowTindakan("Jenis")
-                Tnew("Biaya Tindakan") = hargaAwal
+                Tnew("Biaya Tindakan") = rowTindakan("SubTotal")
                 Tnew("DiscTindakan") = discTindakan.ToString("0.##") & "%"
                 Tnew("DiscNilai") = diskon
                 Tnew("NettBayar") = rowTindakan("NettBayar")
@@ -2585,7 +2585,7 @@ Public Class FormPembayaran
                 Tnew("TindakanID") = rowTindakan("TindakanID")
                 Tnew("Tindakan") = rowTindakan("Tindakan")
                 Tnew("Jenis") = rowTindakan("Jenis")
-                Tnew("Biaya Tindakan") = hargaAwal
+                Tnew("Biaya Tindakan") = rowTindakan("SubTotal")
                 Tnew("DiscTindakan") = discTindakan.ToString("0.##") & "%"
                 Tnew("DiscNilai") = diskon
                 Tnew("NettBayar") = rowTindakan("NettBayar")

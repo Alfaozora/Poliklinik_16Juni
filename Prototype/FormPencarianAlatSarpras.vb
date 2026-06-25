@@ -81,6 +81,8 @@ Public Class FormPencarianAlatSarpras
                 dt.Columns.Add("Model", GetType(String))
                 dt.Columns.Add("Serial Number", GetType(String))
                 dt.Columns.Add("Distributor", GetType(String))
+                dt.Columns.Add("Room ID", GetType(String))
+                dt.Columns.Add("Room Name", GetType(String))
 
                 ' 2. Ambil array 'data' terluar
                 Dim dataItems = jsonResult("data")
@@ -106,14 +108,17 @@ Public Class FormPencarianAlatSarpras
                                     Dim assetSn As String = If(asset("serial_number").Type <> JTokenType.Null, asset("serial_number").ToString(), "-")
                                     Dim assetDist As String = If(asset("distributor").Type <> JTokenType.Null, asset("distributor").ToString(), "-")
 
+                                    Dim assetRoomId As String = If(asset("room_id") IsNot Nothing AndAlso asset("room_id").Type <> JTokenType.Null, asset("room_id").ToString(), "-")
+                                    Dim assetRoomName As String = If(asset("room_name") IsNot Nothing AndAlso asset("room_name").Type <> JTokenType.Null, asset("room_name").ToString(), "-")
+
                                     ' Masukkan satu baris lengkap ke DataTable
-                                    dt.Rows.Add(itemCode, itemName, assetCode, assetMerk, assetType, assetModel, assetSn, assetDist)
+                                    dt.Rows.Add(itemCode, itemName, assetCode, assetMerk, assetType, assetModel, assetSn, assetDist, assetRoomId, assetRoomName)
                                 Next
 
                             Else
                                 ' PERBAIKAN: Masukkan alat ke Grid meskipun fisik asetnya kosong (Cartridge masuk ke sini)
                                 ' Kita isi kolom sisanya dengan tanda strip "-"
-                                dt.Rows.Add(itemCode, itemName, "-", "-", "-", "-", "-", "-")
+                                dt.Rows.Add(itemCode, itemName, "-", "-", "-", "-", "-", "-", "-", "-")
                             End If
                         End If
                     Next
@@ -153,37 +158,49 @@ Public Class FormPencarianAlatSarpras
             Dim kodeItem As String = row.Cells("Kode Item").Value.ToString()
             Dim kodeAset As String = row.Cells("Kode Aset").Value.ToString()
             Dim namaAlat As String = row.Cells("Nama Master Alat").Value.ToString()
+            Dim roomId As String = row.Cells("Room ID").Value.ToString()
+            Dim roomName As String = row.Cells("Room Name").Value.ToString()
 
-            ' 4. Cek Tab mana yang sedang aktif di form utama
-            Dim tabAktif As String = MasterTindakanKlinik.TabControl1.SelectedTab.Name
+            If Application.OpenForms("FormPreOrderAlat") IsNot Nothing Then
+                ' Jika aktif, lempar datanya
+                FormPreOrderAlat.TextBoxKodeItem.Text = kodeItem
+                FormPreOrderAlat.TextBoxId.Text = roomId
 
-            ' 5. Tentukan logika berdasarkan Tab yang aktif
-            If tabAktif = "TabPage1" Then
-                ' --- LOGIKA UNTUK ALAT (TabPage1) ---
-
-                ' Cegah user memilih barang yang belum punya fisik aset
-                If kodeAset = "-" Then
-                    MessageBox.Show("Alat ini tercatat di Master Item, tetapi belum ada fisik asetnya (Kode Aset kosong). Silakan pilih yang lain.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-                    Return
-                End If
-
-                ' Lempar nilai Kode Aset ke form
-                MasterTindakanKlinik.TextBoxKodeAlat.Text = kodeAset
-                MasterTindakanKlinik.TextBoxNamaAlat.Text = namaAlat
-
-            ElseIf tabAktif = "TabPage2" Then
-                ' --- LOGIKA UNTUK CARTRIDGE (TabPage2) ---
-
-                ' Tidak ada pengecekan kodeAset = "-" di sini, jadi yang kosong pun lolos
-
-                ' Lempar nilai Kode Item (bukan Kode Aset) ke form
-                MasterTindakanKlinik.TextBoxKodeCartridge.Text = kodeItem
-                MasterTindakanKlinik.TextBoxNamaCartridge.Text = namaAlat
-
+                ' Tutup form pencarian dan hentikan proses (return) agar tidak lanjut ke logika MasterTindakanKlinik
+                Me.Close()
+                Return
             End If
 
-            ' 6. Tutup form pencarian ini (kembali ke form MasterTindakanKlinik)
-            Me.Close()
+            If Application.OpenForms("MasterTindakanKlinik") IsNot Nothing Then
+                ' 4. Cek Tab mana yang sedang aktif di form utama
+                Dim tabAktif As String = MasterTindakanKlinik.TabControl1.SelectedTab.Name
+
+                ' 5. Tentukan logika berdasarkan Tab yang aktif
+                If tabAktif = "TabPage1" Then
+                    ' --- LOGIKA UNTUK ALAT (TabPage1) ---
+
+                    ' Cegah user memilih barang yang belum punya fisik aset
+                    If kodeAset = "-" Then
+                        MessageBox.Show("Alat ini tercatat di Master Item, tetapi belum ada fisik asetnya (Kode Aset kosong). Silakan pilih yang lain.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                        Return
+                    End If
+
+                    ' Lempar nilai Kode Aset ke form
+                    MasterTindakanKlinik.TextBoxKodeAlat.Text = kodeAset
+                    MasterTindakanKlinik.TextBoxNamaAlat.Text = namaAlat
+                    MasterTindakanKlinik.TextBoxNamaRuangan.Text = roomName
+                    MasterTindakanKlinik.TextBoxIdRuangan.Text = roomId
+
+                ElseIf tabAktif = "TabPage2" Then
+                    ' --- LOGIKA UNTUK CARTRIDGE (TabPage2) ---
+
+                    ' Lempar nilai Kode Item (bukan Kode Aset) ke form
+                    MasterTindakanKlinik.TextBoxKodeCartridge.Text = kodeItem
+                    MasterTindakanKlinik.TextBoxNamaCartridge.Text = namaAlat
+                End If
+
+                Me.Close()
+            End If
         End If
     End Sub
 End Class

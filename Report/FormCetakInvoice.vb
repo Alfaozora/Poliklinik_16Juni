@@ -696,7 +696,7 @@ Public Class FormCetakInvoice
                 Tnew("TindakanID") = rowTindakan("TindakanID")
                 Tnew("Tindakan") = rowTindakan("Tindakan")
                 Tnew("Jenis") = rowTindakan("Jenis")
-                Tnew("Biaya Tindakan") = rowTindakan("Biaya Tindakan")
+                Tnew("Biaya Tindakan") = rowTindakan("SubTotal")
                 Tnew("Qty") = rowTindakan("Qty")
                 Tnew("DiscTindakan") = rowTindakan("TotalDiskon")
                 Tnew("DiscNilai") = rowTindakan("DiscNilai")
@@ -741,7 +741,7 @@ Public Class FormCetakInvoice
                 Tnew("TindakanID") = rowTindakan("TindakanID").ToString()
                 Tnew("Tindakan") = rowTindakan("Tindakan")
                 Tnew("Jenis") = rowTindakan("Jenis")
-                Tnew("Biaya Tindakan") = rowTindakan("Biaya Tindakan")
+                Tnew("Biaya Tindakan") = rowTindakan("SubTotal")
                 Tnew("Qty") = rowTindakan("Qty")
                 Tnew("DiscTindakan") = discTindakan
                 Tnew("DiscNilai") = rowTindakan("DiscNilai")

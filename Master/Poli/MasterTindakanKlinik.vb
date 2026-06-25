@@ -1558,6 +1558,8 @@ Public Class MasterTindakanKlinik
         ' Reset input utama
         TextBoxKodeAlat.Text = ""
         TextBoxNamaAlat.Text = ""
+        TextBoxNamaRuangan.Text = ""
+        TextBoxIdRuangan.Text = ""
 
         ' Status aktif default ON
         CheckBoxAlatAktif.Checked = True
@@ -1752,14 +1754,16 @@ Public Class MasterTindakanKlinik
 
         Dim statusAktif As Integer = If(CheckBoxAlatAktif.Checked, 1, 0)
 
-            WriteSQL("INSERT INTO MasterAlat " & _
-                     "(KodeAlat, NamaAlat, IsAktif, CreatedAt, CreatedBy) " & _
-                     "VALUES (" & _
-                     "'" & TextBoxKodeAlat.Text & "', " & _
-                     "'" & TextBoxNamaAlat.Text & "', " & _
-                     statusAktif & ", " & _
-                     "GETDATE(), " & _
-                     "'" & userInput & "')", 4)
+        WriteSQL("INSERT INTO MasterAlat " & _
+                 "(KodeAlat, NamaAlat, IsAktif, IdRuangan, NamaRuangan, CreatedAt, CreatedBy) " & _
+                 "VALUES (" & _
+                 "'" & TextBoxKodeAlat.Text & "', " & _
+                 "'" & TextBoxNamaAlat.Text & "', " & _
+                 "'" & TextBoxNamaRuangan.Text & "', " & _
+                 "'" & TextBoxIdRuangan.Text & "', " & _
+                 statusAktif & ", " & _
+                 "GETDATE(), " & _
+                 "'" & userInput & "')", 4)
 
             MsgBox("Berhasil menyimpan data alat.", MsgBoxStyle.Information, "Success!")
 
@@ -1819,6 +1823,8 @@ Public Class MasterTindakanKlinik
         parameterUpdate = "KodeAlat = '" & TextBoxKodeAlat.Text.Replace("'", "''") & "', " & _
                           "NamaAlat = '" & TextBoxNamaAlat.Text.Replace("'", "''") & "', " & _
                           "IsAktif = " & statusAktif & ", " & _
+                          "IdRuangan = '" & TextBoxIdRuangan.Text & "', " & _
+                          "NamaRuangan = '" & TextBoxNamaRuangan.Text.Replace("'", "''") & "', " & _
                           "UpdatedAt = GETDATE(), " & _
                           "UpdatedBy = '" & userInput & "'"
 
@@ -2001,6 +2007,9 @@ Public Class MasterTindakanKlinik
         TextBoxAlatID.Text = row("AlatID").ToString()
         TextBoxKodeAlat.Text = row("KodeAlat").ToString()
         TextBoxNamaAlat.Text = row("NamaAlat").ToString()
+        TextBoxNamaRuangan.Text = row("NamaRuangan").ToString()
+        TextBoxIdRuangan.Text = row("IdRuangan").ToString()
+
 
         CheckBoxAlatAktif.Checked = (row("IsAktif") = True)
 

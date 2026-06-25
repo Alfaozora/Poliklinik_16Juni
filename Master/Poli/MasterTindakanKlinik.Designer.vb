@@ -185,6 +185,9 @@ Partial Class MasterTindakanKlinik
         Me.SplitContainer4 = New System.Windows.Forms.SplitContainer
         Me.TabControl1 = New System.Windows.Forms.TabControl
         Me.TabPage1 = New System.Windows.Forms.TabPage
+        Me.TextBoxIdRuangan = New System.Windows.Forms.TextBox
+        Me.Label59 = New System.Windows.Forms.Label
+        Me.TextBoxNamaRuangan = New System.Windows.Forms.TextBox
         Me.ButtonGetAlatSarpras = New System.Windows.Forms.Button
         Me.GroupBox3 = New System.Windows.Forms.GroupBox
         Me.ButtonCetakRiwayat = New System.Windows.Forms.Button
@@ -2338,6 +2341,9 @@ Partial Class MasterTindakanKlinik
         'TabPage1
         '
         Me.TabPage1.BackColor = System.Drawing.Color.White
+        Me.TabPage1.Controls.Add(Me.TextBoxIdRuangan)
+        Me.TabPage1.Controls.Add(Me.Label59)
+        Me.TabPage1.Controls.Add(Me.TextBoxNamaRuangan)
         Me.TabPage1.Controls.Add(Me.ButtonGetAlatSarpras)
         Me.TabPage1.Controls.Add(Me.GroupBox3)
         Me.TabPage1.Controls.Add(Me.Label40)
@@ -2354,6 +2360,39 @@ Partial Class MasterTindakanKlinik
         Me.TabPage1.Size = New System.Drawing.Size(749, 222)
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "Alat"
+        '
+        'TextBoxIdRuangan
+        '
+        Me.TextBoxIdRuangan.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
+        Me.TextBoxIdRuangan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxIdRuangan.Cursor = System.Windows.Forms.Cursors.No
+        Me.TextBoxIdRuangan.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxIdRuangan.Location = New System.Drawing.Point(364, 125)
+        Me.TextBoxIdRuangan.Name = "TextBoxIdRuangan"
+        Me.TextBoxIdRuangan.Size = New System.Drawing.Size(37, 23)
+        Me.TextBoxIdRuangan.TabIndex = 638
+        Me.TextBoxIdRuangan.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'Label59
+        '
+        Me.Label59.AutoSize = True
+        Me.Label59.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label59.Location = New System.Drawing.Point(27, 131)
+        Me.Label59.Name = "Label59"
+        Me.Label59.Size = New System.Drawing.Size(102, 17)
+        Me.Label59.TabIndex = 637
+        Me.Label59.Text = "Nama Ruangan"
+        '
+        'TextBoxNamaRuangan
+        '
+        Me.TextBoxNamaRuangan.BackColor = System.Drawing.Color.White
+        Me.TextBoxNamaRuangan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxNamaRuangan.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
+        Me.TextBoxNamaRuangan.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxNamaRuangan.Location = New System.Drawing.Point(194, 125)
+        Me.TextBoxNamaRuangan.Name = "TextBoxNamaRuangan"
+        Me.TextBoxNamaRuangan.Size = New System.Drawing.Size(167, 23)
+        Me.TextBoxNamaRuangan.TabIndex = 636
         '
         'ButtonGetAlatSarpras
         '
@@ -2471,9 +2510,9 @@ Partial Class MasterTindakanKlinik
         Me.Label40.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
         Me.Label40.Location = New System.Drawing.Point(27, 56)
         Me.Label40.Name = "Label40"
-        Me.Label40.Size = New System.Drawing.Size(67, 17)
+        Me.Label40.Size = New System.Drawing.Size(70, 17)
         Me.Label40.TabIndex = 630
-        Me.Label40.Text = "Kode Alat"
+        Me.Label40.Text = "Kode Aset"
         '
         'TextBoxKodeAlat
         '
@@ -2768,9 +2807,9 @@ Partial Class MasterTindakanKlinik
         Me.Label51.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
         Me.Label51.Location = New System.Drawing.Point(27, 80)
         Me.Label51.Name = "Label51"
-        Me.Label51.Size = New System.Drawing.Size(99, 17)
+        Me.Label51.Size = New System.Drawing.Size(71, 17)
         Me.Label51.TabIndex = 647
-        Me.Label51.Text = "Kode Cartridge"
+        Me.Label51.Text = "Kode Item"
         '
         'TextBoxKodeCartridge
         '
@@ -3332,4 +3371,7 @@ Partial Class MasterTindakanKlinik
     Friend WithEvents Label49 As System.Windows.Forms.Label
     Friend WithEvents ButtonGetAlatSarpras As System.Windows.Forms.Button
     Friend WithEvents ButtonGetAlatCartridge As System.Windows.Forms.Button
+    Friend WithEvents TextBoxIdRuangan As System.Windows.Forms.TextBox
+    Friend WithEvents Label59 As System.Windows.Forms.Label
+    Friend WithEvents TextBoxNamaRuangan As System.Windows.Forms.TextBox
 End Class

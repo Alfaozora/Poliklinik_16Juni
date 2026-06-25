@@ -22,12 +22,15 @@ Partial Class FormPreOrderAlat
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.DtPermintaan = New System.Windows.Forms.DateTimePicker
-        Me.DtDibutuhkan = New System.Windows.Forms.DateTimePicker
         Me.ComboBoxJenisPermintaan = New System.Windows.Forms.ComboBox
         Me.ComboBoxJenisPembayaran = New System.Windows.Forms.ComboBox
         Me.ButtonGetSupplier = New System.Windows.Forms.Button
         Me.GroupBox1 = New System.Windows.Forms.GroupBox
+        Me.Label10 = New System.Windows.Forms.Label
+        Me.TextBoxNoRek = New System.Windows.Forms.TextBox
+        Me.TextBoxNamaRek = New System.Windows.Forms.TextBox
+        Me.Label9 = New System.Windows.Forms.Label
+        Me.TextBoxBank = New System.Windows.Forms.TextBox
         Me.Label8 = New System.Windows.Forms.Label
         Me.TextBoxPay = New System.Windows.Forms.TextBox
         Me.Label7 = New System.Windows.Forms.Label
@@ -35,16 +38,11 @@ Partial Class FormPreOrderAlat
         Me.Label6 = New System.Windows.Forms.Label
         Me.TextBoxNamaSupp = New System.Windows.Forms.TextBox
         Me.Label5 = New System.Windows.Forms.Label
-        Me.Label1 = New System.Windows.Forms.Label
-        Me.Label2 = New System.Windows.Forms.Label
         Me.Label3 = New System.Windows.Forms.Label
         Me.Label4 = New System.Windows.Forms.Label
-        Me.TextBoxBank = New System.Windows.Forms.TextBox
-        Me.Label9 = New System.Windows.Forms.Label
-        Me.TextBoxNamaRek = New System.Windows.Forms.TextBox
-        Me.TextBoxNoRek = New System.Windows.Forms.TextBox
-        Me.Label10 = New System.Windows.Forms.Label
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
+        Me.TextBoxDeskripsi = New System.Windows.Forms.TextBox
+        Me.Label17 = New System.Windows.Forms.Label
         Me.Label11 = New System.Windows.Forms.Label
         Me.TextBoxTotalHarga = New System.Windows.Forms.TextBox
         Me.TextBoxHarga = New System.Windows.Forms.TextBox
@@ -58,35 +56,18 @@ Partial Class FormPreOrderAlat
         Me.TextBoxId = New System.Windows.Forms.TextBox
         Me.Label16 = New System.Windows.Forms.Label
         Me.ButtonCariAlat = New System.Windows.Forms.Button
-        Me.Label17 = New System.Windows.Forms.Label
-        Me.TextBoxDeskripsi = New System.Windows.Forms.TextBox
         Me.ButtonSubmit = New System.Windows.Forms.Button
+        Me.TextBoxBankCode = New System.Windows.Forms.TextBox
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.SuspendLayout()
-        '
-        'DtPermintaan
-        '
-        Me.DtPermintaan.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.DtPermintaan.Location = New System.Drawing.Point(147, 20)
-        Me.DtPermintaan.Name = "DtPermintaan"
-        Me.DtPermintaan.Size = New System.Drawing.Size(121, 20)
-        Me.DtPermintaan.TabIndex = 641
-        '
-        'DtDibutuhkan
-        '
-        Me.DtDibutuhkan.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.DtDibutuhkan.Location = New System.Drawing.Point(147, 64)
-        Me.DtDibutuhkan.Name = "DtDibutuhkan"
-        Me.DtDibutuhkan.Size = New System.Drawing.Size(120, 20)
-        Me.DtDibutuhkan.TabIndex = 643
         '
         'ComboBoxJenisPermintaan
         '
         Me.ComboBoxJenisPermintaan.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBoxJenisPermintaan.FormattingEnabled = True
         Me.ComboBoxJenisPermintaan.Items.AddRange(New Object() {"BARU", "PENGGANTI"})
-        Me.ComboBoxJenisPermintaan.Location = New System.Drawing.Point(401, 20)
+        Me.ComboBoxJenisPermintaan.Location = New System.Drawing.Point(140, 31)
         Me.ComboBoxJenisPermintaan.Name = "ComboBoxJenisPermintaan"
         Me.ComboBoxJenisPermintaan.Size = New System.Drawing.Size(121, 25)
         Me.ComboBoxJenisPermintaan.TabIndex = 653
@@ -96,7 +77,7 @@ Partial Class FormPreOrderAlat
         Me.ComboBoxJenisPembayaran.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBoxJenisPembayaran.FormattingEnabled = True
         Me.ComboBoxJenisPembayaran.Items.AddRange(New Object() {"CASH", "CREDIT", "INSTALLMENT"})
-        Me.ComboBoxJenisPembayaran.Location = New System.Drawing.Point(401, 59)
+        Me.ComboBoxJenisPembayaran.Location = New System.Drawing.Point(462, 31)
         Me.ComboBoxJenisPembayaran.Name = "ComboBoxJenisPembayaran"
         Me.ComboBoxJenisPembayaran.Size = New System.Drawing.Size(121, 25)
         Me.ComboBoxJenisPembayaran.TabIndex = 655
@@ -123,6 +104,7 @@ Partial Class FormPreOrderAlat
         '
         'GroupBox1
         '
+        Me.GroupBox1.Controls.Add(Me.TextBoxBankCode)
         Me.GroupBox1.Controls.Add(Me.Label10)
         Me.GroupBox1.Controls.Add(Me.TextBoxNoRek)
         Me.GroupBox1.Controls.Add(Me.TextBoxNamaRek)
@@ -136,12 +118,71 @@ Partial Class FormPreOrderAlat
         Me.GroupBox1.Controls.Add(Me.TextBoxNamaSupp)
         Me.GroupBox1.Controls.Add(Me.Label5)
         Me.GroupBox1.Controls.Add(Me.ButtonGetSupplier)
-        Me.GroupBox1.Location = New System.Drawing.Point(15, 113)
+        Me.GroupBox1.Location = New System.Drawing.Point(15, 72)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(586, 195)
         Me.GroupBox1.TabIndex = 665
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Supplier"
+        '
+        'Label10
+        '
+        Me.Label10.AutoSize = True
+        Me.Label10.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label10.Location = New System.Drawing.Point(17, 165)
+        Me.Label10.Name = "Label10"
+        Me.Label10.Size = New System.Drawing.Size(23, 15)
+        Me.Label10.TabIndex = 679
+        Me.Label10.Text = "No"
+        '
+        'TextBoxNoRek
+        '
+        Me.TextBoxNoRek.BackColor = System.Drawing.Color.PaleGreen
+        Me.TextBoxNoRek.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.TextBoxNoRek.ForeColor = System.Drawing.Color.Black
+        Me.TextBoxNoRek.Location = New System.Drawing.Point(58, 161)
+        Me.TextBoxNoRek.Multiline = True
+        Me.TextBoxNoRek.Name = "TextBoxNoRek"
+        Me.TextBoxNoRek.ReadOnly = True
+        Me.TextBoxNoRek.Size = New System.Drawing.Size(229, 24)
+        Me.TextBoxNoRek.TabIndex = 678
+        Me.TextBoxNoRek.TabStop = False
+        '
+        'TextBoxNamaRek
+        '
+        Me.TextBoxNamaRek.BackColor = System.Drawing.Color.PaleGreen
+        Me.TextBoxNamaRek.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.TextBoxNamaRek.ForeColor = System.Drawing.Color.Black
+        Me.TextBoxNamaRek.Location = New System.Drawing.Point(344, 126)
+        Me.TextBoxNamaRek.Multiline = True
+        Me.TextBoxNamaRek.Name = "TextBoxNamaRek"
+        Me.TextBoxNamaRek.ReadOnly = True
+        Me.TextBoxNamaRek.Size = New System.Drawing.Size(229, 24)
+        Me.TextBoxNamaRek.TabIndex = 677
+        Me.TextBoxNamaRek.TabStop = False
+        '
+        'Label9
+        '
+        Me.Label9.AutoSize = True
+        Me.Label9.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label9.Location = New System.Drawing.Point(301, 128)
+        Me.Label9.Name = "Label9"
+        Me.Label9.Size = New System.Drawing.Size(41, 15)
+        Me.Label9.TabIndex = 676
+        Me.Label9.Text = "Name"
+        '
+        'TextBoxBank
+        '
+        Me.TextBoxBank.BackColor = System.Drawing.Color.PaleGreen
+        Me.TextBoxBank.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.TextBoxBank.ForeColor = System.Drawing.Color.Black
+        Me.TextBoxBank.Location = New System.Drawing.Point(197, 126)
+        Me.TextBoxBank.Multiline = True
+        Me.TextBoxBank.Name = "TextBoxBank"
+        Me.TextBoxBank.ReadOnly = True
+        Me.TextBoxBank.Size = New System.Drawing.Size(49, 24)
+        Me.TextBoxBank.TabIndex = 675
+        Me.TextBoxBank.TabStop = False
         '
         'Label8
         '
@@ -164,6 +205,7 @@ Partial Class FormPreOrderAlat
         Me.TextBoxPay.ReadOnly = True
         Me.TextBoxPay.Size = New System.Drawing.Size(99, 24)
         Me.TextBoxPay.TabIndex = 673
+        Me.TextBoxPay.TabStop = False
         '
         'Label7
         '
@@ -185,6 +227,7 @@ Partial Class FormPreOrderAlat
         Me.TextBoxAlamatSupp.ReadOnly = True
         Me.TextBoxAlamatSupp.Size = New System.Drawing.Size(229, 55)
         Me.TextBoxAlamatSupp.TabIndex = 671
+        Me.TextBoxAlamatSupp.TabStop = False
         '
         'Label6
         '
@@ -206,6 +249,7 @@ Partial Class FormPreOrderAlat
         Me.TextBoxNamaSupp.ReadOnly = True
         Me.TextBoxNamaSupp.Size = New System.Drawing.Size(229, 55)
         Me.TextBoxNamaSupp.TabIndex = 669
+        Me.TextBoxNamaSupp.TabStop = False
         '
         'Label5
         '
@@ -217,31 +261,11 @@ Partial Class FormPreOrderAlat
         Me.Label5.TabIndex = 668
         Me.Label5.Text = "Nama"
         '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label1.Location = New System.Drawing.Point(12, 20)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(119, 15)
-        Me.Label1.TabIndex = 666
-        Me.Label1.Text = "Tanggal Permintaan"
-        '
-        'Label2
-        '
-        Me.Label2.AutoSize = True
-        Me.Label2.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label2.Location = New System.Drawing.Point(12, 65)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(118, 15)
-        Me.Label2.TabIndex = 667
-        Me.Label2.Text = "Tanggal Dibutuhkan"
-        '
         'Label3
         '
         Me.Label3.AutoSize = True
         Me.Label3.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label3.Location = New System.Drawing.Point(274, 20)
+        Me.Label3.Location = New System.Drawing.Point(13, 31)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(103, 15)
         Me.Label3.TabIndex = 668
@@ -251,67 +275,11 @@ Partial Class FormPreOrderAlat
         '
         Me.Label4.AutoSize = True
         Me.Label4.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label4.Location = New System.Drawing.Point(274, 64)
+        Me.Label4.Location = New System.Drawing.Point(335, 36)
         Me.Label4.Name = "Label4"
         Me.Label4.Size = New System.Drawing.Size(109, 15)
         Me.Label4.TabIndex = 669
         Me.Label4.Text = "Jenis Pembayaran"
-        '
-        'TextBoxBank
-        '
-        Me.TextBoxBank.BackColor = System.Drawing.Color.PaleGreen
-        Me.TextBoxBank.BorderStyle = System.Windows.Forms.BorderStyle.None
-        Me.TextBoxBank.ForeColor = System.Drawing.Color.Black
-        Me.TextBoxBank.Location = New System.Drawing.Point(197, 126)
-        Me.TextBoxBank.Multiline = True
-        Me.TextBoxBank.Name = "TextBoxBank"
-        Me.TextBoxBank.ReadOnly = True
-        Me.TextBoxBank.Size = New System.Drawing.Size(90, 24)
-        Me.TextBoxBank.TabIndex = 675
-        '
-        'Label9
-        '
-        Me.Label9.AutoSize = True
-        Me.Label9.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label9.Location = New System.Drawing.Point(301, 128)
-        Me.Label9.Name = "Label9"
-        Me.Label9.Size = New System.Drawing.Size(41, 15)
-        Me.Label9.TabIndex = 676
-        Me.Label9.Text = "Name"
-        '
-        'TextBoxNamaRek
-        '
-        Me.TextBoxNamaRek.BackColor = System.Drawing.Color.PaleGreen
-        Me.TextBoxNamaRek.BorderStyle = System.Windows.Forms.BorderStyle.None
-        Me.TextBoxNamaRek.ForeColor = System.Drawing.Color.Black
-        Me.TextBoxNamaRek.Location = New System.Drawing.Point(344, 126)
-        Me.TextBoxNamaRek.Multiline = True
-        Me.TextBoxNamaRek.Name = "TextBoxNamaRek"
-        Me.TextBoxNamaRek.ReadOnly = True
-        Me.TextBoxNamaRek.Size = New System.Drawing.Size(229, 24)
-        Me.TextBoxNamaRek.TabIndex = 677
-        '
-        'TextBoxNoRek
-        '
-        Me.TextBoxNoRek.BackColor = System.Drawing.Color.PaleGreen
-        Me.TextBoxNoRek.BorderStyle = System.Windows.Forms.BorderStyle.None
-        Me.TextBoxNoRek.ForeColor = System.Drawing.Color.Black
-        Me.TextBoxNoRek.Location = New System.Drawing.Point(58, 161)
-        Me.TextBoxNoRek.Multiline = True
-        Me.TextBoxNoRek.Name = "TextBoxNoRek"
-        Me.TextBoxNoRek.ReadOnly = True
-        Me.TextBoxNoRek.Size = New System.Drawing.Size(229, 24)
-        Me.TextBoxNoRek.TabIndex = 678
-        '
-        'Label10
-        '
-        Me.Label10.AutoSize = True
-        Me.Label10.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label10.Location = New System.Drawing.Point(17, 165)
-        Me.Label10.Name = "Label10"
-        Me.Label10.Size = New System.Drawing.Size(23, 15)
-        Me.Label10.TabIndex = 679
-        Me.Label10.Text = "No"
         '
         'GroupBox2
         '
@@ -330,12 +298,30 @@ Partial Class FormPreOrderAlat
         Me.GroupBox2.Controls.Add(Me.TextBoxId)
         Me.GroupBox2.Controls.Add(Me.Label16)
         Me.GroupBox2.Controls.Add(Me.ButtonCariAlat)
-        Me.GroupBox2.Location = New System.Drawing.Point(15, 314)
+        Me.GroupBox2.Location = New System.Drawing.Point(15, 273)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Size = New System.Drawing.Size(586, 171)
         Me.GroupBox2.TabIndex = 670
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Item"
+        '
+        'TextBoxDeskripsi
+        '
+        Me.TextBoxDeskripsi.Location = New System.Drawing.Point(75, 132)
+        Me.TextBoxDeskripsi.Multiline = True
+        Me.TextBoxDeskripsi.Name = "TextBoxDeskripsi"
+        Me.TextBoxDeskripsi.Size = New System.Drawing.Size(345, 24)
+        Me.TextBoxDeskripsi.TabIndex = 681
+        '
+        'Label17
+        '
+        Me.Label17.AutoSize = True
+        Me.Label17.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label17.Location = New System.Drawing.Point(11, 133)
+        Me.Label17.Name = "Label17"
+        Me.Label17.Size = New System.Drawing.Size(58, 15)
+        Me.Label17.TabIndex = 680
+        Me.Label17.Text = "Deskripsi"
         '
         'Label11
         '
@@ -349,11 +335,15 @@ Partial Class FormPreOrderAlat
         '
         'TextBoxTotalHarga
         '
+        Me.TextBoxTotalHarga.BackColor = System.Drawing.Color.PaleGreen
+        Me.TextBoxTotalHarga.BorderStyle = System.Windows.Forms.BorderStyle.None
         Me.TextBoxTotalHarga.Location = New System.Drawing.Point(276, 97)
         Me.TextBoxTotalHarga.Multiline = True
         Me.TextBoxTotalHarga.Name = "TextBoxTotalHarga"
+        Me.TextBoxTotalHarga.ReadOnly = True
         Me.TextBoxTotalHarga.Size = New System.Drawing.Size(144, 24)
         Me.TextBoxTotalHarga.TabIndex = 678
+        Me.TextBoxTotalHarga.TabStop = False
         '
         'TextBoxHarga
         '
@@ -465,24 +455,6 @@ Partial Class FormPreOrderAlat
         Me.ButtonCariAlat.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
         Me.ButtonCariAlat.UseVisualStyleBackColor = False
         '
-        'Label17
-        '
-        Me.Label17.AutoSize = True
-        Me.Label17.Font = New System.Drawing.Font("Microsoft Sans Serif", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label17.Location = New System.Drawing.Point(11, 133)
-        Me.Label17.Name = "Label17"
-        Me.Label17.Size = New System.Drawing.Size(58, 15)
-        Me.Label17.TabIndex = 680
-        Me.Label17.Text = "Deskripsi"
-        '
-        'TextBoxDeskripsi
-        '
-        Me.TextBoxDeskripsi.Location = New System.Drawing.Point(75, 132)
-        Me.TextBoxDeskripsi.Multiline = True
-        Me.TextBoxDeskripsi.Name = "TextBoxDeskripsi"
-        Me.TextBoxDeskripsi.Size = New System.Drawing.Size(345, 24)
-        Me.TextBoxDeskripsi.TabIndex = 681
-        '
         'ButtonSubmit
         '
         Me.ButtonSubmit.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
@@ -494,7 +466,7 @@ Partial Class FormPreOrderAlat
         Me.ButtonSubmit.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonSubmit.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
         Me.ButtonSubmit.ForeColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(254, Byte), Integer))
-        Me.ButtonSubmit.Location = New System.Drawing.Point(484, 497)
+        Me.ButtonSubmit.Location = New System.Drawing.Point(487, 460)
         Me.ButtonSubmit.Name = "ButtonSubmit"
         Me.ButtonSubmit.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.ButtonSubmit.Size = New System.Drawing.Size(114, 28)
@@ -503,23 +475,32 @@ Partial Class FormPreOrderAlat
         Me.ButtonSubmit.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
         Me.ButtonSubmit.UseVisualStyleBackColor = False
         '
+        'TextBoxBankCode
+        '
+        Me.TextBoxBankCode.BackColor = System.Drawing.Color.PaleGreen
+        Me.TextBoxBankCode.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.TextBoxBankCode.ForeColor = System.Drawing.Color.Black
+        Me.TextBoxBankCode.Location = New System.Drawing.Point(248, 126)
+        Me.TextBoxBankCode.Multiline = True
+        Me.TextBoxBankCode.Name = "TextBoxBankCode"
+        Me.TextBoxBankCode.ReadOnly = True
+        Me.TextBoxBankCode.Size = New System.Drawing.Size(49, 24)
+        Me.TextBoxBankCode.TabIndex = 680
+        Me.TextBoxBankCode.TabStop = False
+        '
         'FormPreOrderAlat
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.White
-        Me.ClientSize = New System.Drawing.Size(610, 534)
+        Me.ClientSize = New System.Drawing.Size(610, 499)
         Me.Controls.Add(Me.ButtonSubmit)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.Label4)
         Me.Controls.Add(Me.Label3)
-        Me.Controls.Add(Me.Label2)
-        Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.ComboBoxJenisPembayaran)
         Me.Controls.Add(Me.ComboBoxJenisPermintaan)
-        Me.Controls.Add(Me.DtDibutuhkan)
-        Me.Controls.Add(Me.DtPermintaan)
         Me.Name = "FormPreOrderAlat"
         Me.Text = "FormPreOrderAlat"
         Me.GroupBox1.ResumeLayout(False)
@@ -530,16 +511,12 @@ Partial Class FormPreOrderAlat
         Me.PerformLayout()
 
     End Sub
-    Friend WithEvents DtPermintaan As System.Windows.Forms.DateTimePicker
-    Friend WithEvents DtDibutuhkan As System.Windows.Forms.DateTimePicker
     Friend WithEvents ComboBoxJenisPermintaan As System.Windows.Forms.ComboBox
     Friend WithEvents ComboBoxJenisPembayaran As System.Windows.Forms.ComboBox
     Friend WithEvents ButtonGetSupplier As System.Windows.Forms.Button
     Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
     Friend WithEvents TextBoxNamaSupp As System.Windows.Forms.TextBox
     Friend WithEvents Label5 As System.Windows.Forms.Label
-    Friend WithEvents Label1 As System.Windows.Forms.Label
-    Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents Label3 As System.Windows.Forms.Label
     Friend WithEvents Label4 As System.Windows.Forms.Label
     Friend WithEvents TextBoxAlamatSupp As System.Windows.Forms.TextBox
@@ -569,4 +546,5 @@ Partial Class FormPreOrderAlat
     Friend WithEvents TextBoxDeskripsi As System.Windows.Forms.TextBox
     Friend WithEvents Label17 As System.Windows.Forms.Label
     Friend WithEvents ButtonSubmit As System.Windows.Forms.Button
+    Friend WithEvents TextBoxBankCode As System.Windows.Forms.TextBox
 End Class
