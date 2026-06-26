@@ -1614,6 +1614,48 @@ Public Class FormPembayaran
                             Trow("TransPoliIDDetail") & "' " & _
                             "AND LPA.Status = 1 " & _
                             "AND LPA.IsVoid = 0", 4)
+
+                        Dim transDetailID As String = Trow("TransPoliIDDetail").ToString()
+                        Dim sqlSelect As String = _
+                            "SELECT MA.IdRuangan, MC.KodeCartridge, LPA.ShootDipakai " & _
+                            "FROM MasterAlat MA " & _
+                            "INNER JOIN MasterCartridge MC ON MA.AlatID = MC.AlatID " & _
+                            "INNER JOIN LogPemakaianAlat LPA ON MC.CartridgeID = LPA.CartridgeID " & _
+                            "WHERE LPA.TransaksiDetailID = '" & transDetailID & "' " & _
+                            "AND LPA.Status = 1 AND LPA.IsVoid = 0"
+
+                        Dim dtBridging As DataTable = ReadSQL(sqlSelect)
+
+                        If dtBridging IsNot Nothing AndAlso dtBridging.Rows.Count > 0 Then
+                            For Each row As DataRow In dtBridging.Rows
+                                Try
+                                    Dim dataContent As New Dictionary(Of String, Object)()
+                                    dataContent.Add("nau_date", DateTime.Now.ToString("yyyy-MM-dd"))
+                                    dataContent.Add("loc_code", "LLMR")
+                                    dataContent.Add("room_id", Convert.ToInt32(row("IdRuangan")))
+                                    dataContent.Add("item_code", row("KodeCartridge").ToString())
+                                    dataContent.Add("qty", Convert.ToInt32(row("ShootDipakai")))
+                                    dataContent.Add("satuan", "Shoot")
+                                    dataContent.Add("nau_notes", "Bridging otomatis API")
+
+                                    Dim finalPayload As New Dictionary(Of String, Object)()
+                                    finalPayload.Add("payload", dataContent)
+
+                                    Dim jsonString As String = Newtonsoft.Json.JsonConvert.SerializeObject(finalPayload)
+                                    MsgBox(jsonString)
+
+                                    Dim baseUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+                                    Dim apiUrl As String = baseUrl & "api/bridging/ext"
+
+                                    Dim apiResponse As String = InsertDataAPIRM(jsonString, apiUrl)
+                                    MsgBox("Response Server: " & apiResponse)
+
+                                Catch ex As Exception
+                                    MsgBox("Gagal mengirim data bridging: " & ex.Message, MsgBoxStyle.Critical)
+                                End Try
+                            Next
+                        End If
+
                     End If
 
                     'NewHeader.Rows.Clear()

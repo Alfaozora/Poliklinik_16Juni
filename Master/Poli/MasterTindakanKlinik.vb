@@ -2378,4 +2378,8 @@ Public Class MasterTindakanKlinik
     Private Sub ButtonGetAlatCartridge_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonGetAlatCartridge.Click
         FormPencarianAlatSarpras.ShowDialog()
     End Sub
+
+    Private Sub ComboBoxAlatTindakan_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBoxAlatTindakan.SelectedIndexChanged
+
+    End Sub
 End Class
