@@ -2,10 +2,14 @@ Version : 2.0.0.58 ()
 # [New Feature] Penambahan Qty untuk Informed Consent
 # [New Feature] Laporan ulang tahun pasien pada menu Daftar Kunjungan pasien
 # [New Feature] Penambahan Perencanaan Tindakan
+# [New Feature] Bridging dengan API Sarpras untuk alat
 # [Usability Improvement] Terintegrasi dengan SATUSEHAT untuk Poli Kecantikan
 # [Usability Improvement] Group by Tindakan + Qty pada Rekap Tagihan
 # [Usability Improvement] Meperbaiki Terbilang pada Rekap Invoice
+# [Usability Improvement] Update untuk detail alat pada master Tindakan
+# [Usability Improvement] Perbaikan laporan alat
 # [Bug Fix] Memperbaiki NominalBHP pada Rekap Fee Practitioner
+# [Bug Fix] Memperbaiki Penggunaan Voucher Diskon
 
 Version : 2.0.0.57 (08 Mei 2026)
 # [New Feature] Penambahan laporan penggunaan paket Tindakan

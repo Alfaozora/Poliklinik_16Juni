@@ -40,6 +40,98 @@ Partial Class MasterTindakanKlinik
         Me.ButtonSimpanMasterTindakan = New System.Windows.Forms.Button
         Me.ButtonClearMasterTindakan = New System.Windows.Forms.Button
         Me.ButtonExportMasterTindakan = New System.Windows.Forms.Button
+        Me.SplitContainer3 = New System.Windows.Forms.SplitContainer
+        Me.PanelMasterTindakan = New System.Windows.Forms.Panel
+        Me.DataGridViewAlatTindakan = New System.Windows.Forms.DataGridView
+        Me.GroupBox2 = New System.Windows.Forms.GroupBox
+        Me.ButtonTambahAlat = New System.Windows.Forms.Button
+        Me.ComboBoxAlatTindakan = New System.Windows.Forms.ComboBox
+        Me.Label37 = New System.Windows.Forms.Label
+        Me.ComboBoxCartridgeTindakan = New System.Windows.Forms.ComboBox
+        Me.Label36 = New System.Windows.Forms.Label
+        Me.Label41 = New System.Windows.Forms.Label
+        Me.NumericShootPerTindakan = New System.Windows.Forms.NumericUpDown
+        Me.CheckBoxPakaiAlat = New System.Windows.Forms.CheckBox
+        Me.ComboBoxKategori = New System.Windows.Forms.ComboBox
+        Me.Label34 = New System.Windows.Forms.Label
+        Me.CheckedListBoxPoli = New System.Windows.Forms.CheckedListBox
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox
+        Me.Label33 = New System.Windows.Forms.Label
+        Me.TextBoxHariReminder = New System.Windows.Forms.TextBox
+        Me.CheckBoxReminder = New System.Windows.Forms.CheckBox
+        Me.Panel5 = New System.Windows.Forms.Panel
+        Me.RadioButtonPelaksanaDokter = New System.Windows.Forms.RadioButton
+        Me.RadioButtonPelaksanaPerawat = New System.Windows.Forms.RadioButton
+        Me.CheckBoxStatusAktifTindakan = New System.Windows.Forms.CheckBox
+        Me.SplitContainerFeeTindakan = New System.Windows.Forms.SplitContainer
+        Me.Panel3 = New System.Windows.Forms.Panel
+        Me.RadioButtonAktifFee = New System.Windows.Forms.RadioButton
+        Me.RadioButtonNonAktifFee = New System.Windows.Forms.RadioButton
+        Me.Label12 = New System.Windows.Forms.Label
+        Me.TextBoxPersentaseFeePerawat = New System.Windows.Forms.TextBox
+        Me.Label42 = New System.Windows.Forms.Label
+        Me.Panel7 = New System.Windows.Forms.Panel
+        Me.TextBox10 = New System.Windows.Forms.TextBox
+        Me.TextBox11 = New System.Windows.Forms.TextBox
+        Me.TextBox13 = New System.Windows.Forms.TextBox
+        Me.Label30 = New System.Windows.Forms.Label
+        Me.RadioButton3 = New System.Windows.Forms.RadioButton
+        Me.RadioButton4 = New System.Windows.Forms.RadioButton
+        Me.Label31 = New System.Windows.Forms.Label
+        Me.Label47 = New System.Windows.Forms.Label
+        Me.Panel6 = New System.Windows.Forms.Panel
+        Me.TextBox4 = New System.Windows.Forms.TextBox
+        Me.TextBox6 = New System.Windows.Forms.TextBox
+        Me.TextBox8 = New System.Windows.Forms.TextBox
+        Me.Label29 = New System.Windows.Forms.Label
+        Me.RadioButton1 = New System.Windows.Forms.RadioButton
+        Me.RadioButton2 = New System.Windows.Forms.RadioButton
+        Me.Label28 = New System.Windows.Forms.Label
+        Me.TextBoxPersentaseFeeKaryawan = New System.Windows.Forms.TextBox
+        Me.TextBoxPersentaseFeePerusahaan = New System.Windows.Forms.TextBox
+        Me.Label27 = New System.Windows.Forms.Label
+        Me.TextBox14 = New System.Windows.Forms.TextBox
+        Me.TextBoxFeePerawatTambahan = New System.Windows.Forms.TextBox
+        Me.Label21 = New System.Windows.Forms.Label
+        Me.TextBox9 = New System.Windows.Forms.TextBox
+        Me.TextBoxFeeDokterTambahan = New System.Windows.Forms.TextBox
+        Me.Label16 = New System.Windows.Forms.Label
+        Me.TextBox2 = New System.Windows.Forms.TextBox
+        Me.TextBoxNominalFee = New System.Windows.Forms.TextBox
+        Me.Label26 = New System.Windows.Forms.Label
+        Me.Label25 = New System.Windows.Forms.Label
+        Me.Label24 = New System.Windows.Forms.Label
+        Me.Label23 = New System.Windows.Forms.Label
+        Me.Label22 = New System.Windows.Forms.Label
+        Me.Panel4 = New System.Windows.Forms.Panel
+        Me.RadioButtonOpsiPersentase = New System.Windows.Forms.RadioButton
+        Me.RadioButtonOpsiNominal = New System.Windows.Forms.RadioButton
+        Me.Label13 = New System.Windows.Forms.Label
+        Me.ComboBoxInformedConsent = New System.Windows.Forms.ComboBox
+        Me.Label11 = New System.Windows.Forms.Label
+        Me.CheckBoxInformedConsent = New System.Windows.Forms.CheckBox
+        Me.Label18 = New System.Windows.Forms.Label
+        Me.Panel2 = New System.Windows.Forms.Panel
+        Me.RadioButtonBHP = New System.Windows.Forms.RadioButton
+        Me.RadioButtonNonBHP = New System.Windows.Forms.RadioButton
+        Me.TextBoxTindakanID = New System.Windows.Forms.TextBox
+        Me.Label14 = New System.Windows.Forms.Label
+        Me.Label19 = New System.Windows.Forms.Label
+        Me.Label15 = New System.Windows.Forms.Label
+        Me.ButtonFindTindakan = New System.Windows.Forms.Button
+        Me.TextBoxNamaTindakan = New System.Windows.Forms.TextBox
+        Me.Label20 = New System.Windows.Forms.Label
+        Me.TextBoxBiayaTindakan = New System.Windows.Forms.TextBox
+        Me.ComboBoxGroupJenisTindakan = New System.Windows.Forms.ComboBox
+        Me.Label17 = New System.Windows.Forms.Label
+        Me.Label9 = New System.Windows.Forms.Label
+        Me.Panel1 = New System.Windows.Forms.Panel
+        Me.RadioButtonPoliUmum = New System.Windows.Forms.RadioButton
+        Me.RadioButtonPoliGigi = New System.Windows.Forms.RadioButton
+        Me.TextBox7 = New System.Windows.Forms.TextBox
+        Me.TextBox5 = New System.Windows.Forms.TextBox
+        Me.TextBoxMaksimalBHP_Tindakan = New System.Windows.Forms.TextBox
+        Me.Label10 = New System.Windows.Forms.Label
         Me.TabPageMasterPaket = New System.Windows.Forms.TabPage
         Me.SplitContainerPendaftaran = New System.Windows.Forms.SplitContainer
         Me.FlowLayoutPanel4 = New System.Windows.Forms.FlowLayoutPanel
@@ -146,98 +238,6 @@ Partial Class MasterTindakanKlinik
         Me.Button4 = New System.Windows.Forms.Button
         Me.NavBarItem3 = New DevExpress.XtraNavBar.NavBarItem
         Me.NavBarItem4 = New DevExpress.XtraNavBar.NavBarItem
-        Me.PanelMasterTindakan = New System.Windows.Forms.Panel
-        Me.Label10 = New System.Windows.Forms.Label
-        Me.TextBoxMaksimalBHP_Tindakan = New System.Windows.Forms.TextBox
-        Me.TextBox5 = New System.Windows.Forms.TextBox
-        Me.TextBox7 = New System.Windows.Forms.TextBox
-        Me.Panel1 = New System.Windows.Forms.Panel
-        Me.RadioButtonPoliGigi = New System.Windows.Forms.RadioButton
-        Me.RadioButtonPoliUmum = New System.Windows.Forms.RadioButton
-        Me.Label9 = New System.Windows.Forms.Label
-        Me.Label17 = New System.Windows.Forms.Label
-        Me.ComboBoxGroupJenisTindakan = New System.Windows.Forms.ComboBox
-        Me.TextBoxBiayaTindakan = New System.Windows.Forms.TextBox
-        Me.Label20 = New System.Windows.Forms.Label
-        Me.TextBoxNamaTindakan = New System.Windows.Forms.TextBox
-        Me.ButtonFindTindakan = New System.Windows.Forms.Button
-        Me.Label15 = New System.Windows.Forms.Label
-        Me.Label19 = New System.Windows.Forms.Label
-        Me.Label14 = New System.Windows.Forms.Label
-        Me.TextBoxTindakanID = New System.Windows.Forms.TextBox
-        Me.Panel2 = New System.Windows.Forms.Panel
-        Me.RadioButtonNonBHP = New System.Windows.Forms.RadioButton
-        Me.RadioButtonBHP = New System.Windows.Forms.RadioButton
-        Me.Label18 = New System.Windows.Forms.Label
-        Me.CheckBoxInformedConsent = New System.Windows.Forms.CheckBox
-        Me.Label11 = New System.Windows.Forms.Label
-        Me.ComboBoxInformedConsent = New System.Windows.Forms.ComboBox
-        Me.SplitContainerFeeTindakan = New System.Windows.Forms.SplitContainer
-        Me.Label13 = New System.Windows.Forms.Label
-        Me.Panel4 = New System.Windows.Forms.Panel
-        Me.RadioButtonOpsiNominal = New System.Windows.Forms.RadioButton
-        Me.RadioButtonOpsiPersentase = New System.Windows.Forms.RadioButton
-        Me.Label22 = New System.Windows.Forms.Label
-        Me.Label23 = New System.Windows.Forms.Label
-        Me.Label24 = New System.Windows.Forms.Label
-        Me.Label25 = New System.Windows.Forms.Label
-        Me.Label26 = New System.Windows.Forms.Label
-        Me.TextBoxNominalFee = New System.Windows.Forms.TextBox
-        Me.TextBox2 = New System.Windows.Forms.TextBox
-        Me.Label16 = New System.Windows.Forms.Label
-        Me.TextBoxFeeDokterTambahan = New System.Windows.Forms.TextBox
-        Me.TextBox9 = New System.Windows.Forms.TextBox
-        Me.Label21 = New System.Windows.Forms.Label
-        Me.TextBoxFeePerawatTambahan = New System.Windows.Forms.TextBox
-        Me.TextBox14 = New System.Windows.Forms.TextBox
-        Me.Label27 = New System.Windows.Forms.Label
-        Me.TextBoxPersentaseFeePerusahaan = New System.Windows.Forms.TextBox
-        Me.TextBoxPersentaseFeeKaryawan = New System.Windows.Forms.TextBox
-        Me.Label28 = New System.Windows.Forms.Label
-        Me.Panel6 = New System.Windows.Forms.Panel
-        Me.RadioButton2 = New System.Windows.Forms.RadioButton
-        Me.RadioButton1 = New System.Windows.Forms.RadioButton
-        Me.Label29 = New System.Windows.Forms.Label
-        Me.TextBox8 = New System.Windows.Forms.TextBox
-        Me.TextBox6 = New System.Windows.Forms.TextBox
-        Me.TextBox4 = New System.Windows.Forms.TextBox
-        Me.Label47 = New System.Windows.Forms.Label
-        Me.Label31 = New System.Windows.Forms.Label
-        Me.Panel7 = New System.Windows.Forms.Panel
-        Me.RadioButton4 = New System.Windows.Forms.RadioButton
-        Me.RadioButton3 = New System.Windows.Forms.RadioButton
-        Me.Label30 = New System.Windows.Forms.Label
-        Me.TextBox13 = New System.Windows.Forms.TextBox
-        Me.TextBox11 = New System.Windows.Forms.TextBox
-        Me.TextBox10 = New System.Windows.Forms.TextBox
-        Me.Label42 = New System.Windows.Forms.Label
-        Me.TextBoxPersentaseFeePerawat = New System.Windows.Forms.TextBox
-        Me.Label12 = New System.Windows.Forms.Label
-        Me.Panel3 = New System.Windows.Forms.Panel
-        Me.RadioButtonNonAktifFee = New System.Windows.Forms.RadioButton
-        Me.RadioButtonAktifFee = New System.Windows.Forms.RadioButton
-        Me.CheckBoxStatusAktifTindakan = New System.Windows.Forms.CheckBox
-        Me.Panel5 = New System.Windows.Forms.Panel
-        Me.RadioButtonPelaksanaPerawat = New System.Windows.Forms.RadioButton
-        Me.RadioButtonPelaksanaDokter = New System.Windows.Forms.RadioButton
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox
-        Me.CheckBoxReminder = New System.Windows.Forms.CheckBox
-        Me.TextBoxHariReminder = New System.Windows.Forms.TextBox
-        Me.Label33 = New System.Windows.Forms.Label
-        Me.CheckedListBoxPoli = New System.Windows.Forms.CheckedListBox
-        Me.Label34 = New System.Windows.Forms.Label
-        Me.ComboBoxKategori = New System.Windows.Forms.ComboBox
-        Me.GroupBox2 = New System.Windows.Forms.GroupBox
-        Me.CheckBoxPakaiAlat = New System.Windows.Forms.CheckBox
-        Me.NumericShootPerTindakan = New System.Windows.Forms.NumericUpDown
-        Me.Label41 = New System.Windows.Forms.Label
-        Me.Label36 = New System.Windows.Forms.Label
-        Me.ComboBoxCartridgeTindakan = New System.Windows.Forms.ComboBox
-        Me.Label37 = New System.Windows.Forms.Label
-        Me.ComboBoxAlatTindakan = New System.Windows.Forms.ComboBox
-        Me.ButtonTambahAlat = New System.Windows.Forms.Button
-        Me.DataGridViewAlatTindakan = New System.Windows.Forms.DataGridView
-        Me.SplitContainer3 = New System.Windows.Forms.SplitContainer
         Me.PanelTop.SuspendLayout()
         Me.PanelMasterTindakanKlinik.SuspendLayout()
         Me.SplitContainer1.Panel1.SuspendLayout()
@@ -250,6 +250,23 @@ Partial Class MasterTindakanKlinik
         Me.SplitContainer2.Panel2.SuspendLayout()
         Me.SplitContainer2.SuspendLayout()
         Me.FlowLayoutPanel1.SuspendLayout()
+        Me.SplitContainer3.Panel1.SuspendLayout()
+        Me.SplitContainer3.SuspendLayout()
+        Me.PanelMasterTindakan.SuspendLayout()
+        CType(Me.DataGridViewAlatTindakan, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox2.SuspendLayout()
+        CType(Me.NumericShootPerTindakan, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox1.SuspendLayout()
+        Me.Panel5.SuspendLayout()
+        Me.SplitContainerFeeTindakan.Panel1.SuspendLayout()
+        Me.SplitContainerFeeTindakan.Panel2.SuspendLayout()
+        Me.SplitContainerFeeTindakan.SuspendLayout()
+        Me.Panel3.SuspendLayout()
+        Me.Panel7.SuspendLayout()
+        Me.Panel6.SuspendLayout()
+        Me.Panel4.SuspendLayout()
+        Me.Panel2.SuspendLayout()
+        Me.Panel1.SuspendLayout()
         Me.TabPageMasterPaket.SuspendLayout()
         Me.SplitContainerPendaftaran.Panel1.SuspendLayout()
         Me.SplitContainerPendaftaran.Panel2.SuspendLayout()
@@ -273,23 +290,6 @@ Partial Class MasterTindakanKlinik
         Me.TabPage2.SuspendLayout()
         CType(Me.DataGridViewAlat, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.Panel9.SuspendLayout()
-        Me.PanelMasterTindakan.SuspendLayout()
-        Me.Panel1.SuspendLayout()
-        Me.Panel2.SuspendLayout()
-        Me.SplitContainerFeeTindakan.Panel1.SuspendLayout()
-        Me.SplitContainerFeeTindakan.Panel2.SuspendLayout()
-        Me.SplitContainerFeeTindakan.SuspendLayout()
-        Me.Panel4.SuspendLayout()
-        Me.Panel6.SuspendLayout()
-        Me.Panel7.SuspendLayout()
-        Me.Panel3.SuspendLayout()
-        Me.Panel5.SuspendLayout()
-        Me.GroupBox1.SuspendLayout()
-        Me.GroupBox2.SuspendLayout()
-        CType(Me.NumericShootPerTindakan, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.DataGridViewAlatTindakan, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.SplitContainer3.Panel1.SuspendLayout()
-        Me.SplitContainer3.SuspendLayout()
         Me.SuspendLayout()
         '
         'PanelTop
@@ -541,6 +541,1100 @@ Partial Class MasterTindakanKlinik
         Me.ButtonExportMasterTindakan.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         Me.ButtonExportMasterTindakan.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
         Me.ButtonExportMasterTindakan.UseVisualStyleBackColor = False
+        '
+        'SplitContainer3
+        '
+        Me.SplitContainer3.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.SplitContainer3.FixedPanel = System.Windows.Forms.FixedPanel.Panel1
+        Me.SplitContainer3.IsSplitterFixed = True
+        Me.SplitContainer3.Location = New System.Drawing.Point(0, 0)
+        Me.SplitContainer3.Name = "SplitContainer3"
+        Me.SplitContainer3.Orientation = System.Windows.Forms.Orientation.Horizontal
+        '
+        'SplitContainer3.Panel1
+        '
+        Me.SplitContainer3.Panel1.AutoScroll = True
+        Me.SplitContainer3.Panel1.BackColor = System.Drawing.Color.White
+        Me.SplitContainer3.Panel1.Controls.Add(Me.PanelMasterTindakan)
+        '
+        'SplitContainer3.Panel2
+        '
+        Me.SplitContainer3.Panel2.AutoScroll = True
+        Me.SplitContainer3.Size = New System.Drawing.Size(757, 581)
+        Me.SplitContainer3.SplitterDistance = 552
+        Me.SplitContainer3.SplitterWidth = 1
+        Me.SplitContainer3.TabIndex = 462
+        '
+        'PanelMasterTindakan
+        '
+        Me.PanelMasterTindakan.AutoScroll = True
+        Me.PanelMasterTindakan.Controls.Add(Me.DataGridViewAlatTindakan)
+        Me.PanelMasterTindakan.Controls.Add(Me.GroupBox2)
+        Me.PanelMasterTindakan.Controls.Add(Me.ComboBoxKategori)
+        Me.PanelMasterTindakan.Controls.Add(Me.Label34)
+        Me.PanelMasterTindakan.Controls.Add(Me.CheckedListBoxPoli)
+        Me.PanelMasterTindakan.Controls.Add(Me.GroupBox1)
+        Me.PanelMasterTindakan.Controls.Add(Me.Panel5)
+        Me.PanelMasterTindakan.Controls.Add(Me.CheckBoxStatusAktifTindakan)
+        Me.PanelMasterTindakan.Controls.Add(Me.SplitContainerFeeTindakan)
+        Me.PanelMasterTindakan.Controls.Add(Me.ComboBoxInformedConsent)
+        Me.PanelMasterTindakan.Controls.Add(Me.Label11)
+        Me.PanelMasterTindakan.Controls.Add(Me.CheckBoxInformedConsent)
+        Me.PanelMasterTindakan.Controls.Add(Me.Label18)
+        Me.PanelMasterTindakan.Controls.Add(Me.Panel2)
+        Me.PanelMasterTindakan.Controls.Add(Me.TextBoxTindakanID)
+        Me.PanelMasterTindakan.Controls.Add(Me.Label14)
+        Me.PanelMasterTindakan.Controls.Add(Me.Label19)
+        Me.PanelMasterTindakan.Controls.Add(Me.Label15)
+        Me.PanelMasterTindakan.Controls.Add(Me.ButtonFindTindakan)
+        Me.PanelMasterTindakan.Controls.Add(Me.TextBoxNamaTindakan)
+        Me.PanelMasterTindakan.Controls.Add(Me.Label20)
+        Me.PanelMasterTindakan.Controls.Add(Me.TextBoxBiayaTindakan)
+        Me.PanelMasterTindakan.Controls.Add(Me.ComboBoxGroupJenisTindakan)
+        Me.PanelMasterTindakan.Controls.Add(Me.Label17)
+        Me.PanelMasterTindakan.Controls.Add(Me.Label9)
+        Me.PanelMasterTindakan.Controls.Add(Me.Panel1)
+        Me.PanelMasterTindakan.Controls.Add(Me.TextBox7)
+        Me.PanelMasterTindakan.Controls.Add(Me.TextBox5)
+        Me.PanelMasterTindakan.Controls.Add(Me.TextBoxMaksimalBHP_Tindakan)
+        Me.PanelMasterTindakan.Controls.Add(Me.Label10)
+        Me.PanelMasterTindakan.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.PanelMasterTindakan.Location = New System.Drawing.Point(0, 0)
+        Me.PanelMasterTindakan.Name = "PanelMasterTindakan"
+        Me.PanelMasterTindakan.Size = New System.Drawing.Size(757, 552)
+        Me.PanelMasterTindakan.TabIndex = 563
+        '
+        'DataGridViewAlatTindakan
+        '
+        Me.DataGridViewAlatTindakan.AllowUserToAddRows = False
+        Me.DataGridViewAlatTindakan.AllowUserToDeleteRows = False
+        Me.DataGridViewAlatTindakan.BackgroundColor = System.Drawing.Color.White
+        Me.DataGridViewAlatTindakan.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.DataGridViewAlatTindakan.Location = New System.Drawing.Point(808, 301)
+        Me.DataGridViewAlatTindakan.Name = "DataGridViewAlatTindakan"
+        Me.DataGridViewAlatTindakan.ReadOnly = True
+        Me.DataGridViewAlatTindakan.Size = New System.Drawing.Size(428, 130)
+        Me.DataGridViewAlatTindakan.TabIndex = 579
+        '
+        'GroupBox2
+        '
+        Me.GroupBox2.Controls.Add(Me.ButtonTambahAlat)
+        Me.GroupBox2.Controls.Add(Me.ComboBoxAlatTindakan)
+        Me.GroupBox2.Controls.Add(Me.Label37)
+        Me.GroupBox2.Controls.Add(Me.ComboBoxCartridgeTindakan)
+        Me.GroupBox2.Controls.Add(Me.Label36)
+        Me.GroupBox2.Controls.Add(Me.Label41)
+        Me.GroupBox2.Controls.Add(Me.NumericShootPerTindakan)
+        Me.GroupBox2.Controls.Add(Me.CheckBoxPakaiAlat)
+        Me.GroupBox2.Location = New System.Drawing.Point(629, 293)
+        Me.GroupBox2.Name = "GroupBox2"
+        Me.GroupBox2.Size = New System.Drawing.Size(174, 215)
+        Me.GroupBox2.TabIndex = 578
+        Me.GroupBox2.TabStop = False
+        Me.GroupBox2.Text = "Pakai Alat ?"
+        '
+        'ButtonTambahAlat
+        '
+        Me.ButtonTambahAlat.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonTambahAlat.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+        Me.ButtonTambahAlat.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonTambahAlat.FlatAppearance.BorderSize = 0
+        Me.ButtonTambahAlat.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonTambahAlat.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.ButtonTambahAlat.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonTambahAlat.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.ButtonTambahAlat.ForeColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(254, Byte), Integer))
+        Me.ButtonTambahAlat.Location = New System.Drawing.Point(92, 180)
+        Me.ButtonTambahAlat.Name = "ButtonTambahAlat"
+        Me.ButtonTambahAlat.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.ButtonTambahAlat.Size = New System.Drawing.Size(73, 25)
+        Me.ButtonTambahAlat.TabIndex = 587
+        Me.ButtonTambahAlat.Text = " + Tambah"
+        Me.ButtonTambahAlat.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.ButtonTambahAlat.UseVisualStyleBackColor = False
+        '
+        'ComboBoxAlatTindakan
+        '
+        Me.ComboBoxAlatTindakan.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBoxAlatTindakan.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ComboBoxAlatTindakan.FormattingEnabled = True
+        Me.ComboBoxAlatTindakan.Location = New System.Drawing.Point(11, 66)
+        Me.ComboBoxAlatTindakan.Name = "ComboBoxAlatTindakan"
+        Me.ComboBoxAlatTindakan.Size = New System.Drawing.Size(154, 25)
+        Me.ComboBoxAlatTindakan.TabIndex = 586
+        '
+        'Label37
+        '
+        Me.Label37.AutoSize = True
+        Me.Label37.Location = New System.Drawing.Point(7, 47)
+        Me.Label37.Name = "Label37"
+        Me.Label37.Size = New System.Drawing.Size(28, 15)
+        Me.Label37.TabIndex = 585
+        Me.Label37.Text = "Alat"
+        '
+        'ComboBoxCartridgeTindakan
+        '
+        Me.ComboBoxCartridgeTindakan.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBoxCartridgeTindakan.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ComboBoxCartridgeTindakan.FormattingEnabled = True
+        Me.ComboBoxCartridgeTindakan.Location = New System.Drawing.Point(12, 115)
+        Me.ComboBoxCartridgeTindakan.Name = "ComboBoxCartridgeTindakan"
+        Me.ComboBoxCartridgeTindakan.Size = New System.Drawing.Size(154, 25)
+        Me.ComboBoxCartridgeTindakan.TabIndex = 584
+        '
+        'Label36
+        '
+        Me.Label36.AutoSize = True
+        Me.Label36.Location = New System.Drawing.Point(8, 96)
+        Me.Label36.Name = "Label36"
+        Me.Label36.Size = New System.Drawing.Size(56, 15)
+        Me.Label36.TabIndex = 583
+        Me.Label36.Text = "Cartridge"
+        '
+        'Label41
+        '
+        Me.Label41.AutoSize = True
+        Me.Label41.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label41.Location = New System.Drawing.Point(76, 154)
+        Me.Label41.Name = "Label41"
+        Me.Label41.Size = New System.Drawing.Size(78, 17)
+        Me.Label41.TabIndex = 582
+        Me.Label41.Text = "Shoot / Kali"
+        '
+        'NumericShootPerTindakan
+        '
+        Me.NumericShootPerTindakan.Location = New System.Drawing.Point(12, 152)
+        Me.NumericShootPerTindakan.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
+        Me.NumericShootPerTindakan.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
+        Me.NumericShootPerTindakan.Name = "NumericShootPerTindakan"
+        Me.NumericShootPerTindakan.Size = New System.Drawing.Size(58, 23)
+        Me.NumericShootPerTindakan.TabIndex = 580
+        Me.NumericShootPerTindakan.ThousandsSeparator = True
+        Me.NumericShootPerTindakan.Value = New Decimal(New Integer() {1, 0, 0, 0})
+        '
+        'CheckBoxPakaiAlat
+        '
+        Me.CheckBoxPakaiAlat.AutoSize = True
+        Me.CheckBoxPakaiAlat.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.CheckBoxPakaiAlat.Location = New System.Drawing.Point(10, 22)
+        Me.CheckBoxPakaiAlat.Name = "CheckBoxPakaiAlat"
+        Me.CheckBoxPakaiAlat.Size = New System.Drawing.Size(42, 19)
+        Me.CheckBoxPakaiAlat.TabIndex = 577
+        Me.CheckBoxPakaiAlat.Text = "Iya"
+        Me.CheckBoxPakaiAlat.UseVisualStyleBackColor = True
+        '
+        'ComboBoxKategori
+        '
+        Me.ComboBoxKategori.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ComboBoxKategori.FormattingEnabled = True
+        Me.ComboBoxKategori.Items.AddRange(New Object() {"Face", "Hair", "Body", "IV"})
+        Me.ComboBoxKategori.Location = New System.Drawing.Point(629, 259)
+        Me.ComboBoxKategori.Name = "ComboBoxKategori"
+        Me.ComboBoxKategori.Size = New System.Drawing.Size(174, 25)
+        Me.ComboBoxKategori.TabIndex = 576
+        '
+        'Label34
+        '
+        Me.Label34.AutoSize = True
+        Me.Label34.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label34.Location = New System.Drawing.Point(626, 238)
+        Me.Label34.Name = "Label34"
+        Me.Label34.Size = New System.Drawing.Size(118, 17)
+        Me.Label34.TabIndex = 575
+        Me.Label34.Text = "Kategori Tindakan"
+        '
+        'CheckedListBoxPoli
+        '
+        Me.CheckedListBoxPoli.FormattingEnabled = True
+        Me.CheckedListBoxPoli.Location = New System.Drawing.Point(629, 139)
+        Me.CheckedListBoxPoli.Name = "CheckedListBoxPoli"
+        Me.CheckedListBoxPoli.ScrollAlwaysVisible = True
+        Me.CheckedListBoxPoli.Size = New System.Drawing.Size(174, 94)
+        Me.CheckedListBoxPoli.TabIndex = 574
+        '
+        'GroupBox1
+        '
+        Me.GroupBox1.Controls.Add(Me.Label33)
+        Me.GroupBox1.Controls.Add(Me.TextBoxHariReminder)
+        Me.GroupBox1.Controls.Add(Me.CheckBoxReminder)
+        Me.GroupBox1.Location = New System.Drawing.Point(629, 17)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(174, 116)
+        Me.GroupBox1.TabIndex = 573
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "Reminder Pasien ?"
+        '
+        'Label33
+        '
+        Me.Label33.AutoSize = True
+        Me.Label33.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label33.Location = New System.Drawing.Point(15, 51)
+        Me.Label33.Name = "Label33"
+        Me.Label33.Size = New System.Drawing.Size(85, 17)
+        Me.Label33.TabIndex = 574
+        Me.Label33.Text = "Berapa Hari?"
+        '
+        'TextBoxHariReminder
+        '
+        Me.TextBoxHariReminder.BackColor = System.Drawing.Color.White
+        Me.TextBoxHariReminder.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxHariReminder.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
+        Me.TextBoxHariReminder.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxHariReminder.Location = New System.Drawing.Point(18, 71)
+        Me.TextBoxHariReminder.Name = "TextBoxHariReminder"
+        Me.TextBoxHariReminder.Size = New System.Drawing.Size(109, 23)
+        Me.TextBoxHariReminder.TabIndex = 573
+        '
+        'CheckBoxReminder
+        '
+        Me.CheckBoxReminder.AutoSize = True
+        Me.CheckBoxReminder.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.CheckBoxReminder.Location = New System.Drawing.Point(18, 22)
+        Me.CheckBoxReminder.Name = "CheckBoxReminder"
+        Me.CheckBoxReminder.Size = New System.Drawing.Size(42, 19)
+        Me.CheckBoxReminder.TabIndex = 572
+        Me.CheckBoxReminder.Text = "Iya"
+        Me.CheckBoxReminder.UseVisualStyleBackColor = True
+        '
+        'Panel5
+        '
+        Me.Panel5.BackColor = System.Drawing.Color.Transparent
+        Me.Panel5.Controls.Add(Me.RadioButtonPelaksanaDokter)
+        Me.Panel5.Controls.Add(Me.RadioButtonPelaksanaPerawat)
+        Me.Panel5.Location = New System.Drawing.Point(195, 168)
+        Me.Panel5.Name = "Panel5"
+        Me.Panel5.Size = New System.Drawing.Size(327, 25)
+        Me.Panel5.TabIndex = 571
+        '
+        'RadioButtonPelaksanaDokter
+        '
+        Me.RadioButtonPelaksanaDokter.AutoSize = True
+        Me.RadioButtonPelaksanaDokter.Checked = True
+        Me.RadioButtonPelaksanaDokter.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.RadioButtonPelaksanaDokter.Location = New System.Drawing.Point(5, 3)
+        Me.RadioButtonPelaksanaDokter.Name = "RadioButtonPelaksanaDokter"
+        Me.RadioButtonPelaksanaDokter.Size = New System.Drawing.Size(60, 19)
+        Me.RadioButtonPelaksanaDokter.TabIndex = 245
+        Me.RadioButtonPelaksanaDokter.TabStop = True
+        Me.RadioButtonPelaksanaDokter.Text = "Dokter"
+        Me.RadioButtonPelaksanaDokter.UseVisualStyleBackColor = True
+        '
+        'RadioButtonPelaksanaPerawat
+        '
+        Me.RadioButtonPelaksanaPerawat.AutoSize = True
+        Me.RadioButtonPelaksanaPerawat.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.RadioButtonPelaksanaPerawat.Location = New System.Drawing.Point(71, 3)
+        Me.RadioButtonPelaksanaPerawat.Name = "RadioButtonPelaksanaPerawat"
+        Me.RadioButtonPelaksanaPerawat.Size = New System.Drawing.Size(67, 19)
+        Me.RadioButtonPelaksanaPerawat.TabIndex = 246
+        Me.RadioButtonPelaksanaPerawat.Text = "Perawat"
+        Me.RadioButtonPelaksanaPerawat.UseVisualStyleBackColor = True
+        '
+        'CheckBoxStatusAktifTindakan
+        '
+        Me.CheckBoxStatusAktifTindakan.AutoSize = True
+        Me.CheckBoxStatusAktifTindakan.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.CheckBoxStatusAktifTindakan.Location = New System.Drawing.Point(351, 51)
+        Me.CheckBoxStatusAktifTindakan.Name = "CheckBoxStatusAktifTindakan"
+        Me.CheckBoxStatusAktifTindakan.Size = New System.Drawing.Size(51, 19)
+        Me.CheckBoxStatusAktifTindakan.TabIndex = 570
+        Me.CheckBoxStatusAktifTindakan.Text = "Aktif"
+        Me.CheckBoxStatusAktifTindakan.UseVisualStyleBackColor = True
+        '
+        'SplitContainerFeeTindakan
+        '
+        Me.SplitContainerFeeTindakan.FixedPanel = System.Windows.Forms.FixedPanel.Panel1
+        Me.SplitContainerFeeTindakan.Location = New System.Drawing.Point(12, 290)
+        Me.SplitContainerFeeTindakan.Name = "SplitContainerFeeTindakan"
+        Me.SplitContainerFeeTindakan.Orientation = System.Windows.Forms.Orientation.Horizontal
+        '
+        'SplitContainerFeeTindakan.Panel1
+        '
+        Me.SplitContainerFeeTindakan.Panel1.Controls.Add(Me.Panel3)
+        Me.SplitContainerFeeTindakan.Panel1.Controls.Add(Me.Label12)
+        '
+        'SplitContainerFeeTindakan.Panel2
+        '
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.TextBoxPersentaseFeePerawat)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label42)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Panel7)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label31)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label47)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Panel6)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label28)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.TextBoxPersentaseFeeKaryawan)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.TextBoxPersentaseFeePerusahaan)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label27)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.TextBox14)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.TextBoxFeePerawatTambahan)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label21)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.TextBox9)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.TextBoxFeeDokterTambahan)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label16)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.TextBox2)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.TextBoxNominalFee)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label26)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label25)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label24)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label23)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label22)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Panel4)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label13)
+        Me.SplitContainerFeeTindakan.Size = New System.Drawing.Size(604, 320)
+        Me.SplitContainerFeeTindakan.SplitterDistance = 31
+        Me.SplitContainerFeeTindakan.SplitterWidth = 1
+        Me.SplitContainerFeeTindakan.TabIndex = 567
+        '
+        'Panel3
+        '
+        Me.Panel3.BackColor = System.Drawing.Color.Transparent
+        Me.Panel3.Controls.Add(Me.RadioButtonAktifFee)
+        Me.Panel3.Controls.Add(Me.RadioButtonNonAktifFee)
+        Me.Panel3.Location = New System.Drawing.Point(183, 3)
+        Me.Panel3.Name = "Panel3"
+        Me.Panel3.Size = New System.Drawing.Size(327, 25)
+        Me.Panel3.TabIndex = 564
+        '
+        'RadioButtonAktifFee
+        '
+        Me.RadioButtonAktifFee.AutoSize = True
+        Me.RadioButtonAktifFee.Checked = True
+        Me.RadioButtonAktifFee.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.RadioButtonAktifFee.Location = New System.Drawing.Point(5, 3)
+        Me.RadioButtonAktifFee.Name = "RadioButtonAktifFee"
+        Me.RadioButtonAktifFee.Size = New System.Drawing.Size(37, 19)
+        Me.RadioButtonAktifFee.TabIndex = 245
+        Me.RadioButtonAktifFee.TabStop = True
+        Me.RadioButtonAktifFee.Text = "Ya"
+        Me.RadioButtonAktifFee.UseVisualStyleBackColor = True
+        '
+        'RadioButtonNonAktifFee
+        '
+        Me.RadioButtonNonAktifFee.AutoSize = True
+        Me.RadioButtonNonAktifFee.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.RadioButtonNonAktifFee.Location = New System.Drawing.Point(48, 3)
+        Me.RadioButtonNonAktifFee.Name = "RadioButtonNonAktifFee"
+        Me.RadioButtonNonAktifFee.Size = New System.Drawing.Size(54, 19)
+        Me.RadioButtonNonAktifFee.TabIndex = 246
+        Me.RadioButtonNonAktifFee.Text = "Tidak"
+        Me.RadioButtonNonAktifFee.UseVisualStyleBackColor = True
+        '
+        'Label12
+        '
+        Me.Label12.AutoSize = True
+        Me.Label12.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label12.Location = New System.Drawing.Point(16, 6)
+        Me.Label12.Name = "Label12"
+        Me.Label12.Size = New System.Drawing.Size(148, 17)
+        Me.Label12.TabIndex = 563
+        Me.Label12.Text = "Aktifkan Fee Tindakan?"
+        '
+        'TextBoxPersentaseFeePerawat
+        '
+        Me.TextBoxPersentaseFeePerawat.BackColor = System.Drawing.Color.White
+        Me.TextBoxPersentaseFeePerawat.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxPersentaseFeePerawat.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxPersentaseFeePerawat.Location = New System.Drawing.Point(525, 34)
+        Me.TextBoxPersentaseFeePerawat.Name = "TextBoxPersentaseFeePerawat"
+        Me.TextBoxPersentaseFeePerawat.Size = New System.Drawing.Size(50, 23)
+        Me.TextBoxPersentaseFeePerawat.TabIndex = 594
+        '
+        'Label42
+        '
+        Me.Label42.AutoSize = True
+        Me.Label42.BackColor = System.Drawing.Color.Transparent
+        Me.Label42.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.Label42.Location = New System.Drawing.Point(581, 37)
+        Me.Label42.Name = "Label42"
+        Me.Label42.Size = New System.Drawing.Size(17, 15)
+        Me.Label42.TabIndex = 593
+        Me.Label42.Text = "%"
+        '
+        'Panel7
+        '
+        Me.Panel7.BackColor = System.Drawing.Color.Transparent
+        Me.Panel7.Controls.Add(Me.TextBox10)
+        Me.Panel7.Controls.Add(Me.TextBox11)
+        Me.Panel7.Controls.Add(Me.TextBox13)
+        Me.Panel7.Controls.Add(Me.Label30)
+        Me.Panel7.Controls.Add(Me.RadioButton3)
+        Me.Panel7.Controls.Add(Me.RadioButton4)
+        Me.Panel7.Location = New System.Drawing.Point(183, 216)
+        Me.Panel7.Name = "Panel7"
+        Me.Panel7.Size = New System.Drawing.Size(327, 60)
+        Me.Panel7.TabIndex = 591
+        Me.Panel7.Visible = False
+        '
+        'TextBox10
+        '
+        Me.TextBox10.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
+        Me.TextBox10.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBox10.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.TextBox10.Location = New System.Drawing.Point(92, 32)
+        Me.TextBox10.Name = "TextBox10"
+        Me.TextBox10.Size = New System.Drawing.Size(35, 23)
+        Me.TextBox10.TabIndex = 591
+        Me.TextBox10.Text = "Rp"
+        Me.TextBox10.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'TextBox11
+        '
+        Me.TextBox11.BackColor = System.Drawing.Color.White
+        Me.TextBox11.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBox11.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBox11.Location = New System.Drawing.Point(129, 32)
+        Me.TextBox11.Name = "TextBox11"
+        Me.TextBox11.Size = New System.Drawing.Size(129, 23)
+        Me.TextBox11.TabIndex = 590
+        '
+        'TextBox13
+        '
+        Me.TextBox13.BackColor = System.Drawing.Color.White
+        Me.TextBox13.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBox13.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBox13.Location = New System.Drawing.Point(92, 3)
+        Me.TextBox13.Name = "TextBox13"
+        Me.TextBox13.Size = New System.Drawing.Size(35, 23)
+        Me.TextBox13.TabIndex = 593
+        Me.TextBox13.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'Label30
+        '
+        Me.Label30.AutoSize = True
+        Me.Label30.BackColor = System.Drawing.Color.Transparent
+        Me.Label30.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.Label30.Location = New System.Drawing.Point(133, 5)
+        Me.Label30.Name = "Label30"
+        Me.Label30.Size = New System.Drawing.Size(17, 15)
+        Me.Label30.TabIndex = 592
+        Me.Label30.Text = "%"
+        '
+        'RadioButton3
+        '
+        Me.RadioButton3.AutoSize = True
+        Me.RadioButton3.Checked = True
+        Me.RadioButton3.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.RadioButton3.Location = New System.Drawing.Point(5, 3)
+        Me.RadioButton3.Name = "RadioButton3"
+        Me.RadioButton3.Size = New System.Drawing.Size(81, 19)
+        Me.RadioButton3.TabIndex = 245
+        Me.RadioButton3.TabStop = True
+        Me.RadioButton3.Text = "Persentase"
+        Me.RadioButton3.UseVisualStyleBackColor = True
+        '
+        'RadioButton4
+        '
+        Me.RadioButton4.AutoSize = True
+        Me.RadioButton4.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.RadioButton4.Location = New System.Drawing.Point(5, 28)
+        Me.RadioButton4.Name = "RadioButton4"
+        Me.RadioButton4.Size = New System.Drawing.Size(71, 19)
+        Me.RadioButton4.TabIndex = 246
+        Me.RadioButton4.Text = "Nominal"
+        Me.RadioButton4.UseVisualStyleBackColor = True
+        '
+        'Label31
+        '
+        Me.Label31.AutoSize = True
+        Me.Label31.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label31.Location = New System.Drawing.Point(17, 219)
+        Me.Label31.Name = "Label31"
+        Me.Label31.Size = New System.Drawing.Size(82, 17)
+        Me.Label31.TabIndex = 590
+        Me.Label31.Text = "Fee Perawat"
+        Me.Label31.Visible = False
+        '
+        'Label47
+        '
+        Me.Label47.AutoSize = True
+        Me.Label47.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.Label47.Location = New System.Drawing.Point(472, 37)
+        Me.Label47.Name = "Label47"
+        Me.Label47.Size = New System.Drawing.Size(49, 15)
+        Me.Label47.TabIndex = 592
+        Me.Label47.Text = "Perawat"
+        '
+        'Panel6
+        '
+        Me.Panel6.BackColor = System.Drawing.Color.Transparent
+        Me.Panel6.Controls.Add(Me.TextBox4)
+        Me.Panel6.Controls.Add(Me.TextBox6)
+        Me.Panel6.Controls.Add(Me.TextBox8)
+        Me.Panel6.Controls.Add(Me.Label29)
+        Me.Panel6.Controls.Add(Me.RadioButton1)
+        Me.Panel6.Controls.Add(Me.RadioButton2)
+        Me.Panel6.Location = New System.Drawing.Point(183, 150)
+        Me.Panel6.Name = "Panel6"
+        Me.Panel6.Size = New System.Drawing.Size(327, 60)
+        Me.Panel6.TabIndex = 589
+        Me.Panel6.Visible = False
+        '
+        'TextBox4
+        '
+        Me.TextBox4.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
+        Me.TextBox4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBox4.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.TextBox4.Location = New System.Drawing.Point(92, 32)
+        Me.TextBox4.Name = "TextBox4"
+        Me.TextBox4.Size = New System.Drawing.Size(35, 23)
+        Me.TextBox4.TabIndex = 591
+        Me.TextBox4.Text = "Rp"
+        Me.TextBox4.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'TextBox6
+        '
+        Me.TextBox6.BackColor = System.Drawing.Color.White
+        Me.TextBox6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBox6.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBox6.Location = New System.Drawing.Point(129, 32)
+        Me.TextBox6.Name = "TextBox6"
+        Me.TextBox6.Size = New System.Drawing.Size(129, 23)
+        Me.TextBox6.TabIndex = 590
+        '
+        'TextBox8
+        '
+        Me.TextBox8.BackColor = System.Drawing.Color.White
+        Me.TextBox8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBox8.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBox8.Location = New System.Drawing.Point(92, 3)
+        Me.TextBox8.Name = "TextBox8"
+        Me.TextBox8.Size = New System.Drawing.Size(35, 23)
+        Me.TextBox8.TabIndex = 593
+        Me.TextBox8.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'Label29
+        '
+        Me.Label29.AutoSize = True
+        Me.Label29.BackColor = System.Drawing.Color.Transparent
+        Me.Label29.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.Label29.Location = New System.Drawing.Point(133, 5)
+        Me.Label29.Name = "Label29"
+        Me.Label29.Size = New System.Drawing.Size(17, 15)
+        Me.Label29.TabIndex = 592
+        Me.Label29.Text = "%"
+        '
+        'RadioButton1
+        '
+        Me.RadioButton1.AutoSize = True
+        Me.RadioButton1.Checked = True
+        Me.RadioButton1.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.RadioButton1.Location = New System.Drawing.Point(5, 3)
+        Me.RadioButton1.Name = "RadioButton1"
+        Me.RadioButton1.Size = New System.Drawing.Size(81, 19)
+        Me.RadioButton1.TabIndex = 245
+        Me.RadioButton1.TabStop = True
+        Me.RadioButton1.Text = "Persentase"
+        Me.RadioButton1.UseVisualStyleBackColor = True
+        '
+        'RadioButton2
+        '
+        Me.RadioButton2.AutoSize = True
+        Me.RadioButton2.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.RadioButton2.Location = New System.Drawing.Point(5, 28)
+        Me.RadioButton2.Name = "RadioButton2"
+        Me.RadioButton2.Size = New System.Drawing.Size(71, 19)
+        Me.RadioButton2.TabIndex = 246
+        Me.RadioButton2.Text = "Nominal"
+        Me.RadioButton2.UseVisualStyleBackColor = True
+        '
+        'Label28
+        '
+        Me.Label28.AutoSize = True
+        Me.Label28.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label28.Location = New System.Drawing.Point(17, 153)
+        Me.Label28.Name = "Label28"
+        Me.Label28.Size = New System.Drawing.Size(74, 17)
+        Me.Label28.TabIndex = 588
+        Me.Label28.Text = "Fee Dokter"
+        Me.Label28.Visible = False
+        '
+        'TextBoxPersentaseFeeKaryawan
+        '
+        Me.TextBoxPersentaseFeeKaryawan.BackColor = System.Drawing.Color.White
+        Me.TextBoxPersentaseFeeKaryawan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxPersentaseFeeKaryawan.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxPersentaseFeeKaryawan.Location = New System.Drawing.Point(393, 34)
+        Me.TextBoxPersentaseFeeKaryawan.Name = "TextBoxPersentaseFeeKaryawan"
+        Me.TextBoxPersentaseFeeKaryawan.Size = New System.Drawing.Size(50, 23)
+        Me.TextBoxPersentaseFeeKaryawan.TabIndex = 587
+        '
+        'TextBoxPersentaseFeePerusahaan
+        '
+        Me.TextBoxPersentaseFeePerusahaan.BackColor = System.Drawing.Color.White
+        Me.TextBoxPersentaseFeePerusahaan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxPersentaseFeePerusahaan.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxPersentaseFeePerusahaan.Location = New System.Drawing.Point(254, 34)
+        Me.TextBoxPersentaseFeePerusahaan.Name = "TextBoxPersentaseFeePerusahaan"
+        Me.TextBoxPersentaseFeePerusahaan.Size = New System.Drawing.Size(50, 23)
+        Me.TextBoxPersentaseFeePerusahaan.TabIndex = 586
+        '
+        'Label27
+        '
+        Me.Label27.AutoSize = True
+        Me.Label27.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label27.Location = New System.Drawing.Point(17, 121)
+        Me.Label27.Name = "Label27"
+        Me.Label27.Size = New System.Drawing.Size(157, 17)
+        Me.Label27.TabIndex = 585
+        Me.Label27.Text = "Fee Perawat (Tambahan)"
+        '
+        'TextBox14
+        '
+        Me.TextBox14.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
+        Me.TextBox14.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBox14.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.TextBox14.Location = New System.Drawing.Point(183, 121)
+        Me.TextBox14.Name = "TextBox14"
+        Me.TextBox14.Size = New System.Drawing.Size(35, 23)
+        Me.TextBox14.TabIndex = 584
+        Me.TextBox14.Text = "Rp"
+        Me.TextBox14.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'TextBoxFeePerawatTambahan
+        '
+        Me.TextBoxFeePerawatTambahan.BackColor = System.Drawing.Color.White
+        Me.TextBoxFeePerawatTambahan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxFeePerawatTambahan.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxFeePerawatTambahan.Location = New System.Drawing.Point(220, 121)
+        Me.TextBoxFeePerawatTambahan.Name = "TextBoxFeePerawatTambahan"
+        Me.TextBoxFeePerawatTambahan.Size = New System.Drawing.Size(129, 23)
+        Me.TextBoxFeePerawatTambahan.TabIndex = 583
+        '
+        'Label21
+        '
+        Me.Label21.AutoSize = True
+        Me.Label21.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label21.Location = New System.Drawing.Point(17, 92)
+        Me.Label21.Name = "Label21"
+        Me.Label21.Size = New System.Drawing.Size(149, 17)
+        Me.Label21.TabIndex = 582
+        Me.Label21.Text = "Fee Dokter (Tambahan)"
+        '
+        'TextBox9
+        '
+        Me.TextBox9.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
+        Me.TextBox9.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBox9.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.TextBox9.Location = New System.Drawing.Point(183, 92)
+        Me.TextBox9.Name = "TextBox9"
+        Me.TextBox9.Size = New System.Drawing.Size(35, 23)
+        Me.TextBox9.TabIndex = 581
+        Me.TextBox9.Text = "Rp"
+        Me.TextBox9.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'TextBoxFeeDokterTambahan
+        '
+        Me.TextBoxFeeDokterTambahan.BackColor = System.Drawing.Color.White
+        Me.TextBoxFeeDokterTambahan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxFeeDokterTambahan.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxFeeDokterTambahan.Location = New System.Drawing.Point(220, 92)
+        Me.TextBoxFeeDokterTambahan.Name = "TextBoxFeeDokterTambahan"
+        Me.TextBoxFeeDokterTambahan.Size = New System.Drawing.Size(129, 23)
+        Me.TextBoxFeeDokterTambahan.TabIndex = 580
+        '
+        'Label16
+        '
+        Me.Label16.AutoSize = True
+        Me.Label16.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label16.Location = New System.Drawing.Point(16, 63)
+        Me.Label16.Name = "Label16"
+        Me.Label16.Size = New System.Drawing.Size(84, 17)
+        Me.Label16.TabIndex = 579
+        Me.Label16.Text = "Nominal Fee"
+        '
+        'TextBox2
+        '
+        Me.TextBox2.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
+        Me.TextBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBox2.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.TextBox2.Location = New System.Drawing.Point(183, 63)
+        Me.TextBox2.Name = "TextBox2"
+        Me.TextBox2.Size = New System.Drawing.Size(35, 23)
+        Me.TextBox2.TabIndex = 578
+        Me.TextBox2.Text = "Rp"
+        Me.TextBox2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'TextBoxNominalFee
+        '
+        Me.TextBoxNominalFee.BackColor = System.Drawing.Color.White
+        Me.TextBoxNominalFee.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxNominalFee.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxNominalFee.Location = New System.Drawing.Point(220, 63)
+        Me.TextBoxNominalFee.Name = "TextBoxNominalFee"
+        Me.TextBoxNominalFee.Size = New System.Drawing.Size(129, 23)
+        Me.TextBoxNominalFee.TabIndex = 577
+        '
+        'Label26
+        '
+        Me.Label26.AutoSize = True
+        Me.Label26.BackColor = System.Drawing.Color.Transparent
+        Me.Label26.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.Label26.Location = New System.Drawing.Point(449, 36)
+        Me.Label26.Name = "Label26"
+        Me.Label26.Size = New System.Drawing.Size(17, 15)
+        Me.Label26.TabIndex = 576
+        Me.Label26.Text = "%"
+        '
+        'Label25
+        '
+        Me.Label25.AutoSize = True
+        Me.Label25.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.Label25.Location = New System.Drawing.Point(329, 36)
+        Me.Label25.Name = "Label25"
+        Me.Label25.Size = New System.Drawing.Size(58, 15)
+        Me.Label25.TabIndex = 574
+        Me.Label25.Text = "Karyawan"
+        '
+        'Label24
+        '
+        Me.Label24.AutoSize = True
+        Me.Label24.BackColor = System.Drawing.Color.Transparent
+        Me.Label24.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.Label24.Location = New System.Drawing.Point(310, 36)
+        Me.Label24.Name = "Label24"
+        Me.Label24.Size = New System.Drawing.Size(17, 15)
+        Me.Label24.TabIndex = 573
+        Me.Label24.Text = "%"
+        '
+        'Label23
+        '
+        Me.Label23.AutoSize = True
+        Me.Label23.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.Label23.Location = New System.Drawing.Point(180, 36)
+        Me.Label23.Name = "Label23"
+        Me.Label23.Size = New System.Drawing.Size(68, 15)
+        Me.Label23.TabIndex = 572
+        Me.Label23.Text = "Perusahaan"
+        '
+        'Label22
+        '
+        Me.Label22.AutoSize = True
+        Me.Label22.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label22.Location = New System.Drawing.Point(16, 34)
+        Me.Label22.Name = "Label22"
+        Me.Label22.Size = New System.Drawing.Size(99, 17)
+        Me.Label22.TabIndex = 567
+        Me.Label22.Text = "Persentase Fee"
+        '
+        'Panel4
+        '
+        Me.Panel4.BackColor = System.Drawing.Color.Transparent
+        Me.Panel4.Controls.Add(Me.RadioButtonOpsiPersentase)
+        Me.Panel4.Controls.Add(Me.RadioButtonOpsiNominal)
+        Me.Panel4.Location = New System.Drawing.Point(183, 3)
+        Me.Panel4.Name = "Panel4"
+        Me.Panel4.Size = New System.Drawing.Size(327, 25)
+        Me.Panel4.TabIndex = 566
+        '
+        'RadioButtonOpsiPersentase
+        '
+        Me.RadioButtonOpsiPersentase.AutoSize = True
+        Me.RadioButtonOpsiPersentase.Checked = True
+        Me.RadioButtonOpsiPersentase.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.RadioButtonOpsiPersentase.Location = New System.Drawing.Point(5, 3)
+        Me.RadioButtonOpsiPersentase.Name = "RadioButtonOpsiPersentase"
+        Me.RadioButtonOpsiPersentase.Size = New System.Drawing.Size(81, 19)
+        Me.RadioButtonOpsiPersentase.TabIndex = 245
+        Me.RadioButtonOpsiPersentase.TabStop = True
+        Me.RadioButtonOpsiPersentase.Text = "Persentase"
+        Me.RadioButtonOpsiPersentase.UseVisualStyleBackColor = True
+        '
+        'RadioButtonOpsiNominal
+        '
+        Me.RadioButtonOpsiNominal.AutoSize = True
+        Me.RadioButtonOpsiNominal.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.RadioButtonOpsiNominal.Location = New System.Drawing.Point(92, 3)
+        Me.RadioButtonOpsiNominal.Name = "RadioButtonOpsiNominal"
+        Me.RadioButtonOpsiNominal.Size = New System.Drawing.Size(71, 19)
+        Me.RadioButtonOpsiNominal.TabIndex = 246
+        Me.RadioButtonOpsiNominal.Text = "Nominal"
+        Me.RadioButtonOpsiNominal.UseVisualStyleBackColor = True
+        '
+        'Label13
+        '
+        Me.Label13.AutoSize = True
+        Me.Label13.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label13.Location = New System.Drawing.Point(16, 6)
+        Me.Label13.Name = "Label13"
+        Me.Label13.Size = New System.Drawing.Size(62, 17)
+        Me.Label13.TabIndex = 565
+        Me.Label13.Text = "Jenis Fee"
+        '
+        'ComboBoxInformedConsent
+        '
+        Me.ComboBoxInformedConsent.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBoxInformedConsent.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ComboBoxInformedConsent.FormattingEnabled = True
+        Me.ComboBoxInformedConsent.Location = New System.Drawing.Point(239, 199)
+        Me.ComboBoxInformedConsent.Name = "ComboBoxInformedConsent"
+        Me.ComboBoxInformedConsent.Size = New System.Drawing.Size(283, 25)
+        Me.ComboBoxInformedConsent.TabIndex = 565
+        '
+        'Label11
+        '
+        Me.Label11.AutoSize = True
+        Me.Label11.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label11.Location = New System.Drawing.Point(28, 202)
+        Me.Label11.Name = "Label11"
+        Me.Label11.Size = New System.Drawing.Size(118, 17)
+        Me.Label11.TabIndex = 564
+        Me.Label11.Text = "Informed Consent"
+        '
+        'CheckBoxInformedConsent
+        '
+        Me.CheckBoxInformedConsent.AutoSize = True
+        Me.CheckBoxInformedConsent.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.CheckBoxInformedConsent.Location = New System.Drawing.Point(195, 203)
+        Me.CheckBoxInformedConsent.Name = "CheckBoxInformedConsent"
+        Me.CheckBoxInformedConsent.Size = New System.Drawing.Size(38, 19)
+        Me.CheckBoxInformedConsent.TabIndex = 563
+        Me.CheckBoxInformedConsent.Text = "Ya"
+        Me.CheckBoxInformedConsent.UseVisualStyleBackColor = True
+        '
+        'Label18
+        '
+        Me.Label18.AutoSize = True
+        Me.Label18.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label18.Location = New System.Drawing.Point(28, 20)
+        Me.Label18.Name = "Label18"
+        Me.Label18.Size = New System.Drawing.Size(63, 17)
+        Me.Label18.TabIndex = 528
+        Me.Label18.Text = "Jenis Poli"
+        '
+        'Panel2
+        '
+        Me.Panel2.BackColor = System.Drawing.Color.Transparent
+        Me.Panel2.Controls.Add(Me.RadioButtonBHP)
+        Me.Panel2.Controls.Add(Me.RadioButtonNonBHP)
+        Me.Panel2.Location = New System.Drawing.Point(195, 230)
+        Me.Panel2.Name = "Panel2"
+        Me.Panel2.Size = New System.Drawing.Size(327, 25)
+        Me.Panel2.TabIndex = 562
+        '
+        'RadioButtonBHP
+        '
+        Me.RadioButtonBHP.AutoSize = True
+        Me.RadioButtonBHP.Checked = True
+        Me.RadioButtonBHP.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.RadioButtonBHP.Location = New System.Drawing.Point(5, 3)
+        Me.RadioButtonBHP.Name = "RadioButtonBHP"
+        Me.RadioButtonBHP.Size = New System.Drawing.Size(48, 19)
+        Me.RadioButtonBHP.TabIndex = 245
+        Me.RadioButtonBHP.TabStop = True
+        Me.RadioButtonBHP.Text = "BHP"
+        Me.RadioButtonBHP.UseVisualStyleBackColor = True
+        '
+        'RadioButtonNonBHP
+        '
+        Me.RadioButtonNonBHP.AutoSize = True
+        Me.RadioButtonNonBHP.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.RadioButtonNonBHP.Location = New System.Drawing.Point(59, 3)
+        Me.RadioButtonNonBHP.Name = "RadioButtonNonBHP"
+        Me.RadioButtonNonBHP.Size = New System.Drawing.Size(74, 19)
+        Me.RadioButtonNonBHP.TabIndex = 246
+        Me.RadioButtonNonBHP.Text = "Non BHP"
+        Me.RadioButtonNonBHP.UseVisualStyleBackColor = True
+        '
+        'TextBoxTindakanID
+        '
+        Me.TextBoxTindakanID.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
+        Me.TextBoxTindakanID.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxTindakanID.Cursor = System.Windows.Forms.Cursors.No
+        Me.TextBoxTindakanID.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxTindakanID.Location = New System.Drawing.Point(261, 50)
+        Me.TextBoxTindakanID.Name = "TextBoxTindakanID"
+        Me.TextBoxTindakanID.ReadOnly = True
+        Me.TextBoxTindakanID.Size = New System.Drawing.Size(84, 23)
+        Me.TextBoxTindakanID.TabIndex = 526
+        Me.TextBoxTindakanID.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'Label14
+        '
+        Me.Label14.AutoSize = True
+        Me.Label14.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label14.Location = New System.Drawing.Point(28, 233)
+        Me.Label14.Name = "Label14"
+        Me.Label14.Size = New System.Drawing.Size(76, 17)
+        Me.Label14.TabIndex = 561
+        Me.Label14.Text = "Status BHP"
+        '
+        'Label19
+        '
+        Me.Label19.AutoSize = True
+        Me.Label19.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label19.Location = New System.Drawing.Point(28, 79)
+        Me.Label19.Name = "Label19"
+        Me.Label19.Size = New System.Drawing.Size(103, 17)
+        Me.Label19.TabIndex = 525
+        Me.Label19.Text = "Nama Tindakan"
+        '
+        'Label15
+        '
+        Me.Label15.AutoSize = True
+        Me.Label15.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label15.Location = New System.Drawing.Point(28, 171)
+        Me.Label15.Name = "Label15"
+        Me.Label15.Size = New System.Drawing.Size(68, 17)
+        Me.Label15.TabIndex = 560
+        Me.Label15.Text = "Pelaksana"
+        '
+        'ButtonFindTindakan
+        '
+        Me.ButtonFindTindakan.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonFindTindakan.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+        Me.ButtonFindTindakan.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonFindTindakan.FlatAppearance.BorderSize = 0
+        Me.ButtonFindTindakan.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonFindTindakan.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.ButtonFindTindakan.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonFindTindakan.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.ButtonFindTindakan.ForeColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(254, Byte), Integer))
+        Me.ButtonFindTindakan.Location = New System.Drawing.Point(195, 48)
+        Me.ButtonFindTindakan.Name = "ButtonFindTindakan"
+        Me.ButtonFindTindakan.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.ButtonFindTindakan.Size = New System.Drawing.Size(60, 25)
+        Me.ButtonFindTindakan.TabIndex = 527
+        Me.ButtonFindTindakan.Text = " Cari"
+        Me.ButtonFindTindakan.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.ButtonFindTindakan.UseVisualStyleBackColor = False
+        '
+        'TextBoxNamaTindakan
+        '
+        Me.TextBoxNamaTindakan.BackColor = System.Drawing.Color.White
+        Me.TextBoxNamaTindakan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxNamaTindakan.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
+        Me.TextBoxNamaTindakan.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxNamaTindakan.Location = New System.Drawing.Point(195, 79)
+        Me.TextBoxNamaTindakan.Name = "TextBoxNamaTindakan"
+        Me.TextBoxNamaTindakan.Size = New System.Drawing.Size(327, 23)
+        Me.TextBoxNamaTindakan.TabIndex = 531
+        '
+        'Label20
+        '
+        Me.Label20.AutoSize = True
+        Me.Label20.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label20.Location = New System.Drawing.Point(28, 111)
+        Me.Label20.Name = "Label20"
+        Me.Label20.Size = New System.Drawing.Size(79, 17)
+        Me.Label20.TabIndex = 558
+        Me.Label20.Text = "Group Jenis"
+        '
+        'TextBoxBiayaTindakan
+        '
+        Me.TextBoxBiayaTindakan.BackColor = System.Drawing.Color.White
+        Me.TextBoxBiayaTindakan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxBiayaTindakan.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxBiayaTindakan.Location = New System.Drawing.Point(232, 139)
+        Me.TextBoxBiayaTindakan.Name = "TextBoxBiayaTindakan"
+        Me.TextBoxBiayaTindakan.Size = New System.Drawing.Size(129, 23)
+        Me.TextBoxBiayaTindakan.TabIndex = 534
+        '
+        'ComboBoxGroupJenisTindakan
+        '
+        Me.ComboBoxGroupJenisTindakan.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ComboBoxGroupJenisTindakan.FormattingEnabled = True
+        Me.ComboBoxGroupJenisTindakan.Location = New System.Drawing.Point(195, 108)
+        Me.ComboBoxGroupJenisTindakan.Name = "ComboBoxGroupJenisTindakan"
+        Me.ComboBoxGroupJenisTindakan.Size = New System.Drawing.Size(327, 25)
+        Me.ComboBoxGroupJenisTindakan.TabIndex = 557
+        '
+        'Label17
+        '
+        Me.Label17.AutoSize = True
+        Me.Label17.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label17.Location = New System.Drawing.Point(28, 139)
+        Me.Label17.Name = "Label17"
+        Me.Label17.Size = New System.Drawing.Size(99, 17)
+        Me.Label17.TabIndex = 535
+        Me.Label17.Text = "Biaya Tindakan"
+        '
+        'Label9
+        '
+        Me.Label9.AutoSize = True
+        Me.Label9.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label9.Location = New System.Drawing.Point(28, 51)
+        Me.Label9.Name = "Label9"
+        Me.Label9.Size = New System.Drawing.Size(80, 17)
+        Me.Label9.TabIndex = 556
+        Me.Label9.Text = "Tindakan ID"
+        '
+        'Panel1
+        '
+        Me.Panel1.BackColor = System.Drawing.Color.Transparent
+        Me.Panel1.Controls.Add(Me.RadioButtonPoliUmum)
+        Me.Panel1.Controls.Add(Me.RadioButtonPoliGigi)
+        Me.Panel1.Location = New System.Drawing.Point(195, 17)
+        Me.Panel1.Name = "Panel1"
+        Me.Panel1.Size = New System.Drawing.Size(327, 25)
+        Me.Panel1.TabIndex = 555
+        '
+        'RadioButtonPoliUmum
+        '
+        Me.RadioButtonPoliUmum.AutoSize = True
+        Me.RadioButtonPoliUmum.Checked = True
+        Me.RadioButtonPoliUmum.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.RadioButtonPoliUmum.Location = New System.Drawing.Point(5, 3)
+        Me.RadioButtonPoliUmum.Name = "RadioButtonPoliUmum"
+        Me.RadioButtonPoliUmum.Size = New System.Drawing.Size(85, 19)
+        Me.RadioButtonPoliUmum.TabIndex = 245
+        Me.RadioButtonPoliUmum.TabStop = True
+        Me.RadioButtonPoliUmum.Text = "Poli Umum"
+        Me.RadioButtonPoliUmum.UseVisualStyleBackColor = True
+        '
+        'RadioButtonPoliGigi
+        '
+        Me.RadioButtonPoliGigi.AutoSize = True
+        Me.RadioButtonPoliGigi.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.RadioButtonPoliGigi.Location = New System.Drawing.Point(96, 3)
+        Me.RadioButtonPoliGigi.Name = "RadioButtonPoliGigi"
+        Me.RadioButtonPoliGigi.Size = New System.Drawing.Size(69, 19)
+        Me.RadioButtonPoliGigi.TabIndex = 246
+        Me.RadioButtonPoliGigi.Text = "Poli Gigi"
+        Me.RadioButtonPoliGigi.UseVisualStyleBackColor = True
+        '
+        'TextBox7
+        '
+        Me.TextBox7.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
+        Me.TextBox7.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBox7.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.TextBox7.Location = New System.Drawing.Point(195, 139)
+        Me.TextBox7.Name = "TextBox7"
+        Me.TextBox7.Size = New System.Drawing.Size(35, 23)
+        Me.TextBox7.TabIndex = 549
+        Me.TextBox7.Text = "Rp"
+        Me.TextBox7.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'TextBox5
+        '
+        Me.TextBox5.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
+        Me.TextBox5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBox5.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.TextBox5.Location = New System.Drawing.Point(195, 261)
+        Me.TextBox5.Name = "TextBox5"
+        Me.TextBox5.Size = New System.Drawing.Size(35, 23)
+        Me.TextBox5.TabIndex = 554
+        Me.TextBox5.Text = "Rp"
+        Me.TextBox5.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'TextBoxMaksimalBHP_Tindakan
+        '
+        Me.TextBoxMaksimalBHP_Tindakan.BackColor = System.Drawing.Color.White
+        Me.TextBoxMaksimalBHP_Tindakan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxMaksimalBHP_Tindakan.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxMaksimalBHP_Tindakan.Location = New System.Drawing.Point(232, 261)
+        Me.TextBoxMaksimalBHP_Tindakan.Name = "TextBoxMaksimalBHP_Tindakan"
+        Me.TextBoxMaksimalBHP_Tindakan.Size = New System.Drawing.Size(129, 23)
+        Me.TextBoxMaksimalBHP_Tindakan.TabIndex = 552
+        '
+        'Label10
+        '
+        Me.Label10.AutoSize = True
+        Me.Label10.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label10.Location = New System.Drawing.Point(28, 261)
+        Me.Label10.Name = "Label10"
+        Me.Label10.Size = New System.Drawing.Size(95, 17)
+        Me.Label10.TabIndex = 553
+        Me.Label10.Text = "Maksimal BHP"
         '
         'TabPageMasterPaket
         '
@@ -1979,1099 +3073,6 @@ Partial Class MasterTindakanKlinik
         Me.NavBarItem4.Name = "NavBarItem4"
         Me.NavBarItem4.SmallImage = CType(resources.GetObject("NavBarItem4.SmallImage"), System.Drawing.Image)
         '
-        'PanelMasterTindakan
-        '
-        Me.PanelMasterTindakan.AutoScroll = True
-        Me.PanelMasterTindakan.Controls.Add(Me.DataGridViewAlatTindakan)
-        Me.PanelMasterTindakan.Controls.Add(Me.GroupBox2)
-        Me.PanelMasterTindakan.Controls.Add(Me.ComboBoxKategori)
-        Me.PanelMasterTindakan.Controls.Add(Me.Label34)
-        Me.PanelMasterTindakan.Controls.Add(Me.CheckedListBoxPoli)
-        Me.PanelMasterTindakan.Controls.Add(Me.GroupBox1)
-        Me.PanelMasterTindakan.Controls.Add(Me.Panel5)
-        Me.PanelMasterTindakan.Controls.Add(Me.CheckBoxStatusAktifTindakan)
-        Me.PanelMasterTindakan.Controls.Add(Me.SplitContainerFeeTindakan)
-        Me.PanelMasterTindakan.Controls.Add(Me.ComboBoxInformedConsent)
-        Me.PanelMasterTindakan.Controls.Add(Me.Label11)
-        Me.PanelMasterTindakan.Controls.Add(Me.CheckBoxInformedConsent)
-        Me.PanelMasterTindakan.Controls.Add(Me.Label18)
-        Me.PanelMasterTindakan.Controls.Add(Me.Panel2)
-        Me.PanelMasterTindakan.Controls.Add(Me.TextBoxTindakanID)
-        Me.PanelMasterTindakan.Controls.Add(Me.Label14)
-        Me.PanelMasterTindakan.Controls.Add(Me.Label19)
-        Me.PanelMasterTindakan.Controls.Add(Me.Label15)
-        Me.PanelMasterTindakan.Controls.Add(Me.ButtonFindTindakan)
-        Me.PanelMasterTindakan.Controls.Add(Me.TextBoxNamaTindakan)
-        Me.PanelMasterTindakan.Controls.Add(Me.Label20)
-        Me.PanelMasterTindakan.Controls.Add(Me.TextBoxBiayaTindakan)
-        Me.PanelMasterTindakan.Controls.Add(Me.ComboBoxGroupJenisTindakan)
-        Me.PanelMasterTindakan.Controls.Add(Me.Label17)
-        Me.PanelMasterTindakan.Controls.Add(Me.Label9)
-        Me.PanelMasterTindakan.Controls.Add(Me.Panel1)
-        Me.PanelMasterTindakan.Controls.Add(Me.TextBox7)
-        Me.PanelMasterTindakan.Controls.Add(Me.TextBox5)
-        Me.PanelMasterTindakan.Controls.Add(Me.TextBoxMaksimalBHP_Tindakan)
-        Me.PanelMasterTindakan.Controls.Add(Me.Label10)
-        Me.PanelMasterTindakan.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.PanelMasterTindakan.Location = New System.Drawing.Point(0, 0)
-        Me.PanelMasterTindakan.Name = "PanelMasterTindakan"
-        Me.PanelMasterTindakan.Size = New System.Drawing.Size(757, 500)
-        Me.PanelMasterTindakan.TabIndex = 563
-        '
-        'Label10
-        '
-        Me.Label10.AutoSize = True
-        Me.Label10.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label10.Location = New System.Drawing.Point(28, 261)
-        Me.Label10.Name = "Label10"
-        Me.Label10.Size = New System.Drawing.Size(95, 17)
-        Me.Label10.TabIndex = 553
-        Me.Label10.Text = "Maksimal BHP"
-        '
-        'TextBoxMaksimalBHP_Tindakan
-        '
-        Me.TextBoxMaksimalBHP_Tindakan.BackColor = System.Drawing.Color.White
-        Me.TextBoxMaksimalBHP_Tindakan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBoxMaksimalBHP_Tindakan.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxMaksimalBHP_Tindakan.Location = New System.Drawing.Point(232, 261)
-        Me.TextBoxMaksimalBHP_Tindakan.Name = "TextBoxMaksimalBHP_Tindakan"
-        Me.TextBoxMaksimalBHP_Tindakan.Size = New System.Drawing.Size(129, 23)
-        Me.TextBoxMaksimalBHP_Tindakan.TabIndex = 552
-        '
-        'TextBox5
-        '
-        Me.TextBox5.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
-        Me.TextBox5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBox5.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.TextBox5.Location = New System.Drawing.Point(195, 261)
-        Me.TextBox5.Name = "TextBox5"
-        Me.TextBox5.Size = New System.Drawing.Size(35, 23)
-        Me.TextBox5.TabIndex = 554
-        Me.TextBox5.Text = "Rp"
-        Me.TextBox5.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'TextBox7
-        '
-        Me.TextBox7.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
-        Me.TextBox7.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBox7.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.TextBox7.Location = New System.Drawing.Point(195, 139)
-        Me.TextBox7.Name = "TextBox7"
-        Me.TextBox7.Size = New System.Drawing.Size(35, 23)
-        Me.TextBox7.TabIndex = 549
-        Me.TextBox7.Text = "Rp"
-        Me.TextBox7.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'Panel1
-        '
-        Me.Panel1.BackColor = System.Drawing.Color.Transparent
-        Me.Panel1.Controls.Add(Me.RadioButtonPoliUmum)
-        Me.Panel1.Controls.Add(Me.RadioButtonPoliGigi)
-        Me.Panel1.Location = New System.Drawing.Point(195, 17)
-        Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(327, 25)
-        Me.Panel1.TabIndex = 555
-        '
-        'RadioButtonPoliGigi
-        '
-        Me.RadioButtonPoliGigi.AutoSize = True
-        Me.RadioButtonPoliGigi.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.RadioButtonPoliGigi.Location = New System.Drawing.Point(96, 3)
-        Me.RadioButtonPoliGigi.Name = "RadioButtonPoliGigi"
-        Me.RadioButtonPoliGigi.Size = New System.Drawing.Size(69, 19)
-        Me.RadioButtonPoliGigi.TabIndex = 246
-        Me.RadioButtonPoliGigi.Text = "Poli Gigi"
-        Me.RadioButtonPoliGigi.UseVisualStyleBackColor = True
-        '
-        'RadioButtonPoliUmum
-        '
-        Me.RadioButtonPoliUmum.AutoSize = True
-        Me.RadioButtonPoliUmum.Checked = True
-        Me.RadioButtonPoliUmum.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.RadioButtonPoliUmum.Location = New System.Drawing.Point(5, 3)
-        Me.RadioButtonPoliUmum.Name = "RadioButtonPoliUmum"
-        Me.RadioButtonPoliUmum.Size = New System.Drawing.Size(85, 19)
-        Me.RadioButtonPoliUmum.TabIndex = 245
-        Me.RadioButtonPoliUmum.TabStop = True
-        Me.RadioButtonPoliUmum.Text = "Poli Umum"
-        Me.RadioButtonPoliUmum.UseVisualStyleBackColor = True
-        '
-        'Label9
-        '
-        Me.Label9.AutoSize = True
-        Me.Label9.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label9.Location = New System.Drawing.Point(28, 51)
-        Me.Label9.Name = "Label9"
-        Me.Label9.Size = New System.Drawing.Size(80, 17)
-        Me.Label9.TabIndex = 556
-        Me.Label9.Text = "Tindakan ID"
-        '
-        'Label17
-        '
-        Me.Label17.AutoSize = True
-        Me.Label17.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label17.Location = New System.Drawing.Point(28, 139)
-        Me.Label17.Name = "Label17"
-        Me.Label17.Size = New System.Drawing.Size(99, 17)
-        Me.Label17.TabIndex = 535
-        Me.Label17.Text = "Biaya Tindakan"
-        '
-        'ComboBoxGroupJenisTindakan
-        '
-        Me.ComboBoxGroupJenisTindakan.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.ComboBoxGroupJenisTindakan.FormattingEnabled = True
-        Me.ComboBoxGroupJenisTindakan.Location = New System.Drawing.Point(195, 108)
-        Me.ComboBoxGroupJenisTindakan.Name = "ComboBoxGroupJenisTindakan"
-        Me.ComboBoxGroupJenisTindakan.Size = New System.Drawing.Size(327, 25)
-        Me.ComboBoxGroupJenisTindakan.TabIndex = 557
-        '
-        'TextBoxBiayaTindakan
-        '
-        Me.TextBoxBiayaTindakan.BackColor = System.Drawing.Color.White
-        Me.TextBoxBiayaTindakan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBoxBiayaTindakan.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxBiayaTindakan.Location = New System.Drawing.Point(232, 139)
-        Me.TextBoxBiayaTindakan.Name = "TextBoxBiayaTindakan"
-        Me.TextBoxBiayaTindakan.Size = New System.Drawing.Size(129, 23)
-        Me.TextBoxBiayaTindakan.TabIndex = 534
-        '
-        'Label20
-        '
-        Me.Label20.AutoSize = True
-        Me.Label20.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label20.Location = New System.Drawing.Point(28, 111)
-        Me.Label20.Name = "Label20"
-        Me.Label20.Size = New System.Drawing.Size(79, 17)
-        Me.Label20.TabIndex = 558
-        Me.Label20.Text = "Group Jenis"
-        '
-        'TextBoxNamaTindakan
-        '
-        Me.TextBoxNamaTindakan.BackColor = System.Drawing.Color.White
-        Me.TextBoxNamaTindakan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBoxNamaTindakan.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
-        Me.TextBoxNamaTindakan.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxNamaTindakan.Location = New System.Drawing.Point(195, 79)
-        Me.TextBoxNamaTindakan.Name = "TextBoxNamaTindakan"
-        Me.TextBoxNamaTindakan.Size = New System.Drawing.Size(327, 23)
-        Me.TextBoxNamaTindakan.TabIndex = 531
-        '
-        'ButtonFindTindakan
-        '
-        Me.ButtonFindTindakan.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
-        Me.ButtonFindTindakan.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
-        Me.ButtonFindTindakan.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.ButtonFindTindakan.FlatAppearance.BorderSize = 0
-        Me.ButtonFindTindakan.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
-        Me.ButtonFindTindakan.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.ButtonFindTindakan.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.ButtonFindTindakan.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.ButtonFindTindakan.ForeColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(254, Byte), Integer))
-        Me.ButtonFindTindakan.Location = New System.Drawing.Point(195, 48)
-        Me.ButtonFindTindakan.Name = "ButtonFindTindakan"
-        Me.ButtonFindTindakan.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.ButtonFindTindakan.Size = New System.Drawing.Size(60, 25)
-        Me.ButtonFindTindakan.TabIndex = 527
-        Me.ButtonFindTindakan.Text = " Cari"
-        Me.ButtonFindTindakan.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-        Me.ButtonFindTindakan.UseVisualStyleBackColor = False
-        '
-        'Label15
-        '
-        Me.Label15.AutoSize = True
-        Me.Label15.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label15.Location = New System.Drawing.Point(28, 171)
-        Me.Label15.Name = "Label15"
-        Me.Label15.Size = New System.Drawing.Size(68, 17)
-        Me.Label15.TabIndex = 560
-        Me.Label15.Text = "Pelaksana"
-        '
-        'Label19
-        '
-        Me.Label19.AutoSize = True
-        Me.Label19.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label19.Location = New System.Drawing.Point(28, 79)
-        Me.Label19.Name = "Label19"
-        Me.Label19.Size = New System.Drawing.Size(103, 17)
-        Me.Label19.TabIndex = 525
-        Me.Label19.Text = "Nama Tindakan"
-        '
-        'Label14
-        '
-        Me.Label14.AutoSize = True
-        Me.Label14.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label14.Location = New System.Drawing.Point(28, 233)
-        Me.Label14.Name = "Label14"
-        Me.Label14.Size = New System.Drawing.Size(76, 17)
-        Me.Label14.TabIndex = 561
-        Me.Label14.Text = "Status BHP"
-        '
-        'TextBoxTindakanID
-        '
-        Me.TextBoxTindakanID.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
-        Me.TextBoxTindakanID.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBoxTindakanID.Cursor = System.Windows.Forms.Cursors.No
-        Me.TextBoxTindakanID.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxTindakanID.Location = New System.Drawing.Point(261, 50)
-        Me.TextBoxTindakanID.Name = "TextBoxTindakanID"
-        Me.TextBoxTindakanID.ReadOnly = True
-        Me.TextBoxTindakanID.Size = New System.Drawing.Size(84, 23)
-        Me.TextBoxTindakanID.TabIndex = 526
-        Me.TextBoxTindakanID.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'Panel2
-        '
-        Me.Panel2.BackColor = System.Drawing.Color.Transparent
-        Me.Panel2.Controls.Add(Me.RadioButtonBHP)
-        Me.Panel2.Controls.Add(Me.RadioButtonNonBHP)
-        Me.Panel2.Location = New System.Drawing.Point(195, 230)
-        Me.Panel2.Name = "Panel2"
-        Me.Panel2.Size = New System.Drawing.Size(327, 25)
-        Me.Panel2.TabIndex = 562
-        '
-        'RadioButtonNonBHP
-        '
-        Me.RadioButtonNonBHP.AutoSize = True
-        Me.RadioButtonNonBHP.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.RadioButtonNonBHP.Location = New System.Drawing.Point(59, 3)
-        Me.RadioButtonNonBHP.Name = "RadioButtonNonBHP"
-        Me.RadioButtonNonBHP.Size = New System.Drawing.Size(74, 19)
-        Me.RadioButtonNonBHP.TabIndex = 246
-        Me.RadioButtonNonBHP.Text = "Non BHP"
-        Me.RadioButtonNonBHP.UseVisualStyleBackColor = True
-        '
-        'RadioButtonBHP
-        '
-        Me.RadioButtonBHP.AutoSize = True
-        Me.RadioButtonBHP.Checked = True
-        Me.RadioButtonBHP.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.RadioButtonBHP.Location = New System.Drawing.Point(5, 3)
-        Me.RadioButtonBHP.Name = "RadioButtonBHP"
-        Me.RadioButtonBHP.Size = New System.Drawing.Size(48, 19)
-        Me.RadioButtonBHP.TabIndex = 245
-        Me.RadioButtonBHP.TabStop = True
-        Me.RadioButtonBHP.Text = "BHP"
-        Me.RadioButtonBHP.UseVisualStyleBackColor = True
-        '
-        'Label18
-        '
-        Me.Label18.AutoSize = True
-        Me.Label18.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label18.Location = New System.Drawing.Point(28, 20)
-        Me.Label18.Name = "Label18"
-        Me.Label18.Size = New System.Drawing.Size(63, 17)
-        Me.Label18.TabIndex = 528
-        Me.Label18.Text = "Jenis Poli"
-        '
-        'CheckBoxInformedConsent
-        '
-        Me.CheckBoxInformedConsent.AutoSize = True
-        Me.CheckBoxInformedConsent.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.CheckBoxInformedConsent.Location = New System.Drawing.Point(195, 203)
-        Me.CheckBoxInformedConsent.Name = "CheckBoxInformedConsent"
-        Me.CheckBoxInformedConsent.Size = New System.Drawing.Size(38, 19)
-        Me.CheckBoxInformedConsent.TabIndex = 563
-        Me.CheckBoxInformedConsent.Text = "Ya"
-        Me.CheckBoxInformedConsent.UseVisualStyleBackColor = True
-        '
-        'Label11
-        '
-        Me.Label11.AutoSize = True
-        Me.Label11.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label11.Location = New System.Drawing.Point(28, 202)
-        Me.Label11.Name = "Label11"
-        Me.Label11.Size = New System.Drawing.Size(118, 17)
-        Me.Label11.TabIndex = 564
-        Me.Label11.Text = "Informed Consent"
-        '
-        'ComboBoxInformedConsent
-        '
-        Me.ComboBoxInformedConsent.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboBoxInformedConsent.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.ComboBoxInformedConsent.FormattingEnabled = True
-        Me.ComboBoxInformedConsent.Location = New System.Drawing.Point(239, 199)
-        Me.ComboBoxInformedConsent.Name = "ComboBoxInformedConsent"
-        Me.ComboBoxInformedConsent.Size = New System.Drawing.Size(283, 25)
-        Me.ComboBoxInformedConsent.TabIndex = 565
-        '
-        'SplitContainerFeeTindakan
-        '
-        Me.SplitContainerFeeTindakan.FixedPanel = System.Windows.Forms.FixedPanel.Panel1
-        Me.SplitContainerFeeTindakan.Location = New System.Drawing.Point(12, 290)
-        Me.SplitContainerFeeTindakan.Name = "SplitContainerFeeTindakan"
-        Me.SplitContainerFeeTindakan.Orientation = System.Windows.Forms.Orientation.Horizontal
-        '
-        'SplitContainerFeeTindakan.Panel1
-        '
-        Me.SplitContainerFeeTindakan.Panel1.Controls.Add(Me.Panel3)
-        Me.SplitContainerFeeTindakan.Panel1.Controls.Add(Me.Label12)
-        '
-        'SplitContainerFeeTindakan.Panel2
-        '
-        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.TextBoxPersentaseFeePerawat)
-        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label42)
-        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Panel7)
-        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label31)
-        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label47)
-        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Panel6)
-        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label28)
-        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.TextBoxPersentaseFeeKaryawan)
-        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.TextBoxPersentaseFeePerusahaan)
-        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label27)
-        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.TextBox14)
-        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.TextBoxFeePerawatTambahan)
-        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label21)
-        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.TextBox9)
-        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.TextBoxFeeDokterTambahan)
-        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label16)
-        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.TextBox2)
-        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.TextBoxNominalFee)
-        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label26)
-        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label25)
-        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label24)
-        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label23)
-        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label22)
-        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Panel4)
-        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label13)
-        Me.SplitContainerFeeTindakan.Size = New System.Drawing.Size(604, 320)
-        Me.SplitContainerFeeTindakan.SplitterDistance = 31
-        Me.SplitContainerFeeTindakan.SplitterWidth = 1
-        Me.SplitContainerFeeTindakan.TabIndex = 567
-        '
-        'Label13
-        '
-        Me.Label13.AutoSize = True
-        Me.Label13.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label13.Location = New System.Drawing.Point(16, 6)
-        Me.Label13.Name = "Label13"
-        Me.Label13.Size = New System.Drawing.Size(62, 17)
-        Me.Label13.TabIndex = 565
-        Me.Label13.Text = "Jenis Fee"
-        '
-        'Panel4
-        '
-        Me.Panel4.BackColor = System.Drawing.Color.Transparent
-        Me.Panel4.Controls.Add(Me.RadioButtonOpsiPersentase)
-        Me.Panel4.Controls.Add(Me.RadioButtonOpsiNominal)
-        Me.Panel4.Location = New System.Drawing.Point(183, 3)
-        Me.Panel4.Name = "Panel4"
-        Me.Panel4.Size = New System.Drawing.Size(327, 25)
-        Me.Panel4.TabIndex = 566
-        '
-        'RadioButtonOpsiNominal
-        '
-        Me.RadioButtonOpsiNominal.AutoSize = True
-        Me.RadioButtonOpsiNominal.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.RadioButtonOpsiNominal.Location = New System.Drawing.Point(92, 3)
-        Me.RadioButtonOpsiNominal.Name = "RadioButtonOpsiNominal"
-        Me.RadioButtonOpsiNominal.Size = New System.Drawing.Size(71, 19)
-        Me.RadioButtonOpsiNominal.TabIndex = 246
-        Me.RadioButtonOpsiNominal.Text = "Nominal"
-        Me.RadioButtonOpsiNominal.UseVisualStyleBackColor = True
-        '
-        'RadioButtonOpsiPersentase
-        '
-        Me.RadioButtonOpsiPersentase.AutoSize = True
-        Me.RadioButtonOpsiPersentase.Checked = True
-        Me.RadioButtonOpsiPersentase.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.RadioButtonOpsiPersentase.Location = New System.Drawing.Point(5, 3)
-        Me.RadioButtonOpsiPersentase.Name = "RadioButtonOpsiPersentase"
-        Me.RadioButtonOpsiPersentase.Size = New System.Drawing.Size(81, 19)
-        Me.RadioButtonOpsiPersentase.TabIndex = 245
-        Me.RadioButtonOpsiPersentase.TabStop = True
-        Me.RadioButtonOpsiPersentase.Text = "Persentase"
-        Me.RadioButtonOpsiPersentase.UseVisualStyleBackColor = True
-        '
-        'Label22
-        '
-        Me.Label22.AutoSize = True
-        Me.Label22.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label22.Location = New System.Drawing.Point(16, 34)
-        Me.Label22.Name = "Label22"
-        Me.Label22.Size = New System.Drawing.Size(99, 17)
-        Me.Label22.TabIndex = 567
-        Me.Label22.Text = "Persentase Fee"
-        '
-        'Label23
-        '
-        Me.Label23.AutoSize = True
-        Me.Label23.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.Label23.Location = New System.Drawing.Point(180, 36)
-        Me.Label23.Name = "Label23"
-        Me.Label23.Size = New System.Drawing.Size(68, 15)
-        Me.Label23.TabIndex = 572
-        Me.Label23.Text = "Perusahaan"
-        '
-        'Label24
-        '
-        Me.Label24.AutoSize = True
-        Me.Label24.BackColor = System.Drawing.Color.Transparent
-        Me.Label24.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.Label24.Location = New System.Drawing.Point(310, 36)
-        Me.Label24.Name = "Label24"
-        Me.Label24.Size = New System.Drawing.Size(17, 15)
-        Me.Label24.TabIndex = 573
-        Me.Label24.Text = "%"
-        '
-        'Label25
-        '
-        Me.Label25.AutoSize = True
-        Me.Label25.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.Label25.Location = New System.Drawing.Point(329, 36)
-        Me.Label25.Name = "Label25"
-        Me.Label25.Size = New System.Drawing.Size(58, 15)
-        Me.Label25.TabIndex = 574
-        Me.Label25.Text = "Karyawan"
-        '
-        'Label26
-        '
-        Me.Label26.AutoSize = True
-        Me.Label26.BackColor = System.Drawing.Color.Transparent
-        Me.Label26.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.Label26.Location = New System.Drawing.Point(449, 36)
-        Me.Label26.Name = "Label26"
-        Me.Label26.Size = New System.Drawing.Size(17, 15)
-        Me.Label26.TabIndex = 576
-        Me.Label26.Text = "%"
-        '
-        'TextBoxNominalFee
-        '
-        Me.TextBoxNominalFee.BackColor = System.Drawing.Color.White
-        Me.TextBoxNominalFee.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBoxNominalFee.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxNominalFee.Location = New System.Drawing.Point(220, 63)
-        Me.TextBoxNominalFee.Name = "TextBoxNominalFee"
-        Me.TextBoxNominalFee.Size = New System.Drawing.Size(129, 23)
-        Me.TextBoxNominalFee.TabIndex = 577
-        '
-        'TextBox2
-        '
-        Me.TextBox2.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
-        Me.TextBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBox2.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.TextBox2.Location = New System.Drawing.Point(183, 63)
-        Me.TextBox2.Name = "TextBox2"
-        Me.TextBox2.Size = New System.Drawing.Size(35, 23)
-        Me.TextBox2.TabIndex = 578
-        Me.TextBox2.Text = "Rp"
-        Me.TextBox2.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'Label16
-        '
-        Me.Label16.AutoSize = True
-        Me.Label16.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label16.Location = New System.Drawing.Point(16, 63)
-        Me.Label16.Name = "Label16"
-        Me.Label16.Size = New System.Drawing.Size(84, 17)
-        Me.Label16.TabIndex = 579
-        Me.Label16.Text = "Nominal Fee"
-        '
-        'TextBoxFeeDokterTambahan
-        '
-        Me.TextBoxFeeDokterTambahan.BackColor = System.Drawing.Color.White
-        Me.TextBoxFeeDokterTambahan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBoxFeeDokterTambahan.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxFeeDokterTambahan.Location = New System.Drawing.Point(220, 92)
-        Me.TextBoxFeeDokterTambahan.Name = "TextBoxFeeDokterTambahan"
-        Me.TextBoxFeeDokterTambahan.Size = New System.Drawing.Size(129, 23)
-        Me.TextBoxFeeDokterTambahan.TabIndex = 580
-        '
-        'TextBox9
-        '
-        Me.TextBox9.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
-        Me.TextBox9.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBox9.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.TextBox9.Location = New System.Drawing.Point(183, 92)
-        Me.TextBox9.Name = "TextBox9"
-        Me.TextBox9.Size = New System.Drawing.Size(35, 23)
-        Me.TextBox9.TabIndex = 581
-        Me.TextBox9.Text = "Rp"
-        Me.TextBox9.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'Label21
-        '
-        Me.Label21.AutoSize = True
-        Me.Label21.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label21.Location = New System.Drawing.Point(17, 92)
-        Me.Label21.Name = "Label21"
-        Me.Label21.Size = New System.Drawing.Size(149, 17)
-        Me.Label21.TabIndex = 582
-        Me.Label21.Text = "Fee Dokter (Tambahan)"
-        '
-        'TextBoxFeePerawatTambahan
-        '
-        Me.TextBoxFeePerawatTambahan.BackColor = System.Drawing.Color.White
-        Me.TextBoxFeePerawatTambahan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBoxFeePerawatTambahan.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxFeePerawatTambahan.Location = New System.Drawing.Point(220, 121)
-        Me.TextBoxFeePerawatTambahan.Name = "TextBoxFeePerawatTambahan"
-        Me.TextBoxFeePerawatTambahan.Size = New System.Drawing.Size(129, 23)
-        Me.TextBoxFeePerawatTambahan.TabIndex = 583
-        '
-        'TextBox14
-        '
-        Me.TextBox14.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
-        Me.TextBox14.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBox14.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.TextBox14.Location = New System.Drawing.Point(183, 121)
-        Me.TextBox14.Name = "TextBox14"
-        Me.TextBox14.Size = New System.Drawing.Size(35, 23)
-        Me.TextBox14.TabIndex = 584
-        Me.TextBox14.Text = "Rp"
-        Me.TextBox14.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'Label27
-        '
-        Me.Label27.AutoSize = True
-        Me.Label27.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label27.Location = New System.Drawing.Point(17, 121)
-        Me.Label27.Name = "Label27"
-        Me.Label27.Size = New System.Drawing.Size(157, 17)
-        Me.Label27.TabIndex = 585
-        Me.Label27.Text = "Fee Perawat (Tambahan)"
-        '
-        'TextBoxPersentaseFeePerusahaan
-        '
-        Me.TextBoxPersentaseFeePerusahaan.BackColor = System.Drawing.Color.White
-        Me.TextBoxPersentaseFeePerusahaan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBoxPersentaseFeePerusahaan.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxPersentaseFeePerusahaan.Location = New System.Drawing.Point(254, 34)
-        Me.TextBoxPersentaseFeePerusahaan.Name = "TextBoxPersentaseFeePerusahaan"
-        Me.TextBoxPersentaseFeePerusahaan.Size = New System.Drawing.Size(50, 23)
-        Me.TextBoxPersentaseFeePerusahaan.TabIndex = 586
-        '
-        'TextBoxPersentaseFeeKaryawan
-        '
-        Me.TextBoxPersentaseFeeKaryawan.BackColor = System.Drawing.Color.White
-        Me.TextBoxPersentaseFeeKaryawan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBoxPersentaseFeeKaryawan.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxPersentaseFeeKaryawan.Location = New System.Drawing.Point(393, 34)
-        Me.TextBoxPersentaseFeeKaryawan.Name = "TextBoxPersentaseFeeKaryawan"
-        Me.TextBoxPersentaseFeeKaryawan.Size = New System.Drawing.Size(50, 23)
-        Me.TextBoxPersentaseFeeKaryawan.TabIndex = 587
-        '
-        'Label28
-        '
-        Me.Label28.AutoSize = True
-        Me.Label28.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label28.Location = New System.Drawing.Point(17, 153)
-        Me.Label28.Name = "Label28"
-        Me.Label28.Size = New System.Drawing.Size(74, 17)
-        Me.Label28.TabIndex = 588
-        Me.Label28.Text = "Fee Dokter"
-        Me.Label28.Visible = False
-        '
-        'Panel6
-        '
-        Me.Panel6.BackColor = System.Drawing.Color.Transparent
-        Me.Panel6.Controls.Add(Me.TextBox4)
-        Me.Panel6.Controls.Add(Me.TextBox6)
-        Me.Panel6.Controls.Add(Me.TextBox8)
-        Me.Panel6.Controls.Add(Me.Label29)
-        Me.Panel6.Controls.Add(Me.RadioButton1)
-        Me.Panel6.Controls.Add(Me.RadioButton2)
-        Me.Panel6.Location = New System.Drawing.Point(183, 150)
-        Me.Panel6.Name = "Panel6"
-        Me.Panel6.Size = New System.Drawing.Size(327, 60)
-        Me.Panel6.TabIndex = 589
-        Me.Panel6.Visible = False
-        '
-        'RadioButton2
-        '
-        Me.RadioButton2.AutoSize = True
-        Me.RadioButton2.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.RadioButton2.Location = New System.Drawing.Point(5, 28)
-        Me.RadioButton2.Name = "RadioButton2"
-        Me.RadioButton2.Size = New System.Drawing.Size(71, 19)
-        Me.RadioButton2.TabIndex = 246
-        Me.RadioButton2.Text = "Nominal"
-        Me.RadioButton2.UseVisualStyleBackColor = True
-        '
-        'RadioButton1
-        '
-        Me.RadioButton1.AutoSize = True
-        Me.RadioButton1.Checked = True
-        Me.RadioButton1.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.RadioButton1.Location = New System.Drawing.Point(5, 3)
-        Me.RadioButton1.Name = "RadioButton1"
-        Me.RadioButton1.Size = New System.Drawing.Size(81, 19)
-        Me.RadioButton1.TabIndex = 245
-        Me.RadioButton1.TabStop = True
-        Me.RadioButton1.Text = "Persentase"
-        Me.RadioButton1.UseVisualStyleBackColor = True
-        '
-        'Label29
-        '
-        Me.Label29.AutoSize = True
-        Me.Label29.BackColor = System.Drawing.Color.Transparent
-        Me.Label29.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.Label29.Location = New System.Drawing.Point(133, 5)
-        Me.Label29.Name = "Label29"
-        Me.Label29.Size = New System.Drawing.Size(17, 15)
-        Me.Label29.TabIndex = 592
-        Me.Label29.Text = "%"
-        '
-        'TextBox8
-        '
-        Me.TextBox8.BackColor = System.Drawing.Color.White
-        Me.TextBox8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBox8.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBox8.Location = New System.Drawing.Point(92, 3)
-        Me.TextBox8.Name = "TextBox8"
-        Me.TextBox8.Size = New System.Drawing.Size(35, 23)
-        Me.TextBox8.TabIndex = 593
-        Me.TextBox8.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'TextBox6
-        '
-        Me.TextBox6.BackColor = System.Drawing.Color.White
-        Me.TextBox6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBox6.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBox6.Location = New System.Drawing.Point(129, 32)
-        Me.TextBox6.Name = "TextBox6"
-        Me.TextBox6.Size = New System.Drawing.Size(129, 23)
-        Me.TextBox6.TabIndex = 590
-        '
-        'TextBox4
-        '
-        Me.TextBox4.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
-        Me.TextBox4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBox4.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.TextBox4.Location = New System.Drawing.Point(92, 32)
-        Me.TextBox4.Name = "TextBox4"
-        Me.TextBox4.Size = New System.Drawing.Size(35, 23)
-        Me.TextBox4.TabIndex = 591
-        Me.TextBox4.Text = "Rp"
-        Me.TextBox4.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'Label47
-        '
-        Me.Label47.AutoSize = True
-        Me.Label47.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.Label47.Location = New System.Drawing.Point(472, 37)
-        Me.Label47.Name = "Label47"
-        Me.Label47.Size = New System.Drawing.Size(49, 15)
-        Me.Label47.TabIndex = 592
-        Me.Label47.Text = "Perawat"
-        '
-        'Label31
-        '
-        Me.Label31.AutoSize = True
-        Me.Label31.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label31.Location = New System.Drawing.Point(17, 219)
-        Me.Label31.Name = "Label31"
-        Me.Label31.Size = New System.Drawing.Size(82, 17)
-        Me.Label31.TabIndex = 590
-        Me.Label31.Text = "Fee Perawat"
-        Me.Label31.Visible = False
-        '
-        'Panel7
-        '
-        Me.Panel7.BackColor = System.Drawing.Color.Transparent
-        Me.Panel7.Controls.Add(Me.TextBox10)
-        Me.Panel7.Controls.Add(Me.TextBox11)
-        Me.Panel7.Controls.Add(Me.TextBox13)
-        Me.Panel7.Controls.Add(Me.Label30)
-        Me.Panel7.Controls.Add(Me.RadioButton3)
-        Me.Panel7.Controls.Add(Me.RadioButton4)
-        Me.Panel7.Location = New System.Drawing.Point(183, 216)
-        Me.Panel7.Name = "Panel7"
-        Me.Panel7.Size = New System.Drawing.Size(327, 60)
-        Me.Panel7.TabIndex = 591
-        Me.Panel7.Visible = False
-        '
-        'RadioButton4
-        '
-        Me.RadioButton4.AutoSize = True
-        Me.RadioButton4.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.RadioButton4.Location = New System.Drawing.Point(5, 28)
-        Me.RadioButton4.Name = "RadioButton4"
-        Me.RadioButton4.Size = New System.Drawing.Size(71, 19)
-        Me.RadioButton4.TabIndex = 246
-        Me.RadioButton4.Text = "Nominal"
-        Me.RadioButton4.UseVisualStyleBackColor = True
-        '
-        'RadioButton3
-        '
-        Me.RadioButton3.AutoSize = True
-        Me.RadioButton3.Checked = True
-        Me.RadioButton3.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.RadioButton3.Location = New System.Drawing.Point(5, 3)
-        Me.RadioButton3.Name = "RadioButton3"
-        Me.RadioButton3.Size = New System.Drawing.Size(81, 19)
-        Me.RadioButton3.TabIndex = 245
-        Me.RadioButton3.TabStop = True
-        Me.RadioButton3.Text = "Persentase"
-        Me.RadioButton3.UseVisualStyleBackColor = True
-        '
-        'Label30
-        '
-        Me.Label30.AutoSize = True
-        Me.Label30.BackColor = System.Drawing.Color.Transparent
-        Me.Label30.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.Label30.Location = New System.Drawing.Point(133, 5)
-        Me.Label30.Name = "Label30"
-        Me.Label30.Size = New System.Drawing.Size(17, 15)
-        Me.Label30.TabIndex = 592
-        Me.Label30.Text = "%"
-        '
-        'TextBox13
-        '
-        Me.TextBox13.BackColor = System.Drawing.Color.White
-        Me.TextBox13.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBox13.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBox13.Location = New System.Drawing.Point(92, 3)
-        Me.TextBox13.Name = "TextBox13"
-        Me.TextBox13.Size = New System.Drawing.Size(35, 23)
-        Me.TextBox13.TabIndex = 593
-        Me.TextBox13.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'TextBox11
-        '
-        Me.TextBox11.BackColor = System.Drawing.Color.White
-        Me.TextBox11.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBox11.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBox11.Location = New System.Drawing.Point(129, 32)
-        Me.TextBox11.Name = "TextBox11"
-        Me.TextBox11.Size = New System.Drawing.Size(129, 23)
-        Me.TextBox11.TabIndex = 590
-        '
-        'TextBox10
-        '
-        Me.TextBox10.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
-        Me.TextBox10.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBox10.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.TextBox10.Location = New System.Drawing.Point(92, 32)
-        Me.TextBox10.Name = "TextBox10"
-        Me.TextBox10.Size = New System.Drawing.Size(35, 23)
-        Me.TextBox10.TabIndex = 591
-        Me.TextBox10.Text = "Rp"
-        Me.TextBox10.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
-        '
-        'Label42
-        '
-        Me.Label42.AutoSize = True
-        Me.Label42.BackColor = System.Drawing.Color.Transparent
-        Me.Label42.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.Label42.Location = New System.Drawing.Point(581, 37)
-        Me.Label42.Name = "Label42"
-        Me.Label42.Size = New System.Drawing.Size(17, 15)
-        Me.Label42.TabIndex = 593
-        Me.Label42.Text = "%"
-        '
-        'TextBoxPersentaseFeePerawat
-        '
-        Me.TextBoxPersentaseFeePerawat.BackColor = System.Drawing.Color.White
-        Me.TextBoxPersentaseFeePerawat.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBoxPersentaseFeePerawat.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxPersentaseFeePerawat.Location = New System.Drawing.Point(525, 34)
-        Me.TextBoxPersentaseFeePerawat.Name = "TextBoxPersentaseFeePerawat"
-        Me.TextBoxPersentaseFeePerawat.Size = New System.Drawing.Size(50, 23)
-        Me.TextBoxPersentaseFeePerawat.TabIndex = 594
-        '
-        'Label12
-        '
-        Me.Label12.AutoSize = True
-        Me.Label12.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label12.Location = New System.Drawing.Point(16, 6)
-        Me.Label12.Name = "Label12"
-        Me.Label12.Size = New System.Drawing.Size(148, 17)
-        Me.Label12.TabIndex = 563
-        Me.Label12.Text = "Aktifkan Fee Tindakan?"
-        '
-        'Panel3
-        '
-        Me.Panel3.BackColor = System.Drawing.Color.Transparent
-        Me.Panel3.Controls.Add(Me.RadioButtonAktifFee)
-        Me.Panel3.Controls.Add(Me.RadioButtonNonAktifFee)
-        Me.Panel3.Location = New System.Drawing.Point(183, 3)
-        Me.Panel3.Name = "Panel3"
-        Me.Panel3.Size = New System.Drawing.Size(327, 25)
-        Me.Panel3.TabIndex = 564
-        '
-        'RadioButtonNonAktifFee
-        '
-        Me.RadioButtonNonAktifFee.AutoSize = True
-        Me.RadioButtonNonAktifFee.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.RadioButtonNonAktifFee.Location = New System.Drawing.Point(48, 3)
-        Me.RadioButtonNonAktifFee.Name = "RadioButtonNonAktifFee"
-        Me.RadioButtonNonAktifFee.Size = New System.Drawing.Size(54, 19)
-        Me.RadioButtonNonAktifFee.TabIndex = 246
-        Me.RadioButtonNonAktifFee.Text = "Tidak"
-        Me.RadioButtonNonAktifFee.UseVisualStyleBackColor = True
-        '
-        'RadioButtonAktifFee
-        '
-        Me.RadioButtonAktifFee.AutoSize = True
-        Me.RadioButtonAktifFee.Checked = True
-        Me.RadioButtonAktifFee.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.RadioButtonAktifFee.Location = New System.Drawing.Point(5, 3)
-        Me.RadioButtonAktifFee.Name = "RadioButtonAktifFee"
-        Me.RadioButtonAktifFee.Size = New System.Drawing.Size(37, 19)
-        Me.RadioButtonAktifFee.TabIndex = 245
-        Me.RadioButtonAktifFee.TabStop = True
-        Me.RadioButtonAktifFee.Text = "Ya"
-        Me.RadioButtonAktifFee.UseVisualStyleBackColor = True
-        '
-        'CheckBoxStatusAktifTindakan
-        '
-        Me.CheckBoxStatusAktifTindakan.AutoSize = True
-        Me.CheckBoxStatusAktifTindakan.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.CheckBoxStatusAktifTindakan.Location = New System.Drawing.Point(351, 51)
-        Me.CheckBoxStatusAktifTindakan.Name = "CheckBoxStatusAktifTindakan"
-        Me.CheckBoxStatusAktifTindakan.Size = New System.Drawing.Size(51, 19)
-        Me.CheckBoxStatusAktifTindakan.TabIndex = 570
-        Me.CheckBoxStatusAktifTindakan.Text = "Aktif"
-        Me.CheckBoxStatusAktifTindakan.UseVisualStyleBackColor = True
-        '
-        'Panel5
-        '
-        Me.Panel5.BackColor = System.Drawing.Color.Transparent
-        Me.Panel5.Controls.Add(Me.RadioButtonPelaksanaDokter)
-        Me.Panel5.Controls.Add(Me.RadioButtonPelaksanaPerawat)
-        Me.Panel5.Location = New System.Drawing.Point(195, 168)
-        Me.Panel5.Name = "Panel5"
-        Me.Panel5.Size = New System.Drawing.Size(327, 25)
-        Me.Panel5.TabIndex = 571
-        '
-        'RadioButtonPelaksanaPerawat
-        '
-        Me.RadioButtonPelaksanaPerawat.AutoSize = True
-        Me.RadioButtonPelaksanaPerawat.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.RadioButtonPelaksanaPerawat.Location = New System.Drawing.Point(71, 3)
-        Me.RadioButtonPelaksanaPerawat.Name = "RadioButtonPelaksanaPerawat"
-        Me.RadioButtonPelaksanaPerawat.Size = New System.Drawing.Size(67, 19)
-        Me.RadioButtonPelaksanaPerawat.TabIndex = 246
-        Me.RadioButtonPelaksanaPerawat.Text = "Perawat"
-        Me.RadioButtonPelaksanaPerawat.UseVisualStyleBackColor = True
-        '
-        'RadioButtonPelaksanaDokter
-        '
-        Me.RadioButtonPelaksanaDokter.AutoSize = True
-        Me.RadioButtonPelaksanaDokter.Checked = True
-        Me.RadioButtonPelaksanaDokter.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.RadioButtonPelaksanaDokter.Location = New System.Drawing.Point(5, 3)
-        Me.RadioButtonPelaksanaDokter.Name = "RadioButtonPelaksanaDokter"
-        Me.RadioButtonPelaksanaDokter.Size = New System.Drawing.Size(60, 19)
-        Me.RadioButtonPelaksanaDokter.TabIndex = 245
-        Me.RadioButtonPelaksanaDokter.TabStop = True
-        Me.RadioButtonPelaksanaDokter.Text = "Dokter"
-        Me.RadioButtonPelaksanaDokter.UseVisualStyleBackColor = True
-        '
-        'GroupBox1
-        '
-        Me.GroupBox1.Controls.Add(Me.Label33)
-        Me.GroupBox1.Controls.Add(Me.TextBoxHariReminder)
-        Me.GroupBox1.Controls.Add(Me.CheckBoxReminder)
-        Me.GroupBox1.Location = New System.Drawing.Point(629, 17)
-        Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(174, 116)
-        Me.GroupBox1.TabIndex = 573
-        Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "Reminder Pasien ?"
-        '
-        'CheckBoxReminder
-        '
-        Me.CheckBoxReminder.AutoSize = True
-        Me.CheckBoxReminder.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.CheckBoxReminder.Location = New System.Drawing.Point(18, 22)
-        Me.CheckBoxReminder.Name = "CheckBoxReminder"
-        Me.CheckBoxReminder.Size = New System.Drawing.Size(42, 19)
-        Me.CheckBoxReminder.TabIndex = 572
-        Me.CheckBoxReminder.Text = "Iya"
-        Me.CheckBoxReminder.UseVisualStyleBackColor = True
-        '
-        'TextBoxHariReminder
-        '
-        Me.TextBoxHariReminder.BackColor = System.Drawing.Color.White
-        Me.TextBoxHariReminder.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBoxHariReminder.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
-        Me.TextBoxHariReminder.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxHariReminder.Location = New System.Drawing.Point(18, 71)
-        Me.TextBoxHariReminder.Name = "TextBoxHariReminder"
-        Me.TextBoxHariReminder.Size = New System.Drawing.Size(109, 23)
-        Me.TextBoxHariReminder.TabIndex = 573
-        '
-        'Label33
-        '
-        Me.Label33.AutoSize = True
-        Me.Label33.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label33.Location = New System.Drawing.Point(15, 51)
-        Me.Label33.Name = "Label33"
-        Me.Label33.Size = New System.Drawing.Size(85, 17)
-        Me.Label33.TabIndex = 574
-        Me.Label33.Text = "Berapa Hari?"
-        '
-        'CheckedListBoxPoli
-        '
-        Me.CheckedListBoxPoli.FormattingEnabled = True
-        Me.CheckedListBoxPoli.Location = New System.Drawing.Point(629, 139)
-        Me.CheckedListBoxPoli.Name = "CheckedListBoxPoli"
-        Me.CheckedListBoxPoli.ScrollAlwaysVisible = True
-        Me.CheckedListBoxPoli.Size = New System.Drawing.Size(174, 94)
-        Me.CheckedListBoxPoli.TabIndex = 574
-        '
-        'Label34
-        '
-        Me.Label34.AutoSize = True
-        Me.Label34.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label34.Location = New System.Drawing.Point(626, 238)
-        Me.Label34.Name = "Label34"
-        Me.Label34.Size = New System.Drawing.Size(118, 17)
-        Me.Label34.TabIndex = 575
-        Me.Label34.Text = "Kategori Tindakan"
-        '
-        'ComboBoxKategori
-        '
-        Me.ComboBoxKategori.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.ComboBoxKategori.FormattingEnabled = True
-        Me.ComboBoxKategori.Items.AddRange(New Object() {"Face", "Hair", "Body", "IV"})
-        Me.ComboBoxKategori.Location = New System.Drawing.Point(629, 259)
-        Me.ComboBoxKategori.Name = "ComboBoxKategori"
-        Me.ComboBoxKategori.Size = New System.Drawing.Size(174, 25)
-        Me.ComboBoxKategori.TabIndex = 576
-        '
-        'GroupBox2
-        '
-        Me.GroupBox2.Controls.Add(Me.ButtonTambahAlat)
-        Me.GroupBox2.Controls.Add(Me.ComboBoxAlatTindakan)
-        Me.GroupBox2.Controls.Add(Me.Label37)
-        Me.GroupBox2.Controls.Add(Me.ComboBoxCartridgeTindakan)
-        Me.GroupBox2.Controls.Add(Me.Label36)
-        Me.GroupBox2.Controls.Add(Me.Label41)
-        Me.GroupBox2.Controls.Add(Me.NumericShootPerTindakan)
-        Me.GroupBox2.Controls.Add(Me.CheckBoxPakaiAlat)
-        Me.GroupBox2.Location = New System.Drawing.Point(629, 293)
-        Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(174, 215)
-        Me.GroupBox2.TabIndex = 578
-        Me.GroupBox2.TabStop = False
-        Me.GroupBox2.Text = "Pakai Alat ?"
-        '
-        'CheckBoxPakaiAlat
-        '
-        Me.CheckBoxPakaiAlat.AutoSize = True
-        Me.CheckBoxPakaiAlat.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.CheckBoxPakaiAlat.Location = New System.Drawing.Point(10, 22)
-        Me.CheckBoxPakaiAlat.Name = "CheckBoxPakaiAlat"
-        Me.CheckBoxPakaiAlat.Size = New System.Drawing.Size(42, 19)
-        Me.CheckBoxPakaiAlat.TabIndex = 577
-        Me.CheckBoxPakaiAlat.Text = "Iya"
-        Me.CheckBoxPakaiAlat.UseVisualStyleBackColor = True
-        '
-        'NumericShootPerTindakan
-        '
-        Me.NumericShootPerTindakan.Location = New System.Drawing.Point(12, 152)
-        Me.NumericShootPerTindakan.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
-        Me.NumericShootPerTindakan.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
-        Me.NumericShootPerTindakan.Name = "NumericShootPerTindakan"
-        Me.NumericShootPerTindakan.Size = New System.Drawing.Size(58, 23)
-        Me.NumericShootPerTindakan.TabIndex = 580
-        Me.NumericShootPerTindakan.ThousandsSeparator = True
-        Me.NumericShootPerTindakan.Value = New Decimal(New Integer() {1, 0, 0, 0})
-        '
-        'Label41
-        '
-        Me.Label41.AutoSize = True
-        Me.Label41.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label41.Location = New System.Drawing.Point(76, 154)
-        Me.Label41.Name = "Label41"
-        Me.Label41.Size = New System.Drawing.Size(78, 17)
-        Me.Label41.TabIndex = 582
-        Me.Label41.Text = "Shoot / Kali"
-        '
-        'Label36
-        '
-        Me.Label36.AutoSize = True
-        Me.Label36.Location = New System.Drawing.Point(8, 96)
-        Me.Label36.Name = "Label36"
-        Me.Label36.Size = New System.Drawing.Size(56, 15)
-        Me.Label36.TabIndex = 583
-        Me.Label36.Text = "Cartridge"
-        '
-        'ComboBoxCartridgeTindakan
-        '
-        Me.ComboBoxCartridgeTindakan.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboBoxCartridgeTindakan.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.ComboBoxCartridgeTindakan.FormattingEnabled = True
-        Me.ComboBoxCartridgeTindakan.Location = New System.Drawing.Point(12, 115)
-        Me.ComboBoxCartridgeTindakan.Name = "ComboBoxCartridgeTindakan"
-        Me.ComboBoxCartridgeTindakan.Size = New System.Drawing.Size(154, 25)
-        Me.ComboBoxCartridgeTindakan.TabIndex = 584
-        '
-        'Label37
-        '
-        Me.Label37.AutoSize = True
-        Me.Label37.Location = New System.Drawing.Point(7, 47)
-        Me.Label37.Name = "Label37"
-        Me.Label37.Size = New System.Drawing.Size(28, 15)
-        Me.Label37.TabIndex = 585
-        Me.Label37.Text = "Alat"
-        '
-        'ComboBoxAlatTindakan
-        '
-        Me.ComboBoxAlatTindakan.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.ComboBoxAlatTindakan.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.ComboBoxAlatTindakan.FormattingEnabled = True
-        Me.ComboBoxAlatTindakan.Location = New System.Drawing.Point(11, 66)
-        Me.ComboBoxAlatTindakan.Name = "ComboBoxAlatTindakan"
-        Me.ComboBoxAlatTindakan.Size = New System.Drawing.Size(154, 25)
-        Me.ComboBoxAlatTindakan.TabIndex = 586
-        '
-        'ButtonTambahAlat
-        '
-        Me.ButtonTambahAlat.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
-        Me.ButtonTambahAlat.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
-        Me.ButtonTambahAlat.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.ButtonTambahAlat.FlatAppearance.BorderSize = 0
-        Me.ButtonTambahAlat.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
-        Me.ButtonTambahAlat.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.ButtonTambahAlat.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.ButtonTambahAlat.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.ButtonTambahAlat.ForeColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(254, Byte), Integer))
-        Me.ButtonTambahAlat.Location = New System.Drawing.Point(92, 180)
-        Me.ButtonTambahAlat.Name = "ButtonTambahAlat"
-        Me.ButtonTambahAlat.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.ButtonTambahAlat.Size = New System.Drawing.Size(73, 25)
-        Me.ButtonTambahAlat.TabIndex = 587
-        Me.ButtonTambahAlat.Text = " + Tambah"
-        Me.ButtonTambahAlat.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-        Me.ButtonTambahAlat.UseVisualStyleBackColor = False
-        '
-        'DataGridViewAlatTindakan
-        '
-        Me.DataGridViewAlatTindakan.AllowUserToAddRows = False
-        Me.DataGridViewAlatTindakan.AllowUserToDeleteRows = False
-        Me.DataGridViewAlatTindakan.BackgroundColor = System.Drawing.Color.White
-        Me.DataGridViewAlatTindakan.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.DataGridViewAlatTindakan.Location = New System.Drawing.Point(808, 301)
-        Me.DataGridViewAlatTindakan.Name = "DataGridViewAlatTindakan"
-        Me.DataGridViewAlatTindakan.Size = New System.Drawing.Size(428, 130)
-        Me.DataGridViewAlatTindakan.TabIndex = 579
-        '
-        'SplitContainer3
-        '
-        Me.SplitContainer3.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.SplitContainer3.FixedPanel = System.Windows.Forms.FixedPanel.Panel1
-        Me.SplitContainer3.IsSplitterFixed = True
-        Me.SplitContainer3.Location = New System.Drawing.Point(0, 0)
-        Me.SplitContainer3.Name = "SplitContainer3"
-        Me.SplitContainer3.Orientation = System.Windows.Forms.Orientation.Horizontal
-        '
-        'SplitContainer3.Panel1
-        '
-        Me.SplitContainer3.Panel1.AutoScroll = True
-        Me.SplitContainer3.Panel1.BackColor = System.Drawing.Color.White
-        Me.SplitContainer3.Panel1.Controls.Add(Me.PanelMasterTindakan)
-        '
-        'SplitContainer3.Panel2
-        '
-        Me.SplitContainer3.Panel2.AutoScroll = True
-        Me.SplitContainer3.Size = New System.Drawing.Size(757, 581)
-        Me.SplitContainer3.SplitterDistance = 500
-        Me.SplitContainer3.SplitterWidth = 1
-        Me.SplitContainer3.TabIndex = 462
-        '
         'MasterTindakanKlinik
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -3098,6 +3099,35 @@ Partial Class MasterTindakanKlinik
         Me.SplitContainer2.Panel2.ResumeLayout(False)
         Me.SplitContainer2.ResumeLayout(False)
         Me.FlowLayoutPanel1.ResumeLayout(False)
+        Me.SplitContainer3.Panel1.ResumeLayout(False)
+        Me.SplitContainer3.ResumeLayout(False)
+        Me.PanelMasterTindakan.ResumeLayout(False)
+        Me.PanelMasterTindakan.PerformLayout()
+        CType(Me.DataGridViewAlatTindakan, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBox2.ResumeLayout(False)
+        Me.GroupBox2.PerformLayout()
+        CType(Me.NumericShootPerTindakan, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox1.PerformLayout()
+        Me.Panel5.ResumeLayout(False)
+        Me.Panel5.PerformLayout()
+        Me.SplitContainerFeeTindakan.Panel1.ResumeLayout(False)
+        Me.SplitContainerFeeTindakan.Panel1.PerformLayout()
+        Me.SplitContainerFeeTindakan.Panel2.ResumeLayout(False)
+        Me.SplitContainerFeeTindakan.Panel2.PerformLayout()
+        Me.SplitContainerFeeTindakan.ResumeLayout(False)
+        Me.Panel3.ResumeLayout(False)
+        Me.Panel3.PerformLayout()
+        Me.Panel7.ResumeLayout(False)
+        Me.Panel7.PerformLayout()
+        Me.Panel6.ResumeLayout(False)
+        Me.Panel6.PerformLayout()
+        Me.Panel4.ResumeLayout(False)
+        Me.Panel4.PerformLayout()
+        Me.Panel2.ResumeLayout(False)
+        Me.Panel2.PerformLayout()
+        Me.Panel1.ResumeLayout(False)
+        Me.Panel1.PerformLayout()
         Me.TabPageMasterPaket.ResumeLayout(False)
         Me.SplitContainerPendaftaran.Panel1.ResumeLayout(False)
         Me.SplitContainerPendaftaran.Panel2.ResumeLayout(False)
@@ -3127,35 +3157,6 @@ Partial Class MasterTindakanKlinik
         Me.TabPage2.PerformLayout()
         CType(Me.DataGridViewAlat, System.ComponentModel.ISupportInitialize).EndInit()
         Me.Panel9.ResumeLayout(False)
-        Me.PanelMasterTindakan.ResumeLayout(False)
-        Me.PanelMasterTindakan.PerformLayout()
-        Me.Panel1.ResumeLayout(False)
-        Me.Panel1.PerformLayout()
-        Me.Panel2.ResumeLayout(False)
-        Me.Panel2.PerformLayout()
-        Me.SplitContainerFeeTindakan.Panel1.ResumeLayout(False)
-        Me.SplitContainerFeeTindakan.Panel1.PerformLayout()
-        Me.SplitContainerFeeTindakan.Panel2.ResumeLayout(False)
-        Me.SplitContainerFeeTindakan.Panel2.PerformLayout()
-        Me.SplitContainerFeeTindakan.ResumeLayout(False)
-        Me.Panel4.ResumeLayout(False)
-        Me.Panel4.PerformLayout()
-        Me.Panel6.ResumeLayout(False)
-        Me.Panel6.PerformLayout()
-        Me.Panel7.ResumeLayout(False)
-        Me.Panel7.PerformLayout()
-        Me.Panel3.ResumeLayout(False)
-        Me.Panel3.PerformLayout()
-        Me.Panel5.ResumeLayout(False)
-        Me.Panel5.PerformLayout()
-        Me.GroupBox1.ResumeLayout(False)
-        Me.GroupBox1.PerformLayout()
-        Me.GroupBox2.ResumeLayout(False)
-        Me.GroupBox2.PerformLayout()
-        CType(Me.NumericShootPerTindakan, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.DataGridViewAlatTindakan, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.SplitContainer3.Panel1.ResumeLayout(False)
-        Me.SplitContainer3.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub

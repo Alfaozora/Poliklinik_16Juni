@@ -1694,11 +1694,10 @@ Public Class FormPembayaran
 
                 WriteSQL("UPDATE TransaksiPoli SET TotalTagihan = TotalTagihan + " & CDbl(txtotalbruto) & ", TotalDisc = TotalDisc + " & CDbl(txtotaldisc) & ", Pembulatan = Pembulatan + " & CDbl(txtotalpembulatan) & ", NettBayar = NettBayar + " & CDbl(TextBoxTotalTagihan.Value) & ", TotalBayar = TotalBayar + " & CDbl(TextBoxTotalBayar.Value) & ", Pengembalian = Pengembalian + " & CDbl(TextBoxTotalKembali.Value) & ", ClosedBayar = '" & Format(DateAndTime.Now, "MM/dd/yyyy") & "', Status = 'CLOSED' WHERE TransPoliID = '" & _idTransaksi & "'", 4)
 
-
                 ' ================================
                 ' UPDATE JUMLAH TERPAKAI VOUCHER
                 ' ================================
-                If _kodeVoucher.Trim() <> "" Then
+                If _kodeVoucher.Trim() <> "" AndAlso CDbl(txtotaldisc) > 0 Then
                     Try
                         Dim sqlUpdateVoucher As String = _
                             "UPDATE MasterVoucher SET " & _
@@ -2205,6 +2204,9 @@ Public Class FormPembayaran
                 CheckBoxLunasBayar.Checked = True
             End If
         End If
+
+        _kodeVoucher = String.Empty
+        _idTransaksi = String.Empty
     End Sub
 
     ' API PCare - Bridging Antrean (v2)

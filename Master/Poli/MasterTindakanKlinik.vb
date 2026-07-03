@@ -982,6 +982,11 @@ Public Class MasterTindakanKlinik
     End Sub
 
     Private Function GenerateDetailTindakanJSON() As String
+        DataGridViewAlatTindakan.EndEdit()
+
+        If DataGridViewAlatTindakan.BindingContext IsNot Nothing AndAlso DataGridViewAlatTindakan.DataSource IsNot Nothing Then
+            DataGridViewAlatTindakan.BindingContext(DataGridViewAlatTindakan.DataSource).EndCurrentEdit()
+        End If
 
         If dtDetailAlat Is Nothing Then Return "[]"
         If dtDetailAlat.Rows.Count = 0 Then Return "[]"
@@ -989,7 +994,6 @@ Public Class MasterTindakanKlinik
         Dim list As New List(Of Object)
 
         For Each row As DataRow In dtDetailAlat.Rows
-
             list.Add(New With { _
                 .AlatID = row("AlatID"), _
                 .NamaAlat = row("NamaAlat"), _
@@ -998,11 +1002,9 @@ Public Class MasterTindakanKlinik
                 .Shoot = row("Shoot"), _
                 .HargaBeli = row("HargaBeli") _
             })
-
         Next
 
         Return JsonConvert.SerializeObject(list)
-
     End Function
 
     Private Sub SimpanDataTindakan()
@@ -1406,6 +1408,28 @@ Public Class MasterTindakanKlinik
 
         DataGridViewAlatTindakan.DataSource = dtDetailAlat
 
+        DataGridViewAlatTindakan.ReadOnly = False
+
+        For Each col As DataGridViewColumn In DataGridViewAlatTindakan.Columns
+            col.ReadOnly = True
+        Next
+
+        If DataGridViewAlatTindakan.Columns.Contains("Shoot") Then
+            DataGridViewAlatTindakan.Columns("Shoot").ReadOnly = False
+        End If
+
+        If DataGridViewAlatTindakan.Columns.Contains("HargaBeli") Then
+            DataGridViewAlatTindakan.Columns("HargaBeli").ReadOnly = False
+        End If
+
+        If DataGridViewAlatTindakan.Columns.Contains("Shoot") Then
+            DataGridViewAlatTindakan.Columns("Shoot").DefaultCellStyle.BackColor = Color.LightYellow
+        End If
+
+        If DataGridViewAlatTindakan.Columns.Contains("HargaBeli") Then
+            DataGridViewAlatTindakan.Columns("HargaBeli").DefaultCellStyle.BackColor = Color.LightYellow
+        End If
+
     End Sub
 
     Private Sub ButtonTambahAlat_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonTambahAlat.Click
@@ -1777,7 +1801,6 @@ Public Class MasterTindakanKlinik
         End If
 
         Dim statusAktif As Integer = If(CheckBoxCartridge.Checked, 1, 0)
-
         Dim kuotaAwal As Integer = CInt(NumericKuotaAwalCartridge.Text)
         Dim kuotaMinimum As Integer = CInt(NumericKuotaMinimumCartridge.Text)
 
@@ -1785,8 +1808,6 @@ Public Class MasterTindakanKlinik
         Dim hargaBeli As Decimal = 0
         If Not Decimal.TryParse(TextBoxHargaBeli.Text, hargaBeli) Then
             hargaBeli = 0
-            ' Anda bisa mengganti "hargaBeli = 0" dengan MsgBox peringatan 
-            ' dan "Exit Sub" jika harga beli wajib diisi.
         End If
 
         Dim alatID As Integer = CInt(ComboBoxNamaAlat.SelectedValue)
@@ -1796,20 +1817,22 @@ Public Class MasterTindakanKlinik
             Exit Sub
         End If
 
+        Dim strHargaBeli As String = hargaBeli.ToString(System.Globalization.CultureInfo.InvariantCulture)
+
         WriteSQL("INSERT INTO MasterCartridge " & _
-                 "(KodeCartridge, NamaCartridge, KuotaTotal, KuotaTerpakai, IsAktif, CreatedAt, CreatedBy, KuotaAwal, KuotaMinimum, AlatID, HargaBeli) " & _
-                 "VALUES (" & _
-                 "'" & TextBoxKodeCartridge.Text.Replace("'", "''") & "', " & _
-                 "'" & TextBoxNamaCartridge.Text.Replace("'", "''") & "', " & _
-                 kuotaAwal & ", " & _
-                 "0, " & _
-                 statusAktif & ", " & _
-                 "GETDATE(), " & _
-                 "'" & userInput & "', " & _
-                 kuotaAwal & ", " & _
-                 kuotaMinimum & ", " & _
-                 alatID & ", " & _
-                 hargaBeli & ")", 4)
+             "(KodeCartridge, NamaCartridge, KuotaTotal, KuotaTerpakai, IsAktif, CreatedAt, CreatedBy, KuotaAwal, KuotaMinimum, AlatID, HargaBeli) " & _
+             "VALUES (" & _
+             "'" & TextBoxKodeCartridge.Text.Replace("'", "''") & "', " & _
+             "'" & TextBoxNamaCartridge.Text.Replace("'", "''") & "', " & _
+             kuotaAwal & ", " & _
+             "0, " & _
+             statusAktif & ", " & _
+             "GETDATE(), " & _
+             "'" & userInput & "', " & _
+             kuotaAwal & ", " & _
+             kuotaMinimum & ", " & _
+             alatID & ", " & _
+             strHargaBeli & ")", 4)
 
         MsgBox("Berhasil menyimpan data cartridge.", MsgBoxStyle.Information, "Success!")
 
@@ -1837,14 +1860,11 @@ Public Class MasterTindakanKlinik
     End Sub
 
     Private Sub UpdateMasterCartridge()
-
         Dim statusAktif As Integer = If(CheckBoxCartridge.Checked = True, 1, 0)
 
-        ' Ambil kuota terpakai lama
         Dim kuotaTerpakai As Integer = CInt(TextBoxKuotaTerpakaiCartridge.Text)
         Dim kuotaAwalBaru As Integer = CInt(NumericKuotaAwalCartridge.Text)
         Dim kuotaMinimum As Integer = CInt(NumericKuotaMinimumCartridge.Text)
-
         Dim alatID As Integer = CInt(ComboBoxNamaAlat.SelectedValue)
 
         Dim hargaBeli As Decimal = 0
@@ -1869,12 +1889,13 @@ Public Class MasterTindakanKlinik
             Exit Sub
         End If
 
-        Dim parameterUpdate As String = ""
+        Dim strHargaBeli As String = hargaBeli.ToString(System.Globalization.CultureInfo.InvariantCulture)
 
+        Dim parameterUpdate As String = ""
         parameterUpdate = "KodeCartridge = '" & TextBoxKodeCartridge.Text.Replace("'", "''") & "', " & _
                           "NamaCartridge = '" & TextBoxNamaCartridge.Text.Replace("'", "''") & "', " & _
                           "AlatID = " & alatID & ", " & _
-                          "HargaBeli = " & hargaBeli & ", " & _
+                          "HargaBeli = " & strHargaBeli & ", " & _
                           "KuotaMinimum = " & kuotaMinimum & ", " & _
                           "IsAktif = " & statusAktif & ", " & _
                           "UpdatedAt = GETDATE(), " & _
@@ -2052,7 +2073,7 @@ Public Class MasterTindakanKlinik
 
         ' --- MEMASUKKAN NILAI HARGA BELI KE TEXTBOX ---
         ' Anda bisa menggunakan format tertentu, misal hargaBeli.ToString("N0") untuk pemisah ribuan
-        TextBoxHargaBeli.Text = Math.Round(hargaBeli, 0).ToString()
+        TextBoxHargaBeli.Text = hargaBeli.ToString("#,##0.##")
         ' ----------------------------------------------
 
         NumericKuotaAwalCartridge.Text = kuotaAwal.ToString()
@@ -2202,7 +2223,7 @@ Public Class MasterTindakanKlinik
               " MC.KuotaAwal AS Debet, " & _
               " 0 AS Kredit, " & _
               " MC.CartridgeID, " & _
-              " ISNULL(MC.HargaBeli, 0) AS HargaBeli " & _
+              " ISNULL(CAST(MC.HargaBeli AS DECIMAL(18,2)), 0) AS HargaBeli " & _
               " FROM MasterCartridge MC " & _
               " INNER JOIN MasterAlat MA ON MA.AlatID = MC.AlatID " & _
               " WHERE MA.AlatID = @AlatID " & _
@@ -2215,7 +2236,7 @@ Public Class MasterTindakanKlinik
               " 0, " & _
               " LPA.ShootDipakai, " & _
               " MC.CartridgeID, " & _
-              " ISNULL(LPA.HargaBeli, 0) " & _
+              " ISNULL(CAST(LPA.HargaBeli AS DECIMAL(18,2)), 0) * LPA.ShootDipakai " & _
               " FROM LogPemakaianAlat LPA " & _
               " INNER JOIN MasterCartridge MC ON MC.CartridgeID = LPA.CartridgeID " & _
               " INNER JOIN MasterAlat MA ON MA.AlatID = MC.AlatID " & _
@@ -2234,7 +2255,7 @@ Public Class MasterTindakanKlinik
               " CASE WHEN LA.QtyAdjustment > 0 THEN LA.QtyAdjustment ELSE 0 END, " & _
               " CASE WHEN LA.QtyAdjustment < 0 THEN ABS(LA.QtyAdjustment) ELSE 0 END, " & _
               " MC.CartridgeID, " & _
-              " 0 " & _
+              " CAST(0 AS DECIMAL(18,2)) " & _
               " FROM LogAdjustmentCartridge LA " & _
               " INNER JOIN MasterCartridge MC ON MC.CartridgeID = LA.CartridgeID " & _
               " WHERE MC.AlatID = @AlatID " & _
@@ -2266,7 +2287,8 @@ Public Class MasterTindakanKlinik
         ' ========================================================
         Dim totalDebet As Decimal = If(IsDBNull(dt.Compute("SUM(Debet)", "")), 0, CDec(dt.Compute("SUM(Debet)", "")))
         Dim totalKredit As Decimal = If(IsDBNull(dt.Compute("SUM(Kredit)", "")), 0, CDec(dt.Compute("SUM(Kredit)", "")))
-        Dim totalHargaBeli As Decimal = If(IsDBNull(dt.Compute("SUM(HargaBeli)", "")), 0, CDec(dt.Compute("SUM(HargaBeli)", "")))
+        Dim totalHargaBeli As Decimal = If(IsDBNull(dt.Compute("SUM(HargaBeli)", "Kredit > 0")), 0, CDec(dt.Compute("SUM(HargaBeli)", "Kredit > 0")))
+
         Dim totalSaldo As Decimal = totalDebet - totalKredit
         ' ========================================================
 
@@ -2274,32 +2296,14 @@ Public Class MasterTindakanKlinik
         sqlSummary = _
             "DECLARE @AlatID INT = " & alatID & " " & _
             "SELECT " & _
-            "(SELECT ISNULL(SUM(KuotaAwal),0) " & _
-            " FROM MasterCartridge " & _
-            " WHERE AlatID=@AlatID) AS KuotaAwal, " & _
-            "(SELECT ISNULL(SUM(JumlahTopUp),0) " & _
-            " FROM LogTopUpAlat " & _
-            " WHERE AlatID=@AlatID) AS TotalTopUp, " & _
-            "(SELECT ISNULL(SUM(LPA.ShootDipakai),0) " & _
-            " FROM LogPemakaianAlat LPA " & _
-            " INNER JOIN MasterCartridge MC " & _
-            " ON MC.CartridgeID = LPA.CartridgeID " & _
-            " WHERE MC.AlatID=@AlatID " & _
-            " AND LPA.Status=1 " & _
-            " AND LPA.IsVoid=0) AS TotalPemakaian, " & _
+            "(SELECT ISNULL(SUM(KuotaAwal),0) FROM MasterCartridge WHERE AlatID=@AlatID) AS KuotaAwal, " & _
+            "(SELECT ISNULL(SUM(JumlahTopUp),0) FROM LogTopUpAlat WHERE AlatID=@AlatID) AS TotalTopUp, " & _
+            "(SELECT ISNULL(SUM(LPA.ShootDipakai),0) FROM LogPemakaianAlat LPA INNER JOIN MasterCartridge MC ON MC.CartridgeID = LPA.CartridgeID WHERE MC.AlatID=@AlatID AND LPA.Status=1 AND LPA.IsVoid=0) AS TotalPemakaian, " & _
             "( " & _
             " (SELECT ISNULL(SUM(KuotaAwal),0) FROM MasterCartridge WHERE AlatID=@AlatID) " & _
             " + (SELECT ISNULL(SUM(JumlahTopUp),0) FROM LogTopUpAlat WHERE AlatID=@AlatID) " & _
-            " - (SELECT ISNULL(SUM(LPA.ShootDipakai),0) " & _
-            "    FROM LogPemakaianAlat LPA " & _
-            "    INNER JOIN MasterCartridge MC ON MC.CartridgeID=LPA.CartridgeID " & _
-            "    WHERE MC.AlatID=@AlatID " & _
-            "    AND LPA.Status=1 " & _
-            "    AND LPA.IsVoid=0) " & _
-            " + (SELECT ISNULL(SUM(LA.QtyAdjustment),0) " & _
-            "    FROM LogAdjustmentCartridge LA " & _
-            "    INNER JOIN MasterCartridge MC ON MC.CartridgeID=LA.CartridgeID " & _
-            "    WHERE MC.AlatID=@AlatID) " & _
+            " - (SELECT ISNULL(SUM(LPA.ShootDipakai),0) FROM LogPemakaianAlat LPA INNER JOIN MasterCartridge MC ON MC.CartridgeID=LPA.CartridgeID WHERE MC.AlatID=@AlatID AND LPA.Status=1 AND LPA.IsVoid=0) " & _
+            " + (SELECT ISNULL(SUM(LA.QtyAdjustment),0) FROM LogAdjustmentCartridge LA INNER JOIN MasterCartridge MC ON MC.CartridgeID=LA.CartridgeID WHERE MC.AlatID=@AlatID) " & _
             ") AS SaldoAkhir"
 
         Dim dtSummary As DataTable = ReadSQL(sqlSummary)
@@ -2307,13 +2311,13 @@ Public Class MasterTindakanKlinik
         Dim kuotaAwal As Integer = 0
         Dim totalTopUp As Integer = 0
         Dim totalPakai As Integer = 0
-        Dim saldoAkhir As Integer = 0
+        Dim saldoAkhir As Decimal = 0
 
         If dtSummary.Rows.Count > 0 Then
             kuotaAwal = CInt(dtSummary.Rows(0)("KuotaAwal"))
             totalTopUp = CInt(dtSummary.Rows(0)("TotalTopUp"))
             totalPakai = CInt(dtSummary.Rows(0)("TotalPemakaian"))
-            saldoAkhir = CInt(dtSummary.Rows(0)("SaldoAkhir"))
+            saldoAkhir = CDec(dtSummary.Rows(0)("SaldoAkhir"))
         End If
 
         ' Load report dari file
@@ -2356,7 +2360,11 @@ Public Class MasterTindakanKlinik
         If bandReportFooter IsNot Nothing Then
             If bandReportFooter.Controls("lblTotalDebet") IsNot Nothing Then bandReportFooter.Controls("lblTotalDebet").Text = Format(totalDebet, "#,##0")
             If bandReportFooter.Controls("lblTotalKredit") IsNot Nothing Then bandReportFooter.Controls("lblTotalKredit").Text = Format(totalKredit, "#,##0")
-            If bandReportFooter.Controls("lblTotalHargaBeli") IsNot Nothing Then bandReportFooter.Controls("lblTotalHargaBeli").Text = Format(totalHargaBeli, "#,##0")
+            If bandReportFooter.Controls("lblTotalHargaBeli") IsNot Nothing Then
+                ' Menggunakan format "#,##0.##"
+                ' Karakter '#' di belakang koma berarti desimal hanya muncul JIKA ada nilainya.
+                bandReportFooter.Controls("lblTotalHargaBeli").Text = totalHargaBeli.ToString("#,##0.##")
+            End If
             If bandReportFooter.Controls("lblTotalSaldo") IsNot Nothing Then bandReportFooter.Controls("lblTotalSaldo").Text = Format(totalSaldo, "#,##0")
         End If
 
@@ -2380,6 +2388,10 @@ Public Class MasterTindakanKlinik
     End Sub
 
     Private Sub ComboBoxAlatTindakan_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBoxAlatTindakan.SelectedIndexChanged
+
+    End Sub
+
+    Private Sub FlowLayoutPanel1_Paint(ByVal sender As System.Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles FlowLayoutPanel1.Paint
 
     End Sub
 End Class
