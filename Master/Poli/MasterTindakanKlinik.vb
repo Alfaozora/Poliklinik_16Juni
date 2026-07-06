@@ -2390,8 +2390,4 @@ Public Class MasterTindakanKlinik
     Private Sub ComboBoxAlatTindakan_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBoxAlatTindakan.SelectedIndexChanged
 
     End Sub
-
-    Private Sub FlowLayoutPanel1_Paint(ByVal sender As System.Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles FlowLayoutPanel1.Paint
-
-    End Sub
 End Class
