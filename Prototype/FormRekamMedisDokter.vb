@@ -5161,50 +5161,6 @@ Public Class FormRekamMedisDokter
 
         Dim Tbls As DataTable = New DataTable
 
-        'If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
-        '    Tbls = ReadSQL("SELECT " & _
-        '       "TPD.TransPoliIDDetail AS ID, " & _
-        '       "TPD.TindakanID, " & _
-        '       "TPD.NamaTindakan, " & _
-        '       "TPD.JenisTindakan, " & _
-        '       "TPD.CreatedBy, " & _
-        '       "TPD.CreatedDate, " & _
-        '       "TPD.StatusPembayaran, " & _
-        '       "TPD.Penjamin, " & _
-        '       "LPP.KodeVoucher, " & _
-        '       "NULL AS Kuota " & _
-        '       "FROM TransaksiPoliDetail TPD " & _
-        '       "INNER JOIN TransaksiPoli TP ON TPD.TransPoliID = TP.TransPoliID " & _
-        '        "OUTER APPLY ( " & _
-        '        "    SELECT TOP 1 * " & _
-        '        "    FROM LogPenggunaanPaket " & _
-        '        "    WHERE NoTransaksi = TP.NoUrut AND DeletedDate IS NULL " & _
-        '        "    ORDER BY CreatedDate DESC " & _
-        '        ") LPP " & _
-        '       "LEFT JOIN TransaksiPaketTindakan TPT ON LPP.KodeVoucher = TPT.KodeVoucher " & _
-        '       "WHERE TPD.DeletedDate IS NULL AND TPD.Awal <> 1 AND TP.NoUrut = '" & idTransaksi & "' " & _
-        '       "UNION ALL " & _
-        '       "SELECT " & _
-        '       "NULL AS ID, " & _
-        '       "NULL AS TindakanID, " & _
-        '       "TPT.NamaPaket, " & _
-        '       "TPT.JenisPaket, " & _
-        '       "TPBA.admin, " & _
-        '       "TPBA.transaksitime, " & _
-        '       "'PAID' AS StatusPembayaran, " & _
-        '       "'-' AS Penjamin, " & _
-        '       "LPP.KodeVoucher, " & _
-        '       "TPT.Kuota " & _
-        '       "FROM LogPenggunaanPaket LPP " & _
-        '       "LEFT JOIN TransaksiPoli TP ON LPP.NoTransaksi = TP.NoUrut " & _
-        '       "OUTER APPLY ( " & _
-        '       "    SELECT TOP 1 admin, transaksitime " & _
-        '       "    FROM TransaksiPoliBayarAwal " & _
-        '       "    WHERE TransPoliID = TP.TransPoliID " & _
-        '       "    ORDER BY transaksitime DESC " & _
-        '       ") TPBA " & _
-        '       "LEFT JOIN TransaksiPaketTindakan TPT ON LPP.KodeVoucher = TPT.KodeVoucher " & _
-        '       "WHERE LPP.NoTransaksi = '" & idTransaksi & "' AND LPP.DeletedDate IS NULL")
         If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
             Dim filterPaketPerTindakan As Boolean = True
             Dim filterPaketReguler As Boolean = True
@@ -5216,25 +5172,32 @@ Public Class FormRekamMedisDokter
             ' Paket Per-Tindakan dari Log
             If filterPaketPerTindakan Then
                 queryUnion1 = "SELECT DISTINCT " & _
-                    "NULL AS ID, " & _
-                    "LPP.TindakanID, " & _
-                    "LPP.PaketID, " & _
-                    "TPTD.NamaTindakan, " & _
-                    "TPT.JenisPaket AS JenisTindakan, " & _
-                    "TPBA.admin AS CreatedBy, " & _
-                    "TPBA.transaksitime AS CreatedDate, " & _
-                    "'PAID' AS StatusPembayaran, '-' AS Penjamin, " & _
-                    "LPP.KodeVoucher, TPTD.KuotaTindakan AS Kuota " & _
-                    "FROM LogPenggunaanPaket LPP " & _
-                    "LEFT JOIN TransaksiPoli TP ON LPP.NoTransaksi = TP.NoUrut " & _
-                    "OUTER APPLY (SELECT TOP 1 admin, transaksitime FROM TransaksiPoliBayarAwal " & _
-                    "WHERE TransPoliID = TP.TransPoliID ORDER BY transaksitime DESC) TPBA " & _
-                    "INNER JOIN TransaksiPaketTindakan TPT ON LPP.KodeVoucher = TPT.KodeVoucher " & _
-                    "INNER JOIN TransaksiPaketTindakanDetail TPTD " & _
-                    "ON TPT.KodeVoucher = TPTD.KodeVoucher AND TPT.PaketID = TPTD.PaketID " & _
-                    "AND TPTD.TindakanID = LPP.TindakanID " & _
-                    "WHERE LPP.NoTransaksi = '" & idTransaksi & "' AND LPP.DeletedDate IS NULL " & _
-                    "AND TPT.JenisPaket = 'Paket Per-Tindakan' AND TPT.PaketID = LPP.PaketID"
+                        "TPD_DETAIL.TransPoliIDDetail AS ID, " & _
+                        "LPP.TindakanID, " & _
+                        "LPP.PaketID, " & _
+                        "TPTD.NamaTindakan, " & _
+                        "TPT.JenisPaket AS JenisTindakan, " & _
+                        "TPBA.admin AS CreatedBy, " & _
+                        "TPBA.transaksitime AS CreatedDate, " & _
+                        "'PAID' AS StatusPembayaran, '-' AS Penjamin, " & _
+                        "LPP.KodeVoucher, TPTD.KuotaTindakan AS Kuota " & _
+                        "FROM LogPenggunaanPaket LPP " & _
+                        "LEFT JOIN TransaksiPoli TP ON LPP.NoTransaksi = TP.NoUrut " & _
+                        "OUTER APPLY (SELECT TOP 1 admin, transaksitime FROM TransaksiPoliBayarAwal " & _
+                        "WHERE TransPoliID = TP.TransPoliID ORDER BY transaksitime DESC) TPBA " & _
+                        "INNER JOIN TransaksiPaketTindakan TPT ON LPP.KodeVoucher = TPT.KodeVoucher " & _
+                        "INNER JOIN TransaksiPaketTindakanDetail TPTD " & _
+                        "ON TPT.KodeVoucher = TPTD.KodeVoucher AND TPT.PaketID = TPTD.PaketID " & _
+                        "AND TPTD.TindakanID = LPP.TindakanID " & _
+                        "OUTER APPLY (SELECT TOP 1 TransPoliIDDetail FROM TransaksiPoliDetail TPD_INNER " & _
+                        "WHERE TPD_INNER.TransPoliID = TP.TransPoliID " & _
+                        "AND TPD_INNER.TindakanID = LPP.TindakanID " & _
+                        "AND TPD_INNER.PaketID = LPP.PaketID " & _
+                        "AND TPD_INNER.KodeVoucher = LPP.KodeVoucher " & _
+                        "AND TPD_INNER.DeletedDate IS NULL " & _
+                        "ORDER BY TPD_INNER.TransPoliIDDetail ASC) TPD_DETAIL " & _
+                        "WHERE LPP.NoTransaksi = '" & idTransaksi & "' AND LPP.DeletedDate IS NULL " & _
+                        "AND TPT.JenisPaket = 'Paket Per-Tindakan' AND TPT.PaketID = LPP.PaketID"
             End If
 
             ' Paket Reguler
@@ -5289,12 +5252,9 @@ Public Class FormRekamMedisDokter
             ' Eksekusi
             Tbls = ReadSQL(finalQuery)
         ElseIf jenisTransaksi = "GIGI" Then
-        'Tbls = ReadSQL("SELECT TransGigiIDDetail AS 'ID', TindakanID, NamaTindakan, JenisTindakan, CreatedBy, CreatedDate, StatusPembayaran, Penjamin " & _
-        '               "FROM TransaksiGigiDetail " & _
-        '               "WHERE DeletedDate IS NULL AND Awal <> 1 AND TransGigiID IN (SELECT TransGigiID FROM TransaksiGigi WHERE NoUrut = '" & idTransaksi & "')")
-        Tbls = ReadSQL("SELECT TransGigiIDDetail AS 'ID', TindakanID, NamaTindakan, JenisTindakan, CreatedBy, CreatedDate, StatusPembayaran, Penjamin, '' AS Kuota, '' AS KodeVoucher " & _
-           "FROM TransaksiGigiDetail " & _
-           "WHERE DeletedDate IS NULL AND Awal <> 1 AND TransGigiID IN (SELECT TransGigiID FROM TransaksiGigi WHERE NoUrut = '" & idTransaksi & "')")
+            Tbls = ReadSQL("SELECT TransGigiIDDetail AS 'ID', TindakanID, NamaTindakan, JenisTindakan, CreatedBy, CreatedDate, StatusPembayaran, Penjamin, '' AS Kuota, '' AS KodeVoucher " & _
+               "FROM TransaksiGigiDetail " & _
+               "WHERE DeletedDate IS NULL AND Awal <> 1 AND TransGigiID IN (SELECT TransGigiID FROM TransaksiGigi WHERE NoUrut = '" & idTransaksi & "')")
 
         End If
 
@@ -9964,135 +9924,19 @@ Public Class FormRekamMedisDokter
 
     End Sub
 
-    Private Sub HapusPaketReguler(ByVal kodeVoucher As String, ByVal poliIdDetail As String, ByVal tindakanID As String)
-
-        ' Hanya soft delete baris spesifik
-        WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
-                 "WHERE TransPoliIDDetail = '" & poliIdDetail & "' " & _
-                 "AND KodeVoucher = '" & kodeVoucher & "' " & _
-                 "AND DeletedDate IS NULL", 4)
-
-        ' Tambahkan kembali kuota paket
-        WriteSQL("UPDATE TransaksiPaketTindakan SET Kuota = ISNULL(Kuota, 0) + 1 " & _
-                 "WHERE KodeVoucher = '" & kodeVoucher & "'", 4)
-
-        ' Soft delete log spesifik tindakan
-        WriteSQL("UPDATE LogPenggunaanPaket SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
-                 "WHERE ID IN (SELECT TOP 1 ID FROM LogPenggunaanPaket " & _
-                 "WHERE KodeVoucher = '" & kodeVoucher & "' " & _
-                 "AND NoTransaksi = '" & idTransaksi & "' " & _
-                 "AND TindakanID = '" & tindakanID & "' " & _
-                 "AND DeletedDate IS NULL ORDER BY CreatedDate DESC)", 4)
-    End Sub
-
-    'Private Sub SoftDeleteReminder(ByVal reminderID As Integer)
-    '    Dim query As String = "UPDATE LogReminderPasien SET Status = 'CANCEL', DeletedBy = '" & userInput & "', " & _
-    '                          "DeletedDate = GETDATE()WHERE ReminderID = '" & reminderID & "'"
-    '    WriteSQL(query, 4)
-    'End Sub
-
-    Private Sub HapusPaketPerTindakan(ByVal kodeVoucher As String, ByVal tindakanID As String, ByVal idTindakanDetail As String)
-        ' Soft delete 1 tindakan dari TransaksiPoliDetail
-        WriteSQL("WITH CTE AS (" & _
-                 "SELECT TOP 1 * FROM TransaksiPoliDetail " & _
-                 "WHERE KodeVoucher = '" & kodeVoucher & "' AND TindakanID = '" & tindakanID & "' " & _
-                 "AND CONVERT(DATE, TransaksiTime) = CONVERT(DATE, GETDATE()) " & _
-                 "AND DeletedDate IS NULL " & _
-                 "ORDER BY TransaksiTime DESC) " & _
-                 "UPDATE CTE SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE()", 4)
-
-        Dim idPaket As String = ReadSQLNIK("SELECT PaketID FROM TransaksiPoliDetail WHERE TindakanID = '" & tindakanID & "'")
-        Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
-
-        Dim jsonParamPaket As String = _
-              "{" & _
-              """no_transaksi"":""" & idTransaksi & """," & _
-              """no_rm"":""" & idPasien & """," & _
-              """id_paket"":""" & idPaket & """" & _
-              "}"
-        'MsgBox(jsonParamPaket)
-
-        Dim jsonConsentPaket As String = jsonParamPaket
-
-        Dim secretKey As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_payloadEnkrip'")
-
-        Dim encrypted As String = EncryptAES(jsonConsentPaket, secretKey)
-
-        If String.IsNullOrEmpty(encrypted) Then
-            MsgBox("Encrypt gagal! ")
-            Exit Sub
-        End If
-
-        Dim postDataPaket As String = "{""payload"": """ & encrypted & """} "
-
-        Dim urlWebServiceHapusPaket As String = baseURL & "api/lumiera-luzelle/treatment-package/delete/dev"
-
-        Dim responseApiHapusPaket As String = InsertDataAPIRM(postDataPaket, urlWebServiceHapusPaket)
-
-        '---------------------------------------------------------------------------------------------------------
-
-        If responseApiHapusPaket.ToLower().Contains("""success"":true") Then
-            MsgBox("Delete Penggunaan Paket Berhasil")
-
-        Else
-            MsgBox("Delete Penggunaan Paket Gagal: " & responseApiHapusPaket)
-            MsgBox("Gagal menghapus paket tindakan di server online." & vbCrLf & "Silakan hubungi IT.", MsgBoxStyle.Exclamation, "Peringatan")
-        End If
-
-        Dim jsonParam As String = _
-                      "{" & _
-                      """no_transaksi"":""" & idTransaksi & """," & _
-                      """no_rm"":""" & idPasien & """," & _
-                      """id_tindakan"":""" & tindakanID & """," & _
-                      """id_paket"":""" & idPaket & """" & _
-                      "}"
-        Dim jsonConsent As String = jsonParam
-
-        Dim secretKeyPerTindakan As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_payloadEnkrip'")
-
-        Dim encryptedPerTindakan As String = EncryptAES(jsonConsent, secretKeyPerTindakan)
-
-        If String.IsNullOrEmpty(encryptedPerTindakan) Then
-            MsgBox("Encrypt gagal!")
-            Exit Sub
-        End If
-
-        Dim postData As String = "{""payload"":""" & encryptedPerTindakan & """}"
-
-        'MsgBox(jsonParam)
-        Dim urlWebService As String = baseURL & "api/lumiera-luzelle/persetujuan-treatment/delete/dev"
-        Dim responseApi As String = InsertDataAPIRM(postData, urlWebService)
-
-        If responseApi.ToLower().Contains("""success"":true") Then
-            MsgBox("Delete Persetujuan Tindakan Berhasil")
-        Else
-            MsgBox("Delete Persetujuan Tindakan Gagal: " & responseApi)
-            MsgBox("Gagal menghapus persetujuan tindakan di server online." & vbCrLf & "Silakan hubungi IT.", MsgBoxStyle.Exclamation, "Peringatan")
-        End If
-
-        ' Tambahkan kembali kuota tindakan
-        WriteSQL("UPDATE TransaksiPaketTindakanDetail SET KuotaTindakan = ISNULL(KuotaTindakan, 0) + 1 " & _
-             "WHERE KodeVoucher = '" & kodeVoucher & "' AND TindakanID = '" & tindakanID & "'", 4)
-
-        ' Soft delete dari LogPenggunaanPaket
-        WriteSQL("UPDATE LogPenggunaanPaket SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
-                 "WHERE ID IN (SELECT TOP 1 ID FROM LogPenggunaanPaket " & _
-                 "WHERE KodeVoucher = '" & kodeVoucher & "' AND TindakanID = '" & tindakanID & "' AND NoTransaksi = '" & idTransaksi & "' AND DeletedDate IS NULL " & _
-                 "ORDER BY CreatedDate DESC)", 4)
-    End Sub
-
     Private Sub HapusTindakanPaket(ByVal idTindakanDetailObj As Object, ByVal namaTindakan As String, ByVal kodeVoucher As String)
         Dim idTindakanDetail As String = ""
 
-        ' --- Jika ada ID Detail ---
+        ' ==========================================================
+        ' BLOK 1: Soft delete baris TransaksiPoliDetail yang spesifik
+        ' ==========================================================
         If Not IsDBNull(idTindakanDetailObj) AndAlso idTindakanDetailObj IsNot Nothing AndAlso idTindakanDetailObj.ToString() <> "" Then
             idTindakanDetail = idTindakanDetailObj.ToString()
 
             If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
                 Dim tblDetail As DataTable = ReadSQL( _
-                    "SELECT TindakanID, ISNULL(PaketID,0) AS PaketID, ISNULL(Perencanaan, 0) AS Perencanaan " & _
-                    "FROM TransaksiPoliDetail " & _
-                    "WHERE TransPoliIDDetail = '" & idTindakanDetail & "'")
+                    "SELECT TindakanID, ISNULL(PaketID,'') AS PaketID, ISNULL(Perencanaan, 0) AS Perencanaan " & _
+                    "FROM TransaksiPoliDetail WHERE TransPoliIDDetail = '" & idTindakanDetail & "'")
 
                 If tblDetail.Rows.Count = 0 Then
                     MsgBox("Data tindakan tidak ditemukan")
@@ -10100,130 +9944,176 @@ Public Class FormRekamMedisDokter
                 End If
 
                 Dim idTindakan As String = tblDetail.Rows(0)("TindakanID").ToString()
-                Dim paketID As String = tblDetail.Rows(0)("PaketID").ToString().Trim()
-
+                Dim paketIDBaris As String = tblDetail.Rows(0)("PaketID").ToString().Trim()
                 Dim strPerencanaan As String = tblDetail.Rows(0)("Perencanaan").ToString().ToUpper()
-                Dim isPerencanaan As Boolean = False
-                If strPerencanaan = "1" Or strPerencanaan = "TRUE" Or strPerencanaan = "Y" Then
-                    isPerencanaan = True
-                End If
+                Dim isPerencanaan As Boolean = (strPerencanaan = "1" Or strPerencanaan = "TRUE" Or strPerencanaan = "Y")
 
-                ' Soft delete hanya baris yang dipilih
                 WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
                          "WHERE TransPoliIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
 
-                If isPerencanaan = True Then
-                    ' Gunakan TOP (1) agar mengembalikan tepat 1 kuota perencanaan saja
-                    Dim sqlRevertRencana As String = _
-                        "UPDATE TOP (1) TransaksiTindakanPerencanaan " & _
-                        "SET StatusDipakai = 0, TglDipakai = NULL " & _
-                        "WHERE NoRM = '" & idPasien & "' " & _
-                        "AND TindakanID = '" & idTindakan & "' " & _
-                        "AND StatusDipakai = 1"
-
-                    WriteSQL(sqlRevertRencana, 4)
+                If isPerencanaan Then
+                    WriteSQL("UPDATE TOP (1) TransaksiTindakanPerencanaan " & _
+                             "SET StatusDipakai = 0, TglDipakai = NULL " & _
+                             "WHERE NoRM = '" & idPasien & "' AND TindakanID = '" & idTindakan & "' AND StatusDipakai = 1", 4)
                 End If
 
                 VoidPemakaianAlatByDetail(idTindakanDetail)
 
-                Dim jsonParam As String = _
-                  "{" & _
-                  """no_transaksi"":""" & idTransaksi & """," & _
-                  """no_rm"":""" & idPasien & """," & _
-                  """id_tindakan"":""" & idTindakan & """," & _
-                  """id_paket"":""" & paketID & """" & _
-                  "}"
+                ' API delete consent HANYA untuk tindakan biasa (bukan paket)
+                If paketIDBaris = "" Or paketIDBaris = "0" Then
+                    Dim jsonParam As String = _
+                        "{""no_transaksi"":""" & idTransaksi & """,""no_rm"":""" & idPasien & """," & _
+                        """id_tindakan"":""" & idTindakan & """,""id_paket"":""""}"
 
-                Dim jsonParamTindakan As String = jsonParam
+                    Dim secretKeyTindakan As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_payloadEnkrip'")
+                    Dim encryptedTindakan As String = EncryptAES(jsonParam, secretKeyTindakan)
 
-                Dim secretKeyTindakan As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_payloadEnkrip' ")
+                    If Not String.IsNullOrEmpty(encryptedTindakan) Then
+                        Dim postData As String = "{""payload"":""" & encryptedTindakan & """}"
+                        Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+                        Dim urlWebService As String = baseURL & "api/lumiera-luzelle/persetujuan-treatment/delete/dev"
+                        Dim responseApi As String = InsertDataAPIRM(postData, urlWebService)
 
-                Dim encryptedTindakan As String = EncryptAES(jsonParamTindakan, secretKeyTindakan)
-
-                If String.IsNullOrEmpty(encryptedTindakan) Then
-                    MsgBox("Encrypt gagal! ")
-                    Exit Sub
-                End If
-
-                Dim postData As String = "{""payload"":""" & encryptedTindakan & """} "
-                Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
-
-                Dim urlWebService As String = baseURL & "api/lumiera-luzelle/persetujuan-treatment/delete/dev"
-                Dim responseApi As String = InsertDataAPIRM(postData, urlWebService)
-
-                If responseApi.ToLower().Contains("""success"":true") Then
-                    MsgBox("Delete Persetujuan Tindakan Berhasil")
-                Else
-                    MsgBox("Delete Persetujuan Tindakan Gagal: " & responseApi)
-                    MsgBox("Gagal menghapus persetujuan tindakan di server online." & vbCrLf & "Silakan hubungi IT.", MsgBoxStyle.Exclamation, "Peringatan")
-                End If
-
-                If Not String.IsNullOrEmpty(paketID) Then
-                    Dim jsonParamPaket As String = _
-                        "{" & _
-                        """no_transaksi"":""" & idTransaksi & """," & _
-                        """no_rm"":""" & idPasien & """," & _
-                        """id_paket"":""" & paketID & """" & _
-                        "}"
-
-                    Dim jsonParamPaketReguler As String = jsonParamPaket
-
-                    Dim secretKey As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_payloadEnkrip' ")
-
-                    Dim encrypted As String = EncryptAES(jsonParamPaketReguler, secretKey)
-
-                    If String.IsNullOrEmpty(encrypted) Then
-                        MsgBox("Encrypt gagal! ")
-                        Exit Sub
+                        If Not responseApi.ToLower().Contains("""success"":true") Then
+                            MsgBox("Gagal menghapus persetujuan tindakan di server online." & vbCrLf & "Silakan hubungi IT.", MsgBoxStyle.Exclamation, "Peringatan")
+                        End If
                     End If
-
-                    Dim postDataReguler As String = "{""payload"": """ & encrypted & """} "
-
-                    Dim urlWebServiceHapusPaket As String = baseURL & "api/lumiera-luzelle/treatment-package/delete/dev"
-
-                    Dim responseApiHapusPaket As String = InsertDataAPIRM(postDataReguler, urlWebServiceHapusPaket)
-
-                    If responseApiHapusPaket.ToLower().Contains("""success"":true") Then
-                        MsgBox("Delete Penggunaan Paket Berhasil")
-                    Else
-                        MsgBox("Delete Penggunaan Paket Gagal: " & responseApiHapusPaket)
-                    End If
-                Else
-                    'MsgBox("Tindakan bukan paket, skip delete paket API")
                 End If
+
             ElseIf jenisTransaksi = "GIGI" Then
                 WriteSQL("UPDATE TransaksiGigiDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
                          "WHERE TransGigiIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
             End If
         End If
 
-        ' --- Jika ada kodeVoucher ---
-        If kodeVoucher.Trim() <> "" Then
-            ' Ambil TindakanID dari log penggunaan
-            Dim tindakanID As String = ReadSQLNIK("SELECT TOP 1 TindakanID FROM LogPenggunaanPaket " & _
-                                                  "WHERE KodeVoucher = '" & kodeVoucher & "' " & _
-                                                  "AND NoTransaksi = '" & idTransaksi & "' " & _
-                                                  "AND DeletedDate IS NULL ORDER BY CreatedDate DESC")
+        ' ==========================================================
+        ' BLOK 2: Pengembalian kuota paket
+        ' ==========================================================
+        If kodeVoucher.Trim() = "" Then Exit Sub
 
-            ' Cek apakah Paket Reguler
-            Dim queryCek As String = _
-                "SELECT CASE WHEN EXISTS (" & vbCrLf & _
-                "    SELECT 1 FROM LogPenggunaanPaket logpaket " & vbCrLf & _
-                "    INNER JOIN TransaksiPaketTindakan tpt ON logpaket.KodeVoucher = tpt.KodeVoucher AND logpaket.PaketID = tpt.PaketID " & vbCrLf & _
-                "    WHERE logpaket.KodeVoucher = '" & kodeVoucher & "' " & vbCrLf & _
-                "    AND logpaket.NoTransaksi = '" & idTransaksi & "' " & vbCrLf & _
-                "    AND UPPER(tpt.JenisPaket) = 'PAKET REGULER' " & vbCrLf & _
-                "    AND logpaket.DeletedDate IS NULL" & vbCrLf & _
-                ") THEN 1 ELSE 0 END"
+        ' Ambil PaketID + TindakanID dari baris SPESIFIK yang dihapus.
+        ' PaketID inilah kunci pembeda (KodeVoucher tidak unik antar paket!)
+        Dim paketID As String = ""
+        Dim tindakanID As String = ""
 
-            Dim isPaketReguler As Boolean = CBool(ReadSQLNIK(queryCek))
-
-            If isPaketReguler Then
-                HapusPaketReguler(kodeVoucher, idTindakanDetail, tindakanID)
-            ElseIf tindakanID <> "" Then
-                HapusPaketPerTindakan(kodeVoucher, tindakanID, idTindakanDetail)
+        If idTindakanDetail <> "" Then
+            Dim tblBaris As DataTable = ReadSQL( _
+                "SELECT ISNULL(PaketID,'') AS PaketID, ISNULL(TindakanID,'') AS TindakanID " & _
+                "FROM TransaksiPoliDetail WHERE TransPoliIDDetail = '" & idTindakanDetail & "'")
+            If tblBaris.Rows.Count > 0 Then
+                paketID = tblBaris.Rows(0)("PaketID").ToString().Trim()
+                tindakanID = tblBaris.Rows(0)("TindakanID").ToString().Trim()
             End If
         End If
+
+        If paketID = "" Or paketID = "0" Then
+            MsgBox("PaketID tidak ditemukan untuk baris ini. Kuota tidak diubah.", MsgBoxStyle.Exclamation)
+            Exit Sub
+        End If
+
+        ' Tentukan jenis paket dari SOURCE OF TRUTH, diikat ke PaketID (bukan hanya KodeVoucher)
+        Dim jenisPaket As String = ReadSQLNIK( _
+            "SELECT TOP 1 UPPER(LTRIM(RTRIM(JenisPaket))) FROM TransaksiPaketTindakan " & _
+            "WHERE KodeVoucher = '" & kodeVoucher & "' AND PaketID = '" & paketID & "' AND DeletedDate IS NULL")
+
+        If jenisPaket = "PAKET REGULER" Then
+            HapusPaketReguler(kodeVoucher, paketID, idTindakanDetail, tindakanID)
+        ElseIf jenisPaket = "PAKET PER-TINDAKAN" Then
+            HapusPaketPerTindakan(kodeVoucher, paketID, tindakanID, idTindakanDetail)
+        Else
+            MsgBox("Jenis paket tidak dikenali: [" & jenisPaket & "]. Kuota tidak diubah.", MsgBoxStyle.Exclamation)
+        End If
+    End Sub
+
+    ' ==========================================================
+    ' HAPUS PAKET REGULER  — semua WHERE diikat PaketID
+    ' ==========================================================
+    Private Sub HapusPaketReguler(ByVal kodeVoucher As String, ByVal paketID As String, ByVal poliIdDetail As String, ByVal tindakanID As String)
+
+        WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
+                 "WHERE TransPoliIDDetail = '" & poliIdDetail & "' AND DeletedDate IS NULL", 4)
+
+        ' Restore kuota +1 HANYA ke paket yang tepat (KodeVoucher + PaketID)
+        WriteSQL("UPDATE TransaksiPaketTindakan SET Kuota = ISNULL(Kuota, 0) + 1 " & _
+                 "WHERE KodeVoucher = '" & kodeVoucher & "' AND PaketID = '" & paketID & "' AND DeletedDate IS NULL", 4)
+
+        ' Soft delete log spesifik (diikat PaketID)
+        WriteSQL("UPDATE LogPenggunaanPaket SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
+                 "WHERE ID IN (SELECT TOP 1 ID FROM LogPenggunaanPaket " & _
+                 "WHERE KodeVoucher = '" & kodeVoucher & "' AND PaketID = '" & paketID & "' " & _
+                 "AND NoTransaksi = '" & idTransaksi & "' AND DeletedDate IS NULL ORDER BY CreatedDate DESC)", 4)
+
+        ' API delete consent
+        Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+        Dim jsonParam As String = _
+            "{""no_transaksi"":""" & idTransaksi & """,""no_rm"":""" & idPasien & """," & _
+            """id_tindakan"":""" & tindakanID & """,""id_paket"":""" & paketID & """}"
+
+        Dim secretKey As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_payloadEnkrip'")
+        Dim encrypted As String = EncryptAES(jsonParam, secretKey)
+
+        If Not String.IsNullOrEmpty(encrypted) Then
+            Dim postData As String = "{""payload"":""" & encrypted & """}"
+            Dim urlConsent As String = baseURL & "api/lumiera-luzelle/persetujuan-treatment/delete/dev"
+            Dim responseConsent As String = InsertDataAPIRM(postData, urlConsent)
+            If Not responseConsent.ToLower().Contains("""success"":true") Then
+                MsgBox("Delete Persetujuan Tindakan Gagal: " & responseConsent)
+            End If
+        End If
+    End Sub
+
+    ' ==========================================================
+    ' HAPUS PAKET PER-TINDAKAN — semua WHERE diikat PaketID
+    ' ==========================================================
+    Private Sub HapusPaketPerTindakan(ByVal kodeVoucher As String, ByVal paketID As String, ByVal tindakanID As String, ByVal idTindakanDetail As String)
+
+        ' Soft delete pakai idTindakanDetail eksplisit (BUKAN filter tanggal)
+        WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
+                 "WHERE TransPoliIDDetail = '" & idTindakanDetail & "' AND DeletedDate IS NULL", 4)
+
+        Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+        Dim secretKey As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_payloadEnkrip'")
+
+        ' API delete penggunaan paket (pakai paketID yang sudah pasti benar)
+        Dim jsonParamPaket As String = _
+            "{""no_transaksi"":""" & idTransaksi & """,""no_rm"":""" & idPasien & """," & _
+            """id_paket"":""" & paketID & """}"
+
+        Dim encryptedPaket As String = EncryptAES(jsonParamPaket, secretKey)
+        If Not String.IsNullOrEmpty(encryptedPaket) Then
+            Dim postDataPaket As String = "{""payload"": """ & encryptedPaket & """}"
+            Dim urlHapusPaket As String = baseURL & "api/lumiera-luzelle/treatment-package/delete/dev"
+            Dim responseApiHapusPaket As String = InsertDataAPIRM(postDataPaket, urlHapusPaket)
+            If Not responseApiHapusPaket.ToLower().Contains("""success"":true") Then
+                MsgBox("Delete Penggunaan Paket Gagal: " & responseApiHapusPaket)
+            End If
+        End If
+
+        ' API delete consent per-tindakan
+        Dim jsonParam As String = _
+            "{""no_transaksi"":""" & idTransaksi & """,""no_rm"":""" & idPasien & """," & _
+            """id_tindakan"":""" & tindakanID & """,""id_paket"":""" & paketID & """}"
+
+        Dim encryptedPerTindakan As String = EncryptAES(jsonParam, secretKey)
+        If Not String.IsNullOrEmpty(encryptedPerTindakan) Then
+            Dim postData As String = "{""payload"":""" & encryptedPerTindakan & """}"
+            Dim urlConsent As String = baseURL & "api/lumiera-luzelle/persetujuan-treatment/delete/dev"
+            Dim responseApi As String = InsertDataAPIRM(postData, urlConsent)
+            If Not responseApi.ToLower().Contains("""success"":true") Then
+                MsgBox("Delete Persetujuan Tindakan Gagal: " & responseApi)
+            End If
+        End If
+
+        ' Kembalikan kuota tindakan +1 — diikat PaketID + TindakanID + KodeVoucher
+        WriteSQL("UPDATE TransaksiPaketTindakanDetail SET KuotaTindakan = ISNULL(KuotaTindakan, 0) + 1 " & _
+                 "WHERE KodeVoucher = '" & kodeVoucher & "' AND PaketID = '" & paketID & "' AND TindakanID = '" & tindakanID & "'", 4)
+
+        ' Soft delete log spesifik (diikat PaketID + TindakanID)
+        WriteSQL("UPDATE LogPenggunaanPaket SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() " & _
+                 "WHERE ID IN (SELECT TOP 1 ID FROM LogPenggunaanPaket " & _
+                 "WHERE KodeVoucher = '" & kodeVoucher & "' AND PaketID = '" & paketID & "' " & _
+                 "AND TindakanID = '" & tindakanID & "' AND NoTransaksi = '" & idTransaksi & "' " & _
+                 "AND DeletedDate IS NULL ORDER BY CreatedDate DESC)", 4)
     End Sub
 
     'Private Sub DataGridViewTindakan_CellClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles DataGridViewTindakan.CellClick
@@ -13583,8 +13473,10 @@ Public Class FormRekamMedisDokter
         tblTindakan.Columns.Add("KodeVoucher", GetType(String))
         tblTindakan.Columns.Add("Jenis Paket", GetType(String))
 
-
         Try
+            ' ================================
+            ' VALIDASI INFORMED CONSENT
+            ' ================================
             If rowPaket IsNot Nothing AndAlso rowPaket.Length > 0 Then
                 For Each row As DataRow In rowPaket
                     Dim idPaket As String = row("PaketID").ToString()
@@ -13607,18 +13499,14 @@ Public Class FormRekamMedisDokter
                                     tindakanID = GetFirstTindakanIDFromPaket(row("PaketID").ToString())
                                 End If
 
-
                                 Dim frmIC As New FormInputInformedConsent
-
                                 frmIC.KodeVoucher = kodeVoucherPaket
-
                                 frmIC.SetForm( _
                                     "RekamMedisPerencanaanTindakan", _
                                     tblsRekamMedis, _
                                     tindakanID, _
                                     statusPersetujuan, _
                                     jenisTransaksi)
-
                                 frmIC.ShowDialog()
 
                             Catch ex As Exception
@@ -13631,8 +13519,10 @@ Public Class FormRekamMedisDokter
                 Next
             End If
 
+            ' ================================
+            ' SUSUN tblTindakan DARI rowPaket
+            ' ================================
             Dim totalTagihan As Decimal = 0
-            Dim identitasPaket As String = ""
             Dim listPaketID As New HashSet(Of String)
 
             If rowPaket IsNot Nothing AndAlso rowPaket.Length > 0 Then
@@ -13641,9 +13531,8 @@ Public Class FormRekamMedisDokter
                     Dim diskon As Decimal = 0D
                     Dim hargaNett As Decimal = hargaAwal - diskon
                     Dim idPaket As String = row("PaketID").ToString()
-                    If Not listPaketID.Contains(idPaket) Then
-                        listPaketID.Add(idPaket)
-                    End If
+
+                    listPaketID.Add(idPaket)
 
                     Dim Tnew As DataRow = tblTindakan.NewRow
                     Tnew("PaketID") = idPaket
@@ -13657,41 +13546,55 @@ Public Class FormRekamMedisDokter
                     Tnew("KodeVoucher") = row("KodeVoucher")
                     Tnew("Jenis Paket") = row("Jenis Paket")
                     tblTindakan.Rows.Add(Tnew)
-
-                    identitasPaket = idPaket
                 Next
             End If
 
-            ' Ambil data HargaNett dan Kuota dari MasterPaketTindakan
-            Dim tblPaket As DataTable = ReadSQL("SELECT * FROM MasterPaketTindakan WHERE PaketID = '" & identitasPaket & "'")
-            'Parsing JSON DetailTindakan
-            Dim jsonText As String = tblPaket.Rows(0)("DetailTindakan").ToString()
-            Dim listTindakan As List(Of TindakanDetail) = JsonConvert.DeserializeObject(Of List(Of TindakanDetail))(jsonText)
+            ' ================================
+            ' AMBIL DATA PAKET PER PaketID UNIK
+            ' ================================
+            Dim listTindakanPerPaket As New Dictionary(Of String, List(Of TindakanDetail))
+            Dim hargaPerKuotaPerPaket As New Dictionary(Of String, Decimal)
 
-            Dim hargaNettPaket As Decimal = 0
-            Dim kuotaPaket As Integer = 1
+            For Each pkId As String In listPaketID
+                Dim tblPaketX As DataTable = ReadSQL("SELECT * FROM MasterPaketTindakan WHERE PaketID = '" & pkId & "'")
+                If tblPaketX Is Nothing OrElse tblPaketX.Rows.Count = 0 Then Continue For
 
-            If tblPaket IsNot Nothing AndAlso tblPaket.Rows.Count > 0 Then
-                Dim paket As DataRow = tblPaket.Rows(0)
-                If Not IsDBNull(paket("HargaNett")) Then
-                    hargaNettPaket = CDec(paket("HargaNett"))
+                Dim jsonTextX As String = tblPaketX.Rows(0)("DetailTindakan").ToString()
+                Dim listTindakanX As List(Of TindakanDetail) = JsonConvert.DeserializeObject(Of List(Of TindakanDetail))(jsonTextX)
+
+                Dim hargaNettPaketX As Decimal = 0
+                Dim kuotaPaketX As Integer = 1
+
+                If Not IsDBNull(tblPaketX.Rows(0)("HargaNett")) Then
+                    hargaNettPaketX = CDec(tblPaketX.Rows(0)("HargaNett"))
                 End If
-                If Not IsDBNull(paket("Kuota")) AndAlso CInt(paket("Kuota")) > 0 Then
-                    kuotaPaket = CInt(paket("Kuota"))
+                If Not IsDBNull(tblPaketX.Rows(0)("Kuota")) AndAlso CInt(tblPaketX.Rows(0)("Kuota")) > 0 Then
+                    kuotaPaketX = CInt(tblPaketX.Rows(0)("Kuota"))
                 End If
-            End If
 
-            ' Hitung harga per kuota
-            Dim hargaPerKuota As Decimal = 0
-            If kuotaPaket > 0 Then
-                hargaPerKuota = hargaNettPaket / kuotaPaket
-            End If
-            totalTagihan = hargaPerKuota * rowPaket.Length
+                Dim hargaPerKuotaX As Decimal = 0
+                If kuotaPaketX > 0 Then
+                    hargaPerKuotaX = hargaNettPaketX / kuotaPaketX
+                End If
 
-            ' Ambil TransPoliID
+                listTindakanPerPaket(pkId) = listTindakanX
+                hargaPerKuotaPerPaket(pkId) = hargaPerKuotaX
+            Next
+
+            ' Hitung totalTagihan berdasarkan harga-per-kuota MASING-MASING paket per baris
+            totalTagihan = 0
+            For Each rowT As DataRow In tblTindakan.Rows
+                Dim pkIdRow As String = rowT("PaketID").ToString()
+                If hargaPerKuotaPerPaket.ContainsKey(pkIdRow) Then
+                    totalTagihan += hargaPerKuotaPerPaket(pkIdRow)
+                End If
+            Next
+
+            ' ================================
+            ' AMBIL TransPoliID & SIMPAN BAYAR AWAL
+            ' ================================
             Dim transPoliId As String = ReadSQLNIK("SELECT TransPoliID FROM TransaksiPoli WHERE NoUrut = '" & idTransaksi & "'")
 
-            ' Simpan ke TransaksiPoliBayarAwal
             WriteSQL("INSERT INTO TransaksiPoliBayarAwal (TransJenis, TransPoliID, JenisBayar, NoJenisBayar, JumlahBayar, admin, transaksitime, mesin, kartu) " & _
                  "VALUES('POLI', '" & transPoliId & "', 'VOUCHER', '-', '" & CDbl(totalTagihan) & "', '" & userInput & "', GETDATE(), '', '')", 4)
 
@@ -13701,53 +13604,38 @@ Public Class FormRekamMedisDokter
             Dim noHp As String = ReadSQLNIK("SELECT NoHandphone FROM MasterPasien WHERE NoRekamMedis = '" & idPasien & "'")
             Dim tglPerawatan As String = Date.Now.ToString("yyyy-MM-ddTHH:mm:ss")
 
-            ' Proses tiap tindakan
+            ' ================================
+            ' PROSES TIAP TINDAKAN (log, consent, potong kuota)
+            ' ================================
             For Each rowTindakan As DataRow In tblTindakan.Rows
                 WriteSQL("INSERT INTO LogPenggunaanPaket(NoRekamMedis, NoTransaksi, PaketID, TindakanID, JenisPaket, TanggalTransaksi, KodeVoucher, CreatedBy, CreatedDate) " & _
                      "VALUES('" & idPasien & "', '" & idTransaksi & "', '" & rowTindakan("PaketID") & "', '" & rowTindakan("TindakanID") & "', '" & rowTindakan("Jenis Paket") & "', GETDATE(), '" & rowTindakan("KodeVoucher") & "', '" & userInput & "', GETDATE())", 4)
 
-                ' ================================
-                ' KIRIM API INFORMED CONSENT
-                ' ================================
-                'Dim namaTindakan As String = ""
-                'Dim listTindakanApi As New List(Of String)
-                'Dim tindakanID As String = ""
-
                 Dim jenisPaket As String = rowTindakan("Jenis Paket").ToString()
-
                 Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
-
                 Dim urlConsent As String = baseURL & "api/lumiera-luzelle/persetujuan-treatment/dev"
 
                 Dim listConsent As New List(Of Dictionary(Of String, String))
 
-                If jenisPaket = "Paket Reguler" Then
+                If jenisPaket.Trim().ToUpper() = "PAKET REGULER" Then
                     Dim dtDetail As DataTable = GetDetailTindakanLog(rowTindakan("KodeVoucher").ToString())
 
                     If Not dtDetail Is Nothing Then
-
                         For Each r As DataRow In dtDetail.Rows
-
                             Dim item As New Dictionary(Of String, String)
-
                             item.Add("id_tindakan", r("TindakanID").ToString())
                             item.Add("nama_tindakan", r("NamaTindakan").ToString())
-
                             listConsent.Add(item)
-
                         Next
-
                     End If
-                ElseIf jenisPaket = "Paket Per-Tindakan" Then
 
+                ElseIf jenisPaket.Trim().ToUpper() = "PAKET PER-TINDAKAN" Then
                     Dim tindakanID As String = rowTindakan("TindakanID").ToString()
                     Dim namaTindakan As String = GetNamaTindakanDariDetailPaket(rowTindakan("PaketID").ToString(), tindakanID)
 
                     Dim item As New Dictionary(Of String, String)
-
                     item.Add("id_tindakan", tindakanID)
                     item.Add("nama_tindakan", namaTindakan)
-
                     listConsent.Add(item)
                 End If
 
@@ -13764,7 +13652,6 @@ Public Class FormRekamMedisDokter
                     Dim jsonParam As String = jsonConsent
 
                     Dim secretKey As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_payloadEnkrip'")
-
                     Dim encrypted As String = EncryptAES(jsonParam, secretKey)
 
                     If String.IsNullOrEmpty(encrypted) Then
@@ -13773,44 +13660,20 @@ Public Class FormRekamMedisDokter
                     End If
 
                     Dim postData As String = "{""payload"":""" & encrypted & """}"
-
                     Dim responseConsent As String = InsertDataAPIRM(postData, urlConsent)
 
                     If responseConsent.ToLower().Contains("success") Then
-                        MsgBox("Persetujuan tindakan '" & _
-                               item("nama_tindakan") & _
-                               "' berhasil disimpan.")
+                        MsgBox("Persetujuan tindakan '" & item("nama_tindakan") & "' berhasil disimpan.")
                     Else
-                        MsgBox("Persetujuan tindakan '" & _
-                               item("nama_tindakan") & _
-                               "' gagal disimpan.")
+                        MsgBox("Persetujuan tindakan '" & item("nama_tindakan") & "' gagal disimpan.")
                     End If
-
                 Next
 
-                ' ================================
-                ' DATA UNTUK API PEMAKAIAN PAKET
-                ' ================================
-
-                'Dim usage As New Dictionary(Of String, Object)
-                'usage.Add("id_paket", rowTindakan("PaketID").ToString())
-                'usage.Add("kode_voucher", rowTindakan("KodeVoucher").ToString())
-                'usage.Add("id_tindakan", tindakanID)
-                'usage.Add("tindakan", listTindakanApi)
-                'usage.Add("qty", 1)
-                'usage.Add("qty_total", Nothing)
-                'usage.Add("tgl_pembelian", Nothing)
-                'usage.Add("tgl_perawatan", tglPerawatan)
-
-                'usageList.Add(usage)
-
                 For Each item As Dictionary(Of String, String) In listConsent
-
                     Dim listTindakanApi As New List(Of String)
                     listTindakanApi.Add(item("nama_tindakan"))
 
                     Dim usage As New Dictionary(Of String, Object)
-
                     usage.Add("id_paket", rowTindakan("PaketID").ToString())
                     usage.Add("kode_voucher", rowTindakan("KodeVoucher").ToString())
                     usage.Add("id_tindakan", item("id_tindakan"))
@@ -13821,18 +13684,19 @@ Public Class FormRekamMedisDokter
                     usage.Add("tgl_perawatan", tglPerawatan)
 
                     usageList.Add(usage)
-
                 Next
 
-                If rowTindakan("Jenis Paket").ToString() = "Paket Reguler" Then
+                If rowTindakan("Jenis Paket").ToString().Trim().ToUpper() = "PAKET REGULER" Then
                     WriteSQL("UPDATE TransaksiPaketTindakan SET Kuota = Kuota - 1 WHERE PaketID = '" & rowTindakan("PaketID") & "' AND KodeVoucher = '" & rowTindakan("KodeVoucher") & "' AND DeletedDate IS NULL", 4)
-                ElseIf rowTindakan("Jenis Paket").ToString() = "Paket Per-Tindakan" Then
+                ElseIf rowTindakan("Jenis Paket").ToString().Trim().ToUpper() = "PAKET PER-TINDAKAN" Then
                     WriteSQL("UPDATE TransaksiPaketTindakanDetail SET KuotaTindakan = KuotaTindakan - 1 WHERE PaketID = '" & rowTindakan("PaketID") & "' AND TindakanID = '" & rowTindakan("TindakanID") & "' AND KodeVoucher = '" & rowTindakan("KodeVoucher") & "'", 4)
                 End If
             Next
 
+            ' ================================
+            ' KIRIM API PEMAKAIAN PAKET (batch)
+            ' ================================
             If usageList.Count > 0 Then
-
                 Dim payload As New Dictionary(Of String, Object)
                 payload.Add("nama_pasien", namaPasien)
                 payload.Add("no_hp", noHp)
@@ -13843,7 +13707,6 @@ Public Class FormRekamMedisDokter
                 Dim jsonParam As String = JsonConvert.SerializeObject(payload)
 
                 Dim secretKey As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_payloadEnkrip'")
-
                 Dim encrypted As String = EncryptAES(jsonParam, secretKey)
 
                 If String.IsNullOrEmpty(encrypted) Then
@@ -13852,7 +13715,6 @@ Public Class FormRekamMedisDokter
                 End If
 
                 Dim postData As String = "{""payload"":""" & encrypted & """}"
-
                 Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
                 Dim urlWebService As String = baseURL & "api/lumiera-luzelle/treatment-package/dev"
 
@@ -13861,119 +13723,162 @@ Public Class FormRekamMedisDokter
                 If Not responseApi.ToLower().Contains("success") Then
                     MsgBox("Pemotongan paket gagal dikirim ke API: " & responseApi)
                 End If
-
             End If
 
-            ' Ambil TindakanID dari rowPaket agar hanya tindakan yang dipilih yang disimpan
-            Dim tindakanDipilih As New HashSet(Of String)
-            For Each row In rowPaket
-                tindakanDipilih.Add(row("TindakanID").ToString())
-                'Debug.WriteLine("TindakanID dipilih: " & row("TindakanID").ToString())
-            Next
+            ' ================================
+            ' SIMPAN TAGIHAN TINDAKAN KE TransaksiPoliDetail
+            ' - Paket Reguler      : insert SEMUA tindakan dalam listTindakan milik paket itu (1x per PaketID+KodeVoucher)
+            ' - Paket Per-Tindakan : insert HANYA tindakan yang dipilih user (per baris, cocokkan TindakanID)
+            ' ================================
+            Dim paketRegulerSudahDiproses As New HashSet(Of String)
 
-            ' Loop data JSON dan simpan ke TransaksiPoliDetail
             For Each rowTindakan As DataRow In tblTindakan.Rows
-                Dim tindakanID As String = rowTindakan("TindakanID").ToString()
+                Dim pkIdRow As String = rowTindakan("PaketID").ToString()
+                Dim jenisPaketRow As String = rowTindakan("Jenis Paket").ToString().Trim().ToUpper()
+                Dim kodeVoucherRow As String = rowTindakan("KodeVoucher").ToString()
+                Dim penjaminRow As String = rowTindakan("Penjamin").ToString()
 
-                ' Cari data dari JSON yang sesuai dengan tindakanID
-                Dim tindakan As TindakanDetail = listTindakan.Find(Function(x) x.TindakanID = tindakanID)
-                If tindakan Is Nothing Then Continue For
-
-                Dim sqlFee As String = "SELECT FeeDokter, FeePerawat FROM MasterTindakan WHERE TindakanID = '" & tindakan.TindakanID & "'"
-                Dim tblFee As DataTable = ReadSQL(sqlFee)
-
-                Dim feeDokter As Decimal = 0D
-                Dim feePerawat As Decimal = 0D
-                If tblFee IsNot Nothing AndAlso tblFee.Rows.Count > 0 Then
-                    If Not IsDBNull(tblFee.Rows(0)("FeeDokter")) Then
-                        feeDokter = CDec(tblFee.Rows(0)("FeeDokter"))
-                    End If
-                    If Not IsDBNull(tblFee.Rows(0)("FeePerawat")) Then
-                        feePerawat = CDec(tblFee.Rows(0)("FeePerawat"))
-                    End If
+                If Not listTindakanPerPaket.ContainsKey(pkIdRow) Then
+                    MsgBox("Data paket '" & pkIdRow & "' tidak ditemukan.", MsgBoxStyle.Exclamation)
+                    Continue For
                 End If
 
-                WriteSQL("INSERT INTO TransaksiPoliDetail(Awal, TransPoliID, TindakanID, PaketID, NamaTindakan, JenisTindakan, BiayaTindakan, DiscTindakan, NettBayar, admin, transaksitime, DiscPersenTindakan, StatusPembayaran, KodeVoucher, Penjamin, FeeDokter, FeePerawat) " & _
-                     "VALUES('1', '" & transPoliId & "', " & _
-                     "'" & tindakan.TindakanID & "', " & _
-                     "'" & identitasPaket & "', " & _
-                     "'" & tindakan.NamaTindakan.Replace("'", "''") & "', " & _
-                     "'" & tindakan.JenisTindakan.Replace("'", "''") & "', " & _
-                     CDec(tindakan.BiayaTindakan) & ", " & _
-                     CDec(tindakan.DiskonTindakan) & ", " & _
-                     CDec(tindakan.NettBayar) & ", " & _
-                     "'" & userInput & "', GETDATE(), 0, 'PAID', " & _
-                     "'" & rowTindakan("KodeVoucher").ToString() & "', " & _
-                     "'" & rowTindakan("Penjamin").ToString() & "', " & _
-                     feeDokter & ", " & feePerawat & ")", 4)
+                If jenisPaketRow = "PAKET REGULER" Then
 
-                ' Cari ID dari TransaksiPoliDetail yang baru saja di-insert
-                Dim transPoliIDDetail As String = ReadSQLNIK("SELECT TOP 1 TransPoliIDDetail FROM TransaksiPoliDetail WHERE TransPoliID = '" & transPoliId & "' AND TindakanID = '" & tindakan.TindakanID & "' ORDER BY TransPoliIDDetail DESC")
+                    Dim keyReguler As String = pkIdRow & "|" & kodeVoucherRow
+                    If paketRegulerSudahDiproses.Contains(keyReguler) Then
+                        Continue For
+                    End If
+                    paketRegulerSudahDiproses.Add(keyReguler)
 
-                If transPoliIDDetail <> "" Then
-                    ' Panggil proses pemotongan (Qty diasumsikan 1 per tindakan yang di-insert)
-                    ProsesPemotonganKuotaAlat(transPoliIDDetail, tindakan.TindakanID, 1, 1)
+                    For Each tindakan As TindakanDetail In listTindakanPerPaket(pkIdRow)
+                        InsertTransaksiPoliDetailDariPaket(transPoliId, tindakan, pkIdRow, kodeVoucherRow, penjaminRow)
+                    Next
+
+                Else ' "Paket Per-Tindakan" atau jenis lain yang 1 baris = 1 tindakan
+
+                    Dim tindakanID As String = rowTindakan("TindakanID").ToString()
+                    Dim tindakan As TindakanDetail = listTindakanPerPaket(pkIdRow).Find(Function(x) x.TindakanID = tindakanID)
+
+                    If tindakan Is Nothing Then
+                        MsgBox("TindakanID '" & tindakanID & "' tidak ditemukan di Paket '" & pkIdRow & "'.", MsgBoxStyle.Exclamation)
+                        Continue For
+                    End If
+
+                    InsertTransaksiPoliDetailDariPaket(transPoliId, tindakan, pkIdRow, kodeVoucherRow, penjaminRow)
                 End If
-
             Next
 
-            ' Tambahkan khusus untuk Paket Reguler (jika ditemukan)
-            If tblTindakan.Rows.Count > 0 AndAlso tblTindakan.Rows(0)("Jenis Paket").ToString().ToUpper() = "Paket Reguler" Then
-                Dim penjamin As String = tblTindakan.Rows(0)("Penjamin").ToString()
-                kodeVoucher = tblTindakan.Rows(0)("KodeVoucher").ToString()
+            ' =======================================================================
+            ' 🔥 BRIDGE KE API JURNAL BARU (Penggunaan Paket / Potong Paket)
+            ' =======================================================================
+            Try
+                Dim namaPoliLokal As String = ReadSQLNIK("SELECT JenisPoli FROM TransaksiDetail where NoUrut = '" & idTransaksi & "' AND IDInternet = '" & idPasien & "'")
+                Dim poliParam As String = ""
 
-                ' Loop JSON Tindakan
-                For Each tindakan As TindakanDetail In listTindakan
-                    ' --- Ambil fee dokter/perawat ---
-                    Dim sqlFee As String = "SELECT FeeDokter, FeePerawat FROM MasterTindakan WHERE TindakanID = '" & tindakan.TindakanID & "'"
-                    Dim tblFee As DataTable = ReadSQL(sqlFee)
+                If namaPoliLokal.Contains("KECANTIKAN") Then
+                    poliParam = "kecantikan"
+                ElseIf namaPoliLokal.Contains("HBOT") Then
+                    poliParam = "hbot"
+                ElseIf namaPoliLokal.Contains("FISIO") Then
+                    poliParam = "fisio"
+                Else
+                    poliParam = "kecantikan" ' Fallback default
+                End If
 
-                    Dim feeDokter As Decimal = 0D
-                    Dim feePerawat As Decimal = 0D
-                    If tblFee IsNot Nothing AndAlso tblFee.Rows.Count > 0 Then
-                        If Not IsDBNull(tblFee.Rows(0)("FeeDokter")) Then
-                            feeDokter = CDec(tblFee.Rows(0)("FeeDokter"))
-                        End If
-                        If Not IsDBNull(tblFee.Rows(0)("FeePerawat")) Then
-                            feePerawat = CDec(tblFee.Rows(0)("FeePerawat"))
-                        End If
+                ' Jalankan per baris tindakan untuk mencatat jurnal pemakaiannya masing-masing
+                For Each rowTindakan As DataRow In tblTindakan.Rows
+                    Dim pkIdRow As String = rowTindakan("PaketID").ToString()
+                    Dim namaPaketRow As String = rowTindakan("Nama Paket").ToString()
+                    Dim kodeVoucherRow As String = rowTindakan("KodeVoucher").ToString()
+
+                    ' Nominal diambil dari harga per kuota paket yang sudah dihitung di atas
+                    Dim nominalPakai As Decimal = 0D
+                    If hargaPerKuotaPerPaket.ContainsKey(pkIdRow) Then
+                        nominalPakai = hargaPerKuotaPerPaket(pkIdRow)
                     End If
 
-                    ' --- Insert ke TransaksiPoliDetail ---
-                    WriteSQL("INSERT INTO TransaksiPoliDetail(Awal, TransPoliID, TindakanID, PaketID, NamaTindakan, JenisTindakan, BiayaTindakan, DiscTindakan, NettBayar, admin, transaksitime, DiscPersenTindakan, StatusPembayaran, KodeVoucher, Penjamin, FeeDokter, FeePerawat) " & _
-                             "VALUES('1', '" & transPoliId & "', " & _
-                             "'" & tindakan.TindakanID & "', " & _
-                             "'" & identitasPaket & "', " & _
-                             "'" & tindakan.NamaTindakan.Replace("'", "''") & "', " & _
-                             "'" & tindakan.JenisTindakan.Replace("'", "''") & "', " & _
-                             CDec(tindakan.BiayaTindakan) & ", " & _
-                             CDec(tindakan.DiskonTindakan) & ", " & _
-                             CDec(tindakan.NettBayar) & ", " & _
-                             "'" & userInput & "', GETDATE(), 0, 'PAID', " & _
-                             "'" & kodeVoucher & "', " & _
-                             "'" & penjamin & "', " & _
-                             feeDokter & ", " & feePerawat & ")", 4)
+                    ' Susun keterangan jurnal pemakaian paket
+                    Dim keteranganJurnal As String = "Pemakaian Paket " & namaPaketRow & " [Kode Paket: " & kodeVoucherRow & "] - No. Transaksi: " & idTransaksi
 
-                    Dim transPoliIDDetailReguler As String = ReadSQLNIK("SELECT TOP 1 TransPoliIDDetail FROM TransaksiPoliDetail WHERE TransPoliID = '" & transPoliId & "' AND TindakanID = '" & tindakan.TindakanID & "' ORDER BY TransPoliIDDetail DESC")
+                    ' Susun JSON string manual
+                    Dim jsonJurnal As String = "{" & _
+                        """poli"":""" & poliParam & """," & _
+                        """nominal"":" & nominalPakai.ToString().Replace(",", ".") & "," & _
+                        BaseKeteranganJson(keteranganJurnal) & _
+                        "}"
 
-                    If transPoliIDDetailReguler <> "" Then
-                        ' Panggil proses pemotongan (Qty diasumsikan 1 per tindakan yang di-insert)
-                        ProsesPemotonganKuotaAlat(transPoliIDDetailReguler, tindakan.TindakanID, 1, 1)
-                    End If
+                    ' Ambil baseURL dari config database lokal Anda
+                    Dim baseURLJurnal As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+                    Dim urlApiJurnal As String = baseURLJurnal & "api/jurnal/transaksi/penggunaanPaket"
 
+                    ' Hit API Laravel
+                    Dim responseJurnal As String = InsertDataAPIRMOld(jsonJurnal, urlApiJurnal)
+
+                    ' Opsional: Aktifkan pop-up ini jika Anda ingin melihat log response per item saat testing
+                    MsgBox("Respon Jurnal API (Pakai Paket): " & responseJurnal, MsgBoxStyle.Information, "Info Jurnal")
                 Next
-            End If
 
+            Catch exJurnal As Exception
+                MsgBox("Gagal Bridging Jurnal Pemakaian Paket: " & exJurnal.Message, MsgBoxStyle.Critical, "Error Jurnal")
+            End Try
+            ' =======================================================================
 
             MsgBox("Data berhasil disimpan.", MsgBoxStyle.Information, "Sukses")
-            'Return tblTindakan
 
             LoadGridTindakanPoli()
+
         Catch ex As Exception
             MsgBox("Terjadi kesalahan saat menyimpan data: " & ex.Message, MsgBoxStyle.Critical, "Error")
             Return Nothing
         End Try
+
+        Return tblTindakan
     End Function
+
+    Private Function BaseKeteranganJson(ByVal inputKeterangan As String) As String
+        Dim cleanText As String = inputKeterangan.Replace("""", "'").Replace(vbCrLf, " ").Replace(vbCr, " ").Replace(vbLf, " ")
+
+        ' Mengembalikan format string JSON key-value
+        Return """keterangan"":""" & cleanText & """"
+    End Function
+
+    ' ================================
+    ' HELPER: Insert 1 baris TransaksiPoliDetail dari data TindakanDetail (dipakai utk Reguler & Per-Tindakan)
+    ' ================================
+    Private Sub InsertTransaksiPoliDetailDariPaket(ByVal transPoliId As String, ByVal tindakan As TindakanDetail, _
+                                                    ByVal pkIdRow As String, ByVal kodeVoucherRow As String, ByVal penjaminRow As String)
+
+        Dim sqlFee As String = "SELECT FeeDokter, FeePerawat FROM MasterTindakan WHERE TindakanID = '" & tindakan.TindakanID & "'"
+        Dim tblFee As DataTable = ReadSQL(sqlFee)
+
+        Dim feeDokter As Decimal = 0D
+        Dim feePerawat As Decimal = 0D
+        If tblFee IsNot Nothing AndAlso tblFee.Rows.Count > 0 Then
+            If Not IsDBNull(tblFee.Rows(0)("FeeDokter")) Then feeDokter = CDec(tblFee.Rows(0)("FeeDokter"))
+            If Not IsDBNull(tblFee.Rows(0)("FeePerawat")) Then feePerawat = CDec(tblFee.Rows(0)("FeePerawat"))
+        End If
+
+        WriteSQL("INSERT INTO TransaksiPoliDetail(Awal, TransPoliID, TindakanID, PaketID, NamaTindakan, JenisTindakan, BiayaTindakan, DiscTindakan, NettBayar, admin, transaksitime, DiscPersenTindakan, StatusPembayaran, KodeVoucher, Penjamin, FeeDokter, FeePerawat) " & _
+             "VALUES('1', '" & transPoliId & "', " & _
+             "'" & tindakan.TindakanID & "', " & _
+             "'" & pkIdRow & "', " & _
+             "'" & tindakan.NamaTindakan.Replace("'", "''") & "', " & _
+             "'" & tindakan.JenisTindakan.Replace("'", "''") & "', " & _
+             CDec(tindakan.BiayaTindakan) & ", " & _
+             CDec(tindakan.DiskonTindakan) & ", " & _
+             CDec(tindakan.NettBayar) & ", " & _
+             "'" & userInput & "', GETDATE(), 0, 'PAID', " & _
+             "'" & kodeVoucherRow & "', " & _
+             "'" & penjaminRow & "', " & _
+             feeDokter & ", " & feePerawat & ")", 4)
+
+        Dim transPoliIDDetail As String = ReadSQLNIK("SELECT TOP 1 TransPoliIDDetail FROM TransaksiPoliDetail WHERE TransPoliID = '" & transPoliId & "' AND TindakanID = '" & tindakan.TindakanID & "' ORDER BY TransPoliIDDetail DESC")
+
+        If transPoliIDDetail <> "" Then
+            ProsesPemotonganKuotaAlat(transPoliIDDetail, tindakan.TindakanID, 1, 1)
+        End If
+    End Sub
 
     Private Function IsUserAllowed(ByVal userName As String) As Boolean
 

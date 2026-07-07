@@ -1407,12 +1407,10 @@ Public Class FormPembayaran
                             ' 🔥 BRIDGE KE API JURNAL BARU (Beli Paket)
                             ' =======================================================================
                             Try
-                                ' 1. Ambil Data Dinamis dari baris tindakan saat ini
+
                                 Dim nominalPaket As Double = CDbl(rowTindakan("Harga Nett"))
                                 Dim namaPaket As String = rowTindakan("Nama Paket").ToString()
 
-                                ' Asumsi: Anda memiliki variabel penanda poli di form ini, misal: _namaPoli / _jenisPoli
-                                ' Contoh penyesuaian nilai agar sesuai dengan validasi Laravel ('kecantikan', 'hbot', 'fisio')
                                 Dim namaPoliLokal As String = _namaPoli.ToString().ToUpper()
                                 Dim poliParam As String = ""
                                 If namaPoliLokal.Contains("KECANTIKAN") Then
@@ -1422,20 +1420,17 @@ Public Class FormPembayaran
                                 ElseIf namaPoliLokal.Contains("FISIO") Then
                                     poliParam = "fisio"
                                 Else
-                                    poliParam = "kecantikan" ' Fallback default jika tidak cocok
+                                    poliParam = "kecantikan"
                                 End If
 
-                                ' Keterangan dinamis digabungkan dengan Nomor Transaksi dan Nama Paket
                                 Dim keteranganJurnal As String = "Pembelian Paket " & namaPaket & " - No. Transaksi: " & _nomorUrutTransaksi
 
-                                ' 2. Susun Payload JSON secara manual (Aman untuk VB.NET 2008)
                                 Dim jsonJurnal As String = "{" & _
                                     """poli"":""" & poliParam & """," & _
                                     """nominal"":" & nominalPaket.ToString().Replace(",", ".") & "," & _
                                     BaseKeteranganJson(keteranganJurnal) & _
                                     "}"
 
-                                ' 3. Eksekusi menggunakan fungsi POST Anda
                                 Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
                                 Dim urlApiJurnal As String = baseURL & "api/jurnal/transaksi/beliPaket"
                                 Dim responseJurnal As String = InsertDataAPIRMOld(jsonJurnal, urlApiJurnal)
@@ -1483,7 +1478,6 @@ Public Class FormPembayaran
                             ' 🔥 BRIDGE KE API JURNAL BARU (Beli Paket Per-Tindakan)
                             ' =======================================================================
                             Try
-                                ' 1. Ambil Data Dinamis dari baris tindakan saat ini
                                 Dim nominalPaket As Double = CDbl(rowTindakan("Harga Nett"))
                                 Dim namaPaket As String = rowTindakan("Nama Paket").ToString()
 
@@ -1497,20 +1491,17 @@ Public Class FormPembayaran
                                 ElseIf namaPoliLokal.Contains("FISIO") Then
                                     poliParam = "fisio"
                                 Else
-                                    poliParam = "kecantikan" ' Fallback default jika tidak cocok
+                                    poliParam = "kecantikan"
                                 End If
 
-                                ' Keterangan dinamis digabungkan dengan Nomor Transaksi dan Nama Paket
                                 Dim keteranganJurnal As String = "Pembelian Paket " & namaPaket & " - No. Transaksi: " & _nomorUrutTransaksi
 
-                                ' 2. Susun Payload JSON secara manual
                                 Dim jsonJurnal As String = "{" & _
                                     """poli"":""" & poliParam & """," & _
                                     """nominal"":" & nominalPaket.ToString().Replace(",", ".") & "," & _
                                     BaseKeteranganJson(keteranganJurnal) & _
                                     "}"
 
-                                ' 3. Eksekusi menggunakan fungsi POST Anda dengan baseURL dinamis
                                 Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
                                 Dim urlApiJurnal As String = baseURL & "api/jurnal/transaksi/beliPaket"
                                 Dim responseJurnal As String = InsertDataAPIRMOld(jsonJurnal, urlApiJurnal)
