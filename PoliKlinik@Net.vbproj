@@ -868,6 +868,12 @@
     <Compile Include="Prototype\FormRekamMedisDokter.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Prototype\FormRevenueSelling.Designer.vb">
+      <DependentUpon>FormRevenueSelling.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormRevenueSelling.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Prototype\FormSimulasiBHP.Designer.vb">
       <DependentUpon>FormSimulasiBHP.vb</DependentUpon>
     </Compile>
@@ -1750,6 +1756,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormRekamMedisDokter.resx">
       <DependentUpon>FormRekamMedisDokter.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormRevenueSelling.resx">
+      <DependentUpon>FormRevenueSelling.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormSimulasiBHP.resx">
       <DependentUpon>FormSimulasiBHP.vb</DependentUpon>

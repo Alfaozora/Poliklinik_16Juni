@@ -415,7 +415,7 @@
 
 
             ' --- Validasi umum ---
-            If tindakanID = "" Then
+            If jenis = 1 AndAlso tindakanID = "" Then
                 MsgBox("Pilih minimal satu tindakan.", MsgBoxStyle.Exclamation)
                 Exit Sub
             End If

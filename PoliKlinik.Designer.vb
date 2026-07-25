@@ -63,6 +63,7 @@ Partial Class PoliKlinik
         Me.LaporanDaftarDiagnosaToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.DaftarKunjunganPasienToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.LaporanRiwayatPaketTindakanToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.LaporanRevenueDanSellingToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.LaporanToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.RekapPendapatanToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.ReservasiDanReminderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -532,7 +533,7 @@ Partial Class PoliKlinik
         '
         'LaporanKlinikToolStripMenuItem
         '
-        Me.LaporanKlinikToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.Daftar10DiagnosaTerbanyakToolStripMenuItem, Me.LaporanDaftarDiagnosaToolStripMenuItem, Me.DaftarKunjunganPasienToolStripMenuItem, Me.LaporanRiwayatPaketTindakanToolStripMenuItem})
+        Me.LaporanKlinikToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.Daftar10DiagnosaTerbanyakToolStripMenuItem, Me.LaporanDaftarDiagnosaToolStripMenuItem, Me.DaftarKunjunganPasienToolStripMenuItem, Me.LaporanRiwayatPaketTindakanToolStripMenuItem, Me.LaporanRevenueDanSellingToolStripMenuItem})
         Me.LaporanKlinikToolStripMenuItem.Name = "LaporanKlinikToolStripMenuItem"
         Me.LaporanKlinikToolStripMenuItem.Size = New System.Drawing.Size(263, 22)
         Me.LaporanKlinikToolStripMenuItem.Tag = "0309"
@@ -565,6 +566,13 @@ Partial Class PoliKlinik
         Me.LaporanRiwayatPaketTindakanToolStripMenuItem.Size = New System.Drawing.Size(299, 22)
         Me.LaporanRiwayatPaketTindakanToolStripMenuItem.Tag = "030903"
         Me.LaporanRiwayatPaketTindakanToolStripMenuItem.Text = "Laporan Riwayat Paket Tindakan"
+        '
+        'LaporanRevenueDanSellingToolStripMenuItem
+        '
+        Me.LaporanRevenueDanSellingToolStripMenuItem.Name = "LaporanRevenueDanSellingToolStripMenuItem"
+        Me.LaporanRevenueDanSellingToolStripMenuItem.Size = New System.Drawing.Size(299, 22)
+        Me.LaporanRevenueDanSellingToolStripMenuItem.Tag = "030905"
+        Me.LaporanRevenueDanSellingToolStripMenuItem.Text = "Laporan Harian Lumiera Luzelle"
         '
         'LaporanToolStripMenuItem
         '
@@ -2318,4 +2326,5 @@ Partial Class PoliKlinik
     Friend WithEvents BirthdaySenderToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents AdjustmentAlatToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents SimulasiBHPToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents LaporanRevenueDanSellingToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 End Class

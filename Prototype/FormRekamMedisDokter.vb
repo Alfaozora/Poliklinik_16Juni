@@ -13783,7 +13783,7 @@ Public Class FormRekamMedisDokter
                 ElseIf namaPoliLokal.Contains("FISIO") Then
                     poliParam = "fisio"
                 Else
-                    poliParam = "kecantikan" ' Fallback default
+                    poliParam = "" ' Fallback default
                 End If
 
                 ' Jalankan per baris tindakan untuk mencatat jurnal pemakaiannya masing-masing
@@ -13791,12 +13791,39 @@ Public Class FormRekamMedisDokter
                     Dim pkIdRow As String = rowTindakan("PaketID").ToString()
                     Dim namaPaketRow As String = rowTindakan("Nama Paket").ToString()
                     Dim kodeVoucherRow As String = rowTindakan("KodeVoucher").ToString()
+                    Dim jenisPaketRow As String = rowTindakan("Jenis Paket").ToString().Trim().ToUpper()
+                    Dim tindakanIDRow As String = rowTindakan("TindakanID").ToString()
 
-                    ' Nominal diambil dari harga per kuota paket yang sudah dihitung di atas
+                    'MsgBox("[DEBUG 1 - JURNAL PAKET] Memproses Paket: " & namaPaketRow & vbCrLf & "Jenis: " & jenisPaketRow)
+
                     Dim nominalPakai As Decimal = 0D
-                    If hargaPerKuotaPerPaket.ContainsKey(pkIdRow) Then
-                        nominalPakai = hargaPerKuotaPerPaket(pkIdRow)
+
+                    ' =============================================================
+                    ' LOGIKA PERHITUNGAN NOMINAL BERDASARKAN JENIS PAKET
+                    ' =============================================================
+                    If jenisPaketRow = "PAKET REGULER" Then
+                        ' Paket Reguler: Ambil dari perhitungan harga-per-kuota
+                        If hargaPerKuotaPerPaket.ContainsKey(pkIdRow) Then
+                            nominalPakai = hargaPerKuotaPerPaket(pkIdRow)
+                        End If
+
+                    Else ' PAKET PER-TINDAKAN
+                        ' Paket Per-Tindakan: Cari detail TindakanID ini di listTindakanPerPaket
+                        If listTindakanPerPaket.ContainsKey(pkIdRow) Then
+                            Dim tindakanDetail As TindakanDetail = listTindakanPerPaket(pkIdRow).Find(Function(x) x.TindakanID = tindakanIDRow)
+
+                            If tindakanDetail IsNot Nothing Then
+                                ' Ambil NettBayar langsung dari spesifik tindakan tersebut
+                                nominalPakai = CDec(tindakanDetail.NettBayar)
+                                'MsgBox("[DEBUG 2 - JURNAL PAKET PER-TINDAKAN] Menemukan Tindakan: " & tindakanDetail.NamaTindakan & vbCrLf & "NettBayar: " & nominalPakai)
+                            Else
+                                'MsgBox("[DEBUG 2 ERROR] TindakanID " & tindakanIDRow & " tidak ditemukan di list paket " & pkIdRow)
+                            End If
+                        End If
                     End If
+                    ' =============================================================
+
+                    'MsgBox("[DEBUG 3 - JURNAL PAKET] Nominal Final yang akan dikirim: " & nominalPakai)
 
                     ' Susun keterangan jurnal pemakaian paket
                     Dim keteranganJurnal As String = "Pemakaian Paket " & namaPaketRow & " [Kode Paket: " & kodeVoucherRow & "] - No. Transaksi: " & idTransaksi
@@ -13805,18 +13832,25 @@ Public Class FormRekamMedisDokter
                     Dim jsonJurnal As String = "{" & _
                         """poli"":""" & poliParam & """," & _
                         """nominal"":" & nominalPakai.ToString().Replace(",", ".") & "," & _
+                        """user_input"":""" & userInput & """," & _
                         BaseKeteranganJson(keteranganJurnal) & _
                         "}"
 
+                    'MsgBox("[DEBUG 4 - JURNAL PAKET] JSON: " & vbCrLf & jsonJurnal)
+
                     ' Ambil baseURL dari config database lokal Anda
                     Dim baseURLJurnal As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
-                    Dim urlApiJurnal As String = baseURLJurnal & "api/jurnal/transaksi/penggunaanPaket"
+                    Dim StatusUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_jurnal_status'")
+
+                    Dim urlApiJurnal As String = baseURLJurnal & "api/jurnal/transaksi/penggunaanPaket" & If(StatusUrl = "Dev", "/Stg", "")
 
                     ' Hit API Laravel
                     Dim responseJurnal As String = InsertDataAPIRMOld(jsonJurnal, urlApiJurnal)
 
                     ' Opsional: Aktifkan pop-up ini jika Anda ingin melihat log response per item saat testing
                     MsgBox("Respon Jurnal API (Pakai Paket): " & responseJurnal, MsgBoxStyle.Information, "Info Jurnal")
+
+                    'MsgBox("[DEBUG 5 - JURNAL PAKET] Respon API: " & responseJurnal, MsgBoxStyle.Information, "Info Jurnal")
                 Next
 
             Catch exJurnal As Exception
@@ -14076,17 +14110,79 @@ Public Class FormRekamMedisDokter
                      item.CartridgeID & "," & _
                      totalShoot & ",GETDATE(),'" & userInput & "'," & statusPemakaian & ", " & stringHargaBeli & ")")
 
-                ' ======================
-                ' UPDATE CARTRIDGE
-                ' ======================
-                dbTran.Execute( _
-                    "UPDATE MasterCartridge SET " & _
-                    "KuotaTerpakai = KuotaTerpakai + " & totalShoot & " " & _
-                    "WHERE CartridgeID = " & item.CartridgeID)
-
+                If statusPemakaian = 1 Then
+                    ' UPDATE CARTRIDGE
+                    dbTran.Execute( _
+                        "UPDATE MasterCartridge SET " & _
+                        "KuotaTerpakai = KuotaTerpakai + " & totalShoot & " " & _
+                        "WHERE CartridgeID = " & item.CartridgeID)
+                End If
             Next
 
             dbTran.Commit()
+
+            If statusPemakaian = 1 Then
+                'MsgBox("[DEBUG 1] Masuk blok statusPemakaian = 1. Siap memproses " & list.Count & " item alat.")
+
+                For Each item In list
+                    Try
+                        Dim totalShoot As Integer = item.Shoot * qtyTindakan
+                        Dim nominalAlat As Double = item.HargaBeli * totalShoot
+                        Dim cartridgeID As String = item.CartridgeID.ToString()
+
+                        'MsgBox("[DEBUG 2] Data Hitung -> Alat: " & item.NamaCartridge & " | Shoot: " & totalShoot & " | Nominal: " & nominalAlat)
+
+                        ' =======================================================
+                        ' PERBAIKAN BUG: Eksekusi querynya, jangan cuma diset string
+                        ' =======================================================
+                        Dim sqlPoli As String = "SELECT JenisPoli FROM TransaksiDetail WHERE NoUrut = '" & idTransaksi & "'"
+                        ' Gunakan ReadSQLNIK (atau fungsi baca SQL Anda) untuk mendapat hasilnya
+                        Dim namaPoliLokal As String = ReadSQLNIK(sqlPoli).ToUpper()
+
+                        'MsgBox("[DEBUG 3] Hasil baca DB namaPoliLokal: " & namaPoliLokal)
+
+                        Dim poliParam As String = ""
+
+                        If namaPoliLokal.Contains("KECANTIKAN") Then
+                            poliParam = "kecantikan"
+                        ElseIf namaPoliLokal.Contains("HBOT") Then
+                            poliParam = "hbot"
+                        ElseIf namaPoliLokal.Contains("FISIO") Then
+                            poliParam = "fisio"
+                        Else
+                            poliParam = ""
+                        End If
+
+                        'MsgBox("[DEBUG 4] Parameter Poli final: '" & poliParam & "'")
+
+                        Dim namaAlat As String = item.NamaCartridge
+                        Dim keteranganJurnal As String = "Pemakaian BHP Alat [Paket]: " & namaAlat & " [Cartridge ID: " & cartridgeID & "] - No Transaksi: " & idTransaksi
+
+                        Dim jsonJurnal As String = "{" & _
+                            """poli"":""" & poliParam & """," & _
+                            """nominal"":" & nominalAlat.ToString().Replace(",", ".") & "," & _
+                            """user_input"":""" & userInput & """," & _
+                            BaseKeteranganJson(keteranganJurnal) & _
+                            "}"
+
+                        'MsgBox("[DEBUG 5] JSON Payload yang akan dikirim: " & vbCrLf & jsonJurnal)
+
+                        Dim baseUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+                        Dim StatusUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_jurnal_status'")
+
+                        Dim urlApiJurnal As String = baseUrl & "api/jurnal/transaksi/penggunaanAlat" & If(StatusUrl = "Dev", "/Stg", "")
+
+                        'MsgBox("[DEBUG 6] URL Tujuan: " & vbCrLf & urlApiJurnal)
+
+                        Dim responseJurnal As String = InsertDataAPIRMOld(jsonJurnal, urlApiJurnal)
+
+                        'MsgBox("[DEBUG 7] HASIL AKHIR API: " & responseJurnal, MsgBoxStyle.Information, "Info Jurnal")
+
+                    Catch exJurnal As Exception
+                        MsgBox("[DEBUG ERROR] Terjadi kesalahan saat memproses Jurnal: " & exJurnal.Message & vbCrLf & exJurnal.StackTrace, MsgBoxStyle.Critical, "Error Jurnal")
+                    End Try
+                Next
+            End If
 
         Catch ex As Exception
 

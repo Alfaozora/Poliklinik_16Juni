@@ -1,8 +1,11 @@
-Version : 2.0.0.58 ()
+Version : 2.0.0.58 (07 Juli 2026)
 # [New Feature] Penambahan Qty untuk Informed Consent
 # [New Feature] Laporan ulang tahun pasien pada menu Daftar Kunjungan pasien
 # [New Feature] Penambahan Perencanaan Tindakan
 # [New Feature] Bridging dengan API Sarpras untuk alat
+# [New Feature] Sending Jurnal untuk Pembelian Paket, Penggunaan Paket dan Pembatalan Paket
+# [New Feature] Sending Jurnal untuk Penggunaan Alat
+# [New Feature] Laporan Harian Lumiera Luzelle (Selling & Revenue)
 # [Usability Improvement] Terintegrasi dengan SATUSEHAT untuk Poli Kecantikan
 # [Usability Improvement] Group by Tindakan + Qty pada Rekap Tagihan
 # [Usability Improvement] Meperbaiki Terbilang pada Rekap Invoice
@@ -10,6 +13,8 @@ Version : 2.0.0.58 ()
 # [Usability Improvement] Perbaikan laporan alat
 # [Bug Fix] Memperbaiki NominalBHP pada Rekap Fee Practitioner
 # [Bug Fix] Memperbaiki Penggunaan Voucher Diskon
+# [Bug Fix] Memperbaiki Pemotongan Paket
+# [Bug Fix] Memperbaiki Upload Omset
 
 Version : 2.0.0.57 (08 Mei 2026)
 # [New Feature] Penambahan laporan penggunaan paket Tindakan

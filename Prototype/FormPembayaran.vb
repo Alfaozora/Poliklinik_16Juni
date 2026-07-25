@@ -982,7 +982,7 @@ Public Class FormPembayaran
 
             Dim tindakanList As New List(Of Object)
 
-            Dim dtTindakan As DataTable = ReadSQL("SELECT NamaTindakan,BiayaTindakan,DiscTindakan,NettBayar FROM TransaksiPoliDetail WHERE TransPoliID='" & _idTransaksi & "'")
+            Dim dtTindakan As DataTable = ReadSQL("SELECT NamaTindakan,BiayaTindakan,DiscTindakan,NettBayar FROM TransaksiPoliDetail WHERE TransPoliID='" & _idTransaksi & "' AND DeletedDate IS NULL")
 
             For Each row As DataRow In dtTindakan.Rows
 
@@ -1370,6 +1370,9 @@ Public Class FormPembayaran
 
                         Dim jenisPaket As String = rowTindakan("Jenis Paket").ToString()
 
+                        ' =======================================================
+                        ' BLOK 1: JIKA PAKET REGULER
+                        ' =======================================================
                         If jenisPaket = "Paket Reguler" Then
 
                             Dim detailJson As String = rowTindakan("DetailTindakan").ToString()
@@ -1377,20 +1380,17 @@ Public Class FormPembayaran
 
                             If detailJson <> "" Then
                                 Dim dtTindakan As DataTable = JsonToDataTable(detailJson)
-
                                 For Each rowDetail As DataRow In dtTindakan.Rows
-
                                     Dim paket As New Dictionary(Of String, Object)
-
                                     Dim tindakanID As String = rowDetail("TindakanID").ToString()
                                     Dim namaTindakan As String = rowDetail("NamaTindakan").ToString()
-
                                     Dim listTindakanApi As New List(Of String)
+
                                     listTindakanApi.Add(namaTindakan)
 
                                     paket.Add("id_paket", rowTindakan("PaketID").ToString())
                                     paket.Add("kode_voucher", voucherID)
-                                    paket.Add("id_tindakan", tindakanID)   ' 🔥 WAJIB
+                                    paket.Add("id_tindakan", tindakanID)
                                     paket.Add("tindakan", listTindakanApi)
                                     paket.Add("qty", 0)
                                     paket.Add("qty_total", kuotaPaket)
@@ -1398,21 +1398,21 @@ Public Class FormPembayaran
                                     paket.Add("tgl_perawatan", Nothing)
 
                                     paketList.Add(paket)
-
                                 Next
-
                             End If
 
-                            ' =======================================================================
-                            ' 🔥 BRIDGE KE API JURNAL BARU (Beli Paket)
-                            ' =======================================================================
+                            ' -----------------------------------------------------
+                            ' 🔥 BRIDGE JURNAL BARU (Beli Paket Reguler)
+                            ' -----------------------------------------------------
                             Try
-
                                 Dim nominalPaket As Double = CDbl(rowTindakan("Harga Nett"))
                                 Dim namaPaket As String = rowTindakan("Nama Paket").ToString()
 
+                                'MsgBox("[DEBUG 1 - Beli Reguler] Nama Paket: " & namaPaket & vbCrLf & "Nominal (Double): " & nominalPaket)
+
                                 Dim namaPoliLokal As String = _namaPoli.ToString().ToUpper()
                                 Dim poliParam As String = ""
+
                                 If namaPoliLokal.Contains("KECANTIKAN") Then
                                     poliParam = "kecantikan"
                                 ElseIf namaPoliLokal.Contains("HBOT") Then
@@ -1423,41 +1423,54 @@ Public Class FormPembayaran
                                     poliParam = "kecantikan"
                                 End If
 
-                                Dim keteranganJurnal As String = "Pembelian Paket " & namaPaket & " - No. Transaksi: " & _nomorUrutTransaksi
+                                'MsgBox("[DEBUG 2 - Beli Reguler] Poli Lokal: " & namaPoliLokal & vbCrLf & "Poli Param: " & poliParam)
+
+                                Dim dtPembayaran As DataTable = CType(GridControlPembayaran.DataSource, DataTable)
+                                Dim jenisBayarJurnal As String = DapatkanJenisBayarSpesifik(dtPembayaran)
+
+                                Dim keteranganJurnal As String = "Pembelian Paket " & namaPaket & " " & jenisBayarJurnal & " - No. Transaksi: " & _nomorUrutTransaksi
 
                                 Dim jsonJurnal As String = "{" & _
                                     """poli"":""" & poliParam & """," & _
                                     """nominal"":" & nominalPaket.ToString().Replace(",", ".") & "," & _
+                                    """jenis_bayar"":""" & jenisBayarJurnal & """," & _
+                                    """user_input"":""" & userInput & """," & _
                                     BaseKeteranganJson(keteranganJurnal) & _
                                     "}"
 
+                                'MsgBox("[DEBUG 3 - Beli Reguler] JSON Payload:" & vbCrLf & jsonJurnal)
+
                                 Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
-                                Dim urlApiJurnal As String = baseURL & "api/jurnal/transaksi/beliPaket"
+                                Dim StatusUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_jurnal_status'")
+                                Dim urlApiJurnal As String = baseURL & "api/jurnal/transaksi/beliPaket" & If(StatusUrl = "Dev", "/Stg", "")
+
+                                'MsgBox("[DEBUG 4 - Beli Reguler] URL Tujuan: " & vbCrLf & urlApiJurnal)
+
                                 Dim responseJurnal As String = InsertDataAPIRMOld(jsonJurnal, urlApiJurnal)
 
-                                MsgBox("Respon Jurnal API: " & responseJurnal, MsgBoxStyle.Information, "Info Jurnal")
+                                'MsgBox("[DEBUG 5 - Beli Reguler] HASIL AKHIR API: " & responseJurnal, MsgBoxStyle.Information, "Info Jurnal")
 
                             Catch exJurnal As Exception
-                                MsgBox("Gagal Bridging Jurnal: " & exJurnal.Message, MsgBoxStyle.Critical, "Error Jurnal")
+                                'MsgBox("[DEBUG ERROR - Beli Reguler] Gagal Bridging Jurnal: " & exJurnal.Message & vbCrLf & exJurnal.StackTrace, MsgBoxStyle.Critical, "Error Jurnal")
                             End Try
-                            ' =======================================================================
 
+
+                            ' =======================================================
+                            ' BLOK 2: JIKA PAKET PER-TINDAKAN
+                            ' =======================================================
                         ElseIf jenisPaket = "Paket Per-Tindakan" Then
 
                             Dim detailJson As String = rowTindakan("DetailTindakan").ToString()
 
                             If detailJson <> "" Then
                                 Dim dtTindakan As DataTable = JsonToDataTable(detailJson)
-
                                 For Each rowDetail As DataRow In dtTindakan.Rows
-
                                     Dim paket As New Dictionary(Of String, Object)
-
                                     Dim namaTindakan As String = rowDetail("NamaTindakan").ToString()
                                     Dim tindakanID As String = rowDetail("TindakanID").ToString()
                                     Dim kuotaTindakan As Integer = Convert.ToInt32(rowDetail("KuotaTindakan"))
-
                                     Dim listTindakanApi As New List(Of String)
+
                                     listTindakanApi.Add(namaTindakan)
 
                                     paket.Add("id_paket", rowTindakan("PaketID").ToString())
@@ -1470,16 +1483,17 @@ Public Class FormPembayaran
                                     paket.Add("tgl_perawatan", Nothing)
 
                                     paketList.Add(paket)
-
                                 Next
                             End If
 
-                            ' =======================================================================
-                            ' 🔥 BRIDGE KE API JURNAL BARU (Beli Paket Per-Tindakan)
-                            ' =======================================================================
+                            ' -----------------------------------------------------
+                            ' 🔥 BRIDGE JURNAL BARU (Beli Paket Per-Tindakan)
+                            ' -----------------------------------------------------
                             Try
                                 Dim nominalPaket As Double = CDbl(rowTindakan("Harga Nett"))
                                 Dim namaPaket As String = rowTindakan("Nama Paket").ToString()
+
+                                'MsgBox("[DEBUG 1 - Beli Per-Tindakan] Nama Paket: " & namaPaket & vbCrLf & "Nominal (Double): " & nominalPaket)
 
                                 Dim namaPoliLokal As String = _namaPoli.ToString().ToUpper()
                                 Dim poliParam As String = ""
@@ -1494,24 +1508,37 @@ Public Class FormPembayaran
                                     poliParam = "kecantikan"
                                 End If
 
+                                'MsgBox("[DEBUG 2 - Beli Per-Tindakan] Poli Lokal: " & namaPoliLokal & vbCrLf & "Poli Param: " & poliParam)
+
+                                Dim dtPembayaran As DataTable = CType(GridControlPembayaran.DataSource, DataTable)
+                                Dim jenisBayarJurnal As String = DapatkanJenisBayarSpesifik(dtPembayaran)
+
                                 Dim keteranganJurnal As String = "Pembelian Paket " & namaPaket & " - No. Transaksi: " & _nomorUrutTransaksi
 
                                 Dim jsonJurnal As String = "{" & _
                                     """poli"":""" & poliParam & """," & _
                                     """nominal"":" & nominalPaket.ToString().Replace(",", ".") & "," & _
+                                    """jenis_bayar"":""" & jenisBayarJurnal & """," & _
+                                    """user_input"":""" & userInput & """," & _
                                     BaseKeteranganJson(keteranganJurnal) & _
                                     "}"
 
+                                'MsgBox("[DEBUG 3 - Beli Per-Tindakan] JSON Payload:" & vbCrLf & jsonJurnal)
+
                                 Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
-                                Dim urlApiJurnal As String = baseURL & "api/jurnal/transaksi/beliPaket"
+                                Dim StatusUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_jurnal_status'")
+                                Dim urlApiJurnal As String = baseURL & "api/jurnal/transaksi/beliPaket" & If(StatusUrl = "Dev", "/Stg", "")
+
+                                'MsgBox("[DEBUG 4 - Beli Per-Tindakan] URL Tujuan: " & vbCrLf & urlApiJurnal)
+
                                 Dim responseJurnal As String = InsertDataAPIRMOld(jsonJurnal, urlApiJurnal)
 
-                                MsgBox("Respon Jurnal API (Per-Tindakan): " & responseJurnal, MsgBoxStyle.Information, "Info Jurnal")
+                                'MsgBox("[DEBUG 5 - Beli Per-Tindakan] HASIL AKHIR API: " & responseJurnal, MsgBoxStyle.Information, "Info Jurnal")
 
                             Catch exJurnal As Exception
-                                MsgBox("Gagal Bridging Jurnal (Per-Tindakan): " & exJurnal.Message, MsgBoxStyle.Critical, "Error Jurnal")
+                                'MsgBox("[DEBUG ERROR - Beli Per-Tindakan] Gagal Bridging Jurnal: " & exJurnal.Message & vbCrLf & exJurnal.StackTrace, MsgBoxStyle.Critical, "Error Jurnal")
                             End Try
-                            ' =======================================================================
+
                         End If
 
                         ' Insert Tabel TransaksiPaketTindakanDetail
@@ -1652,6 +1679,8 @@ Public Class FormPembayaran
                         'WriteSQL("UPDATE TransaksiPoliDetail SET  BiayaTindakan = " & CDbl(Trow("Biaya Tindakan")) & ", DiscTindakan = " & CDbl(Trow("DiscNilai")) & ", NettBayar = " & CDbl(Trow("NettBayar")) & ", admin = '" & userInput & "', transaksitime = GETDATE(), DiscPersenTindakan = " & CDbl(Trow("DiscTindakan")) & ", GroupBayar = '" & NoPembayaran & "', StatusPembayaran = 'PAID' " & _
                         '         "WHERE TransPoliIDDetail = '" & Trow("TransPoliIDDetail") & "' AND TransPoliID = '" & _idTransaksi & "' AND TindakanID = '" & Trow("TindakanID") & "' AND NamaTindakan = '" & Trow("Tindakan") & "' AND JenisTindakan = '" & Trow("Jenis") & "'", 4)
 
+                        Dim transDetailID As String = Trow("TransPoliIDDetail").ToString()
+
                         WriteSQL("UPDATE TransaksiPoliDetail SET " & _
                               "BiayaTindakan = " & CDbl(Trow("Biaya Tindakan")) & ", " & _
                               "DiscTindakan = " & CDbl(Trow("DiscNilai")) & ", " & _
@@ -1692,7 +1721,6 @@ Public Class FormPembayaran
                             "AND LPA.Status = 1 " & _
                             "AND LPA.IsVoid = 0", 4)
 
-                        Dim transDetailID As String = Trow("TransPoliIDDetail").ToString()
                         Dim sqlSelect As String = _
                             "SELECT MA.IdRuangan, MC.KodeCartridge, LPA.ShootDipakai " & _
                             "FROM MasterAlat MA " & _
@@ -1725,11 +1753,82 @@ Public Class FormPembayaran
                                     Dim apiUrl As String = baseUrl & "api/bridging/ext"
 
                                     Dim apiResponse As String = InsertDataAPIRM(jsonString, apiUrl)
+
                                     MsgBox("Response Server: " & apiResponse)
 
                                 Catch ex As Exception
-                                    MsgBox("Gagal mengirim data bridging: " & ex.Message, MsgBoxStyle.Critical)
+                                    MsgBox("Gagal mengirim data ke bridging sarpras (Masih Pengembangan): " & ex.Message, MsgBoxStyle.Critical)
                                 End Try
+
+                                ' =======================================================================
+                                ' 🔥 BRIDGE KE API JURNAL BARU (Pemakaian Alat / BHP Alat dengan Nominal Query)
+                                ' =======================================================================
+                                Try
+                                    ' 1. Ambil Kunci Cartridge dari row dtBridging yang sedang aktif
+                                    Dim cartridgeID As String = row("KodeCartridge").ToString()
+                                    'MsgBox("[DEBUG 1 - Pembayaran] Memproses Jurnal untuk KodeCartridge: " & cartridgeID & vbCrLf & "TransDetailID: " & transDetailID)
+
+                                    ' 2. Eksekusi Query dengan mengunci TransaksiDetailID DAN KodeCartridge/CartridgeID
+                                    Dim sqlNominal As String = _
+                                        "SELECT CAST(ISNULL(LPA.HargaBeli * LPA.ShootDipakai, 0) AS VARCHAR) " & _
+                                        "FROM LogPemakaianAlat LPA " & _
+                                        "INNER JOIN MasterCartridge MC ON LPA.CartridgeID = MC.CartridgeID " & _
+                                        "WHERE LPA.TransaksiDetailID = '" & transDetailID & "' " & _
+                                        "AND MC.KodeCartridge = '" & cartridgeID & "'"
+
+                                    Dim strNominal As String = ReadSQLNIK(sqlNominal)
+                                    'MsgBox("[DEBUG 2 - Pembayaran] Hasil baca SQL strNominal: '" & strNominal & "'")
+
+                                    Dim nominalAlat As Double = 0.0R
+
+                                    If Not String.IsNullOrEmpty(strNominal) Then
+                                        Double.TryParse(strNominal.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, nominalAlat)
+                                    End If
+                                    'MsgBox("[DEBUG 3 - Pembayaran] Hasil konversi nominalAlat (Double): " & nominalAlat)
+
+                                    ' 3. Sinkronisasi nama poli berdasarkan form lokal
+                                    Dim namaPoliLokal As String = _namaPoli.ToString().ToUpper()
+                                    Dim poliParam As String = ""
+
+                                    If namaPoliLokal.Contains("KECANTIKAN") Then
+                                        poliParam = "kecantikan"
+                                    ElseIf namaPoliLokal.Contains("HBOT") Then
+                                        poliParam = "hbot"
+                                    ElseIf namaPoliLokal.Contains("FISIO") Then
+                                        poliParam = "fisio"
+                                    Else
+                                        poliParam = ""
+                                    End If
+                                    'MsgBox("[DEBUG 4 - Pembayaran] _namaPoli Lokal: " & namaPoliLokal & vbCrLf & "poliParam Final: " & poliParam)
+
+                                    ' 4. Susun keterangan jurnal pemakaian alat
+                                    Dim namaAlat As String = Trow("Tindakan").ToString()
+                                    Dim keteranganJurnal As String = "Pemakaian BHP Alat: " & namaAlat & " [Cartridge ID: " & cartridgeID & "] - No. Transaksi: " & _nomorUrutTransaksi
+
+                                    ' 5. Susun JSON String manual
+                                    Dim jsonJurnal As String = "{" & _
+                                        """poli"":""" & poliParam & """," & _
+                                        """nominal"":" & nominalAlat.ToString().Replace(",", ".") & "," & _
+                                        """user_input"":""" & userInput & """," & _
+                                        BaseKeteranganJson(keteranganJurnal) & _
+                                        "}"
+                                    'MsgBox("[DEBUG 5 - Pembayaran] JSON Jurnal yang akan dikirim: " & vbCrLf & jsonJurnal)
+
+                                    ' 6. Kirim ke endpoint penggunaanAlat di Laravel
+                                    Dim baseUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+                                    Dim StatusUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_jurnal_status'")
+                                    Dim urlApiJurnal As String = baseUrl & "api/jurnal/transaksi/penggunaanAlat" & If(StatusUrl = "Dev", "/Stg", "")
+
+                                    'MsgBox("[DEBUG 6 - Pembayaran] URL API Jurnal: " & vbCrLf & urlApiJurnal)
+
+                                    Dim responseJurnal As String = InsertDataAPIRMOld(jsonJurnal, urlApiJurnal)
+
+                                    'MsgBox("[DEBUG 7 - Pembayaran] HASIL RESPON API: " & responseJurnal, MsgBoxStyle.Information, "Info Jurnal")
+
+                                Catch exJurnal As Exception
+                                    'MsgBox("[DEBUG ERROR - Pembayaran] Gagal Kirim Jurnal Alat: " & exJurnal.Message & vbCrLf & exJurnal.StackTrace, MsgBoxStyle.Critical, "Error Jurnal")
+                                End Try
+                                ' =======================================================================
                             Next
                         End If
 
@@ -2285,6 +2384,33 @@ Public Class FormPembayaran
         _kodeVoucher = String.Empty
         _idTransaksi = String.Empty
     End Sub
+
+    Private Function DapatkanJenisBayarSpesifik(ByVal dtBayar As DataTable) As String
+        ' Default fallback
+        Dim hasilJenisBayar As String = "TUNAI"
+
+        If dtBayar Is Nothing OrElse dtBayar.Rows.Count = 0 Then Return hasilJenisBayar
+
+        ' Ambil baris pembayaran pertama (atau loop jika ada multi-payment, tapi biasanya ambil yang utama)
+        For Each rowBayar As DataRow In dtBayar.Rows
+            Dim jenis As String = rowBayar("Jenis").ToString().Trim().ToUpper() ' DEBET, CARD, TUNAI, TAGIHAN
+            Dim mesin As String = rowBayar("MesinData").ToString().Trim().ToUpper() ' BCA, MANDIRI, QRIS
+
+            If jenis = "DEBET" OrElse jenis = "CARD" Then
+                ' Jika kartu, kita kembalikan nama mesinnya (Misal: "BCA", "MANDIRI", "QRIS")
+                hasilJenisBayar = mesin
+                Exit For
+            ElseIf jenis = "TAGIHAN" OrElse jenis = "PIUTANG" Then
+                hasilJenisBayar = "TAGIHAN"
+                Exit For
+            ElseIf jenis = "TUNAI" OrElse jenis = "CASH" Then
+                hasilJenisBayar = "TUNAI"
+                Exit For
+            End If
+        Next
+
+        Return hasilJenisBayar
+    End Function
 
     ' API PCare - Bridging Antrean (v2)
     Function SendPCareDataV2() As Boolean

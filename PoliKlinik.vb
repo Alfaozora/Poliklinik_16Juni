@@ -1605,4 +1605,9 @@ Public Class PoliKlinik
         FormSimulasiBHP.Show()
         FormSimulasiBHP.Focus()
     End Sub
+
+    Private Sub LaporanRevenueDanSellingToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles LaporanRevenueDanSellingToolStripMenuItem.Click
+        FormRevenueSelling.Show()
+        FormRevenueSelling.Focus()
+    End Sub
 End Class
