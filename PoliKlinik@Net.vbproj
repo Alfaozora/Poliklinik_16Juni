@@ -545,6 +545,12 @@
     <Compile Include="Prototype\FormKodeVoucher.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Prototype\FormLaporanRiwayatAlat.Designer.vb">
+      <DependentUpon>FormLaporanRiwayatAlat.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormLaporanRiwayatAlat.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Prototype\FormMasterDokter.Designer.vb">
       <DependentUpon>FormMasterDokter.vb</DependentUpon>
     </Compile>
@@ -1579,6 +1585,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormKodeVoucher.resx">
       <DependentUpon>FormKodeVoucher.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormLaporanRiwayatAlat.resx">
+      <DependentUpon>FormLaporanRiwayatAlat.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormMasterDokter.resx">
       <DependentUpon>FormMasterDokter.vb</DependentUpon>

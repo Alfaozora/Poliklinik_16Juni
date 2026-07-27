@@ -2428,7 +2428,7 @@ Partial Class MasterTindakanKlinik
         Me.GroupBox3.Size = New System.Drawing.Size(301, 113)
         Me.GroupBox3.TabIndex = 634
         Me.GroupBox3.TabStop = False
-        Me.GroupBox3.Text = "Riwayat Penggunaan Alat"
+        Me.GroupBox3.Text = "Periode Penggunaan Alat"
         '
         'ButtonCetakRiwayat
         '

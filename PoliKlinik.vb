@@ -1610,4 +1610,9 @@ Public Class PoliKlinik
         FormRevenueSelling.Show()
         FormRevenueSelling.Focus()
     End Sub
+
+    Private Sub LaporanPenggunaanAlatToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles LaporanPenggunaanAlatToolStripMenuItem.Click
+        FormLaporanRiwayatAlat.Show()
+        FormLaporanRiwayatAlat.Focus()
+    End Sub
 End Class

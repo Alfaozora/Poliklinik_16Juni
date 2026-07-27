@@ -6,11 +6,13 @@ Version : 2.0.0.58 (07 Juli 2026)
 # [New Feature] Sending Jurnal untuk Pembelian Paket, Penggunaan Paket dan Pembatalan Paket
 # [New Feature] Sending Jurnal untuk Penggunaan Alat
 # [New Feature] Laporan Harian Lumiera Luzelle (Selling & Revenue)
+# [New Feature] Laporan Costumer New, Existing, Sleeping
 # [Usability Improvement] Terintegrasi dengan SATUSEHAT untuk Poli Kecantikan
 # [Usability Improvement] Group by Tindakan + Qty pada Rekap Tagihan
 # [Usability Improvement] Meperbaiki Terbilang pada Rekap Invoice
 # [Usability Improvement] Update untuk detail alat pada master Tindakan
-# [Usability Improvement] Perbaikan laporan alat
+# [Usability Improvement] Perbaikan laporan penggunaan alat
+# [Usability Improvement] Menambahkan nama perawat pada kunjungan
 # [Bug Fix] Memperbaiki NominalBHP pada Rekap Fee Practitioner
 # [Bug Fix] Memperbaiki Penggunaan Voucher Diskon
 # [Bug Fix] Memperbaiki Pemotongan Paket
