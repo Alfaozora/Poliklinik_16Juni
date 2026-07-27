@@ -1615,4 +1615,9 @@ Public Class PoliKlinik
         FormLaporanRiwayatAlat.Show()
         FormLaporanRiwayatAlat.Focus()
     End Sub
+
+    Private Sub BridgingPOSWebToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BridgingPOSWebToolStripMenuItem.Click
+        FormBrigdingPosWeb.Show()
+        FormBrigdingPosWeb.Focus()
+    End Sub
 End Class

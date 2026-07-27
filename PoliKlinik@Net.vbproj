@@ -527,6 +527,12 @@
     <Compile Include="Prototype\FormBirthdaySender.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Prototype\FormBrigdingPosWeb.Designer.vb">
+      <DependentUpon>FormBrigdingPosWeb.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormBrigdingPosWeb.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Prototype\FormICPaket.Designer.vb">
       <DependentUpon>FormICPaket.vb</DependentUpon>
     </Compile>
@@ -916,6 +922,7 @@
     <Compile Include="Prototype\KYC.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Prototype\ModelPosWeb.vb" />
     <Compile Include="Prototype\ModuleInformedConsent.vb" />
     <Compile Include="Prototype\PCareModule.vb" />
     <Compile Include="Prototype\PopUpVoucher.Designer.vb">
@@ -1576,6 +1583,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormBirthdaySender.resx">
       <DependentUpon>FormBirthdaySender.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormBrigdingPosWeb.resx">
+      <DependentUpon>FormBrigdingPosWeb.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormICPaket.resx">
       <DependentUpon>FormICPaket.vb</DependentUpon>

@@ -483,7 +483,6 @@ Public Class ReportLogPaketTindakan
 
     'NEW
     Function GetDataHeaderPaketReguler() As DataTable
-
         Dim tblResult As New DataTable
         Dim query As New StringBuilder()
 
@@ -511,35 +510,36 @@ Public Class ReportLogPaketTindakan
 
         query.AppendLine("FROM TransaksiPaketTindakan tblPaket ")
 
-        ' Diubah ke LEFT JOIN dan kondisi DeletedDate dipindah ke ON agar paket baru/belum terpakai tetap muncul
-        query.AppendLine("LEFT JOIN LogPenggunaanPaket tblLog ")
+        query.AppendLine("INNER JOIN LogPenggunaanPaket tblLog ")
         query.AppendLine("    ON tblLog.PaketID = tblPaket.PaketID ")
         query.AppendLine("    AND tblLog.KodeVoucher = tblPaket.KodeVoucher ")
         query.AppendLine("    AND tblLog.DeletedDate IS NULL ")
 
-        query.AppendLine("LEFT JOIN MasterPasien tblPasien ")
+        query.AppendLine("INNER JOIN MasterPasien tblPasien ")
         query.AppendLine("    ON tblPasien.NoRekamMedis = tblPaket.NoRekamMedis ")
 
-        ' Filter Poli
         query.AppendLine("INNER JOIN TransaksiDetail TD ")
         query.AppendLine("    ON TD.NoUrut = tblPaket.NoTransaksi ")
 
         query.AppendLine("WHERE tblPaket.JenisPaket = 'Paket Reguler' ")
         query.AppendLine("AND tblPaket.DeletedDate IS NULL ")
 
-        ' Filter Poli (Menggunakan Parameter)
+        ' Filter Poli
         If ComboBoxPoli.Text <> "" Then
-            query.AppendLine("AND TD.JenisPoli = '" & ComboBoxPoli.Text & "' ")
+            query.AppendLine("AND TD.JenisPoli = '" & ComboBoxPoli.Text.Replace("'", "''") & "' ")
         End If
 
-        ' Filter No RM (Menggunakan Parameter)
+        ' Filter No RM
         If TextBoxNomorRekamMedis.Text <> "" Then
-            query.AppendLine("AND tblPaket.NoRekamMedis = '" & TextBoxNomorRekamMedis.Text & "'")
+            query.AppendLine("AND tblPaket.NoRekamMedis = '" & TextBoxNomorRekamMedis.Text.Replace("'", "''") & "' ")
         End If
 
-        ' Filter Tanggal (Jika CheckBox TIDAK dicentang, maka filter aktif)
+        ' Filter Tanggal (Langsung passing string format yyyy-MM-dd HH:mm:ss)
         If Not CheckBoxFilterTanggal.Checked Then
-            query.AppendLine("AND (tblLog.PaketID IS NULL OR (tblLog.TanggalTransaksi >= @TglAwal AND tblLog.TanggalTransaksi < DATEADD(DAY, 1, @TglAkhir))) ")
+            Dim tglAwal As String = TglAwalTransaksi.Value.ToString("yyyy-MM-dd 00:00:00")
+            Dim tglAkhir As String = TglAkhirTransaksi.Value.ToString("yyyy-MM-dd 23:59:59")
+
+            query.AppendLine("AND (tblLog.PaketID IS NULL OR (tblLog.TanggalTransaksi >= '" & tglAwal & "' AND tblLog.TanggalTransaksi <= '" & tglAkhir & "')) ")
         End If
 
         query.AppendLine("GROUP BY ")
@@ -556,20 +556,7 @@ Public Class ReportLogPaketTindakan
 
         query.AppendLine("ORDER BY tblPaket.PaketID")
 
-        ' --- PENTING: PENGATURAN PARAMETER ---
-        ' Sesuaikan baris di bawah ini dengan arsitektur fungsi ReadSQL Anda.
-        ' Jika ReadSQL Anda menerima parameter, lewatkan list parameter ke sana.
-
-        ' Contoh jika ReadSQL Anda dimodifikasi mendukung Parameterized Query:
-        ' Dim cmd As New SqlCommand(query.ToString())
-        ' If ComboBoxPoli.Text <> "" Then cmd.Parameters.AddWithValue("@Poli", ComboBoxPoli.Text)
-        ' If TextBoxNomorRekamMedis.Text <> "" Then cmd.Parameters.AddWithValue("@NoRM", TextBoxNomorRekamMedis.Text)
-        ' If Not CheckBoxFilterTanggal.Checked Then
-        '     cmd.Parameters.AddWithValue("@TglAwal", TglAwalTransaksi.Value.ToString("yyyy-MM-dd"))
-        '     cmd.Parameters.AddWithValue("@TglAkhir", TglAkhirTransaksi.Value.ToString("yyyy-MM-dd"))
-        ' End If
-        ' tblResult = ReadSQL(cmd)
-
+        ' Eksekusi query
         tblResult = ReadSQL(query.ToString())
         Return tblResult
 
@@ -989,8 +976,8 @@ Public Class ReportLogPaketTindakan
         query.AppendLine("HAVING ")
         query.AppendLine("    (")
         query.AppendLine("        @PakaiFilterTanggal = 0")
-        query.AppendLine("        OR (MAX(LPP.TanggalTransaksi) >= " & Format(tglTransaksiAwal, "yyyy-MM-dd") & " ")
-        query.AppendLine("            AND MAX(LPP.TanggalTransaksi) < DATEADD(DAY, 1, " & Format(tglTransaksiAkhir, "yyyy-MM-dd") & "))")
+        query.AppendLine("        OR (MAX(LPP.TanggalTransaksi) >= @TglAwal")
+        query.AppendLine("            AND MAX(LPP.TanggalTransaksi) < DATEADD(DAY, 1, @TglAkhir))")
         query.AppendLine("    )")
 
         query.AppendLine("ORDER BY ")
