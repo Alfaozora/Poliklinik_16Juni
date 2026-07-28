@@ -7,16 +7,19 @@ Version : 2.0.0.58 (07 Juli 2026)
 # [New Feature] Sending Jurnal untuk Penggunaan Alat
 # [New Feature] Laporan Harian Lumiera Luzelle (Selling & Revenue)
 # [New Feature] Laporan Costumer New, Existing, Sleeping
+# [New Feature] Bridging Poin Of Sale ERM Web dengan ERM Lokal
+# [New Feature] Laporan Alat Bisa diakses selain Admin
 # [Usability Improvement] Terintegrasi dengan SATUSEHAT untuk Poli Kecantikan
 # [Usability Improvement] Group by Tindakan + Qty pada Rekap Tagihan
 # [Usability Improvement] Meperbaiki Terbilang pada Rekap Invoice
 # [Usability Improvement] Update untuk detail alat pada master Tindakan
-# [Usability Improvement] Perbaikan laporan penggunaan alat
+# [Usability Improvement] Memisahkan Laporan penggunaan paket jika alat memiliki lebih dari 1 cartridge
 # [Usability Improvement] Menambahkan nama perawat pada kunjungan
 # [Bug Fix] Memperbaiki NominalBHP pada Rekap Fee Practitioner
 # [Bug Fix] Memperbaiki Penggunaan Voucher Diskon
 # [Bug Fix] Memperbaiki Pemotongan Paket
 # [Bug Fix] Memperbaiki Upload Omset
+# [Bug Fix] Memperbaiki Bug error rentang tanggal pada cek Riwayat paket tindakan
 
 Version : 2.0.0.57 (08 Mei 2026)
 # [New Feature] Penambahan laporan penggunaan paket Tindakan

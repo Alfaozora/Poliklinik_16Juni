@@ -247,6 +247,26 @@ Public Module ModelPosWeb
         Private _kuota As Integer
         Private _kodeVoucher As String
         Private _tindakan As List(Of DetailTindakan)
+        Private _tanggalMulai As String
+        Private _tanggalAkhir As String
+
+        Public Property TanggalMulai() As String
+            Get
+                Return _tanggalMulai
+            End Get
+            Set(ByVal value As String)
+                _tanggalMulai = value
+            End Set
+        End Property
+
+        Public Property TanggalAkhir() As String
+            Get
+                Return _tanggalAkhir
+            End Get
+            Set(ByVal value As String)
+                _tanggalAkhir = value
+            End Set
+        End Property
 
         Public Property JenisPoli() As String
             Get
@@ -366,4 +386,88 @@ Public Module ModelPosWeb
         End Property
     End Class
 
+    Public Class DetailTindakanItem
+        ' Backing Fields
+        Private _tindakanID As Integer
+        Private _namaTindakan As String
+        Private _jenisTindakan As String
+        Private _biayaTindakan As Decimal
+        Private _diskonTindakan As Decimal
+        Private _nettBayar As Decimal
+        Private _kuotaTindakan As Decimal
+        Private _grandTotal As Decimal
+
+        ' Properties
+        Public Property TindakanID() As Integer
+            Get
+                Return _tindakanID
+            End Get
+            Set(ByVal value As Integer)
+                _tindakanID = value
+            End Set
+        End Property
+
+        Public Property NamaTindakan() As String
+            Get
+                Return _namaTindakan
+            End Get
+            Set(ByVal value As String)
+                _namaTindakan = value
+            End Set
+        End Property
+
+        Public Property JenisTindakan() As String
+            Get
+                Return _jenisTindakan
+            End Get
+            Set(ByVal value As String)
+                _jenisTindakan = value
+            End Set
+        End Property
+
+        Public Property BiayaTindakan() As Decimal
+            Get
+                Return _biayaTindakan
+            End Get
+            Set(ByVal value As Decimal)
+                _biayaTindakan = value
+            End Set
+        End Property
+
+        Public Property DiskonTindakan() As Decimal
+            Get
+                Return _diskonTindakan
+            End Get
+            Set(ByVal value As Decimal)
+                _diskonTindakan = value
+            End Set
+        End Property
+
+        Public Property NettBayar() As Decimal
+            Get
+                Return _nettBayar
+            End Get
+            Set(ByVal value As Decimal)
+                _nettBayar = value
+            End Set
+        End Property
+
+        Public Property KuotaTindakan() As Decimal
+            Get
+                Return _kuotaTindakan
+            End Get
+            Set(ByVal value As Decimal)
+                _kuotaTindakan = value
+            End Set
+        End Property
+
+        Public Property GrandTotal() As Decimal
+            Get
+                Return _grandTotal
+            End Get
+            Set(ByVal value As Decimal)
+                _grandTotal = value
+            End Set
+        End Property
+    End Class
 End Module

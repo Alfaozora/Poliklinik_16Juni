@@ -894,22 +894,16 @@ Public Class ReportLogPaketTindakan
 
     Function GetDataDetailPaketRegulerLaporan(ByVal NoRM As String) As DataTable
 
-        Dim tglTransaksiAwal As Date = TglAwalTransaksi.Value
-        Dim tglTransaksiAkhir As Date = TglAkhirTransaksi.Value
-
         Dim tblResult As New DataTable
         Dim query As New StringBuilder()
 
-        ' 🔥 Checkbox:
-        ' dicentang = semua tanggal (0)
-        ' tidak dicentang = pakai filter (1)
-        Dim pakaiFilterTanggal As Integer = If(CheckBoxFilterTanggal.Checked, 0, 1)
+        Dim pakaiFilterTanggal As Boolean = Not CheckBoxFilterTanggal.Checked
+        Dim cleanNoRM As String = NoRM.Replace("'", "''")
+        Dim cleanPoli As String = ComboBoxPoli.Text.Replace("'", "''")
 
-        query.AppendLine("DECLARE @NoRM VARCHAR(50) = '" & NoRM & "'")
-        query.AppendLine("DECLARE @TglAwal DATE = '" & Format(tglTransaksiAwal, "yyyy-MM-dd") & "'")
-        query.AppendLine("DECLARE @TglAkhir DATE = '" & Format(tglTransaksiAkhir, "yyyy-MM-dd") & "'")
-        query.AppendLine("DECLARE @PakaiFilterTanggal BIT = " & pakaiFilterTanggal)
-        query.AppendLine("DECLARE @JenisPoli VARCHAR(50) = '" & ComboBoxPoli.Text & "'")
+        ' Gunakan format yyyyMMdd murni (ISO standard) agar bebas dari bug regional server
+        Dim tglAwalStr As String = TglAwalTransaksi.Value.ToString("yyyyMMdd 00:00:00")
+        Dim tglAkhirStr As String = TglAkhirTransaksi.Value.ToString("yyyyMMdd 23:59:59")
 
         query.AppendLine("SELECT ")
         query.AppendLine("    TD.JenisPoli,")
@@ -956,12 +950,23 @@ Public Class ReportLogPaketTindakan
         query.AppendLine("    WHERE TPT.KodeVoucher = LPP.KodeVoucher")
         query.AppendLine(") TPT")
 
-
         query.AppendLine("WHERE ")
         query.AppendLine("    LPP.DeletedBy IS NULL")
-        query.AppendLine("    AND (@NoRM = '' OR LPP.NoRekamMedis = @NoRM)")
         query.AppendLine("    AND MPT.JenisPaket = 'Paket Reguler'")
-        query.AppendLine("    AND (@JenisPoli = '' OR TD.JenisPoli = @JenisPoli)")
+
+        ' Filter Langsung di WHERE (Jauh lebih cepat & stabil daripada DECLARE / HAVING)
+        If cleanNoRM <> "" Then
+            query.AppendLine("    AND LPP.NoRekamMedis = '" & cleanNoRM & "'")
+        End If
+
+        If cleanPoli <> "" Then
+            query.AppendLine("    AND TD.JenisPoli = '" & cleanPoli & "'")
+        End If
+
+        If pakaiFilterTanggal Then
+            query.AppendLine("    AND LPP.TanggalTransaksi >= '" & tglAwalStr & "'")
+            query.AppendLine("    AND LPP.TanggalTransaksi <= '" & tglAkhirStr & "'")
+        End If
 
         query.AppendLine("GROUP BY ")
         query.AppendLine("    TD.JenisPoli,")
@@ -973,22 +978,11 @@ Public Class ReportLogPaketTindakan
         query.AppendLine("    MPTD.NamaTindakan,")
         query.AppendLine("    MPT.Kuota")
 
-        query.AppendLine("HAVING ")
-        query.AppendLine("    (")
-        query.AppendLine("        @PakaiFilterTanggal = 0")
-        query.AppendLine("        OR (MAX(LPP.TanggalTransaksi) >= @TglAwal")
-        query.AppendLine("            AND MAX(LPP.TanggalTransaksi) < DATEADD(DAY, 1, @TglAkhir))")
-        query.AppendLine("    )")
-
         query.AppendLine("ORDER BY ")
         query.AppendLine("    TD.JenisPoli,")
         query.AppendLine("    Tgl")
 
-        ' 🔍 DEBUG (opsional tapi sangat disarankan)
-        ' MsgBox(query.ToString())
-
         tblResult = ReadSQL(query.ToString())
-
         Return tblResult
 
     End Function
