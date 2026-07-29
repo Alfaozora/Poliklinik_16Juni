@@ -2332,7 +2332,7 @@ Public Class FormPembayaran
                         If Trow("JenisBayar") = "TAGIHAN" Or Trow("JenisBayar") = "TUNAI" Then
                             Report.Bands.Item(BandKind.ReportFooter).Controls(Tket).Text = Trow("JenisBayar") & " - Jumlah : " & Splitmoney(Trow("JumlahBayar"))
                         Else
-                            Report.Bands.Item(BandKind.ReportFooter).Controls(Tket).Text = Trow("JenisBayar") & " - No Kartu : " & "*".PadRight(Len(Trow("NoJenisBayar")) - 3) & Strings.Right(Trow("NoJenisBayar"), 3) & Trow("kartu") & " - Jumlah : " & Splitmoney(Trow("JumlahBayar"))
+                            Report.Bands.Item(BandKind.ReportFooter).Controls(Tket).Text = Trow("JenisBayar") & " - No Kartu : " & "*".PadRight(Len(Trow("NoJenisBayar")) - 3) & "" & Strings.Right(Trow("NoJenisBayar"), 3) & Trow("kartu") & " - Jumlah : " & Splitmoney(Trow("JumlahBayar"))
                         End If
                     Next
                 Else
@@ -2647,7 +2647,10 @@ Public Class FormPembayaran
 
     Function CreateXRPictureBox(ByVal imageSignature As Image, ByVal LocX As Integer, ByVal LocY As Integer, ByVal SizeX As Integer, ByVal SizeY As Integer) As XRPictureBox
         Dim PictureBox As XRPictureBox = New XRPictureBox()
-        PictureBox.Name = "QR_Hasil"
+
+        ' Gunakan Guid/Unik agar tidak bentrok jika dipanggil beberapa kali
+        PictureBox.Name = "QR_Hasil_" & Guid.NewGuid().ToString("N")
+
         PictureBox.Image = imageSignature
         PictureBox.Location = New Point(LocX, LocY)
         PictureBox.Size = New Size(SizeX, SizeY)
@@ -2705,20 +2708,21 @@ Public Class FormPembayaran
         End If
 
         Dim queryAwal As String = "" & _
-             "SELECT " & _
-                 "TindakanID, " & _
-                 "MAX(NamaTindakan) AS Tindakan, " & _
-                 "MAX(JenisTindakan) AS Jenis, " & _
-                 "MAX(BiayaTindakan) AS [Biaya Tindakan], " & _
-                 "COUNT(*) AS Qty, " & _
-                 "SUM(BiayaTindakan) AS SubTotal, " & _
-                 "MAX(DiscTindakan) AS Diskon, " & _
-                 "SUM(BiayaTindakan - ISNULL(DiscTindakan, 0)) AS NettBayar " & _
-             "FROM TransaksiPoliDetail " & _
-             "WHERE TransPoliID = '" & transPoliID & "' " & _
-                 "AND DeletedBy IS NULL " & _
-                 filterAwal & " " & _
-             "GROUP BY TindakanID"
+            "SELECT " & _
+            "   TindakanID, " & _
+            "   PaketID, " & _
+            "   MAX(NamaTindakan) AS Tindakan, " & _
+            "   MAX(JenisTindakan) AS Jenis, " & _
+            "   MAX(BiayaTindakan) AS [Biaya Tindakan], " & _
+            "   COUNT(*) AS Qty, " & _
+            "   SUM(BiayaTindakan) AS SubTotal, " & _
+            "   MAX(DiscTindakan) AS Diskon, " & _
+            "   SUM(BiayaTindakan - ISNULL(DiscTindakan, 0)) AS NettBayar " & _
+            "FROM TransaksiPoliDetail " & _
+            "WHERE TransPoliID = '" & transPoliID & "' " & _
+            "  AND DeletedBy IS NULL " & _
+            filterAwal & " " & _
+            "GROUP BY TindakanID, PaketID"
 
         'Dim queryAwal As String = "" & _
         '    "SELECT " & _
@@ -2757,6 +2761,7 @@ Public Class FormPembayaran
 
         Dim NewHeader As DataTable = CreateTable()
         NewHeader.Rows.Clear()
+
         For Each rowTindakan As DataRow In tblTindakan.Rows
             Dim Tnew As DataRow = NewHeader.NewRow
 

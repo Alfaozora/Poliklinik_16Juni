@@ -124,7 +124,7 @@ Public Class DialogBoxPaketTindakan
                         newRow("Harga Awal") = Splitmoney(rowPaket("HargaAwal"))
                         newRow("Diskon") = Splitmoney(rowPaket("DiskonNominal"))
                         newRow("Harga Nett") = Splitmoney(rowPaket("HargaNett"))
-                        newRow("Jenis Paket") = Splitmoney(rowPaket("JenisPaket"))
+                        newRow("Jenis Paket") = rowPaket("JenisPaket").ToString()
                         gridPaket.Rows.Add(newRow)
                     Next
 

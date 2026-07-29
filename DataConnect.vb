@@ -985,32 +985,47 @@ Module Test
         End If
     End Function
 
-    Function Splitmoney(ByVal Tnilai As String) As String
-        Dim TSplit() As String = Tnilai.Split(".")
-        Dim Nilai = TSplit(0)
-        Dim Str As String = ""
-        Dim Mark As String = ""
-        If Left(Nilai, 1) = "-" Then
-            Mark = "-"
-            Nilai = Nilai.Replace("-", "")
+    'Function Splitmoney(ByVal Tnilai As String) As String
+    '    Dim TSplit() As String = Tnilai.Split(".")
+    '    Dim Nilai = TSplit(0)
+    '    Dim Str As String = ""
+    '    Dim Mark As String = ""
+    '    If Left(Nilai, 1) = "-" Then
+    '        Mark = "-"
+    '        Nilai = Nilai.Replace("-", "")
+    '    End If
+    '    Dim J As Integer = 0
+    '    For i As Integer = Nilai.Length To 1 Step -1
+    '        If IsNumeric(Mid(Nilai, i, 1)) = True Then
+    '            Str = Mid(Nilai, i, 1) + Str
+    '            J = J + 1
+    '            If J = 3 Then
+    '                J = 0
+    '                Str = "," + Str
+    '            End If
+    '        Else
+    '            Str = Mid(Nilai, i, 1) + Str
+    '        End If
+    '    Next
+    '    If Left(Str, 1) = "," Then Str = Mid(Str, 2, Len(Str) - 1)
+    '    If Str = "" Then Str = "0" Else Str = Mark + Str
+    '    If TSplit.Length > 1 Then Str = Str + "." & TSplit(1)
+    '    Return Str
+    'End Function
+
+    Function Splitmoney(ByVal Tnilai As Object) As String
+        Dim nilaiDecimal As Decimal = 0
+
+        ' Mengubah input string/object menjadi nilai Decimal secara aman
+        If Tnilai IsNot Nothing AndAlso Not String.IsNullOrEmpty(Tnilai.ToString()) Then
+            Decimal.TryParse(Tnilai.ToString().Replace(",", "."), _
+                             System.Globalization.NumberStyles.Any, _
+                             System.Globalization.CultureInfo.InvariantCulture, _
+                             nilaiDecimal)
         End If
-        Dim J As Integer = 0
-        For i As Integer = Nilai.Length To 1 Step -1
-            If IsNumeric(Mid(Nilai, i, 1)) = True Then
-                Str = Mid(Nilai, i, 1) + Str
-                J = J + 1
-                If J = 3 Then
-                    J = 0
-                    Str = "," + Str
-                End If
-            Else
-                Str = Mid(Nilai, i, 1) + Str
-            End If
-        Next
-        If Left(Str, 1) = "," Then Str = Mid(Str, 2, Len(Str) - 1)
-        If Str = "" Then Str = "0" Else Str = Mark + Str
-        If TSplit.Length > 1 Then Str = Str + "." & TSplit(1)
-        Return Str
+
+        ' Mengembalikan format ribuan bulat (Math.Floor/Truncate desimalnya)
+        Return Math.Truncate(nilaiDecimal).ToString("#,##0")
     End Function
 
     Function DetailUang(ByVal Tuang As Integer) As String
@@ -2443,14 +2458,14 @@ Module Test
         Dim noUrut As String = ""
 
         noUrut = ReadSQLNIK("SELECT TOP (1) " & _
-                            "RIGHT(NoNIK, 10) + 1 as 'No NIK' " & _
+                            "CAST(RIGHT(NoNIK, 10) AS BIGINT) + 1 as 'No NIK' " & _
                             "FROM MasterPasien " & _
                             "WHERE NoNIK IS NOT NULL AND PasienTanpaNIK = 1 " & _
-                            "ORDER BY RIGHT(NoNIK, 10) DESC")
+                            "ORDER BY CAST(RIGHT(NoNIK, 10) AS BIGINT) DESC")
 
-        If noUrut = "" Or noUrut = "-" Then noUrut = "0000000001"
+        If noUrut = "" OrElse noUrut = "-" Then noUrut = "1"
 
-        tempNomorNIK = tempNomorNIK & kodeLokasi & noUrut.ToString().PadLeft(10, "0")
+        tempNomorNIK = tempNomorNIK & kodeLokasi & noUrut.PadLeft(10, "0"c)
 
         Return tempNomorNIK
     End Function

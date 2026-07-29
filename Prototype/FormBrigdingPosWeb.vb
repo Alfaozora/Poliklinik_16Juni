@@ -247,6 +247,11 @@ Public Class FormBrigdingPosWeb
                 ' 1. Formatting Nomor Telepon (Tambah 0 di depan jika belum ada)
                 Dim noHpFormatted As String = FormatNoTelepon(item.NoTelepon)
 
+                ' Ambil TanggalTransaksi dari API (dengan fallback DateTime.Now jika null/kosong)
+                Dim valTglTransaksi As String = If(String.IsNullOrEmpty(item.TanggalTransaksi), DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), item.TanggalTransaksi)
+                Dim dtTx As DateTime = DateTime.Now
+                DateTime.TryParse(valTglTransaksi, dtTx)
+
                 ' 2. Cek ke MasterPasien berdasarkan NoHandphone
                 Dim queryCek As String = "SELECT * FROM MasterPasien WHERE NoHandphone = '" & noHpFormatted & "'"
                 Dim tblPasien As DataTable = ReadSQL(queryCek)
@@ -268,7 +273,7 @@ Public Class FormBrigdingPosWeb
 
                     Dim queryInsertPasien As String = _
                         "INSERT INTO MasterPasien (NoRekamMedis, NoNIK, Nama, NoHandphone, PasienTanpaNIK, TglLahir, JenisKelamin, DomisiliAlamat, CreatedBy, CreatedDate) " & _
-                        "VALUES (@noRekamMedis, @noNIK, @namaPasien, @noHandphone, 1, @tglLahir, @jenisKelamin, @alamat, @userInput, GETDATE())"
+                        "VALUES (@noRekamMedis, @noNIK, @namaPasien, @noHandphone, 1, @tglLahir, @jenisKelamin, @alamat, @userInput, @tglTransaksi)"
 
                     WriteParameterizedLokalSQL(queryInsertPasien, 4, _
                          New SqlParameter("@noRekamMedis", noRekamMedisLokal), _
@@ -278,7 +283,8 @@ Public Class FormBrigdingPosWeb
                          New SqlParameter("@tglLahir", tglLahir), _
                          New SqlParameter("@jenisKelamin", jenisKelamin), _
                          New SqlParameter("@alamat", alamat), _
-                         New SqlParameter("@userInput", userInputPasien))
+                         New SqlParameter("@userInput", userInputPasien), _
+                         New SqlParameter("@tglTransaksi", valTglTransaksi))
 
                     totalPasienBaru += 1
                 End If
@@ -290,7 +296,9 @@ Public Class FormBrigdingPosWeb
                         ' A. Generate NoUrut Transaksi
                         Dim kodeTransaksi As String = "U"
                         Dim jenisPoli As String = "UMUM"
-                        Dim tglFormat As String = DateTime.Now.ToString("yyyyMMdd")
+
+                        ' Parse TanggalTransaksi dari API ke format yyMMdd / yyyyMMdd untuk NoUrut
+                        Dim tglFormat As String = dtTx.ToString("yyyyMMdd")
                         Dim isMCU As Boolean = False
 
                         Dim noUrutBaru As String = generateNoTransaksi(kodeTransaksi, jenisPoli, tglFormat, isMCU)
@@ -300,16 +308,16 @@ Public Class FormBrigdingPosWeb
                         Dim dokterDefault As String = ""
                         Dim perawatDefault As String = ""
 
-                        ' C. Query INSERT ke TransaksiPoli
+                        ' C. Query INSERT ke TransaksiPoli (TglPoli, CreatedDate, ArrivedDate menggantikan GETDATE)
                         Dim queryInsertPoli As String = _
                             "INSERT INTO TransaksiPoli (" & _
                             "   IDInternet, DokterPoli, PerawatPoli, TglPoli, TotalTagihan, TotalDisc, Pembulatan, " & _
                             "   NettBayar, TotalBayar, Pengembalian, ClosedBayar, ClosedTransaksi, " & _
                             "   CreatedBy, CreatedDate, NoUrut, StatusKeterangan, StatusTransaksi, ArrivedDate" & _
                             ") VALUES (" & _
-                            "   @idInternet, @dokterPoli, @perawatPoli, GETDATE(), @totalTagihan, @totalDisc, 0, " & _
+                            "   @idInternet, @dokterPoli, @perawatPoli, @tglTransaksi, @totalTagihan, @totalDisc, 0, " & _
                             "   @nettBayar, @totalBayar, 0, '9998-12-31', 0, " & _
-                            "   @createdBy, GETDATE(), @noUrut, 'Belum Diperiksa', 'arrived', GETDATE()" & _
+                            "   @createdBy, @tglTransaksi, @noUrut, 'Belum Diperiksa', 'arrived', @tglTransaksi" & _
                             ")"
 
                         WriteParameterizedLokalSQL(queryInsertPoli, 4, _
@@ -321,7 +329,8 @@ Public Class FormBrigdingPosWeb
                              New SqlParameter("@nettBayar", pkt.HargaAkhir), _
                              New SqlParameter("@totalBayar", pkt.HargaAkhir), _
                              New SqlParameter("@createdBy", userInput), _
-                             New SqlParameter("@noUrut", noUrutBaru))
+                             New SqlParameter("@noUrut", noUrutBaru), _
+                             New SqlParameter("@tglTransaksi", valTglTransaksi))
 
                         totalTransaksiPoli += 1
 
@@ -330,7 +339,7 @@ Public Class FormBrigdingPosWeb
                         Dim valJenisPoli As String = If(String.IsNullOrEmpty(pkt.JenisPoli), "POLI FISIOTERAPI", pkt.JenisPoli)
 
                         If Not String.IsNullOrEmpty(transPoliID) Then
-                            ' E. INSERT ke TransaksiDetail
+                            ' E. INSERT ke TransaksiDetail (TanggalTransaksi & CreatedDate menggantikan GETDATE)
                             Dim queryInsertDetail As String = _
                                 "INSERT INTO TransaksiDetail (" & _
                                 "   StatusBPJS, NoUrutBPJS, NoKunjunganBPJS, JenisKunjungan, JenisRawat, StatusPulang, " & _
@@ -339,8 +348,8 @@ Public Class FormBrigdingPosWeb
                                 "   Sumber, JenisPoli, NoUrut" & _
                                 ") VALUES (" & _
                                 "   0, '', '', 'Kunjungan Sakit', 'Rawat Jalan', 'Berobat Jalan', " & _
-                                "   @noTransaksi, 'POLI', 'UMUM', GETDATE(), @idInternet, " & _
-                                "   '', '', @createdBy, GETDATE(), 0, 1, " & _
+                                "   @noTransaksi, 'POLI', 'UMUM', @tglTransaksi, @idInternet, " & _
+                                "   '', '', @createdBy, @tglTransaksi, 0, 1, " & _
                                 "   'Bridging_POS', @jenisPoli, @noUrut" & _
                                 ")"
 
@@ -349,11 +358,12 @@ Public Class FormBrigdingPosWeb
                                  New SqlParameter("@idInternet", noRekamMedisLokal), _
                                  New SqlParameter("@createdBy", userInput), _
                                  New SqlParameter("@jenisPoli", valJenisPoli), _
-                                 New SqlParameter("@noUrut", noUrutBaru))
+                                 New SqlParameter("@noUrut", noUrutBaru), _
+                                 New SqlParameter("@tglTransaksi", valTglTransaksi))
 
                             totalTransaksiDetail += 1
 
-                            ' F. INSERT ke TransaksiPoliBayarAwal
+                            ' F. INSERT ke TransaksiPoliBayarAwal (TransaksiTime menggantikan GETDATE)
                             Dim valJenisBayar As String = If(String.IsNullOrEmpty(item.JenisPembayaran), "TUNAI", item.JenisPembayaran)
                             Dim valNoKartu As String = If(String.IsNullOrEmpty(item.NoKartu), "-", item.NoKartu)
                             Dim valMesinEDC As String = If(String.IsNullOrEmpty(item.MesinEDC), "-", item.MesinEDC)
@@ -365,7 +375,7 @@ Public Class FormBrigdingPosWeb
                                 "   TransaksiTime, Kembali, TransJenis, mesin, kartu" & _
                                 ") VALUES (" & _
                                 "   @transPoliID, @jenisBayar, @noJenisBayar, @jumlahBayar, @admin, " & _
-                                "   GETDATE(), @kembali, 'POLI', @mesin, @kartu" & _
+                                "   @tglTransaksi, @kembali, 'POLI', @mesin, @kartu" & _
                                 ")"
 
                             WriteParameterizedLokalSQL(queryInsertBayarAwal, 4, _
@@ -376,7 +386,8 @@ Public Class FormBrigdingPosWeb
                                  New SqlParameter("@admin", userInput), _
                                  New SqlParameter("@kembali", item.TotalKembalian), _
                                  New SqlParameter("@mesin", valMesinEDC), _
-                                 New SqlParameter("@kartu", valPenerbitKartu))
+                                 New SqlParameter("@kartu", valPenerbitKartu), _
+                                 New SqlParameter("@tglTransaksi", valTglTransaksi))
 
                             totalBayarAwal += 1
 
@@ -408,7 +419,7 @@ Public Class FormBrigdingPosWeb
 
                             Dim valKodeVoucher As String = If(String.IsNullOrEmpty(pkt.KodeVoucher), "-", pkt.KodeVoucher)
 
-                            ' H. INSERT ke TransaksiPoliDetail
+                            ' H. INSERT ke TransaksiPoliDetail (transaksitime menggantikan GETDATE)
                             Dim queryInsertPoliDetail As String = _
                                 "INSERT INTO TransaksiPoliDetail (" & _
                                 "   TransPoliID, TindakanID, PaketID, NamaTindakan, JenisTindakan, " & _
@@ -418,7 +429,7 @@ Public Class FormBrigdingPosWeb
                                 ") VALUES (" & _
                                 "   @transPoliID, 0, @paketID, @namaTindakan, '-', " & _
                                 "   @biayaTindakan, @discTindakan, @nettBayar, 'Tanpa Asuransi / Umum ', '-', " & _
-                                "   @admin, GETDATE(), 0, '1', '0', " & _
+                                "   @admin, @tglTransaksi, 0, '1', '0', " & _
                                 "   @kodeVoucher, 'PAID'" & _
                                 ")"
 
@@ -430,11 +441,12 @@ Public Class FormBrigdingPosWeb
                                  New SqlParameter("@discTindakan", pkt.Diskon), _
                                  New SqlParameter("@nettBayar", pkt.HargaAkhir), _
                                  New SqlParameter("@admin", userInput), _
-                                 New SqlParameter("@kodeVoucher", valKodeVoucher))
+                                 New SqlParameter("@kodeVoucher", valKodeVoucher), _
+                                 New SqlParameter("@tglTransaksi", valTglTransaksi))
 
                             totalPoliDetail += 1
 
-                            ' I. INSERT ke TransaksiPaketTindakan
+                            ' I. INSERT ke TransaksiPaketTindakan (CreatedDate menggantikan GETDATE)
                             Dim rawJenisPaket As String = If(String.IsNullOrEmpty(pkt.JenisPaket), "-", pkt.JenisPaket)
                             Dim valJenisPaket As String = ToTitleCase(rawJenisPaket)
                             Dim valTglMulai As String = If(String.IsNullOrEmpty(pkt.TanggalMulai), "1900-01-01", pkt.TanggalMulai)
@@ -450,7 +462,7 @@ Public Class FormBrigdingPosWeb
                                 "   @noRekamMedis, @noTransaksi, @paketID, @namaPaket, @keteranganPaket, " & _
                                 "   @jenisPaket, @hargaAwal, @diskonNominal, @hargaNett, @kuota, " & _
                                 "   @detailTindakan, 'PAID', 'Tanpa Asuransi / Umum', @kodeVoucher, " & _
-                                "   @tglMulai, @tglAkhir, @createdBy, GETDATE()" & _
+                                "   @tglMulai, @tglAkhir, @createdBy, @tglTransaksi" & _
                                 ")"
 
                             WriteParameterizedLokalSQL(queryInsertPaketTindakan, 4, _
@@ -468,10 +480,12 @@ Public Class FormBrigdingPosWeb
                                  New SqlParameter("@kodeVoucher", valKodeVoucher), _
                                  New SqlParameter("@tglMulai", valTglMulai), _
                                  New SqlParameter("@tglAkhir", valTglAkhir), _
-                                 New SqlParameter("@createdBy", userInput))
+                                 New SqlParameter("@createdBy", userInput), _
+                                 New SqlParameter("@tglTransaksi", valTglTransaksi))
 
                             totalPaketTindakan += 1
 
+                            ' J. INSERT ke TransaksiPaketTindakanDetail (CreatedDate menggantikan GETDATE)
                             If Not String.IsNullOrEmpty(detailTindakanMaster) AndAlso detailTindakanMaster <> "-" Then
                                 Try
                                     Dim listDetailTindakan As List(Of DetailTindakanItem) = _
@@ -487,7 +501,7 @@ Public Class FormBrigdingPosWeb
                                                 ") VALUES (" & _
                                                 "   @paketID, @kodeVoucher, @tindakanID, @namaTindakan, @jenisTindakan, " & _
                                                 "   @biayaTindakan, @diskonTindakan, @nettBayar, 1, @grandTotal, " & _
-                                                "   @kuotaTindakan, @createdBy, GETDATE()" & _
+                                                "   @kuotaTindakan, @createdBy, @tglTransaksi" & _
                                                 ")"
 
                                             WriteParameterizedLokalSQL(queryInsertPaketDetail, 4, _
@@ -501,7 +515,8 @@ Public Class FormBrigdingPosWeb
                                                  New SqlParameter("@nettBayar", tndInPaket.NettBayar), _
                                                  New SqlParameter("@grandTotal", tndInPaket.GrandTotal), _
                                                  New SqlParameter("@kuotaTindakan", tndInPaket.KuotaTindakan), _
-                                                 New SqlParameter("@createdBy", userInput))
+                                                 New SqlParameter("@createdBy", userInput), _
+                                                 New SqlParameter("@tglTransaksi", valTglTransaksi))
 
                                             totalPaketTindakanDetail += 1
                                         Next
@@ -517,20 +532,9 @@ Public Class FormBrigdingPosWeb
                 totalBerhasil += 1
             Next
 
-            'MessageBox.Show("Proses simpan berhasil!" & vbCrLf & _
-            '                "- Total Transaksi Diproses         : " & totalBerhasil & vbCrLf & _
-            '                "- Pasien Baru Dibuat                : " & totalPasienBaru & vbCrLf & _
-            '                "- TransaksiPoli Terbuat             : " & totalTransaksiPoli & vbCrLf & _
-            '                "- TransaksiDetail Terbuat           : " & totalTransaksiDetail & vbCrLf & _
-            '                "- TransaksiPoliBayarAwal            : " & totalBayarAwal & vbCrLf & _
-            '                "- TransaksiPoliDetail Terbuat       : " & totalPoliDetail & vbCrLf & _
-            '                "- TransaksiPaketTindakan            : " & totalPaketTindakan & vbCrLf & _
-            '                "- TransaksiPaketTindakanDetail      : " & totalPaketTindakanDetail, _
-            '                "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
-
             MessageBox.Show("Berhasil menyimpan data " & totalBerhasil & " pasien!" & vbCrLf & _
-                "(Pasien Baru: " & totalPasienBaru & ")", _
-                "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                            "(Pasien Baru: " & totalPasienBaru & ")", _
+                            "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
 
             ' Refresh Tampilan Grid
             ButtonCari_Click(Nothing, Nothing)
