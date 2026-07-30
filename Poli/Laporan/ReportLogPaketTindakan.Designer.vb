@@ -26,11 +26,13 @@ Partial Class ReportLogPaketTindakan
         Me.PanelTop = New System.Windows.Forms.Panel
         Me.btnClose = New System.Windows.Forms.Button
         Me.Panel1 = New System.Windows.Forms.Panel
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox
+        Me.CheckBoxDownload10Tindakan = New System.Windows.Forms.CheckBox
+        Me.CheckBoxFilterTanggal = New System.Windows.Forms.CheckBox
+        Me.CheckBoxDownloadLaporanTindakan = New System.Windows.Forms.CheckBox
         Me.ComboBoxPoli = New System.Windows.Forms.ComboBox
         Me.Label3 = New System.Windows.Forms.Label
-        Me.CheckBoxDownloadLaporanTindakan = New System.Windows.Forms.CheckBox
         Me.ButtonLaporanPdf = New System.Windows.Forms.Button
-        Me.CheckBoxFilterTanggal = New System.Windows.Forms.CheckBox
         Me.ButtonClearData = New System.Windows.Forms.Button
         Me.TextBoxNamaRekamMedis = New System.Windows.Forms.TextBox
         Me.Panel9 = New System.Windows.Forms.Panel
@@ -48,17 +50,15 @@ Partial Class ReportLogPaketTindakan
         Me.SplitContainerRiwayatPaket = New System.Windows.Forms.SplitContainer
         Me.GridControlRiwayatPaket = New DevExpress.XtraGrid.GridControl
         Me.GridViewRiwayatPaket = New DevExpress.XtraGrid.Views.Grid.GridView
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox
-        Me.CheckBoxDownload10Tindakan = New System.Windows.Forms.CheckBox
         Me.PanelTop.SuspendLayout()
         Me.Panel1.SuspendLayout()
+        Me.GroupBox1.SuspendLayout()
         Me.Panel9.SuspendLayout()
         Me.SplitContainerRiwayatPaket.Panel1.SuspendLayout()
         Me.SplitContainerRiwayatPaket.Panel2.SuspendLayout()
         Me.SplitContainerRiwayatPaket.SuspendLayout()
         CType(Me.GridControlRiwayatPaket, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.GridViewRiwayatPaket, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
         'PanelTop
@@ -110,6 +110,48 @@ Partial Class ReportLogPaketTindakan
         Me.Panel1.Size = New System.Drawing.Size(1000, 220)
         Me.Panel1.TabIndex = 6
         '
+        'GroupBox1
+        '
+        Me.GroupBox1.Controls.Add(Me.CheckBoxDownload10Tindakan)
+        Me.GroupBox1.Controls.Add(Me.CheckBoxFilterTanggal)
+        Me.GroupBox1.Controls.Add(Me.CheckBoxDownloadLaporanTindakan)
+        Me.GroupBox1.Location = New System.Drawing.Point(538, 10)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(199, 158)
+        Me.GroupBox1.TabIndex = 576
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "Fungsi"
+        '
+        'CheckBoxDownload10Tindakan
+        '
+        Me.CheckBoxDownload10Tindakan.AutoSize = True
+        Me.CheckBoxDownload10Tindakan.Location = New System.Drawing.Point(15, 72)
+        Me.CheckBoxDownload10Tindakan.Name = "CheckBoxDownload10Tindakan"
+        Me.CheckBoxDownload10Tindakan.Size = New System.Drawing.Size(137, 19)
+        Me.CheckBoxDownload10Tindakan.TabIndex = 574
+        Me.CheckBoxDownload10Tindakan.Text = "List Jumlah Tindakan"
+        Me.CheckBoxDownload10Tindakan.UseVisualStyleBackColor = True
+        '
+        'CheckBoxFilterTanggal
+        '
+        Me.CheckBoxFilterTanggal.AutoSize = True
+        Me.CheckBoxFilterTanggal.Location = New System.Drawing.Point(15, 22)
+        Me.CheckBoxFilterTanggal.Name = "CheckBoxFilterTanggal"
+        Me.CheckBoxFilterTanggal.Size = New System.Drawing.Size(103, 19)
+        Me.CheckBoxFilterTanggal.TabIndex = 571
+        Me.CheckBoxFilterTanggal.Text = "Tanpa Tanggal"
+        Me.CheckBoxFilterTanggal.UseVisualStyleBackColor = True
+        '
+        'CheckBoxDownloadLaporanTindakan
+        '
+        Me.CheckBoxDownloadLaporanTindakan.AutoSize = True
+        Me.CheckBoxDownloadLaporanTindakan.Location = New System.Drawing.Point(15, 47)
+        Me.CheckBoxDownloadLaporanTindakan.Name = "CheckBoxDownloadLaporanTindakan"
+        Me.CheckBoxDownloadLaporanTindakan.Size = New System.Drawing.Size(121, 19)
+        Me.CheckBoxDownloadLaporanTindakan.TabIndex = 573
+        Me.CheckBoxDownloadLaporanTindakan.Text = "Laporan Tindakan"
+        Me.CheckBoxDownloadLaporanTindakan.UseVisualStyleBackColor = True
+        '
         'ComboBoxPoli
         '
         Me.ComboBoxPoli.FormattingEnabled = True
@@ -129,16 +171,6 @@ Partial Class ReportLogPaketTindakan
         Me.Label3.Size = New System.Drawing.Size(30, 17)
         Me.Label3.TabIndex = 574
         Me.Label3.Text = "Poli"
-        '
-        'CheckBoxDownloadLaporanTindakan
-        '
-        Me.CheckBoxDownloadLaporanTindakan.AutoSize = True
-        Me.CheckBoxDownloadLaporanTindakan.Location = New System.Drawing.Point(15, 47)
-        Me.CheckBoxDownloadLaporanTindakan.Name = "CheckBoxDownloadLaporanTindakan"
-        Me.CheckBoxDownloadLaporanTindakan.Size = New System.Drawing.Size(121, 19)
-        Me.CheckBoxDownloadLaporanTindakan.TabIndex = 573
-        Me.CheckBoxDownloadLaporanTindakan.Text = "Laporan Tindakan"
-        Me.CheckBoxDownloadLaporanTindakan.UseVisualStyleBackColor = True
         '
         'ButtonLaporanPdf
         '
@@ -160,16 +192,6 @@ Partial Class ReportLogPaketTindakan
         Me.ButtonLaporanPdf.TextAlign = System.Drawing.ContentAlignment.MiddleRight
         Me.ButtonLaporanPdf.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
         Me.ButtonLaporanPdf.UseVisualStyleBackColor = False
-        '
-        'CheckBoxFilterTanggal
-        '
-        Me.CheckBoxFilterTanggal.AutoSize = True
-        Me.CheckBoxFilterTanggal.Location = New System.Drawing.Point(15, 22)
-        Me.CheckBoxFilterTanggal.Name = "CheckBoxFilterTanggal"
-        Me.CheckBoxFilterTanggal.Size = New System.Drawing.Size(103, 19)
-        Me.CheckBoxFilterTanggal.TabIndex = 571
-        Me.CheckBoxFilterTanggal.Text = "Tanpa Tanggal"
-        Me.CheckBoxFilterTanggal.UseVisualStyleBackColor = True
         '
         'ButtonClearData
         '
@@ -399,28 +421,6 @@ Partial Class ReportLogPaketTindakan
         Me.GridViewRiwayatPaket.OptionsView.ShowGroupPanel = False
         Me.GridViewRiwayatPaket.PaintStyleName = "Office2003"
         '
-        'GroupBox1
-        '
-        Me.GroupBox1.Controls.Add(Me.CheckBoxDownload10Tindakan)
-        Me.GroupBox1.Controls.Add(Me.CheckBoxFilterTanggal)
-        Me.GroupBox1.Controls.Add(Me.CheckBoxDownloadLaporanTindakan)
-        Me.GroupBox1.Location = New System.Drawing.Point(538, 10)
-        Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(199, 158)
-        Me.GroupBox1.TabIndex = 576
-        Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "Fungsi"
-        '
-        'CheckBoxDownload10Tindakan
-        '
-        Me.CheckBoxDownload10Tindakan.AutoSize = True
-        Me.CheckBoxDownload10Tindakan.Location = New System.Drawing.Point(15, 72)
-        Me.CheckBoxDownload10Tindakan.Name = "CheckBoxDownload10Tindakan"
-        Me.CheckBoxDownload10Tindakan.Size = New System.Drawing.Size(147, 19)
-        Me.CheckBoxDownload10Tindakan.TabIndex = 574
-        Me.CheckBoxDownload10Tindakan.Text = "10 Tindakan Terbanyak"
-        Me.CheckBoxDownload10Tindakan.UseVisualStyleBackColor = True
-        '
         'ReportLogPaketTindakan
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)
@@ -440,6 +440,8 @@ Partial Class ReportLogPaketTindakan
         Me.PanelTop.ResumeLayout(False)
         Me.Panel1.ResumeLayout(False)
         Me.Panel1.PerformLayout()
+        Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox1.PerformLayout()
         Me.Panel9.ResumeLayout(False)
         Me.Panel9.PerformLayout()
         Me.SplitContainerRiwayatPaket.Panel1.ResumeLayout(False)
@@ -447,8 +449,6 @@ Partial Class ReportLogPaketTindakan
         Me.SplitContainerRiwayatPaket.ResumeLayout(False)
         CType(Me.GridControlRiwayatPaket, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.GridViewRiwayatPaket, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.GroupBox1.ResumeLayout(False)
-        Me.GroupBox1.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub

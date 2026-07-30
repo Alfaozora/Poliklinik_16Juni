@@ -1,4 +1,8 @@
-﻿Public Class FormLaporanRiwayatAlat
+﻿Imports System.Net
+Imports System.IO
+Imports System.Text
+
+Public Class FormLaporanRiwayatAlat
 
     Private userInput As String = PoliKlinik.Lbluser.Text
 
@@ -22,7 +26,7 @@
         Dim row As DataRow = dt.Rows(0)
 
         ' Isi form
-        TextBoxAlatID.Text = row("AlatID").ToString()
+        TextBoxAlatId.Text = row("AlatID").ToString()
         TextBoxKodeAlat.Text = row("KodeAlat").ToString()
         TextBoxNamaAlat.Text = row("NamaAlat").ToString()
         TextBoxNamaRuangan.Text = row("NamaRuangan").ToString()
@@ -215,5 +219,171 @@
         report.DataSource = dt
         'report.RunDesigner()
         report.ShowPreview()
+    End Sub
+
+    Private Sub ButtonKirimJurnal_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonKirimJurnal.Click
+        Try
+            ' 1. Ambil Rentang Tanggal dari Form Picker
+            Dim tglAwal As Date = dtAwal.Value.Date
+            Dim tglAkhir As Date = dtAkhir.Value.Date
+
+            Dim strAwal As String = tglAwal.ToString("yyyy-MM-dd 00:00:00")
+            Dim strAkhir As String = tglAkhir.ToString("yyyy-MM-dd 23:59:59")
+
+            ' 2. Query Data Penggunaan Alat Baru (Termasuk NoUrut)
+            Dim sqlGetLog As String = String.Format( _
+                "SELECT " & _
+                "   LPA.LogID, " & _
+                "   TD.NoUrut, " & _
+                "   LPA.TglPemakaian, " & _
+                "   TD.JenisPoli AS [Poli], " & _
+                "   MA.NamaAlat AS [NamaAlat], " & _
+                "   MC.NamaCartridge AS [NamaCartridge], " & _
+                "   LPA.ShootDipakai AS [Shoot], " & _
+                "   LPA.HargaBeli AS [BiayaShoot] " & _
+                "FROM LogPemakaianAlat LPA " & _
+                "INNER JOIN MasterCartridge MC ON LPA.CartridgeID = MC.CartridgeID " & _
+                "INNER JOIN MasterAlat MA ON MC.AlatID = MA.AlatID " & _
+                "INNER JOIN TransaksiPoliDetail TPD ON LPA.TransaksiDetailID = TPD.TransPoliIDDetail " & _
+                "INNER JOIN TransaksiDetail TD ON TPD.TransPoliID = TD.NoTransaksi " & _
+                "WHERE LPA.IsVoid = '0' " & _
+                "  AND LPA.VoidAt IS NULL " & _
+                "  AND LPA.Upload = '0' " & _
+                "  AND LPA.TglPemakaian BETWEEN '{0}' AND '{1}' " & _
+                "ORDER BY LPA.TglPemakaian ASC", strAwal, strAkhir)
+
+            Dim dtLog As DataTable = ReadSQL(sqlGetLog)
+
+            If dtLog Is Nothing OrElse dtLog.Rows.Count = 0 Then
+                MessageBox.Show("Tidak ada data penggunaan alat yang perlu dikirim pada periode tersebut.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Exit Sub
+            End If
+
+            ' 3. Inisialisasi UI Progress Bar
+            ProgressBar1.Minimum = 0
+            ProgressBar1.Maximum = dtLog.Rows.Count + 2
+            ProgressBar1.Value = 0
+            ProgressBar1.Visible = True
+
+            lblStatusProgress.Text = "Menyiapkan data penggunaan alat..."
+            lblStatusProgress.Visible = True
+            Application.DoEvents()
+
+            ' 4. Menyusun Payload JSON Batch & List LogID
+            Dim sbJson As New StringBuilder()
+            sbJson.Append("{")
+            sbJson.Append("""user_input"": """ & userInput & """,")
+            sbJson.Append("""laporan"": [")
+
+            Dim listLogID As New List(Of String)()
+            Dim isFirst As Boolean = True
+            Dim progressStep As Integer = 0
+
+            For Each row As DataRow In dtLog.Rows
+                Dim logID As String = row("LogID").ToString()
+                Dim noTransaksi As String = row("NoUrut").ToString().Trim()
+                Dim tglPemakaian As Date = CDate(row("TglPemakaian"))
+                Dim strTanggalFormatYmd As String = tglPemakaian.ToString("yyyyMMdd")
+
+                Dim namaPoliDB As String = row("Poli").ToString().Trim().ToUpper()
+                Dim namaAlat As String = row("NamaAlat").ToString().Trim()
+                Dim namaCartridge As String = row("NamaCartridge").ToString().Trim()
+                Dim shoot As Decimal = If(IsDBNull(row("Shoot")), 0, CDec(row("Shoot")))
+                Dim biayaShoot As Decimal = If(IsDBNull(row("BiayaShoot")), 0, CDec(row("BiayaShoot")))
+
+                ' Total Nominal Pemakaian
+                Dim totalNominal As Decimal = shoot * biayaShoot
+
+                ' Mapping Poli
+                Dim poliKey As String = ""
+                Select Case namaPoliDB
+                    Case "POLI KECANTIKAN"
+                        poliKey = "kecantikan"
+                    Case "POLI HBOT"
+                        poliKey = "hbot"
+                    Case "POLI FISIOTERAPI"
+                        poliKey = "fisio"
+                    Case Else
+                        poliKey = namaPoliDB.ToLower()
+                End Select
+
+                Dim keterangan As String = String.Format("Pemakaian BHP Alat: {0} [{1}] - No. Transaksi: {2}", namaAlat, namaCartridge, noTransaksi)
+
+                If totalNominal > 0 Then
+                    If Not isFirst Then sbJson.Append(",")
+
+                    sbJson.Append("{")
+                    sbJson.Append("""poli"": """ & poliKey & """,")
+                    sbJson.Append("""nominal"": " & totalNominal.ToString(System.Globalization.CultureInfo.InvariantCulture) & ",")
+                    sbJson.Append("""keterangan"": """ & keterangan.Replace("""", "\""") & """,")
+                    sbJson.Append("""tanggal"": """ & strTanggalFormatYmd & """")
+                    sbJson.Append("}")
+
+                    listLogID.Add(logID)
+                    isFirst = False
+                End If
+
+                progressStep += 1
+                If progressStep <= ProgressBar1.Maximum Then ProgressBar1.Value = progressStep
+                Application.DoEvents()
+            Next
+
+            sbJson.Append("]")
+            sbJson.Append("}")
+
+            If listLogID.Count = 0 Then
+                MessageBox.Show("Tidak ada nominal pemakaian alat yang valid untuk dikirim.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                Exit Sub
+            End If
+
+            ' 5. Ambil Config URL & Exec API
+            lblStatusProgress.Text = "Menghubungkan ke API Jurnal..."
+            ProgressBar1.Value = ProgressBar1.Maximum - 1
+            Application.DoEvents()
+
+            Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+            If Not baseURL.EndsWith("/") Then baseURL &= "/"
+
+            Dim StatusUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_jurnal_status'")
+            Dim urlApiJurnal As String = baseURL & "api/jurnal/transaksi/penggunaanAlat" & If(StatusUrl = "Dev", "/Stg", "")
+            Dim jsonPayload As String = sbJson.ToString()
+
+            lblStatusProgress.Text = "Mengirim jurnal penggunaan alat ke server..."
+            Application.DoEvents()
+
+            Dim responseApi As String = InsertDataAPIRMOld(jsonPayload, urlApiJurnal)
+
+            ProgressBar1.Value = ProgressBar1.Maximum
+            lblStatusProgress.Text = "Selesai!"
+            Application.DoEvents()
+
+            ' 6. Handling Response & Update LogPemakaianAlat
+            If responseApi.ToLower().Contains("""success"":true") Then
+                Try
+                    ' Gabungkan seluruh LogID menjadi format list (misal: '1','2','3')
+                    Dim strInLogID As String = String.Join("','", listLogID.ToArray())
+
+                    ' Buat query update batch
+                    Dim sqlUpdate As String = "UPDATE LogPemakaianAlat SET Upload = '1' WHERE LogID IN ('" & strInLogID & "')"
+
+                    ' Eksekusi menggunakan WriteSQL milik Anda (parameter kedua disesuaikan jika perlu index connection tertentu, misal 4)
+                    WriteSQL(sqlUpdate, 4)
+
+                    MessageBox.Show("Berhasil mengirim " & listLogID.Count & " data penggunaan alat ke Jurnal dan status Upload telah diperbarui!", "Sukses API", MessageBoxButtons.OK, MessageBoxIcon.Information)
+
+                Catch exUpdate As Exception
+                    MessageBox.Show("API Berhasil terkirim, namun gagal memperbarui status Upload di database lokal: " & exUpdate.Message, "Error Database", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                End Try
+            Else
+                MessageBox.Show("Gagal mengirim data penggunaan alat. Response Server:" & vbCrLf & responseApi, "Gagal Kirim API", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End If
+
+        Catch ex As Exception
+            MessageBox.Show("Terjadi kesalahan saat memproses penggunaan alat: " & ex.Message, "Error Application", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        Finally
+            ProgressBar1.Visible = False
+            lblStatusProgress.Visible = False
+            lblStatusProgress.Text = ""
+        End Try
     End Sub
 End Class

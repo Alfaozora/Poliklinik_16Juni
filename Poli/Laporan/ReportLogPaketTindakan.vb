@@ -1384,7 +1384,7 @@ Public Class ReportLogPaketTindakan
         ' =========================
         ' QUERY
         ' =========================
-        query.AppendLine("SELECT TOP 10")
+        query.AppendLine("SELECT TOP 100")
         query.AppendLine("    TPD.TindakanID,")
         query.AppendLine("    TPD.NamaTindakan,")
         query.AppendLine("    TD.JenisPoli,")

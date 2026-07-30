@@ -14121,68 +14121,68 @@ Public Class FormRekamMedisDokter
 
             dbTran.Commit()
 
-            If statusPemakaian = 1 Then
-                'MsgBox("[DEBUG 1] Masuk blok statusPemakaian = 1. Siap memproses " & list.Count & " item alat.")
+            'If statusPemakaian = 1 Then
+            '    'MsgBox("[DEBUG 1] Masuk blok statusPemakaian = 1. Siap memproses " & list.Count & " item alat.")
 
-                For Each item In list
-                    Try
-                        Dim totalShoot As Integer = item.Shoot * qtyTindakan
-                        Dim nominalAlat As Double = item.HargaBeli * totalShoot
-                        Dim cartridgeID As String = item.CartridgeID.ToString()
+            '    For Each item In list
+            '        Try
+            '            Dim totalShoot As Integer = item.Shoot * qtyTindakan
+            '            Dim nominalAlat As Double = item.HargaBeli * totalShoot
+            '            Dim cartridgeID As String = item.CartridgeID.ToString()
 
-                        'MsgBox("[DEBUG 2] Data Hitung -> Alat: " & item.NamaCartridge & " | Shoot: " & totalShoot & " | Nominal: " & nominalAlat)
+            '            'MsgBox("[DEBUG 2] Data Hitung -> Alat: " & item.NamaCartridge & " | Shoot: " & totalShoot & " | Nominal: " & nominalAlat)
 
-                        ' =======================================================
-                        ' PERBAIKAN BUG: Eksekusi querynya, jangan cuma diset string
-                        ' =======================================================
-                        Dim sqlPoli As String = "SELECT JenisPoli FROM TransaksiDetail WHERE NoUrut = '" & idTransaksi & "'"
-                        ' Gunakan ReadSQLNIK (atau fungsi baca SQL Anda) untuk mendapat hasilnya
-                        Dim namaPoliLokal As String = ReadSQLNIK(sqlPoli).ToUpper()
+            '            ' =======================================================
+            '            ' PERBAIKAN BUG: Eksekusi querynya, jangan cuma diset string
+            '            ' =======================================================
+            '            Dim sqlPoli As String = "SELECT JenisPoli FROM TransaksiDetail WHERE NoUrut = '" & idTransaksi & "'"
+            '            ' Gunakan ReadSQLNIK (atau fungsi baca SQL Anda) untuk mendapat hasilnya
+            '            Dim namaPoliLokal As String = ReadSQLNIK(sqlPoli).ToUpper()
 
-                        'MsgBox("[DEBUG 3] Hasil baca DB namaPoliLokal: " & namaPoliLokal)
+            '            'MsgBox("[DEBUG 3] Hasil baca DB namaPoliLokal: " & namaPoliLokal)
 
-                        Dim poliParam As String = ""
+            '            Dim poliParam As String = ""
 
-                        If namaPoliLokal.Contains("KECANTIKAN") Then
-                            poliParam = "kecantikan"
-                        ElseIf namaPoliLokal.Contains("HBOT") Then
-                            poliParam = "hbot"
-                        ElseIf namaPoliLokal.Contains("FISIO") Then
-                            poliParam = "fisio"
-                        Else
-                            poliParam = ""
-                        End If
+            '            If namaPoliLokal.Contains("KECANTIKAN") Then
+            '                poliParam = "kecantikan"
+            '            ElseIf namaPoliLokal.Contains("HBOT") Then
+            '                poliParam = "hbot"
+            '            ElseIf namaPoliLokal.Contains("FISIO") Then
+            '                poliParam = "fisio"
+            '            Else
+            '                poliParam = ""
+            '            End If
 
-                        'MsgBox("[DEBUG 4] Parameter Poli final: '" & poliParam & "'")
+            '            'MsgBox("[DEBUG 4] Parameter Poli final: '" & poliParam & "'")
 
-                        Dim namaAlat As String = item.NamaCartridge
-                        Dim keteranganJurnal As String = "Pemakaian BHP Alat [Paket]: " & namaAlat & " [Cartridge ID: " & cartridgeID & "] - No Transaksi: " & idTransaksi
+            '            Dim namaAlat As String = item.NamaCartridge
+            '            Dim keteranganJurnal As String = "Pemakaian BHP Alat [Paket]: " & namaAlat & " [Cartridge ID: " & cartridgeID & "] - No Transaksi: " & idTransaksi
 
-                        Dim jsonJurnal As String = "{" & _
-                            """poli"":""" & poliParam & """," & _
-                            """nominal"":" & nominalAlat.ToString().Replace(",", ".") & "," & _
-                            """user_input"":""" & userInput & """," & _
-                            BaseKeteranganJson(keteranganJurnal) & _
-                            "}"
+            '            Dim jsonJurnal As String = "{" & _
+            '                """poli"":""" & poliParam & """," & _
+            '                """nominal"":" & nominalAlat.ToString().Replace(",", ".") & "," & _
+            '                """user_input"":""" & userInput & """," & _
+            '                BaseKeteranganJson(keteranganJurnal) & _
+            '                "}"
 
-                        'MsgBox("[DEBUG 5] JSON Payload yang akan dikirim: " & vbCrLf & jsonJurnal)
+            '            'MsgBox("[DEBUG 5] JSON Payload yang akan dikirim: " & vbCrLf & jsonJurnal)
 
-                        Dim baseUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
-                        Dim StatusUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_jurnal_status'")
+            '            Dim baseUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+            '            Dim StatusUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_jurnal_status'")
 
-                        Dim urlApiJurnal As String = baseUrl & "api/jurnal/transaksi/penggunaanAlat" & If(StatusUrl = "Dev", "/Stg", "")
+            '            Dim urlApiJurnal As String = baseUrl & "api/jurnal/transaksi/penggunaanAlat" & If(StatusUrl = "Dev", "/Stg", "")
 
-                        'MsgBox("[DEBUG 6] URL Tujuan: " & vbCrLf & urlApiJurnal)
+            '            'MsgBox("[DEBUG 6] URL Tujuan: " & vbCrLf & urlApiJurnal)
 
-                        Dim responseJurnal As String = InsertDataAPIRMOld(jsonJurnal, urlApiJurnal)
+            '            Dim responseJurnal As String = InsertDataAPIRMOld(jsonJurnal, urlApiJurnal)
 
-                        'MsgBox("[DEBUG 7] HASIL AKHIR API: " & responseJurnal, MsgBoxStyle.Information, "Info Jurnal")
+            '            'MsgBox("[DEBUG 7] HASIL AKHIR API: " & responseJurnal, MsgBoxStyle.Information, "Info Jurnal")
 
-                    Catch exJurnal As Exception
-                        MsgBox("[DEBUG ERROR] Terjadi kesalahan saat memproses Jurnal: " & exJurnal.Message & vbCrLf & exJurnal.StackTrace, MsgBoxStyle.Critical, "Error Jurnal")
-                    End Try
-                Next
-            End If
+            '        Catch exJurnal As Exception
+            '            MsgBox("[DEBUG ERROR] Terjadi kesalahan saat memproses Jurnal: " & exJurnal.Message & vbCrLf & exJurnal.StackTrace, MsgBoxStyle.Critical, "Error Jurnal")
+            '        End Try
+            '    Next
+            'End If
 
         Catch ex As Exception
 

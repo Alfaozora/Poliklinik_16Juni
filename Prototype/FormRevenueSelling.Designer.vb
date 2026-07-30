@@ -41,7 +41,12 @@ Partial Class FormRevenueSelling
         Me.ComboBoxPoliTarget = New System.Windows.Forms.ComboBox
         Me.Label3 = New System.Windows.Forms.Label
         Me.ButtonCetakCostumer = New System.Windows.Forms.Button
+        Me.ButtonKirimLaporan = New System.Windows.Forms.Button
+        Me.GroupBox2 = New System.Windows.Forms.GroupBox
+        Me.lblStatusProgress = New System.Windows.Forms.Label
+        Me.ProgressBar1 = New System.Windows.Forms.ProgressBar
         Me.GroupBox1.SuspendLayout()
+        Me.GroupBox2.SuspendLayout()
         Me.SuspendLayout()
         '
         'RadioButtonHarian
@@ -131,7 +136,7 @@ Partial Class FormRevenueSelling
         Me.ButtonCetakLaporan.FlatAppearance.BorderSize = 0
         Me.ButtonCetakLaporan.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonCetakLaporan.ForeColor = System.Drawing.Color.White
-        Me.ButtonCetakLaporan.Location = New System.Drawing.Point(479, 174)
+        Me.ButtonCetakLaporan.Location = New System.Drawing.Point(479, 170)
         Me.ButtonCetakLaporan.Name = "ButtonCetakLaporan"
         Me.ButtonCetakLaporan.Size = New System.Drawing.Size(142, 23)
         Me.ButtonCetakLaporan.TabIndex = 454
@@ -233,19 +238,63 @@ Partial Class FormRevenueSelling
         Me.ButtonCetakCostumer.FlatAppearance.BorderSize = 0
         Me.ButtonCetakCostumer.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonCetakCostumer.ForeColor = System.Drawing.Color.Black
-        Me.ButtonCetakCostumer.Location = New System.Drawing.Point(327, 174)
+        Me.ButtonCetakCostumer.Location = New System.Drawing.Point(327, 170)
         Me.ButtonCetakCostumer.Name = "ButtonCetakCostumer"
         Me.ButtonCetakCostumer.Size = New System.Drawing.Size(146, 23)
         Me.ButtonCetakCostumer.TabIndex = 458
         Me.ButtonCetakCostumer.Text = "Cetak Laporan Costumer"
         Me.ButtonCetakCostumer.UseVisualStyleBackColor = False
         '
+        'ButtonKirimLaporan
+        '
+        Me.ButtonKirimLaporan.BackColor = System.Drawing.Color.Goldenrod
+        Me.ButtonKirimLaporan.Cursor = System.Windows.Forms.Cursors.Default
+        Me.ButtonKirimLaporan.FlatAppearance.BorderSize = 0
+        Me.ButtonKirimLaporan.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonKirimLaporan.ForeColor = System.Drawing.Color.Black
+        Me.ButtonKirimLaporan.Location = New System.Drawing.Point(217, 60)
+        Me.ButtonKirimLaporan.Name = "ButtonKirimLaporan"
+        Me.ButtonKirimLaporan.Size = New System.Drawing.Size(142, 23)
+        Me.ButtonKirimLaporan.TabIndex = 459
+        Me.ButtonKirimLaporan.Text = "Kirim Data"
+        Me.ButtonKirimLaporan.UseVisualStyleBackColor = False
+        '
+        'GroupBox2
+        '
+        Me.GroupBox2.Controls.Add(Me.lblStatusProgress)
+        Me.GroupBox2.Controls.Add(Me.ProgressBar1)
+        Me.GroupBox2.Controls.Add(Me.ButtonKirimLaporan)
+        Me.GroupBox2.Location = New System.Drawing.Point(256, 218)
+        Me.GroupBox2.Name = "GroupBox2"
+        Me.GroupBox2.Size = New System.Drawing.Size(365, 93)
+        Me.GroupBox2.TabIndex = 460
+        Me.GroupBox2.TabStop = False
+        Me.GroupBox2.Text = "Kirim Web Dashboard"
+        '
+        'lblStatusProgress
+        '
+        Me.lblStatusProgress.AutoSize = True
+        Me.lblStatusProgress.BackColor = System.Drawing.Color.Transparent
+        Me.lblStatusProgress.Location = New System.Drawing.Point(6, 22)
+        Me.lblStatusProgress.Name = "lblStatusProgress"
+        Me.lblStatusProgress.Size = New System.Drawing.Size(10, 13)
+        Me.lblStatusProgress.TabIndex = 461
+        Me.lblStatusProgress.Text = "-"
+        '
+        'ProgressBar1
+        '
+        Me.ProgressBar1.Location = New System.Drawing.Point(7, 38)
+        Me.ProgressBar1.Name = "ProgressBar1"
+        Me.ProgressBar1.Size = New System.Drawing.Size(352, 14)
+        Me.ProgressBar1.TabIndex = 460
+        '
         'FormRevenueSelling
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.White
-        Me.ClientSize = New System.Drawing.Size(633, 215)
+        Me.ClientSize = New System.Drawing.Size(633, 334)
+        Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.ButtonCetakCostumer)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.ComboBoxPoli)
@@ -259,12 +308,14 @@ Partial Class FormRevenueSelling
         Me.Controls.Add(Me.RadioButtonTahunan)
         Me.Controls.Add(Me.RadioButtonBulanan)
         Me.Controls.Add(Me.RadioButtonHarian)
-        Me.MaximumSize = New System.Drawing.Size(649, 254)
-        Me.MinimumSize = New System.Drawing.Size(649, 254)
+        Me.MaximumSize = New System.Drawing.Size(649, 373)
+        Me.MinimumSize = New System.Drawing.Size(649, 373)
         Me.Name = "FormRevenueSelling"
         Me.Text = "FormRevenueSelling"
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
+        Me.GroupBox2.ResumeLayout(False)
+        Me.GroupBox2.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -288,4 +339,8 @@ Partial Class FormRevenueSelling
     Friend WithEvents TextBoxHariKerja As System.Windows.Forms.TextBox
     Friend WithEvents Label4 As System.Windows.Forms.Label
     Friend WithEvents ButtonCetakCostumer As System.Windows.Forms.Button
+    Friend WithEvents ButtonKirimLaporan As System.Windows.Forms.Button
+    Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
+    Friend WithEvents ProgressBar1 As System.Windows.Forms.ProgressBar
+    Friend WithEvents lblStatusProgress As System.Windows.Forms.Label
 End Class

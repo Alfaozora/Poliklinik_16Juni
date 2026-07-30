@@ -40,6 +40,9 @@ Partial Class FormLaporanRiwayatAlat
         Me.ButtonCariAlat = New System.Windows.Forms.Button
         Me.TextBoxNamaAlat = New System.Windows.Forms.TextBox
         Me.Label43 = New System.Windows.Forms.Label
+        Me.ButtonKirimJurnal = New System.Windows.Forms.Button
+        Me.ProgressBar1 = New System.Windows.Forms.ProgressBar
+        Me.lblStatusProgress = New System.Windows.Forms.Label
         Me.GroupBox3.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -80,6 +83,7 @@ Partial Class FormLaporanRiwayatAlat
         '
         'GroupBox3
         '
+        Me.GroupBox3.Controls.Add(Me.ButtonKirimJurnal)
         Me.GroupBox3.Controls.Add(Me.ButtonCetakRiwayat)
         Me.GroupBox3.Controls.Add(Me.Label46)
         Me.GroupBox3.Controls.Add(Me.Label45)
@@ -268,12 +272,54 @@ Partial Class FormLaporanRiwayatAlat
         Me.Label43.TabIndex = 643
         Me.Label43.Text = "Alat ID"
         '
+        'ButtonKirimJurnal
+        '
+        Me.ButtonKirimJurnal.BackColor = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(0, Byte), Integer))
+        Me.ButtonKirimJurnal.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+        Me.ButtonKirimJurnal.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonKirimJurnal.FlatAppearance.BorderSize = 0
+        Me.ButtonKirimJurnal.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonKirimJurnal.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.ButtonKirimJurnal.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonKirimJurnal.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.ButtonKirimJurnal.ForeColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(254, Byte), Integer))
+        Me.ButtonKirimJurnal.Location = New System.Drawing.Point(101, 78)
+        Me.ButtonKirimJurnal.Name = "ButtonKirimJurnal"
+        Me.ButtonKirimJurnal.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.ButtonKirimJurnal.Size = New System.Drawing.Size(125, 25)
+        Me.ButtonKirimJurnal.TabIndex = 652
+        Me.ButtonKirimJurnal.Text = "Kirim Jurnal"
+        Me.ButtonKirimJurnal.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.ButtonKirimJurnal.UseVisualStyleBackColor = False
+        '
+        'ProgressBar1
+        '
+        Me.ProgressBar1.Location = New System.Drawing.Point(352, 181)
+        Me.ProgressBar1.Name = "ProgressBar1"
+        Me.ProgressBar1.Size = New System.Drawing.Size(301, 10)
+        Me.ProgressBar1.TabIndex = 652
+        Me.ProgressBar1.Visible = False
+        '
+        'lblStatusProgress
+        '
+        Me.lblStatusProgress.AutoSize = True
+        Me.lblStatusProgress.BackColor = System.Drawing.Color.Transparent
+        Me.lblStatusProgress.Font = New System.Drawing.Font("Segoe UI", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.lblStatusProgress.Location = New System.Drawing.Point(353, 164)
+        Me.lblStatusProgress.Name = "lblStatusProgress"
+        Me.lblStatusProgress.Size = New System.Drawing.Size(11, 13)
+        Me.lblStatusProgress.TabIndex = 653
+        Me.lblStatusProgress.Text = "-"
+        Me.lblStatusProgress.Visible = False
+        '
         'FormLaporanRiwayatAlat
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.White
         Me.ClientSize = New System.Drawing.Size(669, 203)
+        Me.Controls.Add(Me.lblStatusProgress)
+        Me.Controls.Add(Me.ProgressBar1)
         Me.Controls.Add(Me.TextBoxIdRuangan)
         Me.Controls.Add(Me.Label59)
         Me.Controls.Add(Me.TextBoxNamaRuangan)
@@ -314,4 +360,7 @@ Partial Class FormLaporanRiwayatAlat
     Friend WithEvents ButtonCariAlat As System.Windows.Forms.Button
     Friend WithEvents TextBoxNamaAlat As System.Windows.Forms.TextBox
     Friend WithEvents Label43 As System.Windows.Forms.Label
+    Friend WithEvents ButtonKirimJurnal As System.Windows.Forms.Button
+    Friend WithEvents ProgressBar1 As System.Windows.Forms.ProgressBar
+    Friend WithEvents lblStatusProgress As System.Windows.Forms.Label
 End Class

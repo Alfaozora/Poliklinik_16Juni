@@ -9,6 +9,8 @@ Version : 2.0.0.58 (07 Juli 2026)
 # [New Feature] Laporan Costumer New, Existing, Sleeping
 # [New Feature] Bridging Poin Of Sale ERM Web dengan ERM Lokal
 # [New Feature] Laporan Alat Bisa diakses selain Admin
+# [New Feature] Sending Selling dan Revenue ke web Dashboard
+# [New Feature] Sending Jurnal Pemakaian Alat Batch per Hari
 # [Usability Improvement] Terintegrasi dengan SATUSEHAT untuk Poli Kecantikan
 # [Usability Improvement] Group by Tindakan + Qty pada Rekap Tagihan
 # [Usability Improvement] Meperbaiki Terbilang pada Rekap Invoice

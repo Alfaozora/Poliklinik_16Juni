@@ -1,4 +1,10 @@
-﻿Public Class FormRevenueSelling
+﻿Imports System.Net
+Imports System.IO
+Imports System.Text
+
+Public Class FormRevenueSelling
+    Dim dtRaw As DataTable
+    Private userInput As String = PoliKlinik.Lbluser.Text
 
     Private Sub FormRevenueSelling_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Dim namaBulan() As String = { _
@@ -674,8 +680,8 @@
 
                 report.DataSource = dtCustomer
 
-                report.ShowPreview()
-                'report.RunDesigner()
+                'report.ShowPreview()
+                report.RunDesigner()
 
             Catch ex As Exception
                 MessageBox.Show("Gagal memproses laporan: " & ex.Message, "Error DevExpress", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -683,5 +689,147 @@
         Else
             MessageBox.Show("Data tidak ditemukan untuk periode dan poli ini.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information)
         End If
+    End Sub
+
+    Private Sub ButtonKirimLaporan_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonKirimLaporan.Click
+        Try
+            Dim tglAwal As Date = dtAwal.Value.Date
+            Dim tglAkhir As Date = dtAkhir.Value.Date
+
+            Dim strAwal As String = tglAwal.ToString("yyyy-MM-dd 00:00:00")
+            Dim strAkhir As String = tglAkhir.ToString("yyyy-MM-dd 23:59:59")
+
+            Dim listPoli As New Dictionary(Of String, String)()
+            listPoli.Add("POLI KECANTIKAN", "LMR")
+            listPoli.Add("POLI HBOT", "HBOT")
+            listPoli.Add("POLI FISIOTERAPI", "FISIO")
+
+            Dim totalHari As Integer = (tglAkhir - tglAwal).Days + 1
+            Dim totalStep As Integer = listPoli.Count * totalHari
+
+            ProgressBar1.Minimum = 0
+            ProgressBar1.Maximum = totalStep + 2
+            ProgressBar1.Value = 0
+            ProgressBar1.Visible = True
+
+            lblStatusProgress.Text = "Menyiapkan data laporan..."
+            lblStatusProgress.Visible = True
+            Application.DoEvents()
+
+            Dim sbJson As New StringBuilder()
+            sbJson.Append("{")
+            sbJson.Append("""user"": """ & userInput & """,")
+            sbJson.Append("""laporan"": [")
+
+            Dim isFirstItem As Boolean = True
+            Dim currentProgressVal As Integer = 0
+
+            For Each kvp As KeyValuePair(Of String, String) In listPoli
+                Dim namaPoliDB As String = kvp.Key
+                Dim kodePoliAPI As String = kvp.Value
+
+                lblStatusProgress.Text = "Mengambil data " & namaPoliDB & "..."
+                Application.DoEvents()
+
+                ' Query khusus Selling & Revenue per Poli
+                Dim sqlQuery As String = String.Format( _
+                    "SELECT " & _
+                    "    ISNULL(S.Tgl, R.Tgl) AS Tgl, " & _
+                    "    ISNULL(S.TotalSelling, 0) AS SELLING, " & _
+                    "    ISNULL(R.TotalRevenue, 0) AS REVENUE " & _
+                    "FROM ( " & _
+                    "    SELECT Tgl, SUM(TotalHarga) AS TotalSelling " & _
+                    "    FROM ( " & _
+                    "        SELECT CAST(TPT.CreatedDate AS DATE) AS Tgl, TPT.HargaNett AS TotalHarga " & _
+                    "        FROM TransaksiPaketTindakan TPT " & _
+                    "        INNER JOIN TransaksiDetail TD ON TPT.NoTransaksi = TD.NoUrut " & _
+                    "        WHERE TPT.DeletedDate IS NULL AND TD.JenisPoli = '{0}' AND TD.DeletedBy IS NULL AND TPT.CreatedDate BETWEEN '{1}' AND '{2}' " & _
+                    "        UNION ALL " & _
+                    "        SELECT CAST(TPD.CreatedDate AS DATE) AS Tgl, TPD.NettBayar AS TotalHarga " & _
+                    "        FROM TransaksiPoliDetail TPD " & _
+                    "        INNER JOIN TransaksiPoli TP ON TPD.TransPoliID = TP.TransPoliID " & _
+                    "        INNER JOIN TransaksiDetail TD ON TP.NoUrut = TD.NoUrut " & _
+                    "        WHERE TPD.DeletedDate IS NULL AND TD.JenisPoli = '{0}' AND TD.DeletedBy IS NULL AND TPD.CreatedDate BETWEEN '{1}' AND '{2}' " & _
+                    "    ) CombinedSelling " & _
+                    "    GROUP BY Tgl " & _
+                    ") S " & _
+                    "FULL OUTER JOIN ( " & _
+                    "    SELECT CAST(TPD.CreatedDate AS DATE) AS Tgl, SUM(TPD.NettBayar) AS TotalRevenue " & _
+                    "    FROM TransaksiPoliDetail TPD " & _
+                    "    INNER JOIN TransaksiPoli TP ON TPD.TransPoliID = TP.TransPoliID " & _
+                    "    INNER JOIN TransaksiDetail TD ON TP.NoUrut = TD.NoUrut " & _
+                    "    WHERE TPD.DeletedDate IS NULL AND TD.JenisPoli = '{0}' AND TD.DeletedBy IS NULL AND TPD.CreatedDate BETWEEN '{1}' AND '{2}' " & _
+                    "    GROUP BY CAST(TPD.CreatedDate AS DATE) " & _
+                    ") R ON S.Tgl = R.Tgl " & _
+                    "ORDER BY Tgl ASC", namaPoliDB, strAwal, strAkhir)
+
+                Dim dtPoli As DataTable = ReadSQL(sqlQuery)
+
+                Dim currentTgl As Date = tglAwal
+                While currentTgl <= tglAkhir
+                    Dim strTglCurrent As String = currentTgl.ToString("yyyy-MM-dd")
+
+                    Dim sellingVal As Decimal = 0
+                    Dim revenueVal As Decimal = 0
+
+                    If dtPoli IsNot Nothing AndAlso dtPoli.Rows.Count > 0 Then
+                        Dim rowsMatch() As DataRow = dtPoli.Select("Tgl = #" & strTglCurrent & "#")
+                        If rowsMatch.Length > 0 Then
+                            sellingVal = If(IsDBNull(rowsMatch(0)("SELLING")), 0, CDec(rowsMatch(0)("SELLING")))
+                            revenueVal = If(IsDBNull(rowsMatch(0)("REVENUE")), 0, CDec(rowsMatch(0)("REVENUE")))
+                        End If
+                    End If
+
+                    If Not isFirstItem Then sbJson.Append(",")
+
+                    sbJson.Append("{")
+                    sbJson.Append("""tanggal"": """ & strTglCurrent & """,")
+                    sbJson.Append("""kode_poli"": """ & kodePoliAPI & """,")
+                    sbJson.Append("""selling"": " & sellingVal.ToString(System.Globalization.CultureInfo.InvariantCulture) & ",")
+                    sbJson.Append("""revenue"": " & revenueVal.ToString(System.Globalization.CultureInfo.InvariantCulture) & "")
+                    sbJson.Append("}")
+
+                    isFirstItem = False
+                    currentTgl = currentTgl.AddDays(1)
+
+                    currentProgressVal += 1
+                    If currentProgressVal <= ProgressBar1.Maximum Then
+                        ProgressBar1.Value = currentProgressVal
+                    End If
+                    Application.DoEvents()
+                End While
+            Next
+
+            sbJson.Append("]")
+            sbJson.Append("}")
+
+            lblStatusProgress.Text = "Menghubungkan ke API Server..."
+            ProgressBar1.Value = ProgressBar1.Maximum - 1
+            Application.DoEvents()
+
+            Dim jsonPayload As String = sbJson.ToString()
+            Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+
+            If Not baseURL.EndsWith("/") Then baseURL &= "/"
+            Dim apiUrl As String = baseURL & "api/analisa/insert-batch"
+
+            lblStatusProgress.Text = "Mengirim data ke server..."
+            Application.DoEvents()
+
+            Dim responseApi As String = InsertDataAPIRMOld(jsonPayload, apiUrl)
+
+            ProgressBar1.Value = ProgressBar1.Maximum
+            lblStatusProgress.Text = "Selesai!"
+            Application.DoEvents()
+
+            If responseApi.ToLower().Contains("""success"":true") OrElse responseApi.ToLower().Contains("""status"":""success""") Then
+                MessageBox.Show("Berhasil mengirim data laporan harian untuk SELURUH POLI (Kecantikan, HBOT, Fisio) periode " & tglAwal.ToString("dd/MM/yyyy") & " s/d " & tglAkhir.ToString("dd/MM/yyyy") & "!", "Sukses Batch API", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Else
+                MessageBox.Show("Gagal mengirim data. Response Server:" & vbCrLf & responseApi, "Gagal Kirim API", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End If
+
+        Catch ex As Exception
+            MessageBox.Show("Terjadi kesalahan saat pengiriman otomatis seluruh poli: " & ex.Message, "Error Application", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
     End Sub
 End Class
