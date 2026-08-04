@@ -51,59 +51,85 @@ Public Class FormLaporanRiwayatAlat
         Dim stringTglTransaksiAkhir As String = tglAkhir.Day & " " & BulanIndonesia(tglAkhir.Month) & " " & tglAkhir.Year
 
         ' ========================================================
-        ' 1. QUERY SQL (Memisahkan HargaBeliTampil dan HargaBeliTotal)
+        ' 1. QUERY SQL (Memperhitungkan Saldo Awal sebelum @TglAwal)
         ' ========================================================
         Dim sql As String = ""
         sql = "DECLARE @AlatID INT = " & alatID & " " & _
               "DECLARE @TglAwal DATETIME = '" & tglAwal.ToString("yyyy-MM-dd HH:mm:ss") & "' " & _
               "DECLARE @TglAkhir DATETIME = '" & tglAkhir.ToString("yyyy-MM-dd HH:mm:ss") & "' " & _
-              " ;WITH Ledger AS ( " & _
-              " SELECT " & _
-              " MC.CreatedAt AS Tanggal, " & _
-              " 'SALDO AWAL' AS JenisTransaksi, " & _
-              " MA.NamaAlat + ' - ' + MC.NamaCartridge AS Keterangan, " & _
-              " MC.KuotaAwal AS Debet, " & _
-              " 0 AS Kredit, " & _
-              " MC.CartridgeID, " & _
-              " ISNULL(CAST(MC.HargaBeli AS DECIMAL(18,2)), 0) AS HargaBeliTampil, " & _
-              " CAST(0 AS DECIMAL(18,2)) AS HargaBeliTotal " & _
-              " FROM MasterCartridge MC " & _
-              " INNER JOIN MasterAlat MA ON MA.AlatID = MC.AlatID " & _
-              " WHERE MA.AlatID = @AlatID " & _
-              " UNION ALL " & _
-              " SELECT " & _
-              " LPA.TglPemakaian, " & _
-              " CAST(TP.NoUrut AS VARCHAR(50)), " & _
-              " TPD.NamaTindakan + ' - ' + MP.Nama + ' | ' + MC.NamaCartridge, " & _
-              " 0, " & _
-              " LPA.ShootDipakai, " & _
-              " MC.CartridgeID, " & _
-              " ISNULL(CAST(LPA.HargaBeli AS DECIMAL(18,2)), 0) * LPA.ShootDipakai AS HargaBeliTampil, " & _
-              " ISNULL(CAST(LPA.HargaBeli AS DECIMAL(18,2)), 0) * LPA.ShootDipakai AS HargaBeliTotal " & _
-              " FROM LogPemakaianAlat LPA " & _
-              " INNER JOIN MasterCartridge MC ON MC.CartridgeID = LPA.CartridgeID " & _
-              " INNER JOIN MasterAlat MA ON MA.AlatID = MC.AlatID " & _
-              " INNER JOIN TransaksiPoliDetail TPD ON TPD.TransPoliIDDetail = LPA.TransaksiDetailID " & _
-              " INNER JOIN TransaksiPoli TP ON TP.TransPoliID = TPD.TransPoliID " & _
-              " INNER JOIN MasterPasien MP ON MP.NoRekamMedis = TP.IDInternet " & _
-              " WHERE MA.AlatID = @AlatID " & _
-              " AND LPA.IsVoid = 0 " & _
-              " AND LPA.Status = 1 " & _
-              " AND LPA.TglPemakaian BETWEEN @TglAwal AND @TglAkhir " & _
-              " UNION ALL " & _
-              " SELECT " & _
-              " LA.TglAdjustment, " & _
-              " 'ADJUSTMENT', " & _
-              " 'Penyesuaian - ' + ISNULL(LA.Keterangan, ''), " & _
-              " CASE WHEN LA.QtyAdjustment > 0 THEN LA.QtyAdjustment ELSE 0 END, " & _
-              " CASE WHEN LA.QtyAdjustment < 0 THEN ABS(LA.QtyAdjustment) ELSE 0 END, " & _
-              " MC.CartridgeID, " & _
-              " CAST(0 AS DECIMAL(18,2)) AS HargaBeliTampil, " & _
-              " CAST(0 AS DECIMAL(18,2)) AS HargaBeliTotal " & _
-              " FROM LogAdjustmentCartridge LA " & _
-              " INNER JOIN MasterCartridge MC ON MC.CartridgeID = LA.CartridgeID " & _
-              " WHERE MC.AlatID = @AlatID " & _
-              " AND LA.TglAdjustment BETWEEN @TglAwal AND @TglAkhir " & _
+              " ;WITH HistoryBefore AS ( " & _
+              "     /* 1. Ambil Kuota Awal Master Cartridge */ " & _
+              "     SELECT MC.CartridgeID, MC.CreatedAt AS Tanggal, MC.KuotaAwal AS Debet, 0 AS Kredit " & _
+              "     FROM MasterCartridge MC WHERE MC.AlatID = @AlatID " & _
+              "     UNION ALL " & _
+              "     /* 2. Pemakaian sebelum TglAwal */ " & _
+              "     SELECT LPA.CartridgeID, LPA.TglPemakaian, 0, LPA.ShootDipakai " & _
+              "     FROM LogPemakaianAlat LPA " & _
+              "     INNER JOIN MasterCartridge MC ON MC.CartridgeID = LPA.CartridgeID " & _
+              "     WHERE MC.AlatID = @AlatID AND LPA.IsVoid = 0 AND LPA.Status = 1 AND LPA.TglPemakaian < @TglAwal " & _
+              "     UNION ALL " & _
+              "     /* 3. Adjustment sebelum TglAwal */ " & _
+              "     SELECT MC.CartridgeID, LA.TglAdjustment, " & _
+              "     CASE WHEN LA.QtyAdjustment > 0 THEN LA.QtyAdjustment ELSE 0 END, " & _
+              "     CASE WHEN LA.QtyAdjustment < 0 THEN ABS(LA.QtyAdjustment) ELSE 0 END " & _
+              "     FROM LogAdjustmentCartridge LA " & _
+              "     INNER JOIN MasterCartridge MC ON MC.CartridgeID = LA.CartridgeID " & _
+              "     WHERE MC.AlatID = @AlatID AND LA.TglAdjustment < @TglAwal " & _
+              " ), " & _
+              " SaldoAwalPeriode AS ( " & _
+              "     /* Menghitung akumulasi sisa saldo sebelum TglAwal */ " & _
+              "     SELECT CartridgeID, ISNULL(SUM(Debet - Kredit), 0) AS SaldoAwal " & _
+              "     FROM HistoryBefore GROUP BY CartridgeID " & _
+              " ), " & _
+              " Ledger AS ( " & _
+              "     /* Baris SALDO AWAL untuk Laporan Periode Ini */ " & _
+              "     SELECT " & _
+              "     MC.CartridgeID, " & _
+              "     @TglAwal AS Tanggal, " & _
+              "     'SALDO AWAL' AS JenisTransaksi, " & _
+              "     MA.NamaAlat + ' - ' + MC.NamaCartridge AS Keterangan, " & _
+              "     ISNULL(SA.SaldoAwal, 0) AS Debet, " & _
+              "     0 AS Kredit, " & _
+              "     CAST(0 AS DECIMAL(18,2)) AS HargaBeliTampil, " & _
+              "     CAST(0 AS DECIMAL(18,2)) AS HargaBeliTotal " & _
+              "     FROM MasterCartridge MC " & _
+              "     INNER JOIN MasterAlat MA ON MA.AlatID = MC.AlatID " & _
+              "     LEFT JOIN SaldoAwalPeriode SA ON SA.CartridgeID = MC.CartridgeID " & _
+              "     WHERE MC.AlatID = @AlatID " & _
+              "     UNION ALL " & _
+              "     /* Transaksi Pemakaian dalam Periode (@TglAwal s/d @TglAkhir) */ " & _
+              "     SELECT " & _
+              "     MC.CartridgeID, " & _
+              "     LPA.TglPemakaian, " & _
+              "     CAST(TP.NoUrut AS VARCHAR(50)), " & _
+              "     TPD.NamaTindakan + ' - ' + MP.Nama + ' | ' + MC.NamaCartridge, " & _
+              "     0, " & _
+              "     LPA.ShootDipakai, " & _
+              "     ISNULL(CAST(LPA.HargaBeli AS DECIMAL(18,2)), 0) * LPA.ShootDipakai, " & _
+              "     ISNULL(CAST(LPA.HargaBeli AS DECIMAL(18,2)), 0) * LPA.ShootDipakai " & _
+              "     FROM LogPemakaianAlat LPA " & _
+              "     INNER JOIN MasterCartridge MC ON MC.CartridgeID = LPA.CartridgeID " & _
+              "     INNER JOIN MasterAlat MA ON MA.AlatID = MC.AlatID " & _
+              "     INNER JOIN TransaksiPoliDetail TPD ON TPD.TransPoliIDDetail = LPA.TransaksiDetailID " & _
+              "     INNER JOIN TransaksiPoli TP ON TP.TransPoliID = TPD.TransPoliID " & _
+              "     INNER JOIN MasterPasien MP ON MP.NoRekamMedis = TP.IDInternet " & _
+              "     WHERE MA.AlatID = @AlatID AND LPA.IsVoid = 0 AND LPA.Status = 1 " & _
+              "     AND LPA.TglPemakaian BETWEEN @TglAwal AND @TglAkhir " & _
+              "     UNION ALL " & _
+              "     /* Adjustment dalam Periode (@TglAwal s/d @TglAkhir) */ " & _
+              "     SELECT " & _
+              "     MC.CartridgeID, " & _
+              "     LA.TglAdjustment, " & _
+              "     'ADJUSTMENT', " & _
+              "     'Penyesuaian - ' + ISNULL(LA.Keterangan, ''), " & _
+              "     CASE WHEN LA.QtyAdjustment > 0 THEN LA.QtyAdjustment ELSE 0 END, " & _
+              "     CASE WHEN LA.QtyAdjustment < 0 THEN ABS(LA.QtyAdjustment) ELSE 0 END, " & _
+              "     CAST(0 AS DECIMAL(18,2)), " & _
+              "     CAST(0 AS DECIMAL(18,2)) " & _
+              "     FROM LogAdjustmentCartridge LA " & _
+              "     INNER JOIN MasterCartridge MC ON MC.CartridgeID = LA.CartridgeID " & _
+              "     WHERE MC.AlatID = @AlatID " & _
+              "     AND LA.TglAdjustment BETWEEN @TglAwal AND @TglAkhir " & _
               " ) " & _
               " SELECT " & _
               " L1.CartridgeID, " & _
@@ -135,27 +161,33 @@ Public Class FormLaporanRiwayatAlat
         ' ========================================================
         Dim totalDebet As Decimal = If(IsDBNull(dt.Compute("SUM(Debet)", "")), 0, CDec(dt.Compute("SUM(Debet)", "")))
         Dim totalKredit As Decimal = If(IsDBNull(dt.Compute("SUM(Kredit)", "")), 0, CDec(dt.Compute("SUM(Kredit)", "")))
-
-        ' Menghitung Total dari HargaBeliTotal (Saldo Awal nilainya 0 di kolom ini)
         Dim totalHargaBeli As Decimal = If(IsDBNull(dt.Compute("SUM(HargaBeliTotal)", "")), 0, CDec(dt.Compute("SUM(HargaBeliTotal)", "")))
-
         Dim totalSaldo As Decimal = totalDebet - totalKredit
 
         ' ========================================================
-        ' 3. QUERY SUMMARY HEADER ALAT
+        ' 3. QUERY SUMMARY HEADER ALAT (BERDAPATKAN RENTANG TANGGAL)
         ' ========================================================
         Dim sqlSummary As String = _
             "DECLARE @AlatID INT = " & alatID & " " & _
+            "DECLARE @TglAwal DATETIME = '" & tglAwal.ToString("yyyy-MM-dd HH:mm:ss") & "' " & _
+            "DECLARE @TglAkhir DATETIME = '" & tglAkhir.ToString("yyyy-MM-dd HH:mm:ss") & "' " & _
             "SELECT " & _
-            "(SELECT ISNULL(SUM(KuotaAwal),0) FROM MasterCartridge WHERE AlatID=@AlatID) AS KuotaAwal, " & _
-            "(SELECT ISNULL(SUM(JumlahTopUp),0) FROM LogTopUpAlat WHERE AlatID=@AlatID) AS TotalTopUp, " & _
-            "(SELECT ISNULL(SUM(LPA.ShootDipakai),0) FROM LogPemakaianAlat LPA INNER JOIN MasterCartridge MC ON MC.CartridgeID = LPA.CartridgeID WHERE MC.AlatID=@AlatID AND LPA.Status=1 AND LPA.IsVoid=0) AS TotalPemakaian, " & _
+            "/* Saldo Awal sebelum TglAwal */ " & _
             "( " & _
-            " (SELECT ISNULL(SUM(KuotaAwal),0) FROM MasterCartridge WHERE AlatID=@AlatID) " & _
-            " + (SELECT ISNULL(SUM(JumlahTopUp),0) FROM LogTopUpAlat WHERE AlatID=@AlatID) " & _
-            " - (SELECT ISNULL(SUM(LPA.ShootDipakai),0) FROM LogPemakaianAlat LPA INNER JOIN MasterCartridge MC ON MC.CartridgeID=LPA.CartridgeID WHERE MC.AlatID=@AlatID AND LPA.Status=1 AND LPA.IsVoid=0) " & _
-            " + (SELECT ISNULL(SUM(LA.QtyAdjustment),0) FROM LogAdjustmentCartridge LA INNER JOIN MasterCartridge MC ON MC.CartridgeID=LA.CartridgeID WHERE MC.AlatID=@AlatID) " & _
-            ") AS SaldoAkhir"
+            "  (SELECT ISNULL(SUM(KuotaAwal),0) FROM MasterCartridge WHERE AlatID=@AlatID) " & _
+            "  - (SELECT ISNULL(SUM(LPA.ShootDipakai),0) FROM LogPemakaianAlat LPA INNER JOIN MasterCartridge MC ON MC.CartridgeID=LPA.CartridgeID WHERE MC.AlatID=@AlatID AND LPA.Status=1 AND LPA.IsVoid=0 AND LPA.TglPemakaian < @TglAwal) " & _
+            "  + (SELECT ISNULL(SUM(LA.QtyAdjustment),0) FROM LogAdjustmentCartridge LA INNER JOIN MasterCartridge MC ON MC.CartridgeID=LA.CartridgeID WHERE MC.AlatID=@AlatID AND LA.TglAdjustment < @TglAwal) " & _
+            ") AS KuotaAwalPeriode, " & _
+            "/* TopUp pada Periode */ " & _
+            "0 AS TotalTopUp, " & _
+            "/* Pemakaian pada Periode */ " & _
+            "(SELECT ISNULL(SUM(LPA.ShootDipakai),0) FROM LogPemakaianAlat LPA INNER JOIN MasterCartridge MC ON MC.CartridgeID = LPA.CartridgeID WHERE MC.AlatID=@AlatID AND LPA.Status=1 AND LPA.IsVoid=0 AND LPA.TglPemakaian BETWEEN @TglAwal AND @TglAkhir) AS TotalPemakaian, " & _
+            "/* Saldo Akhir s/d TglAkhir */ " & _
+            "( " & _
+            "  (SELECT ISNULL(SUM(KuotaAwal),0) FROM MasterCartridge WHERE AlatID=@AlatID) " & _
+            "  - (SELECT ISNULL(SUM(LPA.ShootDipakai),0) FROM LogPemakaianAlat LPA INNER JOIN MasterCartridge MC ON MC.CartridgeID=LPA.CartridgeID WHERE MC.AlatID=@AlatID AND LPA.Status=1 AND LPA.IsVoid=0 AND LPA.TglPemakaian <= @TglAkhir) " & _
+            "  + (SELECT ISNULL(SUM(LA.QtyAdjustment),0) FROM LogAdjustmentCartridge LA INNER JOIN MasterCartridge MC ON MC.CartridgeID=LA.CartridgeID WHERE MC.AlatID=@AlatID AND LA.TglAdjustment <= @TglAkhir) " & _
+            ") AS SaldoAkhirPeriode"
 
         Dim dtSummary As DataTable = ReadSQL(sqlSummary)
         Dim kuotaAwal As Integer = 0
@@ -164,10 +196,10 @@ Public Class FormLaporanRiwayatAlat
         Dim saldoAkhir As Decimal = 0
 
         If dtSummary.Rows.Count > 0 Then
-            kuotaAwal = CInt(dtSummary.Rows(0)("KuotaAwal"))
+            kuotaAwal = CInt(dtSummary.Rows(0)("KuotaAwalPeriode"))
             totalTopUp = CInt(dtSummary.Rows(0)("TotalTopUp"))
             totalPakai = CInt(dtSummary.Rows(0)("TotalPemakaian"))
-            saldoAkhir = CDec(dtSummary.Rows(0)("SaldoAkhir"))
+            saldoAkhir = CDec(dtSummary.Rows(0)("SaldoAkhirPeriode"))
         End If
 
         ' ========================================================
@@ -223,6 +255,17 @@ Public Class FormLaporanRiwayatAlat
 
     Private Sub ButtonKirimJurnal_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonKirimJurnal.Click
         Try
+            Dim confirmResult As DialogResult = MessageBox.Show( _
+            "Apakah Anda yakin ingin mengirim data jurnal penggunaan alat ini?", _
+            "Konfirmasi Pengiriman", _
+            MessageBoxButtons.YesNo, _
+            MessageBoxIcon.Question, _
+            MessageBoxDefaultButton.Button2)
+
+            If confirmResult = DialogResult.No Then
+                Exit Sub
+            End If
+
             ' 1. Ambil Rentang Tanggal dari Form Picker
             Dim tglAwal As Date = dtAwal.Value.Date
             Dim tglAkhir As Date = dtAkhir.Value.Date

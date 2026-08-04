@@ -478,6 +478,28 @@ Public Class FormPembatalanTransaksi
 
             For Each rowTransaksi As DataRow In tblTransaksi.Select("[Checked]=True")
                 If rowTransaksi("StatusDelete").ToString = "0" Then
+                    Dim transPoliID As String = rowTransaksi("ID").ToString()
+
+                    If rowTransaksi("JenisTransaksi").ToString() = "POLI" Then
+
+                        WriteSQL( _
+                            "UPDATE MC SET " & _
+                            "MC.KuotaTerpakai = MC.KuotaTerpakai - LPA.ShootDipakai " & _
+                            "FROM MasterCartridge MC " & _
+                            "INNER JOIN LogPemakaianAlat LPA ON MC.CartridgeID = LPA.CartridgeID " & _
+                            "WHERE LPA.TransaksiDetailID IN (SELECT TransPoliIDDetail FROM TransaksiPoliDetail WHERE TransPoliID = '" & transPoliID & "') " & _
+                            "AND LPA.IsVoid = 0", 4)
+
+                        WriteSQL( _
+                            "UPDATE LogPemakaianAlat SET " & _
+                            "IsVoid = 1, " & _
+                            "VoidAt = GETDATE(), " & _
+                            "VoidBy = '" & userInput & "' " & _
+                            "WHERE TransaksiDetailID IN (SELECT TransPoliIDDetail FROM TransaksiPoliDetail WHERE TransPoliID = '" & transPoliID & "') " & _
+                            "AND IsVoid = 0", 4)
+
+                    End If
+
                     ' Delete Data PCare BPJS
                     If Not String.IsNullOrEmpty(rowTransaksi("NoKunjunganBPJS").ToString()) Then
                         uriBPJS = urlPcare + "kunjungan/" & rowTransaksi("NoKunjunganBPJS").ToString()

@@ -40,6 +40,7 @@ Partial Class ReportPendapatanKlinik
         Me.ButtonCetakLaporanPendapatan = New System.Windows.Forms.Button
         Me.ButtonClearDataLaporanPendapatan = New System.Windows.Forms.Button
         Me.SplitContainerLaporanPendapatanHeader = New System.Windows.Forms.SplitContainer
+        Me.CheckBoxPaket = New System.Windows.Forms.CheckBox
         Me.CheckBoxVoucher = New System.Windows.Forms.CheckBox
         Me.CheckBoxTransaksiNolRupiah = New System.Windows.Forms.CheckBox
         Me.CheckBoxCard = New System.Windows.Forms.CheckBox
@@ -405,6 +406,7 @@ Partial Class ReportPendapatanKlinik
         'SplitContainerLaporanPendapatanHeader.Panel1
         '
         Me.SplitContainerLaporanPendapatanHeader.Panel1.BackColor = System.Drawing.Color.White
+        Me.SplitContainerLaporanPendapatanHeader.Panel1.Controls.Add(Me.CheckBoxPaket)
         Me.SplitContainerLaporanPendapatanHeader.Panel1.Controls.Add(Me.CheckBoxVoucher)
         Me.SplitContainerLaporanPendapatanHeader.Panel1.Controls.Add(Me.CheckBoxTransaksiNolRupiah)
         Me.SplitContainerLaporanPendapatanHeader.Panel1.Controls.Add(Me.CheckBoxCard)
@@ -433,6 +435,18 @@ Partial Class ReportPendapatanKlinik
         Me.SplitContainerLaporanPendapatanHeader.SplitterDistance = 250
         Me.SplitContainerLaporanPendapatanHeader.SplitterWidth = 1
         Me.SplitContainerLaporanPendapatanHeader.TabIndex = 462
+        '
+        'CheckBoxPaket
+        '
+        Me.CheckBoxPaket.AutoSize = True
+        Me.CheckBoxPaket.Font = New System.Drawing.Font("Segoe UI", 9.75!)
+        Me.CheckBoxPaket.Location = New System.Drawing.Point(510, 79)
+        Me.CheckBoxPaket.Name = "CheckBoxPaket"
+        Me.CheckBoxPaket.Size = New System.Drawing.Size(63, 21)
+        Me.CheckBoxPaket.TabIndex = 573
+        Me.CheckBoxPaket.Tag = ""
+        Me.CheckBoxPaket.Text = "Paket"
+        Me.CheckBoxPaket.UseVisualStyleBackColor = True
         '
         'CheckBoxVoucher
         '
@@ -1707,4 +1721,5 @@ Partial Class ReportPendapatanKlinik
     Friend WithEvents TextBoxNoTagihan As System.Windows.Forms.TextBox
     Friend WithEvents CheckBoxTransaksiNolRupiah As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBoxVoucher As System.Windows.Forms.CheckBox
+    Friend WithEvents CheckBoxPaket As System.Windows.Forms.CheckBox
 End Class

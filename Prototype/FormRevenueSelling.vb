@@ -601,59 +601,45 @@ Public Class FormRevenueSelling
 
     Private Sub ButtonCetakCostumer_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCetakCostumer.Click
         Dim jenisPoli As String = ComboBoxPoli.Text
-
         Dim tglAwal As DateTime = dtAwal.Value
         Dim tglAkhir As DateTime = dtAkhir.Value
 
         Dim strTglAwal As String = tglAwal.ToString("yyyy-MM-dd")
         Dim strTglAkhir As String = tglAkhir.ToString("yyyy-MM-dd")
 
-        Dim sqlCustomer As String = _
+        ' Query CTE Dasar untuk mengelompokkan Status Customer
+        Dim cteBase As String = _
             "WITH CustomerLifespan AS ( " & _
-            "    SELECT " & _
-            "        IDInternet, " & _
-            "        JenisPoli, " & _
-            "        MIN(CreatedDate) AS FirstTransaction, " & _
-            "        MAX(CreatedDate) AS LastTransaction " & _
+            "    SELECT IDInternet, JenisPoli, MIN(CreatedDate) AS FirstTransaction, MAX(CreatedDate) AS LastTransaction " & _
             "    FROM TransaksiDetail " & _
-            "    WHERE DeletedDate IS NULL " & _
-            "      AND JenisPoli = '" & jenisPoli & "' " & _
+            "    WHERE DeletedDate IS NULL AND JenisPoli = '" & jenisPoli & "' " & _
             "    GROUP BY IDInternet, JenisPoli " & _
             "), " & _
             "CustomerStatus AS ( " & _
-            "    SELECT " & _
-            "        IDInternet, " & _
-            "        JenisPoli, " & _
-            "        FirstTransaction, " & _
-            "        LastTransaction, " & _
+            "    SELECT IDInternet, JenisPoli, FirstTransaction, LastTransaction, " & _
             "        CASE " & _
             "            WHEN FirstTransaction BETWEEN '" & strTglAwal & "' AND '" & strTglAkhir & "' THEN 'New' " & _
             "            WHEN LastTransaction < DATEADD(month, -6, '" & strTglAkhir & "') THEN 'Sleeping' " & _
             "            ELSE 'Existing' " & _
             "        END AS StatusCustomer " & _
             "    FROM CustomerLifespan " & _
-            ") " & _
-            "SELECT " & _
-            "    CS.IDInternet, " & _
-            "    MP.Nama, " & _
-            "    MP.NoHandphone, " & _
-            "    CS.JenisPoli, " & _
-            "    CS.StatusCustomer, " & _
-            "    CS.FirstTransaction AS [Kunjungan Pertama], " & _
-            "    CS.LastTransaction AS [Kunjungan Terakhir] " & _
+            ") "
+
+        ' 1. Query Detail Data
+        Dim sqlCustomer As String = cteBase & _
+            "SELECT CS.IDInternet, MP.Nama, MP.NoHandphone, CS.JenisPoli, CS.StatusCustomer, " & _
+            "       CS.FirstTransaction AS [Kunjungan Pertama], CS.LastTransaction AS [Kunjungan Terakhir] " & _
             "FROM CustomerStatus CS " & _
             "INNER JOIN MasterPasien MP ON CS.IDInternet = MP.NoRekamMedis " & _
             "ORDER BY CS.StatusCustomer, MP.Nama"
 
-        Dim sqlSummary As String = _
+        ' 2. Query Summary untuk Header (Menghitung langsung dari CustomerStatus)
+        Dim sqlSummary As String = cteBase & _
             "SELECT " & _
-            "    SUM(CASE WHEN FirstTransaction BETWEEN '" & strTglAwal & "' AND '" & strTglAkhir & "' THEN 1 ELSE 0 END) AS TotalNew, " & _
-            "    SUM(CASE WHEN LastTransaction < DATEADD(month, -6, '" & strTglAkhir & "') THEN 1 ELSE 0 END) AS TotalSleeping, " & _
-            "    SUM(CASE WHEN FirstTransaction NOT BETWEEN '" & strTglAwal & "' AND '" & strTglAkhir & "' AND LastTransaction >= DATEADD(month, -6, '" & strTglAkhir & "') THEN 1 ELSE 0 END) AS TotalExisting " & _
-            "FROM ( " & _
-            "    SELECT IDInternet, MIN(CreatedDate) AS FirstTransaction, MAX(CreatedDate) AS LastTransaction " & _
-            "    FROM TransaksiDetail WHERE DeletedDate IS NULL AND JenisPoli = '" & jenisPoli & "' GROUP BY IDInternet " & _
-            ") AS Base"
+            "    SUM(CASE WHEN StatusCustomer = 'New' THEN 1 ELSE 0 END) AS TotalNew, " & _
+            "    SUM(CASE WHEN StatusCustomer = 'Existing' THEN 1 ELSE 0 END) AS TotalExisting, " & _
+            "    SUM(CASE WHEN StatusCustomer = 'Sleeping' THEN 1 ELSE 0 END) AS TotalSleeping " & _
+            "FROM CustomerStatus"
 
         Dim dtCustomer As DataTable = ReadSQL(sqlCustomer)
         Dim dtSummary As DataTable = ReadSQL(sqlSummary)
@@ -661,8 +647,9 @@ Public Class FormRevenueSelling
         If dtCustomer IsNot Nothing AndAlso dtCustomer.Rows.Count > 0 Then
             Try
                 Dim report As New DevExpress.XtraReports.UI.XtraReport
-                report = XtraReport.FromFile(Application.StartupPath & "\reports\LaporanCostumer.repx", True)
+                report = DevExpress.XtraReports.UI.XtraReport.FromFile(Application.StartupPath & "\reports\LaporanCostumer.repx", True)
 
+                ' Set Header Text
                 Dim bandHeader As ReportHeaderBand = CType(report.Bands(BandKind.ReportHeader), ReportHeaderBand)
                 If bandHeader IsNot Nothing Then
                     If bandHeader.Controls("lblPoli") IsNot Nothing Then bandHeader.Controls("lblPoli").Text = jenisPoli
@@ -670,18 +657,18 @@ Public Class FormRevenueSelling
                         bandHeader.Controls("lblPeriode").Text = tglAwal.ToString("dd MMM yyyy") & " - " & tglAkhir.ToString("dd MMM yyyy")
                     End If
 
+                    ' Bind Total ke Label Header
                     If dtSummary IsNot Nothing AndAlso dtSummary.Rows.Count > 0 Then
-                        Dim rowSummary As DataRow = dtSummary.Rows(0)
-                        If bandHeader.Controls("lblTotalNew") IsNot Nothing Then bandHeader.Controls("lblTotalNew").Text = rowSummary("TotalNew").ToString() & " Orang"
-                        If bandHeader.Controls("lblTotalExisting") IsNot Nothing Then bandHeader.Controls("lblTotalExisting").Text = rowSummary("TotalExisting").ToString() & " Orang"
-                        If bandHeader.Controls("lblTotalSleeping") IsNot Nothing Then bandHeader.Controls("lblTotalSleeping").Text = rowSummary("TotalSleeping").ToString() & " Orang"
+                        Dim row As DataRow = dtSummary.Rows(0)
+                        If bandHeader.Controls("lblTotalNew") IsNot Nothing Then bandHeader.Controls("lblTotalNew").Text = Convert.ToInt32(row("TotalNew")).ToString("N0") & " Orang"
+                        If bandHeader.Controls("lblTotalExisting") IsNot Nothing Then bandHeader.Controls("lblTotalExisting").Text = Convert.ToInt32(row("TotalExisting")).ToString("N0") & " Orang"
+                        If bandHeader.Controls("lblTotalSleeping") IsNot Nothing Then bandHeader.Controls("lblTotalSleeping").Text = Convert.ToInt32(row("TotalSleeping")).ToString("N0") & " Orang"
                     End If
                 End If
 
                 report.DataSource = dtCustomer
-
-                'report.ShowPreview()
-                report.RunDesigner()
+                'report.RunDesigner()
+                report.ShowPreview()
 
             Catch ex As Exception
                 MessageBox.Show("Gagal memproses laporan: " & ex.Message, "Error DevExpress", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -693,6 +680,17 @@ Public Class FormRevenueSelling
 
     Private Sub ButtonKirimLaporan_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonKirimLaporan.Click
         Try
+            Dim confirmResult As DialogResult = MessageBox.Show( _
+            "Apakah Anda yakin ingin mengirim data Selling Revenue periode ini?", _
+            "Konfirmasi Pengiriman", _
+            MessageBoxButtons.YesNo, _
+            MessageBoxIcon.Question, _
+            MessageBoxDefaultButton.Button2)
+
+            If confirmResult = DialogResult.No Then
+                Exit Sub
+            End If
+
             Dim tglAwal As Date = dtAwal.Value.Date
             Dim tglAkhir As Date = dtAkhir.Value.Date
 
@@ -700,9 +698,9 @@ Public Class FormRevenueSelling
             Dim strAkhir As String = tglAkhir.ToString("yyyy-MM-dd 23:59:59")
 
             Dim listPoli As New Dictionary(Of String, String)()
-            listPoli.Add("POLI KECANTIKAN", "LMR")
+            listPoli.Add("POLI KECANTIKAN", "LMIE")
             listPoli.Add("POLI HBOT", "HBOT")
-            listPoli.Add("POLI FISIOTERAPI", "FISIO")
+            listPoli.Add("POLI FISIOTERAPI", "FISIOTERAPI")
 
             Dim totalHari As Integer = (tglAkhir - tglAwal).Days + 1
             Dim totalStep As Integer = listPoli.Count * totalHari

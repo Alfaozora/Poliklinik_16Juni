@@ -156,7 +156,7 @@ Partial Class ReportLogPaketTindakan
         '
         Me.ComboBoxPoli.FormattingEnabled = True
         Me.ComboBoxPoli.ItemHeight = 15
-        Me.ComboBoxPoli.Items.AddRange(New Object() {"POLI FISIOTERAPI", "POLI HBOT", "POLI KECANTIKAN"})
+        Me.ComboBoxPoli.Items.AddRange(New Object() {"POLI FISIOTERAPI", "POLI HBOT", "POLI KECANTIKAN", "POLI EYELASH & NAIL", "POLI REHABILITASI MEDIK"})
         Me.ComboBoxPoli.Location = New System.Drawing.Point(205, 78)
         Me.ComboBoxPoli.Name = "ComboBoxPoli"
         Me.ComboBoxPoli.Size = New System.Drawing.Size(327, 23)

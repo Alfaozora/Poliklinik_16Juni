@@ -26,6 +26,7 @@ Partial Class FormLaporanRiwayatAlat
         Me.Label59 = New System.Windows.Forms.Label
         Me.TextBoxNamaRuangan = New System.Windows.Forms.TextBox
         Me.GroupBox3 = New System.Windows.Forms.GroupBox
+        Me.ButtonKirimJurnal = New System.Windows.Forms.Button
         Me.ButtonCetakRiwayat = New System.Windows.Forms.Button
         Me.Label46 = New System.Windows.Forms.Label
         Me.Label45 = New System.Windows.Forms.Label
@@ -40,7 +41,6 @@ Partial Class FormLaporanRiwayatAlat
         Me.ButtonCariAlat = New System.Windows.Forms.Button
         Me.TextBoxNamaAlat = New System.Windows.Forms.TextBox
         Me.Label43 = New System.Windows.Forms.Label
-        Me.ButtonKirimJurnal = New System.Windows.Forms.Button
         Me.ProgressBar1 = New System.Windows.Forms.ProgressBar
         Me.lblStatusProgress = New System.Windows.Forms.Label
         Me.GroupBox3.SuspendLayout()
@@ -97,6 +97,26 @@ Partial Class FormLaporanRiwayatAlat
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "Periode Penggunaan Alat"
         '
+        'ButtonKirimJurnal
+        '
+        Me.ButtonKirimJurnal.BackColor = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(0, Byte), Integer))
+        Me.ButtonKirimJurnal.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+        Me.ButtonKirimJurnal.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonKirimJurnal.FlatAppearance.BorderSize = 0
+        Me.ButtonKirimJurnal.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonKirimJurnal.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.ButtonKirimJurnal.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonKirimJurnal.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.ButtonKirimJurnal.ForeColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(254, Byte), Integer))
+        Me.ButtonKirimJurnal.Location = New System.Drawing.Point(101, 78)
+        Me.ButtonKirimJurnal.Name = "ButtonKirimJurnal"
+        Me.ButtonKirimJurnal.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.ButtonKirimJurnal.Size = New System.Drawing.Size(125, 25)
+        Me.ButtonKirimJurnal.TabIndex = 652
+        Me.ButtonKirimJurnal.Text = "Kirim Jurnal"
+        Me.ButtonKirimJurnal.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.ButtonKirimJurnal.UseVisualStyleBackColor = False
+        '
         'ButtonCetakRiwayat
         '
         Me.ButtonCetakRiwayat.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
@@ -122,7 +142,7 @@ Partial Class FormLaporanRiwayatAlat
         Me.Label46.AutoSize = True
         Me.Label46.BackColor = System.Drawing.Color.Transparent
         Me.Label46.Font = New System.Drawing.Font("Segoe UI", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label46.Location = New System.Drawing.Point(164, 27)
+        Me.Label46.Location = New System.Drawing.Point(6, 27)
         Me.Label46.Name = "Label46"
         Me.Label46.Size = New System.Drawing.Size(33, 13)
         Me.Label46.TabIndex = 457
@@ -133,7 +153,7 @@ Partial Class FormLaporanRiwayatAlat
         Me.Label45.AutoSize = True
         Me.Label45.BackColor = System.Drawing.Color.Transparent
         Me.Label45.Font = New System.Drawing.Font("Segoe UI", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label45.Location = New System.Drawing.Point(6, 27)
+        Me.Label45.Location = New System.Drawing.Point(164, 27)
         Me.Label45.Name = "Label45"
         Me.Label45.Size = New System.Drawing.Size(18, 13)
         Me.Label45.TabIndex = 456
@@ -271,26 +291,6 @@ Partial Class FormLaporanRiwayatAlat
         Me.Label43.Size = New System.Drawing.Size(49, 17)
         Me.Label43.TabIndex = 643
         Me.Label43.Text = "Alat ID"
-        '
-        'ButtonKirimJurnal
-        '
-        Me.ButtonKirimJurnal.BackColor = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(0, Byte), Integer))
-        Me.ButtonKirimJurnal.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
-        Me.ButtonKirimJurnal.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.ButtonKirimJurnal.FlatAppearance.BorderSize = 0
-        Me.ButtonKirimJurnal.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
-        Me.ButtonKirimJurnal.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.ButtonKirimJurnal.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.ButtonKirimJurnal.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.ButtonKirimJurnal.ForeColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(254, Byte), Integer))
-        Me.ButtonKirimJurnal.Location = New System.Drawing.Point(101, 78)
-        Me.ButtonKirimJurnal.Name = "ButtonKirimJurnal"
-        Me.ButtonKirimJurnal.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.ButtonKirimJurnal.Size = New System.Drawing.Size(125, 25)
-        Me.ButtonKirimJurnal.TabIndex = 652
-        Me.ButtonKirimJurnal.Text = "Kirim Jurnal"
-        Me.ButtonKirimJurnal.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-        Me.ButtonKirimJurnal.UseVisualStyleBackColor = False
         '
         'ProgressBar1
         '

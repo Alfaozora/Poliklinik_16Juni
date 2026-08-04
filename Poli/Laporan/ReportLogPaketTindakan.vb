@@ -482,9 +482,12 @@ Public Class ReportLogPaketTindakan
     End Sub
 
     'NEW
-    Function GetDataHeaderPaketReguler() As DataTable
+    Public Function GetDataHeaderPaketReguler() As DataTable
         Dim tblResult As New DataTable
         Dim query As New StringBuilder()
+
+        Dim namaPoli As String = ComboBoxPoli.Text.Trim().Replace("'", "''")
+        Dim noRM As String = TextBoxNomorRekamMedis.Text.Trim().Replace("'", "''")
 
         query.AppendLine("SELECT ")
         query.AppendLine("    tblPasien.Nama, ")
@@ -494,10 +497,10 @@ Public Class ReportLogPaketTindakan
 
         query.AppendLine("    STUFF(( ")
         query.AppendLine("        SELECT ', ' + d.NamaTindakan ")
-        query.AppendLine("        FROM TransaksiPaketTindakanDetail d ")
+        query.AppendLine("        FROM TransaksiPaketTindakanDetail d WITH(NOLOCK) ")
         query.AppendLine("        WHERE d.PaketID = tblPaket.PaketID ")
         query.AppendLine("        AND d.KodeVoucher = tblPaket.KodeVoucher ")
-        query.AppendLine("        FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'),1,2,'') ")
+        query.AppendLine("        FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '') ")
         query.AppendLine("    AS [Nama Tindakan], ")
 
         query.AppendLine("    tblPaket.JenisPaket AS [Jenis Paket], ")
@@ -508,33 +511,39 @@ Public Class ReportLogPaketTindakan
         query.AppendLine("    tblPaket.KodeVoucher, ")
         query.AppendLine("    0 AS TindakanID ")
 
-        query.AppendLine("FROM TransaksiPaketTindakan tblPaket ")
+        query.AppendLine("FROM TransaksiPaketTindakan tblPaket WITH(NOLOCK) ")
 
-        query.AppendLine("INNER JOIN LogPenggunaanPaket tblLog ")
+        ' LEFT JOIN agar paket yang belum terpakai / terpakai di poli lain tetap terakomodasi
+        query.AppendLine("LEFT JOIN LogPenggunaanPaket tblLog WITH(NOLOCK) ")
         query.AppendLine("    ON tblLog.PaketID = tblPaket.PaketID ")
         query.AppendLine("    AND tblLog.KodeVoucher = tblPaket.KodeVoucher ")
         query.AppendLine("    AND tblLog.DeletedDate IS NULL ")
 
-        query.AppendLine("INNER JOIN MasterPasien tblPasien ")
+        ' Join ke TransaksiDetail Penggunaan (Tempat Pakai)
+        query.AppendLine("LEFT JOIN TransaksiDetail TDLog WITH(NOLOCK) ")
+        query.AppendLine("    ON TDLog.NoUrut = tblLog.NoTransaksi ")
+
+        query.AppendLine("INNER JOIN MasterPasien tblPasien WITH(NOLOCK) ")
         query.AppendLine("    ON tblPasien.NoRekamMedis = tblPaket.NoRekamMedis ")
 
-        query.AppendLine("INNER JOIN TransaksiDetail TD ")
-        query.AppendLine("    ON TD.NoUrut = tblPaket.NoTransaksi ")
+        ' Join ke TransaksiDetail Pembelian (Tempat Beli)
+        query.AppendLine("LEFT JOIN TransaksiDetail TDPembelian WITH(NOLOCK) ")
+        query.AppendLine("    ON TDPembelian.NoUrut = tblPaket.NoTransaksi ")
 
         query.AppendLine("WHERE tblPaket.JenisPaket = 'Paket Reguler' ")
         query.AppendLine("AND tblPaket.DeletedDate IS NULL ")
 
-        ' Filter Poli
-        If ComboBoxPoli.Text <> "" Then
-            query.AppendLine("AND TD.JenisPoli = '" & ComboBoxPoli.Text.Replace("'", "''") & "' ")
+        ' Filter Poli (Mengecek Poli Beli ATAU Poli Pakai)
+        If namaPoli <> "" Then
+            query.AppendLine("AND (LTRIM(RTRIM(TDPembelian.JenisPoli)) = '" & namaPoli & "' OR LTRIM(RTRIM(TDLog.JenisPoli)) = '" & namaPoli & "') ")
         End If
 
         ' Filter No RM
-        If TextBoxNomorRekamMedis.Text <> "" Then
-            query.AppendLine("AND tblPaket.NoRekamMedis = '" & TextBoxNomorRekamMedis.Text.Replace("'", "''") & "' ")
+        If noRM <> "" Then
+            query.AppendLine("AND tblPaket.NoRekamMedis = '" & noRM & "' ")
         End If
 
-        ' Filter Tanggal (Langsung passing string format yyyy-MM-dd HH:mm:ss)
+        ' Filter Tanggal (Jika CheckBoxFilterTanggal TIDAK dicentang)
         If Not CheckBoxFilterTanggal.Checked Then
             Dim tglAwal As String = TglAwalTransaksi.Value.ToString("yyyy-MM-dd 00:00:00")
             Dim tglAkhir As String = TglAkhirTransaksi.Value.ToString("yyyy-MM-dd 23:59:59")
@@ -554,16 +563,15 @@ Public Class ReportLogPaketTindakan
         query.AppendLine("    tblPaket.PaketID, ")
         query.AppendLine("    tblPaket.KodeVoucher ")
 
-        query.AppendLine("ORDER BY tblPaket.PaketID")
+        query.AppendLine("ORDER BY tblPaket.PaketID ASC")
 
-        ' Eksekusi query
+        ' Eksekusi query ke database
         tblResult = ReadSQL(query.ToString())
         Return tblResult
 
     End Function
 
     'Function GetDataHeaderPaketReguler() As DataTable
-
     '    Dim tblResult As New DataTable
     '    Dim query As New StringBuilder()
 
@@ -591,36 +599,36 @@ Public Class ReportLogPaketTindakan
 
     '    query.AppendLine("FROM TransaksiPaketTindakan tblPaket ")
 
-    '    ' JOIN ke log supaya filter konsisten
     '    query.AppendLine("INNER JOIN LogPenggunaanPaket tblLog ")
     '    query.AppendLine("    ON tblLog.PaketID = tblPaket.PaketID ")
     '    query.AppendLine("    AND tblLog.KodeVoucher = tblPaket.KodeVoucher ")
+    '    query.AppendLine("    AND tblLog.DeletedDate IS NULL ")
 
-    '    query.AppendLine("LEFT JOIN MasterPasien tblPasien ")
+    '    query.AppendLine("INNER JOIN MasterPasien tblPasien ")
     '    query.AppendLine("    ON tblPasien.NoRekamMedis = tblPaket.NoRekamMedis ")
 
-    '    'Filter Poli
     '    query.AppendLine("INNER JOIN TransaksiDetail TD ")
     '    query.AppendLine("    ON TD.NoUrut = tblPaket.NoTransaksi ")
 
     '    query.AppendLine("WHERE tblPaket.JenisPaket = 'Paket Reguler' ")
     '    query.AppendLine("AND tblPaket.DeletedDate IS NULL ")
-    '    query.AppendLine("AND tblLog.DeletedDate IS NULL ")
 
+    '    ' Filter Poli
     '    If ComboBoxPoli.Text <> "" Then
-    '        query.AppendLine("AND TD.JenisPoli = '" & ComboBoxPoli.Text & "' ")
+    '        query.AppendLine("AND TD.JenisPoli = '" & ComboBoxPoli.Text.Replace("'", "''") & "' ")
     '    End If
 
+    '    ' Filter No RM
     '    If TextBoxNomorRekamMedis.Text <> "" Then
-    '        query.AppendLine("AND tblPaket.NoRekamMedis = '" & TextBoxNomorRekamMedis.Text & "'")
+    '        query.AppendLine("AND tblPaket.NoRekamMedis = '" & TextBoxNomorRekamMedis.Text.Replace("'", "''") & "' ")
     '    End If
 
+    '    ' Filter Tanggal (Langsung passing string format yyyy-MM-dd HH:mm:ss)
     '    If Not CheckBoxFilterTanggal.Checked Then
-    '        query.AppendLine("AND tblLog.TanggalTransaksi >= '" & _
-    '        Format(TglAwalTransaksi.Value, "yyyy-MM-dd") & "'")
+    '        Dim tglAwal As String = TglAwalTransaksi.Value.ToString("yyyy-MM-dd 00:00:00")
+    '        Dim tglAkhir As String = TglAkhirTransaksi.Value.ToString("yyyy-MM-dd 23:59:59")
 
-    '        query.AppendLine("AND tblLog.TanggalTransaksi < DATEADD(DAY,1,'" & _
-    '        Format(TglAkhirTransaksi.Value, "yyyy-MM-dd") & "')")
+    '        query.AppendLine("AND (tblLog.PaketID IS NULL OR (tblLog.TanggalTransaksi >= '" & tglAwal & "' AND tblLog.TanggalTransaksi <= '" & tglAkhir & "')) ")
     '    End If
 
     '    query.AppendLine("GROUP BY ")
@@ -637,75 +645,8 @@ Public Class ReportLogPaketTindakan
 
     '    query.AppendLine("ORDER BY tblPaket.PaketID")
 
+    '    ' Eksekusi query
     '    tblResult = ReadSQL(query.ToString())
-    '    Return tblResult
-
-    'End Function
-
-    'Function GetDataHeaderPaketReguler() As DataTable
-
-    '    Dim tblResult As New DataTable
-    '    Dim query As New StringBuilder()
-
-    '    query.AppendLine("SELECT ")
-    '    query.AppendLine("    MP.Nama, ")
-    '    query.AppendLine("    LPP.NoRekamMedis AS [No RM], ")
-    '    query.AppendLine("    LPP.NoTransaksi AS [No Transaksi], ")
-    '    query.AppendLine("    MPT.NamaPaket AS [Nama Paket], ")
-
-    '    query.AppendLine("    STUFF(( ")
-    '    query.AppendLine("        SELECT ', ' + D.NamaTindakan ")
-    '    query.AppendLine("        FROM MasterPaketTindakanDetail D ")
-    '    query.AppendLine("        WHERE D.PaketID = LPP.PaketID ")
-    '    query.AppendLine("        FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'),1,2,'') ")
-    '    query.AppendLine("    AS [Nama Tindakan], ")
-
-    '    query.AppendLine("    'Paket Reguler' AS [Jenis Paket], ")
-    '    query.AppendLine("    MPT.Kuota, ")
-
-    '    query.AppendLine("    MIN(LPP.TanggalTransaksi) AS [Tgl Mulai], ")
-    '    query.AppendLine("    MAX(LPP.TanggalTransaksi) AS [Tgl Berakhir], ")
-
-    '    query.AppendLine("    LPP.PaketID, ")
-    '    query.AppendLine("    LPP.KodeVoucher, ")
-    '    query.AppendLine("    0 AS [TindakanID], ")
-
-    '    query.AppendLine("    COUNT(*) AS TotalPemakaian ")
-
-    '    query.AppendLine("FROM LogPenggunaanPaket LPP ")
-
-    '    query.AppendLine("INNER JOIN MasterPasien MP ")
-    '    query.AppendLine("    ON MP.NoRekamMedis = LPP.NoRekamMedis ")
-
-    '    query.AppendLine("INNER JOIN MasterPaketTindakan MPT ")
-    '    query.AppendLine("    ON MPT.PaketID = LPP.PaketID ")
-
-    '    query.AppendLine("WHERE LPP.DeletedDate IS NULL ")
-    '    query.AppendLine("AND MPT.JenisPaket = 'Paket Reguler' ")
-
-    '    If TextBoxNomorRekamMedis.Text <> "" Then
-    '        query.AppendLine("AND LPP.NoRekamMedis = '" & TextBoxNomorRekamMedis.Text & "'")
-    '    End If
-
-    '    If Not CheckBoxFilterTanggal.Checked Then
-    '        query.AppendLine("AND CONVERT(DATE, LPP.TanggalTransaksi) BETWEEN '" _
-    '                         & Format(TglAwalTransaksi.Value, "yyyyMMdd") & "' AND '" _
-    '                         & Format(TglAkhirTransaksi.Value, "yyyyMMdd") & "'")
-    '    End If
-
-    '    query.AppendLine("GROUP BY ")
-    '    query.AppendLine("    MP.Nama, ")
-    '    query.AppendLine("    LPP.NoRekamMedis, ")
-    '    query.AppendLine("    LPP.NoTransaksi, ")
-    '    query.AppendLine("    MPT.NamaPaket, ")
-    '    query.AppendLine("    MPT.Kuota, ")
-    '    query.AppendLine("    LPP.PaketID, ")
-    '    query.AppendLine("    LPP.KodeVoucher ")
-
-    '    query.AppendLine("ORDER BY LPP.PaketID ")
-
-    '    tblResult = ReadSQL(query.ToString())
-
     '    Return tblResult
 
     'End Function
@@ -892,21 +833,21 @@ Public Class ReportLogPaketTindakan
         TextBoxNamaRekamMedis.ResetText()
     End Sub
 
-    Function GetDataDetailPaketRegulerLaporan(ByVal NoRM As String) As DataTable
+    Public Function GetDataDetailPaketRegulerLaporan(ByVal NoRM As String) As DataTable
 
         Dim tblResult As New DataTable
         Dim query As New StringBuilder()
 
         Dim pakaiFilterTanggal As Boolean = Not CheckBoxFilterTanggal.Checked
-        Dim cleanNoRM As String = NoRM.Replace("'", "''")
-        Dim cleanPoli As String = ComboBoxPoli.Text.Replace("'", "''")
+        Dim cleanNoRM As String = NoRM.Trim().Replace("'", "''")
+        Dim cleanPoli As String = ComboBoxPoli.Text.Trim().Replace("'", "''")
 
-        ' Gunakan format yyyyMMdd murni (ISO standard) agar bebas dari bug regional server
-        Dim tglAwalStr As String = TglAwalTransaksi.Value.ToString("yyyyMMdd 00:00:00")
-        Dim tglAkhirStr As String = TglAkhirTransaksi.Value.ToString("yyyyMMdd 23:59:59")
+        ' Format Tanggal Standar ISO (yyyy-MM-dd HH:mm:ss)
+        Dim tglAwalStr As String = TglAwalTransaksi.Value.ToString("yyyy-MM-dd 00:00:00")
+        Dim tglAkhirStr As String = TglAkhirTransaksi.Value.ToString("yyyy-MM-dd 23:59:59")
 
         query.AppendLine("SELECT ")
-        query.AppendLine("    TD.JenisPoli,")
+        query.AppendLine("    ISNULL(TD.JenisPoli, TDPembelian.JenisPoli) AS JenisPoli,")
         query.AppendLine("    LPP.NoTransaksi,")
         query.AppendLine("    LPP.KodeVoucher,")
         query.AppendLine("    MAX(LPP.TanggalTransaksi) AS Tgl,")
@@ -919,7 +860,7 @@ Public Class ReportLogPaketTindakan
         query.AppendLine("    MPT.Kuota -")
         query.AppendLine("    (")
         query.AppendLine("        SELECT COUNT(*)")
-        query.AppendLine("        FROM LogPenggunaanPaket LPP2")
+        query.AppendLine("        FROM LogPenggunaanPaket LPP2 WITH(NOLOCK)")
         query.AppendLine("        WHERE LPP2.KodeVoucher = LPP.KodeVoucher")
         query.AppendLine("        AND LPP2.PaketID = LPP.PaketID")
         query.AppendLine("        AND LPP2.NoTransaksi <= LPP.NoTransaksi")
@@ -927,42 +868,54 @@ Public Class ReportLogPaketTindakan
         query.AppendLine("    ) AS SisaKuota,")
         query.AppendLine("    CAST(MAX(TPT.TanggalAkhirPaket) AS DATE) AS TanggalAkhirPaket")
 
-        query.AppendLine("FROM LogPenggunaanPaket LPP")
+        query.AppendLine("FROM LogPenggunaanPaket LPP WITH(NOLOCK)")
 
-        query.AppendLine("INNER JOIN MasterPasien MP")
+        query.AppendLine("INNER JOIN MasterPasien MP WITH(NOLOCK)")
         query.AppendLine("    ON MP.NoRekamMedis = LPP.NoRekamMedis")
 
-        query.AppendLine("INNER JOIN MasterPaketTindakan MPT")
+        query.AppendLine("INNER JOIN MasterPaketTindakan MPT WITH(NOLOCK)")
         query.AppendLine("    ON MPT.PaketID = LPP.PaketID")
 
-        query.AppendLine("INNER JOIN MasterPaketTindakanDetail MPTD")
+        query.AppendLine("INNER JOIN MasterPaketTindakanDetail MPTD WITH(NOLOCK)")
         query.AppendLine("    ON MPTD.PaketID = MPT.PaketID")
 
-        query.AppendLine("INNER JOIN (")
+        ' Join Transaksi Pemakaian (Poli Tempat Pemakaian)
+        query.AppendLine("LEFT JOIN (")
         query.AppendLine("    SELECT DISTINCT NoUrut, JenisPoli")
-        query.AppendLine("    FROM TransaksiDetail")
+        query.AppendLine("    FROM TransaksiDetail WITH(NOLOCK)")
         query.AppendLine(") TD")
         query.AppendLine("    ON TD.NoUrut = LPP.NoTransaksi")
 
+        ' Outer Apply untuk Ambil Data Paket Pembelian
         query.AppendLine("OUTER APPLY (")
-        query.AppendLine("    SELECT TOP 1 TanggalAkhirPaket")
-        query.AppendLine("    FROM TransaksiPaketTindakan TPT")
+        query.AppendLine("    SELECT TOP 1 TanggalAkhirPaket, NoTransaksi")
+        query.AppendLine("    FROM TransaksiPaketTindakan TPT WITH(NOLOCK)")
         query.AppendLine("    WHERE TPT.KodeVoucher = LPP.KodeVoucher")
+        query.AppendLine("    AND TPT.PaketID = LPP.PaketID")
         query.AppendLine(") TPT")
+
+        ' Join Transaksi Pembelian Paket (Poli Tempat Pembelian)
+        query.AppendLine("LEFT JOIN (")
+        query.AppendLine("    SELECT DISTINCT NoUrut, JenisPoli")
+        query.AppendLine("    FROM TransaksiDetail WITH(NOLOCK)")
+        query.AppendLine(") TDPembelian")
+        query.AppendLine("    ON TDPembelian.NoUrut = TPT.NoTransaksi")
 
         query.AppendLine("WHERE ")
         query.AppendLine("    LPP.DeletedBy IS NULL")
         query.AppendLine("    AND MPT.JenisPaket = 'Paket Reguler'")
 
-        ' Filter Langsung di WHERE (Jauh lebih cepat & stabil daripada DECLARE / HAVING)
+        ' Filter Nomor Rekam Medis
         If cleanNoRM <> "" Then
             query.AppendLine("    AND LPP.NoRekamMedis = '" & cleanNoRM & "'")
         End If
 
+        ' Filter Poli (Pilih berdasarkan Poli Pemakaian ATAU Poli Pembelian)
         If cleanPoli <> "" Then
-            query.AppendLine("    AND TD.JenisPoli = '" & cleanPoli & "'")
+            query.AppendLine("    AND (LTRIM(RTRIM(TD.JenisPoli)) = '" & cleanPoli & "' OR LTRIM(RTRIM(TDPembelian.JenisPoli)) = '" & cleanPoli & "')")
         End If
 
+        ' Filter Tanggal Pemakaian
         If pakaiFilterTanggal Then
             query.AppendLine("    AND LPP.TanggalTransaksi >= '" & tglAwalStr & "'")
             query.AppendLine("    AND LPP.TanggalTransaksi <= '" & tglAkhirStr & "'")
@@ -970,6 +923,7 @@ Public Class ReportLogPaketTindakan
 
         query.AppendLine("GROUP BY ")
         query.AppendLine("    TD.JenisPoli,")
+        query.AppendLine("    TDPembelian.JenisPoli,")
         query.AppendLine("    LPP.NoTransaksi,")
         query.AppendLine("    LPP.KodeVoucher,")
         query.AppendLine("    LPP.PaketID,")
@@ -979,13 +933,108 @@ Public Class ReportLogPaketTindakan
         query.AppendLine("    MPT.Kuota")
 
         query.AppendLine("ORDER BY ")
-        query.AppendLine("    TD.JenisPoli,")
-        query.AppendLine("    Tgl")
+        query.AppendLine("    ISNULL(TD.JenisPoli, TDPembelian.JenisPoli),")
+        query.AppendLine("    Tgl ASC")
 
         tblResult = ReadSQL(query.ToString())
         Return tblResult
 
     End Function
+
+    'Function GetDataDetailPaketRegulerLaporan(ByVal NoRM As String) As DataTable
+
+    '    Dim tblResult As New DataTable
+    '    Dim query As New StringBuilder()
+
+    '    Dim pakaiFilterTanggal As Boolean = Not CheckBoxFilterTanggal.Checked
+    '    Dim cleanNoRM As String = NoRM.Replace("'", "''")
+    '    Dim cleanPoli As String = ComboBoxPoli.Text.Replace("'", "''")
+
+    '    ' Gunakan format yyyyMMdd murni (ISO standard) agar bebas dari bug regional server
+    '    Dim tglAwalStr As String = TglAwalTransaksi.Value.ToString("yyyyMMdd 00:00:00")
+    '    Dim tglAkhirStr As String = TglAkhirTransaksi.Value.ToString("yyyyMMdd 23:59:59")
+
+    '    query.AppendLine("SELECT ")
+    '    query.AppendLine("    TD.JenisPoli,")
+    '    query.AppendLine("    LPP.NoTransaksi,")
+    '    query.AppendLine("    LPP.KodeVoucher,")
+    '    query.AppendLine("    MAX(LPP.TanggalTransaksi) AS Tgl,")
+    '    query.AppendLine("    MP.Nama AS NamaPasien,")
+    '    query.AppendLine("    MPT.NamaPaket,")
+    '    query.AppendLine("    MPTD.NamaTindakan,")
+    '    query.AppendLine("    MPT.Kuota AS KuotaAwal,")
+    '    query.AppendLine("    COUNT(*) AS PenggunaanTransaksi,")
+
+    '    query.AppendLine("    MPT.Kuota -")
+    '    query.AppendLine("    (")
+    '    query.AppendLine("        SELECT COUNT(*)")
+    '    query.AppendLine("        FROM LogPenggunaanPaket LPP2")
+    '    query.AppendLine("        WHERE LPP2.KodeVoucher = LPP.KodeVoucher")
+    '    query.AppendLine("        AND LPP2.PaketID = LPP.PaketID")
+    '    query.AppendLine("        AND LPP2.NoTransaksi <= LPP.NoTransaksi")
+    '    query.AppendLine("        AND LPP2.DeletedBy IS NULL")
+    '    query.AppendLine("    ) AS SisaKuota,")
+    '    query.AppendLine("    CAST(MAX(TPT.TanggalAkhirPaket) AS DATE) AS TanggalAkhirPaket")
+
+    '    query.AppendLine("FROM LogPenggunaanPaket LPP")
+
+    '    query.AppendLine("INNER JOIN MasterPasien MP")
+    '    query.AppendLine("    ON MP.NoRekamMedis = LPP.NoRekamMedis")
+
+    '    query.AppendLine("INNER JOIN MasterPaketTindakan MPT")
+    '    query.AppendLine("    ON MPT.PaketID = LPP.PaketID")
+
+    '    query.AppendLine("INNER JOIN MasterPaketTindakanDetail MPTD")
+    '    query.AppendLine("    ON MPTD.PaketID = MPT.PaketID")
+
+    '    query.AppendLine("INNER JOIN (")
+    '    query.AppendLine("    SELECT DISTINCT NoUrut, JenisPoli")
+    '    query.AppendLine("    FROM TransaksiDetail")
+    '    query.AppendLine(") TD")
+    '    query.AppendLine("    ON TD.NoUrut = LPP.NoTransaksi")
+
+    '    query.AppendLine("OUTER APPLY (")
+    '    query.AppendLine("    SELECT TOP 1 TanggalAkhirPaket")
+    '    query.AppendLine("    FROM TransaksiPaketTindakan TPT")
+    '    query.AppendLine("    WHERE TPT.KodeVoucher = LPP.KodeVoucher")
+    '    query.AppendLine(") TPT")
+
+    '    query.AppendLine("WHERE ")
+    '    query.AppendLine("    LPP.DeletedBy IS NULL")
+    '    query.AppendLine("    AND MPT.JenisPaket = 'Paket Reguler'")
+
+    '    ' Filter Langsung di WHERE (Jauh lebih cepat & stabil daripada DECLARE / HAVING)
+    '    If cleanNoRM <> "" Then
+    '        query.AppendLine("    AND LPP.NoRekamMedis = '" & cleanNoRM & "'")
+    '    End If
+
+    '    If cleanPoli <> "" Then
+    '        query.AppendLine("    AND TD.JenisPoli = '" & cleanPoli & "'")
+    '    End If
+
+    '    If pakaiFilterTanggal Then
+    '        query.AppendLine("    AND LPP.TanggalTransaksi >= '" & tglAwalStr & "'")
+    '        query.AppendLine("    AND LPP.TanggalTransaksi <= '" & tglAkhirStr & "'")
+    '    End If
+
+    '    query.AppendLine("GROUP BY ")
+    '    query.AppendLine("    TD.JenisPoli,")
+    '    query.AppendLine("    LPP.NoTransaksi,")
+    '    query.AppendLine("    LPP.KodeVoucher,")
+    '    query.AppendLine("    LPP.PaketID,")
+    '    query.AppendLine("    MP.Nama,")
+    '    query.AppendLine("    MPT.NamaPaket,")
+    '    query.AppendLine("    MPTD.NamaTindakan,")
+    '    query.AppendLine("    MPT.Kuota")
+
+    '    query.AppendLine("ORDER BY ")
+    '    query.AppendLine("    TD.JenisPoli,")
+    '    query.AppendLine("    Tgl")
+
+    '    tblResult = ReadSQL(query.ToString())
+    '    Return tblResult
+
+    'End Function
 
     Function GetDataDetailPaketPerTindakanLaporan(ByVal NoRM As String) As DataTable
 
