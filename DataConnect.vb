@@ -3529,6 +3529,54 @@ Module Test
         End Try
     End Function
 
+    Public Function DownloadPdfFromAPI(ByVal jsonParameter As String, ByVal uri As String) As Byte()
+        Dim bytearr() As Byte = Encoding.UTF8.GetBytes(jsonParameter)
+
+        Try
+            Dim webreq As HttpWebRequest = CType(WebRequest.Create(uri), HttpWebRequest)
+            webreq.Accept = "application/pdf"
+            webreq.Method = "POST"
+            webreq.ContentType = "application/json"
+            webreq.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+            webreq.Headers.Add("X-API-KEY", "M1tR4M3D1c@rECaH4Y42025")
+            webreq.Timeout = 120000 ' 2 Menit Timeout
+            webreq.ContentLength = bytearr.Length
+
+            ' Kirim Data JSON
+            Using dataStream As Stream = webreq.GetRequestStream()
+                dataStream.Write(bytearr, 0, bytearr.Length)
+            End Using
+
+            ' Tangkap Respon Stream Binary PDF
+            Using res As WebResponse = webreq.GetResponse()
+                Using stream As Stream = res.GetResponseStream()
+                    Using ms As New MemoryStream()
+                        Dim buffer(4095) As Byte
+                        Dim bytesRead As Integer = 0
+                        Do
+                            bytesRead = stream.Read(buffer, 0, buffer.Length)
+                            If bytesRead = 0 Then Exit Do
+                            ms.Write(buffer, 0, bytesRead)
+                        Loop
+                        Return ms.ToArray() ' Kembalikan byte array PDF murni
+                    End Using
+                End Using
+            End Using
+
+        Catch ex As WebException
+            Dim errMessage As String = ex.Message
+            If ex.Response IsNot Nothing Then
+                Using responseStream As Stream = ex.Response.GetResponseStream()
+                    Using reader As New StreamReader(responseStream)
+                        errMessage = reader.ReadToEnd()
+                    End Using
+                End Using
+            End If
+            ' Throw exception agar ditangkap oleh Try-Catch utama
+            Throw New Exception("API Error: " & errMessage)
+        End Try
+    End Function
+
     Public Function InsertDataAPIRMInformConsent(ByVal json As String, ByVal url As String) As String
         Try
             ServicePointManager.Expect100Continue = True

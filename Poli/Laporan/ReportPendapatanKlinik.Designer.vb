@@ -122,6 +122,7 @@ Partial Class ReportPendapatanKlinik
         Me.ButtonFindPerusahaanRekapInvoice = New System.Windows.Forms.Button
         Me.GridControlRekapInvoice = New DevExpress.XtraGrid.GridControl
         Me.GridViewRekapInvoice = New DevExpress.XtraGrid.Views.Grid.GridView
+        Me.RadioButtonOptionPendapatanV3 = New System.Windows.Forms.RadioButton
         Me.PanelTop.SuspendLayout()
         Me.PanelReportPendapatanKlinik.SuspendLayout()
         Me.SplitContainer1.Panel1.SuspendLayout()
@@ -442,7 +443,7 @@ Partial Class ReportPendapatanKlinik
         Me.CheckBoxPaket.Font = New System.Drawing.Font("Segoe UI", 9.75!)
         Me.CheckBoxPaket.Location = New System.Drawing.Point(510, 79)
         Me.CheckBoxPaket.Name = "CheckBoxPaket"
-        Me.CheckBoxPaket.Size = New System.Drawing.Size(63, 21)
+        Me.CheckBoxPaket.Size = New System.Drawing.Size(58, 21)
         Me.CheckBoxPaket.TabIndex = 573
         Me.CheckBoxPaket.Tag = ""
         Me.CheckBoxPaket.Text = "Paket"
@@ -531,11 +532,12 @@ Partial Class ReportPendapatanKlinik
         'Panel9
         '
         Me.Panel9.BackColor = System.Drawing.Color.Transparent
+        Me.Panel9.Controls.Add(Me.RadioButtonOptionPendapatanV3)
         Me.Panel9.Controls.Add(Me.RadioButtonOptionLaporanPendapatanTagihan)
         Me.Panel9.Controls.Add(Me.RadioButtonOptionLaporanPendapatan)
         Me.Panel9.Location = New System.Drawing.Point(159, 151)
         Me.Panel9.Name = "Panel9"
-        Me.Panel9.Size = New System.Drawing.Size(387, 25)
+        Me.Panel9.Size = New System.Drawing.Size(577, 25)
         Me.Panel9.TabIndex = 564
         '
         'RadioButtonOptionLaporanPendapatanTagihan
@@ -1562,6 +1564,17 @@ Partial Class ReportPendapatanKlinik
         Me.GridViewRekapInvoice.OptionsView.ShowIndicator = False
         Me.GridViewRekapInvoice.PaintStyleName = "Skin"
         '
+        'RadioButtonOptionPendapatanV3
+        '
+        Me.RadioButtonOptionPendapatanV3.AutoSize = True
+        Me.RadioButtonOptionPendapatanV3.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.RadioButtonOptionPendapatanV3.Location = New System.Drawing.Point(373, 3)
+        Me.RadioButtonOptionPendapatanV3.Name = "RadioButtonOptionPendapatanV3"
+        Me.RadioButtonOptionPendapatanV3.Size = New System.Drawing.Size(178, 19)
+        Me.RadioButtonOptionPendapatanV3.TabIndex = 249
+        Me.RadioButtonOptionPendapatanV3.Text = "Laporan Pendapatan (Versi 3)"
+        Me.RadioButtonOptionPendapatanV3.UseVisualStyleBackColor = True
+        '
         'ReportPendapatanKlinik
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -1722,4 +1735,5 @@ Partial Class ReportPendapatanKlinik
     Friend WithEvents CheckBoxTransaksiNolRupiah As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBoxVoucher As System.Windows.Forms.CheckBox
     Friend WithEvents CheckBoxPaket As System.Windows.Forms.CheckBox
+    Friend WithEvents RadioButtonOptionPendapatanV3 As System.Windows.Forms.RadioButton
 End Class

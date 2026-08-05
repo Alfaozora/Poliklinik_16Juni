@@ -2,6 +2,7 @@
 Imports System.Data.OleDb
 Imports System.IO
 Imports System.Drawing
+Imports System.Net
 
 Imports Excel = Microsoft.Office.Interop.Excel
 Imports Microsoft.Office
@@ -1324,6 +1325,206 @@ Public Class ReportPendapatanKlinik
         Find.Query("SELECT NoCompany AS 'ID', CompanyCode AS 'Kode Perusahaan', CompanyNama AS 'Keterangan' FROM mastercompany WHERE GETDATE() BETWEEN StartDate AND EndDate", " ORDER BY NoCompany ASC", "FindPerusahaanReportPendapatanKlinik_LaporanPendapatan", 2)
     End Sub
 
+    Private Sub CetakLaporanPendapatanV3()
+        Try
+            ' 1. Konfirmasi User
+            Dim confirmResult As DialogResult = MessageBox.Show( _
+                "Apakah Anda yakin ingin mencetak Laporan Pendapatan ke Web PDF?", _
+                "Konfirmasi Cetak Laporan", _
+                MessageBoxButtons.YesNo, _
+                MessageBoxIcon.Question, _
+                MessageBoxDefaultButton.Button2)
+
+            If confirmResult = DialogResult.No Then Exit Sub
+
+            ' 2. Persiapan Parameter Tanggal
+            Dim tglAwal As Date = TglAwalTransaksiLaporanPendapatan.Value.Date
+            Dim tglAkhir As Date = TglAkhirTransaksiLaporanPendapatan.Value.Date
+
+            Dim strAwal As String = tglAwal.ToString("yyyy-MM-dd 00:00:00")
+            Dim strAkhir As String = tglAkhir.ToString("yyyy-MM-dd 23:59:59")
+
+            ' ----------------------------------------------------
+            ' 3. LOGIKA FILTER POLI DARI COMBOBOX
+            ' ----------------------------------------------------
+            Dim selectedPoli As String = ""
+            If ComboBoxPoliTujuanLaporanPendapatan.SelectedItem IsNot Nothing Then
+                selectedPoli = ComboBoxPoliTujuanLaporanPendapatan.SelectedItem.ToString().Trim()
+            Else
+                selectedPoli = ComboBoxPoliTujuanLaporanPendapatan.Text.Trim()
+            End If
+
+            ' Tentukan filter SQL Poli: Jika 'SEMUA TRANSAKSI' atau kosong, kosongkan kriteria filter poli
+            Dim isAllPoli As Boolean = True
+            Dim filterPoliSql As String = ""
+
+            If Not String.IsNullOrEmpty(selectedPoli) AndAlso selectedPoli.ToUpper() <> "SEMUA TRANSAKSI" Then
+                filterPoliSql = String.Format("  AND TD.JenisPoli = '{0}' ", selectedPoli.Replace("'", "''"))
+                isAllPoli = False
+            End If
+
+            ' ----------------------------------------------------
+            ' 4. QUERY SQL DETAIL LAPORAN PENDAPATAN
+            ' ----------------------------------------------------
+            Dim sqlQuery As String = String.Format( _
+                "SELECT " & _
+                "    TD.JenisPoli AS [Nama Poli], " & _
+                "    TD.NoUrut AS [No Transaksi], " & _
+                "    TD.TanggalTransaksi AS [Tanggal Kunjungan], " & _
+                "    MP.Nama, " & _
+                "    TPD.NamaTindakan AS [Nama Tindakan], " & _
+                "    ISNULL(STUFF(( " & _
+                "        SELECT DISTINCT ' + ' + PB.JenisBayar + " & _
+                "               CASE WHEN ISNULL(PB.mesin,'') <> '' OR ISNULL(PB.kartu,'') <> '' " & _
+                "                    THEN ' (' + NULLIF(PB.mesin,'') + CASE WHEN ISNULL(PB.mesin,'') <> '' AND ISNULL(PB.kartu,'') <> '' THEN ' - ' ELSE '' END + NULLIF(PB.kartu,'') + ')' " & _
+                "                    ELSE '' END " & _
+                "        FROM ( " & _
+                "            SELECT TransPoliID, JenisBayar, mesin, kartu FROM TransaksiPoliBayar WHERE ISNULL(JumlahBayar, 0) > 0 AND ISNULL(TPD.PaketID, '0') = '0' " & _
+                "            UNION ALL " & _
+                "            SELECT TransPoliID, CASE WHEN UPPER(JenisBayar) = 'VOUCHER' THEN 'PENGGUNAAN PAKET' ELSE JenisBayar END AS JenisBayar, mesin, kartu FROM TransaksiPoliBayarAwal WHERE ISNULL(JumlahBayar, 0) > 0 AND ISNULL(TPD.PaketID, '0') <> '0' AND TPD.JenisTindakan = 'Tindakan' " & _
+                "        ) PB " & _
+                "        WHERE PB.TransPoliID = TPD.TransPoliID " & _
+                "        FOR XML PATH('') " & _
+                "    ), 1, 3, ''), '-') AS [JenisBayar], " & _
+                "    TPD.BiayaTindakan AS [Harga Ril], " & _
+                "    TPD.DiscTindakan AS [Diskon], " & _
+                "    CASE WHEN ISNULL(TPD.BiayaTindakan, 0) > 0 THEN (TPD.DiscTindakan / TPD.BiayaTindakan) * 100 ELSE 0 END AS [PctDiskon], " & _
+                "    TPD.NettBayar AS [Pembayaran], " & _
+                "    ISNULL((SELECT TOP 1 CASE " & _
+                "        WHEN UPPER(PB.kartu) LIKE '%QRIS%' OR UPPER(PB.JenisBayar) LIKE '%QRIS%' THEN 0.7 " & _
+                "        WHEN UPPER(PB.mesin) LIKE '%MANDIRI%' THEN " & _
+                "            CASE WHEN UPPER(PB.JenisBayar) LIKE '%DEBET%' OR UPPER(PB.JenisBayar) LIKE '%DEBIT%' THEN CASE WHEN UPPER(PB.kartu) LIKE '%MANDIRI%' THEN 0.15 ELSE 1.0 END " & _
+                "                 WHEN UPPER(PB.JenisBayar) LIKE '%CARD%' OR UPPER(PB.JenisBayar) LIKE '%CREDIT%' OR UPPER(PB.JenisBayar) LIKE '%KREDIT%' THEN 1.5 ELSE 0 END " & _
+                "        WHEN UPPER(PB.mesin) LIKE '%BCA%' THEN " & _
+                "            CASE WHEN UPPER(PB.JenisBayar) LIKE '%DEBET%' OR UPPER(PB.JenisBayar) LIKE '%DEBIT%' THEN CASE WHEN UPPER(PB.kartu) LIKE '%BCA%' THEN 0.15 ELSE 1.0 END " & _
+                "                 WHEN UPPER(PB.JenisBayar) LIKE '%CARD%' OR UPPER(PB.JenisBayar) LIKE '%CREDIT%' OR UPPER(PB.JenisBayar) LIKE '%KREDIT%' THEN CASE WHEN UPPER(PB.kartu) LIKE '%BCA%' THEN 1.5 ELSE 2.0 END ELSE 0 END " & _
+                "        ELSE CASE WHEN UPPER(PB.JenisBayar) LIKE '%DEBET%' OR UPPER(PB.JenisBayar) LIKE '%DEBIT%' THEN 1.0 " & _
+                "                  WHEN UPPER(PB.JenisBayar) LIKE '%CARD%' OR UPPER(PB.JenisBayar) LIKE '%CREDIT%' OR UPPER(PB.JenisBayar) LIKE '%KREDIT%' THEN 2.0 ELSE 0 END " & _
+                "    END FROM TransaksiPoliBayar PB WHERE PB.TransPoliID = TPD.TransPoliID AND ISNULL(PB.JumlahBayar, 0) > 0 AND ISNULL(TPD.PaketID, '0') = '0'), 0) AS [PctFeeAdminBank], " & _
+                "    (TPD.NettBayar * ISNULL((SELECT TOP 1 CASE " & _
+                "        WHEN UPPER(PB.kartu) LIKE '%QRIS%' OR UPPER(PB.JenisBayar) LIKE '%QRIS%' THEN 0.7 " & _
+                "        WHEN UPPER(PB.mesin) LIKE '%MANDIRI%' THEN " & _
+                "            CASE WHEN UPPER(PB.JenisBayar) LIKE '%DEBET%' OR UPPER(PB.JenisBayar) LIKE '%DEBIT%' THEN CASE WHEN UPPER(PB.kartu) LIKE '%MANDIRI%' THEN 0.15 ELSE 1.0 END " & _
+                "                 WHEN UPPER(PB.JenisBayar) LIKE '%CARD%' OR UPPER(PB.JenisBayar) LIKE '%CREDIT%' OR UPPER(PB.JenisBayar) LIKE '%KREDIT%' THEN 1.5 ELSE 0 END " & _
+                "        WHEN UPPER(PB.mesin) LIKE '%BCA%' THEN " & _
+                "            CASE WHEN UPPER(PB.JenisBayar) LIKE '%DEBET%' OR UPPER(PB.JenisBayar) LIKE '%DEBIT%' THEN CASE WHEN UPPER(PB.kartu) LIKE '%BCA%' THEN 0.15 ELSE 1.0 END " & _
+                "                 WHEN UPPER(PB.JenisBayar) LIKE '%CARD%' OR UPPER(PB.JenisBayar) LIKE '%CREDIT%' OR UPPER(PB.JenisBayar) LIKE '%KREDIT%' THEN CASE WHEN UPPER(PB.kartu) LIKE '%BCA%' THEN 1.5 ELSE 2.0 END ELSE 0 END " & _
+                "        ELSE CASE WHEN UPPER(PB.JenisBayar) LIKE '%DEBET%' OR UPPER(PB.JenisBayar) LIKE '%DEBIT%' THEN 1.0 " & _
+                "                  WHEN UPPER(PB.JenisBayar) LIKE '%CARD%' OR UPPER(PB.JenisBayar) LIKE '%CREDIT%' OR UPPER(PB.JenisBayar) LIKE '%KREDIT%' THEN 2.0 ELSE 0 END " & _
+                "    END FROM TransaksiPoliBayar PB WHERE PB.TransPoliID = TPD.TransPoliID AND ISNULL(PB.JumlahBayar, 0) > 0 AND ISNULL(TPD.PaketID, '0') = '0'), 0)) / 100.0 AS [FeeAdminBank], " & _
+                "    MA.NamaAlat, " & _
+                "    ISNULL(LPA.ShootDipakai * LPA.HargaBeli, 0) AS [BHP Alat], " & _
+                "    CASE WHEN ISNULL(TPD.NettBayar, 0) > 0 THEN (ISNULL(LPA.ShootDipakai * LPA.HargaBeli, 0) / TPD.NettBayar) * 100 ELSE 0 END AS [PctBHPAlat], " & _
+                "    TPD.TotalBayarBHP AS [BHP Apotek], " & _
+                "    CASE WHEN ISNULL(TPD.NettBayar, 0) > 0 THEN (ISNULL(TPD.TotalBayarBHP, 0) / TPD.NettBayar) * 100 ELSE 0 END AS [PctBHPApotek], " & _
+                "    ISNULL(TPD.FeeDokter, 0) AS [FeeDokter], " & _
+                "    CASE WHEN ISNULL(TPD.NettBayar, 0) > 0 THEN (ISNULL(TPD.FeeDokter, 0) / TPD.NettBayar) * 100 ELSE 0 END AS [PctFeeDokter], " & _
+                "    ISNULL(TPD.FeePerawat, 0) AS [FeePerawat], " & _
+                "    CASE WHEN ISNULL(TPD.NettBayar, 0) > 0 THEN (ISNULL(TPD.FeePerawat, 0) / TPD.NettBayar) * 100 ELSE 0 END AS [PctFeePerawat], " & _
+                "    0 AS [BiayaOverhead], " & _
+                "    0 AS [PctOverhead], " & _
+                "    (TPD.NettBayar - ( " & _
+                "        (TPD.NettBayar * ISNULL((SELECT TOP 1 CASE WHEN UPPER(PB.kartu) LIKE '%QRIS%' OR UPPER(PB.JenisBayar) LIKE '%QRIS%' THEN 0.7 WHEN UPPER(PB.mesin) LIKE '%MANDIRI%' THEN CASE WHEN UPPER(PB.JenisBayar) LIKE '%DEBET%' OR UPPER(PB.JenisBayar) LIKE '%DEBIT%' THEN CASE WHEN UPPER(PB.kartu) LIKE '%MANDIRI%' THEN 0.15 ELSE 1.0 END WHEN UPPER(PB.JenisBayar) LIKE '%CARD%' OR UPPER(PB.JenisBayar) LIKE '%CREDIT%' OR UPPER(PB.JenisBayar) LIKE '%KREDIT%' THEN 1.5 ELSE 0 END WHEN UPPER(PB.mesin) LIKE '%BCA%' THEN CASE WHEN UPPER(PB.JenisBayar) LIKE '%DEBET%' OR UPPER(PB.JenisBayar) LIKE '%DEBIT%' THEN CASE WHEN UPPER(PB.kartu) LIKE '%BCA%' THEN 0.15 ELSE 1.0 END WHEN UPPER(PB.JenisBayar) LIKE '%CARD%' OR UPPER(PB.JenisBayar) LIKE '%CREDIT%' OR UPPER(PB.JenisBayar) LIKE '%KREDIT%' THEN CASE WHEN UPPER(PB.kartu) LIKE '%BCA%' THEN 1.5 ELSE 2.0 END ELSE 0 END ELSE CASE WHEN UPPER(PB.JenisBayar) LIKE '%DEBET%' OR UPPER(PB.JenisBayar) LIKE '%DEBIT%' THEN 1.0 WHEN UPPER(PB.JenisBayar) LIKE '%CARD%' OR UPPER(PB.JenisBayar) LIKE '%CREDIT%' OR UPPER(PB.JenisBayar) LIKE '%KREDIT%' THEN 2.0 ELSE 0 END END FROM TransaksiPoliBayar PB WHERE PB.TransPoliID = TPD.TransPoliID AND ISNULL(PB.JumlahBayar, 0) > 0 AND ISNULL(TPD.PaketID, '0') = '0'), 0)) / 100.0 " & _
+                "        + ISNULL(LPA.ShootDipakai * LPA.HargaBeli, 0) " & _
+                "        + ISNULL(TPD.TotalBayarBHP, 0) " & _
+                "        + ISNULL(TPD.FeeDokter, 0) " & _
+                "        + ISNULL(TPD.FeePerawat, 0) " & _
+                "    )) AS [PendapatanBersih] " & _
+                "FROM TransaksiDetail TD " & _
+                "INNER JOIN MasterPasien MP ON TD.IDInternet = MP.NoRekamMedis " & _
+                "INNER JOIN TransaksiPoliDetail TPD ON TD.NoTransaksi = TPD.TransPoliID " & _
+                "LEFT JOIN LogPemakaianAlat LPA ON TPD.TransPoliIDDetail = LPA.TransaksiDetailID " & _
+                "LEFT JOIN MasterAlat MA ON LPA.AlatID = MA.AlatID " & _
+                "WHERE TPD.DeletedBy IS NULL " & _
+                "  AND TPD.JenisTindakan = 'Tindakan' " & _
+                "  AND TPD.StatusPembayaran = 'PAID' " & _
+                "  AND TD.TanggalTransaksi BETWEEN '{0}' AND '{1}' " & _
+                "{2} " & _
+                "ORDER BY TD.TanggalTransaksi ASC", strAwal, strAkhir, filterPoliSql)
+
+            Dim dtReport As DataTable = ReadSQL(sqlQuery)
+
+            If dtReport Is Nothing OrElse dtReport.Rows.Count = 0 Then
+                MessageBox.Show("Tidak ada data transaksi ditemukan pada periode dan poli yang dipilih.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Exit Sub
+            End If
+
+            ' 5. Menyusun Periode Text untuk Header Laporan PDF
+            Dim periodeText As String = tglAwal.ToString("dd/MM/yyyy") & " - " & tglAkhir.ToString("dd/MM/yyyy")
+            If Not String.IsNullOrEmpty(selectedPoli) AndAlso selectedPoli.ToUpper() <> "SEMUA TRANSAKSI" Then
+                periodeText &= " (" & selectedPoli & ")"
+            Else
+                periodeText &= " (Semua Poli)"
+            End If
+
+            Dim userAktif As String = "System"
+            If Not String.IsNullOrEmpty(userInput) Then
+                userAktif = userInput
+            End If
+
+            Dim payloadObject = New With { _
+                .periode = periodeText, _
+                .user = userAktif, _
+                .is_all_poli = isAllPoli, _
+                .details = dtReport _
+            }
+
+            Dim jsonPayload As String = JsonConvert.SerializeObject(payloadObject)
+
+            ' 6. Pengambilan URL Endpoint API dari MsConfig
+            Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+            If Not baseURL.EndsWith("/") Then baseURL &= "/"
+            Dim apiUrl As String = baseURL & "api/laporan/pendapatan-pdf"
+
+            Application.DoEvents()
+
+            ' 7. Tembak API Menggunakan Fungsi Khusus PDF
+            Dim pdfBytes As Byte() = DownloadPdfFromAPI(jsonPayload, apiUrl)
+
+            If pdfBytes IsNot Nothing AndAlso pdfBytes.Length > 0 Then
+                ' Simpan File PDF Sementara di Temp Folder Komputer
+                Dim fileName As String = "Laporan_Pendapatan_" & DateTime.Now.ToString("yyyyMMdd_HHmmss") & ".pdf"
+                Dim tempPath As String = Path.Combine(Path.GetTempPath(), fileName)
+                File.WriteAllBytes(tempPath, pdfBytes)
+
+                ' Buka di Browser
+                OpenPdfInBrowser(tempPath)
+            Else
+                MessageBox.Show("Gagal mengunduh file PDF dari server Web.", "Gagal Cetak PDF", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End If
+
+        Catch ex As Exception
+            MessageBox.Show("Terjadi kesalahan sistem: " & ex.Message, "Error Application", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    Private Sub OpenPdfInBrowser(ByVal pdfPath As String)
+        Dim browserExecutable As String = ""
+
+        Dim chromePath64 As String = "C:\Program Files\Google\Chrome\Application\chrome.exe"
+        Dim chromePath86 As String = "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
+        Dim edgePath86 As String = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+        Dim edgePath64 As String = "C:\Program Files\Microsoft\Edge\Application\msedge.exe"
+
+        If File.Exists(chromePath64) Then
+            browserExecutable = chromePath64
+        ElseIf File.Exists(chromePath86) Then
+            browserExecutable = chromePath86
+        ElseIf File.Exists(edgePath86) Then
+            browserExecutable = edgePath86
+        ElseIf File.Exists(edgePath64) Then
+            browserExecutable = edgePath64
+        End If
+
+        If Not String.IsNullOrEmpty(browserExecutable) Then
+            Process.Start(browserExecutable, """" & pdfPath & """")
+        Else
+            Dim pInfo As New ProcessStartInfo(pdfPath)
+            pInfo.UseShellExecute = True
+            Process.Start(pInfo)
+        End If
+    End Sub
+
     Private Sub ButtonCetakLaporanPendapatan_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCetakLaporanPendapatan.Click
         Dim tblOmset As DataTable = GridControlLaporanPendapatan.DataSource
 
@@ -1337,6 +1538,8 @@ Public Class ReportPendapatanKlinik
                 LaporanPendapatanKlinikVersi1(tblOmset)
             ElseIf RadioButtonOptionLaporanPendapatanTagihan.Checked Then
                 LaporanPendapatanKlinikVersi2(tblOmset)
+            ElseIf RadioButtonOptionPendapatanV3.Checked Then
+                CetakLaporanPendapatanV3()
             End If
         Else
             MessageBox.Show("Tidak Ada Data.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
