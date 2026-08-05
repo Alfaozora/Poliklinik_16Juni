@@ -1,6 +1,7 @@
 Version : 2.0.0.59 (01 Agustus 2026)
 # [Usability Improvement] Jurnal Pemakaian dan Pembelian Paket
 # [Usability Improvement] Menampilkan saldo awal per periode untuk laporan penggunaan alat
+# [New Feature] Laporan Pendapatan v3
 
 Version : 2.0.0.58 (07 Juli 2026)
 # [New Feature] Penambahan Qty untuk Informed Consent
