@@ -1417,25 +1417,28 @@ Public Class ReportPendapatanKlinik
                 "    CASE WHEN ISNULL(TPD.NettBayar, 0) > 0 THEN (ISNULL(LPA.ShootDipakai * LPA.HargaBeli, 0) / TPD.NettBayar) * 100 ELSE 0 END AS [PctBHPAlat], " & _
                 "    TPD.TotalBayarBHP AS [BHP Apotek], " & _
                 "    CASE WHEN ISNULL(TPD.NettBayar, 0) > 0 THEN (ISNULL(TPD.TotalBayarBHP, 0) / TPD.NettBayar) * 100 ELSE 0 END AS [PctBHPApotek], " & _
-                "    ISNULL(TPD.FeeDokter, 0) AS [FeeDokter], " & _
-                "    CASE WHEN ISNULL(TPD.NettBayar, 0) > 0 THEN (ISNULL(TPD.FeeDokter, 0) / TPD.NettBayar) * 100 ELSE 0 END AS [PctFeeDokter], " & _
-                "    ISNULL(TPD.FeePerawat, 0) AS [FeePerawat], " & _
-                "    CASE WHEN ISNULL(TPD.NettBayar, 0) > 0 THEN (ISNULL(TPD.FeePerawat, 0) / TPD.NettBayar) * 100 ELSE 0 END AS [PctFeePerawat], " & _
+                "    CASE WHEN ISNULL(TPD.ClosedFeeDokter, 0) = 1 THEN ISNULL(TPD.FeeDokter, 0) ELSE 0 END AS [FeeDokter], " & _
+                "    CASE WHEN ISNULL(TPD.NettBayar, 0) > 0 THEN (CASE WHEN ISNULL(TPD.ClosedFeeDokter, 0) = 1 THEN ISNULL(TPD.FeeDokter, 0) ELSE 0 END / TPD.NettBayar) * 100 ELSE 0 END AS [PctFeeDokter], " & _
+                "    CASE WHEN ISNULL(TPD.ClosedFeePerawat, 0) = 1 THEN ISNULL(TPD.FeePerawat, 0) ELSE 0 END AS [FeePerawat], " & _
+                "    CASE WHEN ISNULL(TPD.NettBayar, 0) > 0 THEN (CASE WHEN ISNULL(TPD.ClosedFeePerawat, 0) = 1 THEN ISNULL(TPD.FeePerawat, 0) ELSE 0 END / TPD.NettBayar) * 100 ELSE 0 END AS [PctFeePerawat], " & _
                 "    0 AS [BiayaOverhead], " & _
                 "    0 AS [PctOverhead], " & _
                 "    (TPD.NettBayar - ( " & _
                 "        (TPD.NettBayar * ISNULL((SELECT TOP 1 CASE WHEN UPPER(PB.kartu) LIKE '%QRIS%' OR UPPER(PB.JenisBayar) LIKE '%QRIS%' THEN 0.7 WHEN UPPER(PB.mesin) LIKE '%MANDIRI%' THEN CASE WHEN UPPER(PB.JenisBayar) LIKE '%DEBET%' OR UPPER(PB.JenisBayar) LIKE '%DEBIT%' THEN CASE WHEN UPPER(PB.kartu) LIKE '%MANDIRI%' THEN 0.15 ELSE 1.0 END WHEN UPPER(PB.JenisBayar) LIKE '%CARD%' OR UPPER(PB.JenisBayar) LIKE '%CREDIT%' OR UPPER(PB.JenisBayar) LIKE '%KREDIT%' THEN 1.5 ELSE 0 END WHEN UPPER(PB.mesin) LIKE '%BCA%' THEN CASE WHEN UPPER(PB.JenisBayar) LIKE '%DEBET%' OR UPPER(PB.JenisBayar) LIKE '%DEBIT%' THEN CASE WHEN UPPER(PB.kartu) LIKE '%BCA%' THEN 0.15 ELSE 1.0 END WHEN UPPER(PB.JenisBayar) LIKE '%CARD%' OR UPPER(PB.JenisBayar) LIKE '%CREDIT%' OR UPPER(PB.JenisBayar) LIKE '%KREDIT%' THEN CASE WHEN UPPER(PB.kartu) LIKE '%BCA%' THEN 1.5 ELSE 2.0 END ELSE 0 END ELSE CASE WHEN UPPER(PB.JenisBayar) LIKE '%DEBET%' OR UPPER(PB.JenisBayar) LIKE '%DEBIT%' THEN 1.0 WHEN UPPER(PB.JenisBayar) LIKE '%CARD%' OR UPPER(PB.JenisBayar) LIKE '%CREDIT%' OR UPPER(PB.JenisBayar) LIKE '%KREDIT%' THEN 2.0 ELSE 0 END END FROM TransaksiPoliBayar PB WHERE PB.TransPoliID = TPD.TransPoliID AND ISNULL(PB.JumlahBayar, 0) > 0 AND ISNULL(TPD.PaketID, '0') = '0'), 0)) / 100.0 " & _
                 "        + ISNULL(LPA.ShootDipakai * LPA.HargaBeli, 0) " & _
                 "        + ISNULL(TPD.TotalBayarBHP, 0) " & _
-                "        + ISNULL(TPD.FeeDokter, 0) " & _
-                "        + ISNULL(TPD.FeePerawat, 0) " & _
+                "        + CASE WHEN ISNULL(TPD.ClosedFeeDokter, 0) = 1 THEN ISNULL(TPD.FeeDokter, 0) ELSE 0 END " & _
+                "        + CASE WHEN ISNULL(TPD.ClosedFeePerawat, 0) = 1 THEN ISNULL(TPD.FeePerawat, 0) ELSE 0 END " & _
                 "    )) AS [PendapatanBersih] " & _
                 "FROM TransaksiDetail TD " & _
                 "INNER JOIN MasterPasien MP ON TD.IDInternet = MP.NoRekamMedis " & _
                 "INNER JOIN TransaksiPoliDetail TPD ON TD.NoTransaksi = TPD.TransPoliID " & _
                 "LEFT JOIN LogPemakaianAlat LPA ON TPD.TransPoliIDDetail = LPA.TransaksiDetailID " & _
                 "LEFT JOIN MasterAlat MA ON LPA.AlatID = MA.AlatID " & _
+                "LEFT JOIN TransaksiCancel TC ON TD.NoUrut = TC.NoUrut " & _
                 "WHERE TPD.DeletedBy IS NULL " & _
+                "  AND TD.DeletedBy IS NULL " & _
+                "  AND TC.NoUrut IS NULL " & _
                 "  AND TPD.JenisTindakan = 'Tindakan' " & _
                 "  AND TPD.StatusPembayaran = 'PAID' " & _
                 "  AND TD.TanggalTransaksi BETWEEN '{0}' AND '{1}' " & _

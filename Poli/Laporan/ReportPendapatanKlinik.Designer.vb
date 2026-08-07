@@ -48,6 +48,7 @@ Partial Class ReportPendapatanKlinik
         Me.CheckBoxTunai = New System.Windows.Forms.CheckBox
         Me.CheckBoxTagihan = New System.Windows.Forms.CheckBox
         Me.Panel9 = New System.Windows.Forms.Panel
+        Me.RadioButtonOptionPendapatanV3 = New System.Windows.Forms.RadioButton
         Me.RadioButtonOptionLaporanPendapatanTagihan = New System.Windows.Forms.RadioButton
         Me.RadioButtonOptionLaporanPendapatan = New System.Windows.Forms.RadioButton
         Me.ComboBoxPoliTujuanLaporanPendapatan = New System.Windows.Forms.ComboBox
@@ -122,7 +123,6 @@ Partial Class ReportPendapatanKlinik
         Me.ButtonFindPerusahaanRekapInvoice = New System.Windows.Forms.Button
         Me.GridControlRekapInvoice = New DevExpress.XtraGrid.GridControl
         Me.GridViewRekapInvoice = New DevExpress.XtraGrid.Views.Grid.GridView
-        Me.RadioButtonOptionPendapatanV3 = New System.Windows.Forms.RadioButton
         Me.PanelTop.SuspendLayout()
         Me.PanelReportPendapatanKlinik.SuspendLayout()
         Me.SplitContainer1.Panel1.SuspendLayout()
@@ -539,6 +539,17 @@ Partial Class ReportPendapatanKlinik
         Me.Panel9.Name = "Panel9"
         Me.Panel9.Size = New System.Drawing.Size(577, 25)
         Me.Panel9.TabIndex = 564
+        '
+        'RadioButtonOptionPendapatanV3
+        '
+        Me.RadioButtonOptionPendapatanV3.AutoSize = True
+        Me.RadioButtonOptionPendapatanV3.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.RadioButtonOptionPendapatanV3.Location = New System.Drawing.Point(373, 3)
+        Me.RadioButtonOptionPendapatanV3.Name = "RadioButtonOptionPendapatanV3"
+        Me.RadioButtonOptionPendapatanV3.Size = New System.Drawing.Size(178, 19)
+        Me.RadioButtonOptionPendapatanV3.TabIndex = 249
+        Me.RadioButtonOptionPendapatanV3.Text = "Laporan Pendapatan (Versi 3)"
+        Me.RadioButtonOptionPendapatanV3.UseVisualStyleBackColor = True
         '
         'RadioButtonOptionLaporanPendapatanTagihan
         '
@@ -1563,17 +1574,6 @@ Partial Class ReportPendapatanKlinik
         Me.GridViewRekapInvoice.OptionsView.ShowGroupPanel = False
         Me.GridViewRekapInvoice.OptionsView.ShowIndicator = False
         Me.GridViewRekapInvoice.PaintStyleName = "Skin"
-        '
-        'RadioButtonOptionPendapatanV3
-        '
-        Me.RadioButtonOptionPendapatanV3.AutoSize = True
-        Me.RadioButtonOptionPendapatanV3.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.RadioButtonOptionPendapatanV3.Location = New System.Drawing.Point(373, 3)
-        Me.RadioButtonOptionPendapatanV3.Name = "RadioButtonOptionPendapatanV3"
-        Me.RadioButtonOptionPendapatanV3.Size = New System.Drawing.Size(178, 19)
-        Me.RadioButtonOptionPendapatanV3.TabIndex = 249
-        Me.RadioButtonOptionPendapatanV3.Text = "Laporan Pendapatan (Versi 3)"
-        Me.RadioButtonOptionPendapatanV3.UseVisualStyleBackColor = True
         '
         'ReportPendapatanKlinik
         '
