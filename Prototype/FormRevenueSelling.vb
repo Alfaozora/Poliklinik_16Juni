@@ -298,7 +298,7 @@ Public Class FormRevenueSelling
         End If
 
         Dim strAwal As String = tglAwal.ToString("yyyy-MM-dd 00:00:00")
-        Dim strAkhir As String = tglAkhir.ToString("yyyy-MM-dd 23:59:59")
+        Dim strAkhir As String = tglAkhir.AddDays(1).ToString("yyyy-MM-dd 00:00:00")
 
         ' 2. QUERY SELLING & REVENUE
         Dim sqlSellingRevenue As String = String.Format( _
@@ -311,49 +311,53 @@ Public Class FormRevenueSelling
             "        Tgl, " & _
             "        SUM(TotalHarga) AS TotalSelling " & _
             "    FROM ( " & _
+            "        /* 1. Selling Paket Tindakan */ " & _
             "        SELECT " & _
-            "            CAST(TPT.CreatedDate AS DATE) AS Tgl, " & _
+            "            CAST(TD.TanggalTransaksi AS DATE) AS Tgl, " & _
             "            TPT.HargaNett AS TotalHarga " & _
             "        FROM TransaksiPaketTindakan TPT " & _
-            "        INNER JOIN TransaksiDetail TD ON TPT.NoTransaksi = TD.NoUrut " & _
+            "        INNER JOIN TransaksiDetail TD ON CAST(TPT.NoTransaksi AS VARCHAR(50)) = CAST(TD.NoUrut AS VARCHAR(50)) " & _
             "        WHERE TPT.DeletedDate IS NULL " & _
             "          AND TD.JenisPoli = '{0}' " & _
             "          AND TD.DeletedBy IS NULL " & _
-            "          AND TPT.CreatedDate BETWEEN '{1}' AND '{2}' " & _
+            "          AND TD.TanggalTransaksi >= '{1}' AND TD.TanggalTransaksi < '{2}' " & _
             " " & _
             "        UNION ALL " & _
             " " & _
+            "        /* 2. Selling Tindakan Poli */ " & _
             "        SELECT " & _
-            "            CAST(TPD.CreatedDate AS DATE) AS Tgl, " & _
+            "            CAST(TD.TanggalTransaksi AS DATE) AS Tgl, " & _
             "            TPD.NettBayar AS TotalHarga " & _
             "        FROM TransaksiPoliDetail TPD " & _
-            "        INNER JOIN TransaksiPoli TP ON TPD.TransPoliID = TP.TransPoliID " & _
-            "        INNER JOIN TransaksiDetail TD ON TP.NoUrut = TD.NoUrut " & _
+            "        INNER JOIN TransaksiPoli TP ON CAST(TPD.TransPoliID AS VARCHAR(50)) = CAST(TP.TransPoliID AS VARCHAR(50)) " & _
+            "        INNER JOIN TransaksiDetail TD ON CAST(TP.NoUrut AS VARCHAR(50)) = CAST(TD.NoUrut AS VARCHAR(50)) " & _
             "        WHERE TPD.DeletedDate IS NULL " & _
             "          AND TD.JenisPoli = '{0}' " & _
             "          AND TD.DeletedBy IS NULL " & _
-            "          AND TPD.CreatedDate BETWEEN '{1}' AND '{2}' " & _
+            "          AND TD.TanggalTransaksi >= '{1}' AND TD.TanggalTransaksi < '{2}' " & _
             "    ) CombinedSelling " & _
             "    GROUP BY Tgl " & _
             ") S " & _
             "FULL OUTER JOIN ( " & _
+            "    /* Revenue / Pembayaran Paid */ " & _
             "    SELECT " & _
             "        CAST(TD.TanggalTransaksi AS DATE) AS Tgl, " & _
             "        SUM(TPD.NettBayar) AS TotalRevenue " & _
             "    FROM TransaksiDetail TD " & _
-            "    INNER JOIN TransaksiPoliDetail TPD ON TD.NoTransaksi = TPD.TransPoliID " & _
+            "    INNER JOIN TransaksiPoli TP ON CAST(TD.NoUrut AS VARCHAR(50)) = CAST(TP.NoUrut AS VARCHAR(50)) " & _
+            "    INNER JOIN TransaksiPoliDetail TPD ON CAST(TP.TransPoliID AS VARCHAR(50)) = CAST(TPD.TransPoliID AS VARCHAR(50)) " & _
             "    WHERE TPD.DeletedBy IS NULL " & _
             "      AND TD.DeletedBy IS NULL " & _
             "      AND TPD.JenisTindakan = 'Tindakan' " & _
             "      AND TPD.StatusPembayaran = 'PAID' " & _
             "      AND TD.JenisPoli = '{0}' " & _
-            "      AND TD.TanggalTransaksi BETWEEN '{1}' AND '{2}' " & _
+            "      AND TD.TanggalTransaksi >= '{1}' AND TD.TanggalTransaksi < '{2}' " & _
             "      AND EXISTS ( " & _
             "          SELECT 1 FROM ( " & _
-            "              SELECT TransPoliID FROM TransaksiPoliBayar WHERE ISNULL(JumlahBayar, 0) > 0 " & _
+            "              SELECT CAST(TransPoliID AS VARCHAR(50)) AS TransPoliID FROM TransaksiPoliBayar WHERE ISNULL(JumlahBayar, 0) > 0 " & _
             "              UNION ALL " & _
-            "              SELECT TransPoliID FROM TransaksiPoliBayarAwal WHERE ISNULL(JumlahBayar, 0) > 0 " & _
-            "          ) PB WHERE PB.TransPoliID = TPD.TransPoliID " & _
+            "              SELECT CAST(TransPoliID AS VARCHAR(50)) AS TransPoliID FROM TransaksiPoliBayarAwal WHERE ISNULL(JumlahBayar, 0) > 0 " & _
+            "          ) PB WHERE PB.TransPoliID = CAST(TPD.TransPoliID AS VARCHAR(50)) " & _
             "      ) " & _
             "    GROUP BY CAST(TD.TanggalTransaksi AS DATE) " & _
             ") R ON S.Tgl = R.Tgl " & _
@@ -382,18 +386,18 @@ Public Class FormRevenueSelling
         dtRaw.Columns.Add("TargetBulanan", GetType(Decimal))
         dtRaw.Columns.Add("Persentase_Selling_Revenue", GetType(Decimal))
 
-        ' Kolom Informasi Hari
         dtRaw.Columns.Add("TotalHariKalender", GetType(Integer))
         dtRaw.Columns.Add("TotalHariKerja", GetType(Integer))
         dtRaw.Columns.Add("HariBerjalan", GetType(Integer))
         dtRaw.Columns.Add("SisaHariKerja", GetType(Integer))
 
-        ' Get Target Bulanan
+        ' Get Target Bulanan & Hari Kerja
         Dim targetBulan As Integer = tglAwal.Month
         Dim targetTahun As Integer = tglAwal.Year
-        Dim sqlTarget As String = "SELECT ISNULL(TargetBulanan, 0) FROM MasterTargetPoli WHERE JenisPoli = '" & jenisPoli & "' AND Bulan = " & targetBulan & " AND Tahun = " & targetTahun
+        Dim sqlTarget As String = "SELECT ISNULL(TargetBulanan, 0), ISNULL(HariKerja, 0) FROM MasterTargetPoli WHERE JenisPoli = '" & jenisPoli & "' AND Bulan = " & targetBulan & " AND Tahun = " & targetTahun
         Dim dtTarget As DataTable = ReadSQL(sqlTarget)
         Dim nominalTarget As Decimal = If(dtTarget.Rows.Count > 0, CDec(dtTarget.Rows(0)(0)), 0)
+        Dim totalHariKerja As Integer = If(dtTarget.Rows.Count > 0 AndAlso CInt(dtTarget.Rows(0)(1)) > 0, CInt(dtTarget.Rows(0)(1)), 1)
 
         ' SUNTIK BARIS BAYANGAN JIKA BELUM ADA TRANSAKSI DI TANGGAL AKHIR
         Dim tanggalTerakhirData As Date = tglAwal
@@ -409,94 +413,67 @@ Public Class FormRevenueSelling
             dtRaw.Rows.Add(newRow)
         End If
 
-        ' HITUNG YESTERDAY & TODAY COLLECTION BERDASARKAN TANGGAL EXAK
-        Dim totalYesterdayCollection As Decimal = 0
-        Dim totalTodayCollection As Decimal = 0
-
-        For Each rowItem As DataRow In dtRaw.Rows
-            Dim tglRow As Date = CDate(rowItem("Tgl")).Date
-            Dim sellingVal As Decimal = If(IsDBNull(rowItem("SELLING")), 0, CDec(rowItem("SELLING")))
-
-            If tglRow < tglAkhir.Date Then
-                totalYesterdayCollection += sellingVal
-            ElseIf tglRow = tglAkhir.Date Then
-                totalTodayCollection = sellingVal
-            End If
-        Next
-
-        ' === REVISI: JUMLAH HARI DALAM 1 BULAN KALENDER ===
+        ' METERAN KALENDER & HARI KERJA
         Dim totalHariKalender As Integer = Date.DaysInMonth(tglAwal.Year, tglAwal.Month)
-
-        ' HITUNG HARI KERJA
-        Dim sqlHariKerja As String = "SELECT ISNULL(HariKerja, 0) FROM MasterTargetPoli WHERE JenisPoli = '" & jenisPoli & "' AND Bulan = " & targetBulan & " AND Tahun = " & targetTahun
-        Dim dtHariKerja As DataTable = ReadSQL(sqlHariKerja)
-        Dim totalHariKerja As Integer = If(dtHariKerja.Rows.Count > 0, Convert.ToInt32(dtHariKerja.Rows(0)(0)), 1)
-        If totalHariKerja = 0 Then totalHariKerja = 1
-
         Dim hariBerjalan As Integer = HitungHariKerjaBerjalan(tglAwal, tglAkhir)
-        Dim sisaHariKerja As Integer = totalHariKerja - hariBerjalan
-        If sisaHariKerja < 0 Then sisaHariKerja = 0
+        Dim sisaHariKerja As Integer = Math.Max(0, totalHariKerja - hariBerjalan)
 
-        ' POPULASI SELURUH KOLOM
+        ' PERBAIKAN UTAMA: HITUNG RUNNING TOTAL (MTD & YESTERDAY)
+        Dim runningTotalMTD As Decimal = 0
+
         For Each row As DataRow In dtRaw.Rows
             Dim sellingHariIni As Decimal = If(IsDBNull(row("SELLING")), 0, CDec(row("SELLING")))
             Dim revenueHariIni As Decimal = If(IsDBNull(row("REVENUE")), 0, CDec(row("REVENUE")))
 
-            row("TargetBulanan") = Convert.ToDecimal(nominalTarget)
-            row("Yesterday_Collection") = Convert.ToDecimal(totalYesterdayCollection)
-            row("Today_Collection") = Convert.ToDecimal(totalTodayCollection)
+            ' Set Yesterday = MTD Kumulatif Sebelum Hari Ini
+            Dim yesterdayCol As Decimal = runningTotalMTD
 
+            ' PERBAIKAN: Gunakan revenueHariIni agar Actual Collection sesuai dengan Revenue
+            Dim todayCol As Decimal = revenueHariIni
+
+            ' Update MTD = Yesterday + Today
+            runningTotalMTD += todayCol
+
+            ' Assignment Nilai Kolom
+            row("Yesterday_Collection") = yesterdayCol
+            row("Today_Collection") = todayCol
+            row("ActualCollectionMTD") = runningTotalMTD
+
+            row("TargetBulanan") = nominalTarget
             row("TotalHariKalender") = totalHariKalender
             row("TotalHariKerja") = totalHariKerja
             row("HariBerjalan") = hariBerjalan
             row("SisaHariKerja") = sisaHariKerja
 
-            ' PERBAIKAN 1: Cek sellingHariIni > 0 sebelum membagi
-            If sellingHariIni > 0 Then
-                row("Persentase_Selling_Revenue") = Convert.ToDecimal(revenueHariIni / sellingHariIni)
-            Else
-                row("Persentase_Selling_Revenue") = Convert.ToDecimal(0)
-            End If
+            ' Rasio Selling vs Revenue
+            row("Persentase_Selling_Revenue") = If(sellingHariIni > 0, revenueHariIni / sellingHariIni, 0)
 
             If sellingHariIni = 0 Then row("SELLING") = DBNull.Value
             If revenueHariIni = 0 Then row("REVENUE") = DBNull.Value
 
-            Dim mtdVal As Decimal = totalYesterdayCollection + totalTodayCollection
-            row("ActualCollectionMTD") = Convert.ToDecimal(mtdVal)
-
-            Dim currentAch As Decimal = 0
-            If nominalTarget > 0 Then
-                currentAch = Convert.ToDecimal(mtdVal / nominalTarget)
-            End If
+            ' Achievement & Gap
+            Dim currentAch As Decimal = If(nominalTarget > 0, runningTotalMTD / nominalTarget, 0)
             row("ActualAchievement") = currentAch
+            row("Gap_To_Target") = runningTotalMTD - nominalTarget
 
-            row("Gap_To_Target") = Convert.ToDecimal(mtdVal - nominalTarget)
+            ' Projection
+            Dim projeksiDesimal As Decimal = If(hariBerjalan > 0, (currentAch / CDec(hariBerjalan)) * CDec(totalHariKerja), 0)
+            row("Projection") = projeksiDesimal
 
-            ' PERBAIKAN 2: Cek hariBerjalan > 0 sebelum membagi Projection
-            Dim projeksiDesimal As Decimal = 0
-            If hariBerjalan > 0 Then
-                projeksiDesimal = (currentAch / Convert.ToDecimal(hariBerjalan)) * Convert.ToDecimal(totalHariKerja)
-            End If
-            row("Projection") = Convert.ToDecimal(projeksiDesimal)
-
-            ' PERBAIKAN 3: Hitung DailyNeeds
-            Dim sisaTarget As Decimal = nominalTarget - mtdVal
+            ' Daily Needs
+            Dim sisaTarget As Decimal = nominalTarget - runningTotalMTD
             If sisaTarget > 0 Then
-                If sisaHariKerja > 0 Then
-                    row("DailyNeeds") = Convert.ToDecimal(sisaTarget / Convert.ToDecimal(sisaHariKerja))
-                Else
-                    row("DailyNeeds") = Convert.ToDecimal(sisaTarget)
-                End If
+                row("DailyNeeds") = If(sisaHariKerja > 0, sisaTarget / CDec(sisaHariKerja), sisaTarget)
             Else
-                row("DailyNeeds") = Convert.ToDecimal(0)
+                row("DailyNeeds") = 0
             End If
         Next
 
         ' BUKA REPORT & RUN DESIGNER
         Dim report As New DevExpress.XtraReports.UI.XtraReport
-        report = XtraReport.FromFile(Application.StartupPath & "\reports\LaporanRevenueSelling.repx", True)
+        report = DevExpress.XtraReports.UI.XtraReport.FromFile(Application.StartupPath & "\reports\LaporanRevenueSelling.repx", True)
 
-        Dim bandHeader As ReportHeaderBand = CType(report.Bands(BandKind.ReportHeader), ReportHeaderBand)
+        Dim bandHeader As DevExpress.XtraReports.UI.ReportHeaderBand = CType(report.Bands(DevExpress.XtraReports.UI.BandKind.ReportHeader), DevExpress.XtraReports.UI.ReportHeaderBand)
         If bandHeader IsNot Nothing Then
             If bandHeader.Controls("lblPoli") IsNot Nothing Then bandHeader.Controls("lblPoli").Text = jenisPoli
             If bandHeader.Controls("lblPeriode") IsNot Nothing Then bandHeader.Controls("lblPeriode").Text = tglAwal.ToString("dd MMM yyyy") & " - " & tglAkhir.ToString("dd MMM yyyy")
@@ -694,57 +671,65 @@ Public Class FormRevenueSelling
 
     Private Sub ButtonKirimLaporan_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonKirimLaporan.Click
         Try
+            ' 1. Konfirmasi User
             Dim confirmResult As DialogResult = MessageBox.Show( _
-                "Apakah Anda yakin ingin mengirim data Selling Revenue periode ini?", _
+                "Apakah Anda yakin ingin mengirim data Selling Revenue dan Detail Pendapatan periode ini ke Server Web?", _
                 "Konfirmasi Pengiriman", _
                 MessageBoxButtons.YesNo, _
                 MessageBoxIcon.Question, _
                 MessageBoxDefaultButton.Button2)
 
-            If confirmResult = DialogResult.No Then
-                Exit Sub
-            End If
+            If confirmResult = DialogResult.No Then Exit Sub
 
+            ' 2. Persiapan Parameter Tanggal
             Dim tglAwal As Date = dtAwal.Value.Date
             Dim tglAkhir As Date = dtAkhir.Value.Date
 
             Dim strAwal As String = tglAwal.ToString("yyyy-MM-dd 00:00:00")
             Dim strAkhir As String = tglAkhir.ToString("yyyy-MM-dd 23:59:59")
 
+            ' Mapping Poli untuk Analisa Selling & Revenue
             Dim listPoli As New Dictionary(Of String, String)()
             listPoli.Add("POLI KECANTIKAN", "LMIE")
             listPoli.Add("POLI HBOT", "HBOT")
             listPoli.Add("POLI FISIOTERAPI", "FISIOTERAPI")
+            listPoli.Add("POLI REHABILITASI MEDIK", "RHBMDK")
+            listPoli.Add("POLI EYELASH & NAIL", "EYELASHNAIL")
 
+
+            ' 3. Inisialisasi UI Progress Bar
             Dim totalHari As Integer = (tglAkhir - tglAwal).Days + 1
-            Dim totalStep As Integer = listPoli.Count * totalHari
+            Dim totalStepAnalisa As Integer = listPoli.Count * totalHari
 
             ProgressBar1.Minimum = 0
-            ProgressBar1.Maximum = totalStep + 2
+            ProgressBar1.Maximum = totalStepAnalisa + 10
             ProgressBar1.Value = 0
             ProgressBar1.Visible = True
 
-            lblStatusProgress.Text = "Menyiapkan data laporan..."
+            ' =========================================================================
+            ' PROSES 1: PROSES & KIRIM ANALISA SELLING REVENUE
+            ' =========================================================================
+            lblStatusProgress.Text = "Menyiapkan data analisa Selling & Revenue..."
             lblStatusProgress.Visible = True
             Application.DoEvents()
 
-            Dim sbJson As New StringBuilder()
-            sbJson.Append("{")
-            sbJson.Append("""user"": """ & userInput & """,")
-            sbJson.Append("""laporan"": [")
+            Dim sbJsonAnalisa As New StringBuilder()
+            sbJsonAnalisa.Append("{")
+            sbJsonAnalisa.Append("""user"": """ & userInput & """,")
+            sbJsonAnalisa.Append("""laporan"": [")
 
-            Dim isFirstItem As Boolean = True
+            Dim isFirstItemAnalisa As Boolean = True
             Dim currentProgressVal As Integer = 0
 
             For Each kvp As KeyValuePair(Of String, String) In listPoli
                 Dim namaPoliDB As String = kvp.Key
                 Dim kodePoliAPI As String = kvp.Value
 
-                lblStatusProgress.Text = "Mengambil data " & namaPoliDB & "..."
+                lblStatusProgress.Text = "Mengambil data analisa " & namaPoliDB & "..."
                 Application.DoEvents()
 
                 ' Query Selling & Revenue Terbaru per Poli
-                Dim sqlQuery As String = String.Format( _
+                Dim sqlQueryAnalisa As String = String.Format( _
                     "SELECT " & _
                     "    ISNULL(S.Tgl, R.Tgl) AS Tgl, " & _
                     "    ISNULL(S.TotalSelling, 0) AS SELLING, " & _
@@ -788,7 +773,7 @@ Public Class FormRevenueSelling
                     ") R ON S.Tgl = R.Tgl " & _
                     "ORDER BY Tgl ASC", namaPoliDB, strAwal, strAkhir)
 
-                Dim dtPoli As DataTable = ReadSQL(sqlQuery)
+                Dim dtPoli As DataTable = ReadSQL(sqlQueryAnalisa)
 
                 Dim currentTgl As Date = tglAwal
                 While currentTgl <= tglAkhir
@@ -805,56 +790,259 @@ Public Class FormRevenueSelling
                         End If
                     End If
 
-                    If Not isFirstItem Then sbJson.Append(",")
+                    If Not isFirstItemAnalisa Then sbJsonAnalisa.Append(",")
 
-                    sbJson.Append("{")
-                    sbJson.Append("""tanggal"": """ & strTglCurrent & """,")
-                    sbJson.Append("""kode_poli"": """ & kodePoliAPI & """,")
-                    sbJson.Append("""selling"": " & sellingVal.ToString(System.Globalization.CultureInfo.InvariantCulture) & ",")
-                    sbJson.Append("""revenue"": " & revenueVal.ToString(System.Globalization.CultureInfo.InvariantCulture) & "")
-                    sbJson.Append("}")
+                    sbJsonAnalisa.Append("{")
+                    sbJsonAnalisa.Append("""tanggal"": """ & strTglCurrent & """,")
+                    sbJsonAnalisa.Append("""kode_poli"": """ & kodePoliAPI & """,")
+                    sbJsonAnalisa.Append("""selling"": " & sellingVal.ToString(System.Globalization.CultureInfo.InvariantCulture) & ",")
+                    sbJsonAnalisa.Append("""revenue"": " & revenueVal.ToString(System.Globalization.CultureInfo.InvariantCulture) & "")
+                    sbJsonAnalisa.Append("}")
 
-                    isFirstItem = False
+                    isFirstItemAnalisa = False
                     currentTgl = currentTgl.AddDays(1)
 
                     currentProgressVal += 1
-                    If currentProgressVal <= ProgressBar1.Maximum Then
-                        ProgressBar1.Value = currentProgressVal
-                    End If
+                    If currentProgressVal <= ProgressBar1.Maximum Then ProgressBar1.Value = currentProgressVal
                     Application.DoEvents()
                 End While
             Next
 
-            sbJson.Append("]")
-            sbJson.Append("}")
+            sbJsonAnalisa.Append("]")
+            sbJsonAnalisa.Append("}")
 
-            lblStatusProgress.Text = "Menghubungkan ke API Server..."
-            ProgressBar1.Value = ProgressBar1.Maximum - 1
+            ' =========================================================================
+            ' PROSES 2: QUERY DETAIL LAPORAN PENDAPATAN (UNTUK sp_InsertPendapatan)
+            ' =========================================================================
+            lblStatusProgress.Text = "Mengambil data detail transaksi pendapatan..."
             Application.DoEvents()
 
-            Dim jsonPayload As String = sbJson.ToString()
+            ' Menambahkan TPD.TransPoliIDDetail ke SELECT Query
+            Dim sqlQueryPendapatan As String = String.Format( _
+                "SELECT " & _
+                "    TD.JenisPoli AS [NamaPoli], " & _
+                "    TD.NoUrut AS [NoTransaksi], " & _
+                "    TPD.TransPoliIDDetail AS [TransPoliIDDetail], " & _
+                "    TD.TanggalTransaksi AS [TanggalKunjungan], " & _
+                "    MP.Nama AS [NamaPasien], " & _
+                "    TPD.NamaTindakan AS [NamaTindakan], " & _
+                "    ISNULL(STUFF(( " & _
+                "        SELECT DISTINCT ' + ' + PB.JenisBayar + " & _
+                "               CASE WHEN ISNULL(PB.mesin,'') <> '' OR ISNULL(PB.kartu,'') <> '' " & _
+                "                    THEN ' (' + NULLIF(PB.mesin,'') + CASE WHEN ISNULL(PB.mesin,'') <> '' AND ISNULL(PB.kartu,'') <> '' THEN ' - ' ELSE '' END + NULLIF(PB.kartu,'') + ')' " & _
+                "                    ELSE '' END " & _
+                "        FROM ( " & _
+                "            SELECT TransPoliID, JenisBayar, mesin, kartu FROM TransaksiPoliBayar WHERE ISNULL(JumlahBayar, 0) > 0 AND ISNULL(TPD.PaketID, '0') = '0' " & _
+                "            UNION ALL " & _
+                "            SELECT TransPoliID, CASE WHEN UPPER(JenisBayar) = 'VOUCHER' THEN 'PENGGUNAAN PAKET' ELSE JenisBayar END AS JenisBayar, mesin, kartu FROM TransaksiPoliBayarAwal WHERE ISNULL(JumlahBayar, 0) > 0 AND ISNULL(TPD.PaketID, '0') <> '0' AND TPD.JenisTindakan = 'Tindakan' " & _
+                "        ) PB " & _
+                "        WHERE PB.TransPoliID = TPD.TransPoliID " & _
+                "        FOR XML PATH('') " & _
+                "    ), 1, 3, ''), '-') AS [JenisBayar], " & _
+                "    TPD.BiayaTindakan AS [HargaRil], " & _
+                "    TPD.DiscTindakan AS [Diskon], " & _
+                "    CASE WHEN ISNULL(TPD.BiayaTindakan, 0) > 0 THEN (TPD.DiscTindakan / TPD.BiayaTindakan) * 100 ELSE 0 END AS [PctDiskon], " & _
+                "    TPD.NettBayar AS [Pembayaran], " & _
+                "    (TPD.NettBayar * ISNULL((SELECT TOP 1 CASE " & _
+                "        WHEN UPPER(PB.kartu) LIKE '%QRIS%' OR UPPER(PB.JenisBayar) LIKE '%QRIS%' THEN 0.7 " & _
+                "        WHEN UPPER(PB.mesin) LIKE '%MANDIRI%' THEN " & _
+                "            CASE WHEN UPPER(PB.JenisBayar) LIKE '%DEBET%' OR UPPER(PB.JenisBayar) LIKE '%DEBIT%' THEN CASE WHEN UPPER(PB.kartu) LIKE '%MANDIRI%' THEN 0.15 ELSE 1.0 END " & _
+                "                 WHEN UPPER(PB.JenisBayar) LIKE '%CARD%' OR UPPER(PB.JenisBayar) LIKE '%CREDIT%' OR UPPER(PB.JenisBayar) LIKE '%KREDIT%' THEN 1.5 ELSE 0 END " & _
+                "        WHEN UPPER(PB.mesin) LIKE '%BCA%' THEN " & _
+                "            CASE WHEN UPPER(PB.JenisBayar) LIKE '%DEBET%' OR UPPER(PB.JenisBayar) LIKE '%DEBIT%' THEN CASE WHEN UPPER(PB.kartu) LIKE '%BCA%' THEN 0.15 ELSE 1.0 END " & _
+                "                 WHEN UPPER(PB.JenisBayar) LIKE '%CARD%' OR UPPER(PB.JenisBayar) LIKE '%CREDIT%' OR UPPER(PB.JenisBayar) LIKE '%KREDIT%' THEN CASE WHEN UPPER(PB.kartu) LIKE '%BCA%' THEN 1.5 ELSE 2.0 END ELSE 0 END " & _
+                "        ELSE CASE WHEN UPPER(PB.JenisBayar) LIKE '%DEBET%' OR UPPER(PB.JenisBayar) LIKE '%DEBIT%' THEN 1.0 " & _
+                "                  WHEN UPPER(PB.JenisBayar) LIKE '%CARD%' OR UPPER(PB.JenisBayar) LIKE '%CREDIT%' OR UPPER(PB.JenisBayar) LIKE '%KREDIT%' THEN 2.0 ELSE 0 END " & _
+                "    END FROM TransaksiPoliBayar PB WHERE PB.TransPoliID = TPD.TransPoliID AND ISNULL(PB.JumlahBayar, 0) > 0 AND ISNULL(TPD.PaketID, '0') = '0'), 0)) / 100.0 AS [FeeAdminBank], " & _
+                "    MA.NamaAlat, " & _
+                "    ISNULL(LPA.ShootDipakai * LPA.HargaBeli, 0) AS [BHPAlat], " & _
+                "    CASE WHEN ISNULL(TPD.NettBayar, 0) > 0 THEN (ISNULL(LPA.ShootDipakai * LPA.HargaBeli, 0) / TPD.NettBayar) * 100 ELSE 0 END AS [PctBHPAlat], " & _
+                "    TPD.TotalBayarBHP AS [BHPApotek], " & _
+                "    CASE WHEN ISNULL(TPD.NettBayar, 0) > 0 THEN (ISNULL(TPD.TotalBayarBHP, 0) / TPD.NettBayar) * 100 ELSE 0 END AS [PctBHPApotek], " & _
+                "    CASE WHEN ISNULL(TPD.ClosedFeeDokter, 0) = 1 THEN ISNULL(TPD.FeeDokter, 0) ELSE 0 END AS [FeeDokter], " & _
+                "    CASE WHEN ISNULL(TPD.NettBayar, 0) > 0 THEN (CASE WHEN ISNULL(TPD.ClosedFeeDokter, 0) = 1 THEN ISNULL(TPD.FeeDokter, 0) ELSE 0 END / TPD.NettBayar) * 100 ELSE 0 END AS [PctFeeDokter], " & _
+                "    CASE WHEN ISNULL(TPD.ClosedFeePerawat, 0) = 1 THEN ISNULL(TPD.FeePerawat, 0) ELSE 0 END AS [FeePerawat], " & _
+                "    CASE WHEN ISNULL(TPD.NettBayar, 0) > 0 THEN (CASE WHEN ISNULL(TPD.ClosedFeePerawat, 0) = 1 THEN ISNULL(TPD.FeePerawat, 0) ELSE 0 END / TPD.NettBayar) * 100 ELSE 0 END AS [PctFeePerawat], " & _
+                "    0 AS [BiayaOverhead], " & _
+                "    0 AS [PctOverhead], " & _
+                "    (TPD.NettBayar - ( " & _
+                "        (TPD.NettBayar * ISNULL((SELECT TOP 1 CASE WHEN UPPER(PB.kartu) LIKE '%QRIS%' OR UPPER(PB.JenisBayar) LIKE '%QRIS%' THEN 0.7 WHEN UPPER(PB.mesin) LIKE '%MANDIRI%' THEN CASE WHEN UPPER(PB.JenisBayar) LIKE '%DEBET%' OR UPPER(PB.JenisBayar) LIKE '%DEBIT%' THEN CASE WHEN UPPER(PB.kartu) LIKE '%MANDIRI%' THEN 0.15 ELSE 1.0 END WHEN UPPER(PB.JenisBayar) LIKE '%CARD%' OR UPPER(PB.JenisBayar) LIKE '%CREDIT%' OR UPPER(PB.JenisBayar) LIKE '%KREDIT%' THEN 1.5 ELSE 0 END WHEN UPPER(PB.mesin) LIKE '%BCA%' THEN CASE WHEN UPPER(PB.JenisBayar) LIKE '%DEBET%' OR UPPER(PB.JenisBayar) LIKE '%DEBIT%' THEN CASE WHEN UPPER(PB.kartu) LIKE '%BCA%' THEN 0.15 ELSE 1.0 END WHEN UPPER(PB.JenisBayar) LIKE '%CARD%' OR UPPER(PB.JenisBayar) LIKE '%CREDIT%' OR UPPER(PB.JenisBayar) LIKE '%KREDIT%' THEN CASE WHEN UPPER(PB.kartu) LIKE '%BCA%' THEN 1.5 ELSE 2.0 END ELSE 0 END ELSE CASE WHEN UPPER(PB.JenisBayar) LIKE '%DEBET%' OR UPPER(PB.JenisBayar) LIKE '%DEBIT%' THEN 1.0 WHEN UPPER(PB.JenisBayar) LIKE '%CARD%' OR UPPER(PB.JenisBayar) LIKE '%CREDIT%' OR UPPER(PB.JenisBayar) LIKE '%KREDIT%' THEN 2.0 ELSE 0 END END FROM TransaksiPoliBayar PB WHERE PB.TransPoliID = TPD.TransPoliID AND ISNULL(PB.JumlahBayar, 0) > 0 AND ISNULL(TPD.PaketID, '0') = '0'), 0)) / 100.0 " & _
+                "        + ISNULL(LPA.ShootDipakai * LPA.HargaBeli, 0) " & _
+                "        + ISNULL(TPD.TotalBayarBHP, 0) " & _
+                "        + CASE WHEN ISNULL(TPD.ClosedFeeDokter, 0) = 1 THEN ISNULL(TPD.FeeDokter, 0) ELSE 0 END " & _
+                "        + CASE WHEN ISNULL(TPD.ClosedFeePerawat, 0) = 1 THEN ISNULL(TPD.FeePerawat, 0) ELSE 0 END " & _
+                "    )) AS [PendapatanBersih], " & _
+                "    CASE WHEN ISNULL(TPD.NettBayar, 0) > 0 THEN ((TPD.NettBayar - ((TPD.NettBayar * ISNULL((SELECT TOP 1 CASE WHEN UPPER(PB.kartu) LIKE '%QRIS%' OR UPPER(PB.JenisBayar) LIKE '%QRIS%' THEN 0.7 WHEN UPPER(PB.mesin) LIKE '%MANDIRI%' THEN CASE WHEN UPPER(PB.JenisBayar) LIKE '%DEBET%' OR UPPER(PB.JenisBayar) LIKE '%DEBIT%' THEN CASE WHEN UPPER(PB.kartu) LIKE '%MANDIRI%' THEN 0.15 ELSE 1.0 END WHEN UPPER(PB.JenisBayar) LIKE '%CARD%' OR UPPER(PB.JenisBayar) LIKE '%CREDIT%' OR UPPER(PB.JenisBayar) LIKE '%KREDIT%' THEN 1.5 ELSE 0 END WHEN UPPER(PB.mesin) LIKE '%BCA%' THEN CASE WHEN UPPER(PB.JenisBayar) LIKE '%DEBET%' OR UPPER(PB.JenisBayar) LIKE '%DEBIT%' THEN CASE WHEN UPPER(PB.kartu) LIKE '%BCA%' THEN 0.15 ELSE 1.0 END WHEN UPPER(PB.JenisBayar) LIKE '%CARD%' OR UPPER(PB.JenisBayar) LIKE '%CREDIT%' OR UPPER(PB.JenisBayar) LIKE '%KREDIT%' THEN CASE WHEN UPPER(PB.kartu) LIKE '%BCA%' THEN 1.5 ELSE 2.0 END ELSE 0 END ELSE CASE WHEN UPPER(PB.JenisBayar) LIKE '%DEBET%' OR UPPER(PB.JenisBayar) LIKE '%DEBIT%' THEN 1.0 WHEN UPPER(PB.JenisBayar) LIKE '%CARD%' OR UPPER(PB.JenisBayar) LIKE '%CREDIT%' OR UPPER(PB.JenisBayar) LIKE '%KREDIT%' THEN 2.0 ELSE 0 END END FROM TransaksiPoliBayar PB WHERE PB.TransPoliID = TPD.TransPoliID AND ISNULL(PB.JumlahBayar, 0) > 0 AND ISNULL(TPD.PaketID, '0') = '0'), 0)) / 100.0 + ISNULL(LPA.ShootDipakai * LPA.HargaBeli, 0) + ISNULL(TPD.TotalBayarBHP, 0) + CASE WHEN ISNULL(TPD.ClosedFeeDokter, 0) = 1 THEN ISNULL(TPD.FeeDokter, 0) ELSE 0 END + CASE WHEN ISNULL(TPD.ClosedFeePerawat, 0) = 1 THEN ISNULL(TPD.FeePerawat, 0) ELSE 0 END)) / TPD.NettBayar) * 100 ELSE 0 END AS [PctPendapatanBersih] " & _
+                "FROM TransaksiDetail TD " & _
+                "INNER JOIN MasterPasien MP ON TD.IDInternet = MP.NoRekamMedis " & _
+                "INNER JOIN TransaksiPoliDetail TPD ON TD.NoTransaksi = TPD.TransPoliID " & _
+                "LEFT JOIN LogPemakaianAlat LPA ON TPD.TransPoliIDDetail = LPA.TransaksiDetailID " & _
+                "LEFT JOIN MasterAlat MA ON LPA.AlatID = MA.AlatID " & _
+                "LEFT JOIN TransaksiCancel TC ON TD.NoUrut = TC.NoUrut " & _
+                "WHERE TPD.DeletedBy IS NULL " & _
+                "  AND TD.DeletedBy IS NULL " & _
+                "  AND TC.NoUrut IS NULL " & _
+                "  AND TPD.JenisTindakan = 'Tindakan' " & _
+                "  AND TPD.StatusPembayaran = 'PAID' " & _
+                "  AND TD.TanggalTransaksi BETWEEN '{0}' AND '{1}' " & _
+                "ORDER BY TD.TanggalTransaksi ASC", strAwal, strAkhir)
+
+            Dim dtPendapatan As DataTable = ReadSQL(sqlQueryPendapatan)
+
+            ' Menyusun JSON Batch Detail Pendapatan
+            Dim sbJsonPendapatan As New StringBuilder()
+            sbJsonPendapatan.Append("{")
+            sbJsonPendapatan.Append("""user"": """ & userInput & """,")
+            sbJsonPendapatan.Append("""laporan"": [")
+
+            Dim isFirstItemPendapatan As Boolean = True
+
+            If dtPendapatan IsNot Nothing AndAlso dtPendapatan.Rows.Count > 0 Then
+                For Each row As DataRow In dtPendapatan.Rows
+                    Dim tglKunjungan As Date = CDate(row("TanggalKunjungan"))
+                    Dim strTglKunjungan As String = tglKunjungan.ToString("yyyy-MM-dd")
+
+                    Dim namaPoli As String = row("NamaPoli").ToString().Trim()
+                    Dim noTrans As String = row("NoTransaksi").ToString().Trim()
+                    Dim transPoliIDDetail As String = row("TransPoliIDDetail").ToString().Trim() ' <--- AMBIL NILAI BARU
+                    Dim namaPasien As String = row("NamaPasien").ToString().Trim()
+                    Dim namaTindakan As String = row("NamaTindakan").ToString().Trim()
+                    Dim jenisBayar As String = row("JenisBayar").ToString().Trim()
+
+                    ' === MAPPING KODE CABANG KONSISTEN BERSADARKAN JENIS POLI ===
+                    Dim kodeCabang As String = ""
+                    Select Case namaPoli.Trim().ToUpper()
+                        Case "POLI KECANTIKAN"
+                            kodeCabang = "LMIE"
+                        Case "POLI HBOT"
+                            kodeCabang = "HBOT"
+                        Case "POLI FISIOTERAPI"
+                            kodeCabang = "FISIOTERAPI"
+                        Case "POLI REHABILITASI MEDIK"
+                            kodeCabang = "RHBMDK"
+                        Case "POLI EYELASH & NAIL"
+                            kodeCabang = "EYELASHNAIL"
+                        Case Else
+                            kodeCabang = namaPoli.Trim()
+                    End Select
+
+                    ' Nilai Nominal & Persentase
+                    Dim hargaRil As Decimal = If(IsDBNull(row("HargaRil")), 0, CDec(row("HargaRil")))
+                    Dim diskonNominal As Decimal = If(IsDBNull(row("Diskon")), 0, CDec(row("Diskon")))
+                    Dim diskonPersen As Decimal = If(IsDBNull(row("PctDiskon")), 0, CDec(row("PctDiskon")))
+                    Dim pembayaran As Decimal = If(IsDBNull(row("Pembayaran")), 0, CDec(row("Pembayaran")))
+
+                    Dim namaAlat As String = If(IsDBNull(row("NamaAlat")), "", row("NamaAlat").ToString().Trim())
+
+                    Dim bhpAlatNominal As Decimal = If(IsDBNull(row("BHPAlat")), 0, CDec(row("BHPAlat")))
+                    Dim bhpAlatPersen As Decimal = If(IsDBNull(row("PctBHPAlat")), 0, CDec(row("PctBHPAlat")))
+                    Dim bhPApotekNominal As Decimal = If(IsDBNull(row("BHPApotek")), 0, CDec(row("BHPApotek")))
+                    Dim bhPApotekPersen As Decimal = If(IsDBNull(row("PctBHPApotek")), 0, CDec(row("PctBHPApotek")))
+
+                    Dim feeDokterNominal As Decimal = If(IsDBNull(row("FeeDokter")), 0, CDec(row("FeeDokter")))
+                    Dim feeDokterPersen As Decimal = If(IsDBNull(row("PctFeeDokter")), 0, CDec(row("PctFeeDokter")))
+                    Dim feePerawatNominal As Decimal = If(IsDBNull(row("FeePerawat")), 0, CDec(row("FeePerawat")))
+                    Dim feePerawatPersen As Decimal = If(IsDBNull(row("PctFeePerawat")), 0, CDec(row("PctFeePerawat")))
+
+                    Dim feeAdminBank As Decimal = If(IsDBNull(row("FeeAdminBank")), 0, CDec(row("FeeAdminBank")))
+                    Dim overheadNominal As Decimal = If(IsDBNull(row("BiayaOverhead")), 0, CDec(row("BiayaOverhead")))
+                    Dim overheadPersen As Decimal = If(IsDBNull(row("PctOverhead")), 0, CDec(row("PctOverhead")))
+
+                    Dim pendapatanBersihNominal As Decimal = If(IsDBNull(row("PendapatanBersih")), 0, CDec(row("PendapatanBersih")))
+                    Dim pendapatanBersihPersen As Decimal = If(IsDBNull(row("PctPendapatanBersih")), 0, CDec(row("PctPendapatanBersih")))
+
+                    If Not isFirstItemPendapatan Then sbJsonPendapatan.Append(",")
+
+                    sbJsonPendapatan.Append("{")
+                    sbJsonPendapatan.Append("""cabang"": """ & kodeCabang & """,")
+                    sbJsonPendapatan.Append("""no_trans"": """ & noTrans & """,")
+                    ' === PARAMETER BARU DISISIPKAN TEPAT SETELAH no_trans ===
+                    sbJsonPendapatan.Append("""transpoli_id_detail"": """ & transPoliIDDetail & """,")
+                    sbJsonPendapatan.Append("""tgl_kunjungan"": """ & strTglKunjungan & """,")
+                    sbJsonPendapatan.Append("""nama_poli"": """ & namaPoli & """,")
+                    sbJsonPendapatan.Append("""nama_pasien"": """ & namaPasien.Replace("""", "\""") & """,")
+                    sbJsonPendapatan.Append("""tindakan"": """ & namaTindakan.Replace("""", "\""") & """,")
+                    sbJsonPendapatan.Append("""metode_bayar"": """ & jenisBayar.Replace("""", "\""") & """,")
+                    sbJsonPendapatan.Append("""harga_ril"": " & hargaRil.ToString(System.Globalization.CultureInfo.InvariantCulture) & ",")
+                    sbJsonPendapatan.Append("""diskon_nominal"": " & diskonNominal.ToString(System.Globalization.CultureInfo.InvariantCulture) & ",")
+                    sbJsonPendapatan.Append("""diskon_persentase"": " & diskonPersen.ToString(System.Globalization.CultureInfo.InvariantCulture) & ",")
+                    sbJsonPendapatan.Append("""pembayaran"": " & pembayaran.ToString(System.Globalization.CultureInfo.InvariantCulture) & ",")
+
+                    If String.IsNullOrEmpty(namaAlat) Then
+                        sbJsonPendapatan.Append("""alat"": null,")
+                    Else
+                        sbJsonPendapatan.Append("""alat"": """ & namaAlat.Replace("""", "\""") & """,")
+                    End If
+
+                    sbJsonPendapatan.Append("""bhp_alat_nominal"": " & bhpAlatNominal.ToString(System.Globalization.CultureInfo.InvariantCulture) & ",")
+                    sbJsonPendapatan.Append("""bhp_alat_persentase"": " & bhpAlatPersen.ToString(System.Globalization.CultureInfo.InvariantCulture) & ",")
+                    sbJsonPendapatan.Append("""bhp_apotek_nominal"": " & bhPApotekNominal.ToString(System.Globalization.CultureInfo.InvariantCulture) & ",")
+                    sbJsonPendapatan.Append("""bhp_apotek_persentase"": " & bhPApotekPersen.ToString(System.Globalization.CultureInfo.InvariantCulture) & ",")
+                    sbJsonPendapatan.Append("""fee_dokter_nominal"": " & feeDokterNominal.ToString(System.Globalization.CultureInfo.InvariantCulture) & ",")
+                    sbJsonPendapatan.Append("""fee_dokter_persentase"": " & feeDokterPersen.ToString(System.Globalization.CultureInfo.InvariantCulture) & ",")
+                    sbJsonPendapatan.Append("""fee_perawat_nominal"": " & feePerawatNominal.ToString(System.Globalization.CultureInfo.InvariantCulture) & ",")
+                    sbJsonPendapatan.Append("""fee_perawat_persentase"": " & feePerawatPersen.ToString(System.Globalization.CultureInfo.InvariantCulture) & ",")
+                    sbJsonPendapatan.Append("""fee_admin"": " & feeAdminBank.ToString(System.Globalization.CultureInfo.InvariantCulture) & ",")
+                    sbJsonPendapatan.Append("""biaya_overhead_nominal"": " & overheadNominal.ToString(System.Globalization.CultureInfo.InvariantCulture) & ",")
+                    sbJsonPendapatan.Append("""biaya_overhead_persentase"": " & overheadPersen.ToString(System.Globalization.CultureInfo.InvariantCulture) & ",")
+                    sbJsonPendapatan.Append("""pendapatan_bersih_nominal"": " & pendapatanBersihNominal.ToString(System.Globalization.CultureInfo.InvariantCulture) & ",")
+                    sbJsonPendapatan.Append("""pendapatan_bersih_persentase"": " & pendapatanBersihPersen.ToString(System.Globalization.CultureInfo.InvariantCulture) & "")
+                    sbJsonPendapatan.Append("}")
+
+                    isFirstItemPendapatan = False
+                Next
+            End If
+
+            sbJsonPendapatan.Append("]")
+            sbJsonPendapatan.Append("}")
+
+            ' =========================================================================
+            ' PROSES 3: EKSEKUSI PENGIRIMAN KE DUA ENDPOINT API LARAVEL
+            ' =========================================================================
             Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
-
             If Not baseURL.EndsWith("/") Then baseURL &= "/"
-            Dim apiUrl As String = baseURL & "api/analisa/insert-batch"
 
-            lblStatusProgress.Text = "Mengirim data ke server..."
+            ' 1. Kirim API Analisa Selling Revenue
+            lblStatusProgress.Text = "Mengirim data Analisa Selling Revenue..."
             Application.DoEvents()
 
-            Dim responseApi As String = InsertDataAPIRMOld(jsonPayload, apiUrl)
+            Dim apiUrlAnalisa As String = baseURL & "api/analisa/insert-batch"
+            Dim responseApiAnalisa As String = InsertDataAPIRMOld(sbJsonAnalisa.ToString(), apiUrlAnalisa)
+
+            ' 2. Kirim API Detail Pendapatan
+            lblStatusProgress.Text = "Mengirim data Detail Pendapatan Transaksi..."
+            Application.DoEvents()
+
+            Dim apiUrlPendapatan As String = baseURL & "api/pendapatan/insert-batch"
+            Dim responseApiPendapatan As String = InsertDataAPIRMOld(sbJsonPendapatan.ToString(), apiUrlPendapatan)
 
             ProgressBar1.Value = ProgressBar1.Maximum
             lblStatusProgress.Text = "Selesai!"
             Application.DoEvents()
 
-            If responseApi.ToLower().Contains("""success"":true") OrElse responseApi.ToLower().Contains("""status"":""success""") Then
-                MessageBox.Show("Berhasil mengirim data laporan harian untuk SELURUH POLI (Kecantikan, HBOT, Fisio) periode " & tglAwal.ToString("dd/MM/yyyy") & " s/d " & tglAkhir.ToString("dd/MM/yyyy") & "!", "Sukses Batch API", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            ' =========================================================================
+            ' PROSES 4: EVALUASI HASIL RESPONSE SERVER
+            ' =========================================================================
+            Dim isSuccessAnalisa As Boolean = responseApiAnalisa.ToLower().Contains("""success"":true") OrElse responseApiAnalisa.ToLower().Contains("""status"":""success""")
+            Dim isSuccessPendapatan As Boolean = responseApiPendapatan.ToLower().Contains("""success"":true") OrElse responseApiPendapatan.ToLower().Contains("""status"":""success""")
+
+            If isSuccessAnalisa AndAlso isSuccessPendapatan Then
+                MessageBox.Show("Berhasil mengirim data Analisa Selling Revenue & " & dtPendapatan.Rows.Count & " data Detail Pendapatan ke Server!", "Sukses Batch API", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Else
-                MessageBox.Show("Gagal mengirim data. Response Server:" & vbCrLf & responseApi, "Gagal Kirim API", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                Dim msgError As String = "Pengiriman selesai dengan catatan:" & vbCrLf
+                msgError &= "1. Status Analisa API: " & If(isSuccessAnalisa, "SUKSES", "GAGAL -> " & responseApiAnalisa) & vbCrLf
+                msgError &= "2. Status Pendapatan API: " & If(isSuccessPendapatan, "SUKSES", "GAGAL -> " & responseApiPendapatan)
+
+                MessageBox.Show(msgError, "Hasil Pengiriman API", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             End If
 
         Catch ex As Exception
-            MessageBox.Show("Terjadi kesalahan saat pengiriman otomatis seluruh poli: " & ex.Message, "Error Application", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            MessageBox.Show("Terjadi kesalahan saat pengiriman otomatis ke server: " & ex.Message, "Error Application", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        Finally
+            ' Reset & Sembunyikan UI Progress
+            ProgressBar1.Visible = False
+            lblStatusProgress.Visible = False
+            lblStatusProgress.Text = ""
         End Try
     End Sub
 End Class

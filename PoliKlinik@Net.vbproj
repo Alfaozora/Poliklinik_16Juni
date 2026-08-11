@@ -455,6 +455,7 @@
     <Compile Include="Poli\UploadPasienMCU.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Prototype\CheckinModels.vb" />
     <Compile Include="Prototype\Dashboard.Designer.vb">
       <DependentUpon>Dashboard.vb</DependentUpon>
     </Compile>
@@ -567,6 +568,12 @@
       <DependentUpon>FormMasterPasien.vb</DependentUpon>
     </Compile>
     <Compile Include="Prototype\FormMasterPasien.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Prototype\FormPasienBooking.Designer.vb">
+      <DependentUpon>FormPasienBooking.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormPasienBooking.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Prototype\FormPembayaran.Designer.vb">
@@ -1604,6 +1611,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormMasterPasien.resx">
       <DependentUpon>FormMasterPasien.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormPasienBooking.resx">
+      <DependentUpon>FormPasienBooking.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormPembayaran.resx">
       <DependentUpon>FormPembayaran.vb</DependentUpon>

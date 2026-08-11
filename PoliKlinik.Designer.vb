@@ -70,6 +70,7 @@ Partial Class PoliKlinik
         Me.ReservasiDanReminderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.PersetujuanPenerimaanBarangToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.AdjustmentAlatToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.BridgingPOSWebToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.LabToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.TransaksiLabToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
         Me.PenggunaanStockToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -280,7 +281,6 @@ Partial Class PoliKlinik
         Me.TimerShutdown = New System.Windows.Forms.Timer(Me.components)
         Me.TimerKirimReminderWA = New System.Windows.Forms.Timer(Me.components)
         Me.TimerBirthday = New System.Windows.Forms.Timer(Me.components)
-        Me.BridgingPOSWebToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip.SuspendLayout()
         Me.StatusStrip.SuspendLayout()
         Me.SuspendLayout()
@@ -616,6 +616,13 @@ Partial Class PoliKlinik
         Me.AdjustmentAlatToolStripMenuItem.Size = New System.Drawing.Size(263, 22)
         Me.AdjustmentAlatToolStripMenuItem.Tag = "0313"
         Me.AdjustmentAlatToolStripMenuItem.Text = "Adjustment Alat"
+        '
+        'BridgingPOSWebToolStripMenuItem
+        '
+        Me.BridgingPOSWebToolStripMenuItem.Name = "BridgingPOSWebToolStripMenuItem"
+        Me.BridgingPOSWebToolStripMenuItem.Size = New System.Drawing.Size(263, 22)
+        Me.BridgingPOSWebToolStripMenuItem.Tag = "0314"
+        Me.BridgingPOSWebToolStripMenuItem.Text = "Bridging POS Web"
         '
         'LabToolStripMenuItem
         '
@@ -1245,6 +1252,7 @@ Partial Class PoliKlinik
         Me.KeuanganToolStripMenuItem1.Font = New System.Drawing.Font("Arial", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.KeuanganToolStripMenuItem1.Name = "KeuanganToolStripMenuItem1"
         Me.KeuanganToolStripMenuItem1.Size = New System.Drawing.Size(78, 20)
+        Me.KeuanganToolStripMenuItem1.Tag = "10"
         Me.KeuanganToolStripMenuItem1.Text = "Keuangan"
         '
         'RekapTagihanToolStripMenuItem
@@ -1289,12 +1297,14 @@ Partial Class PoliKlinik
         Me.UploadKeuanganToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.TagihanApotekToolStripMenuItem, Me.PinjamanKaryawanToolStripMenuItem})
         Me.UploadKeuanganToolStripMenuItem.Name = "UploadKeuanganToolStripMenuItem"
         Me.UploadKeuanganToolStripMenuItem.Size = New System.Drawing.Size(311, 22)
+        Me.UploadKeuanganToolStripMenuItem.Tag = "1003"
         Me.UploadKeuanganToolStripMenuItem.Text = "Upload Ke Program Keuangan (Website)"
         '
         'TagihanApotekToolStripMenuItem
         '
         Me.TagihanApotekToolStripMenuItem.Name = "TagihanApotekToolStripMenuItem"
         Me.TagihanApotekToolStripMenuItem.Size = New System.Drawing.Size(191, 22)
+        Me.TagihanApotekToolStripMenuItem.Tag = "100301"
         Me.TagihanApotekToolStripMenuItem.Text = "Tagihan Apotek"
         '
         'PinjamanKaryawanToolStripMenuItem
@@ -2055,13 +2065,6 @@ Partial Class PoliKlinik
         'TimerBirthday
         '
         Me.TimerBirthday.Interval = 300000
-        '
-        'BridgingPOSWebToolStripMenuItem
-        '
-        Me.BridgingPOSWebToolStripMenuItem.Name = "BridgingPOSWebToolStripMenuItem"
-        Me.BridgingPOSWebToolStripMenuItem.Size = New System.Drawing.Size(263, 22)
-        Me.BridgingPOSWebToolStripMenuItem.Tag = "0314"
-        Me.BridgingPOSWebToolStripMenuItem.Text = "Bridging POS Web"
         '
         'PoliKlinik
         '

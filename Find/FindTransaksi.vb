@@ -361,4 +361,9 @@ Public Class FindTransaksi
             row.Visible = matchFound
         Next
     End Sub
+
+    Private Sub ButtonCariPasienBooking_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCariPasienBooking.Click
+        FormPasienBooking.Show()
+        FormPasienBooking.Focus()
+    End Sub
 End Class

@@ -44,8 +44,8 @@ Public Class FormLaporanRiwayatAlat
         End If
 
         Dim alatID As String = TextBoxAlatId.Text.Trim()
-        Dim tglAwal As Date = dtAwal.Value
-        Dim tglAkhir As Date = dtAkhir.Value
+        Dim tglAwal As Date = dtAwal.Value.Date
+        Dim tglAkhir As Date = dtAkhir.Value.Date.AddDays(1).AddSeconds(-1)
         Dim namaAlat As String = TextBoxNamaAlat.Text
         Dim stringTglTransaksiAwal As String = tglAwal.Day & " " & BulanIndonesia(tglAwal.Month) & " " & tglAwal.Year
         Dim stringTglTransaksiAkhir As String = tglAkhir.Day & " " & BulanIndonesia(tglAkhir.Month) & " " & tglAkhir.Year
