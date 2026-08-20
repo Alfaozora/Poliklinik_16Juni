@@ -300,112 +300,115 @@ Public Class FormRevenueSelling
         Dim strAwal As String = tglAwal.ToString("yyyy-MM-dd 00:00:00")
         Dim strAkhir As String = tglAkhir.AddDays(1).ToString("yyyy-MM-dd 00:00:00")
 
-        Dim sqlSellingRevenue As String = String.Format( _
-                    "SELECT " & _
-                    "    ISNULL(S.Tgl, R.Tgl) AS Tgl, " & _
-                    "    ISNULL(S.TotalSelling, 0) AS SELLING, " & _
-                    "    ISNULL(R.TotalRevenue, 0) AS REVENUE " & _
-                    "FROM ( " & _
-                    "    SELECT Tgl, SUM(TotalHarga) AS TotalSelling " & _
-                    "    FROM ( " & _
-                    "        SELECT CAST(TPT.CreatedDate AS DATE) AS Tgl, TPT.HargaNett AS TotalHarga " & _
-                    "        FROM TransaksiPaketTindakan TPT " & _
-                    "        INNER JOIN TransaksiDetail TD ON TPT.NoTransaksi = TD.NoUrut " & _
-                    "        WHERE TPT.DeletedDate IS NULL AND TD.JenisPoli = '{0}' AND TD.DeletedBy IS NULL AND TPT.CreatedDate BETWEEN '{1}' AND '{2}' " & _
-                    "        UNION ALL " & _
-                    "        SELECT CAST(TPD.CreatedDate AS DATE) AS Tgl, TPD.NettBayar AS TotalHarga " & _
-                    "        FROM TransaksiPoliDetail TPD " & _
-                    "        INNER JOIN TransaksiPoli TP ON TPD.TransPoliID = TP.TransPoliID " & _
-                    "        INNER JOIN TransaksiDetail TD ON TP.NoUrut = TD.NoUrut " & _
-                    "        WHERE TPD.DeletedDate IS NULL AND TD.JenisPoli = '{0}' AND TD.DeletedBy IS NULL AND TPD.CreatedDate BETWEEN '{1}' AND '{2}' " & _
-                    "    ) CombinedSelling " & _
-                    "    GROUP BY Tgl " & _
-                    ") S " & _
-                    "FULL OUTER JOIN ( " & _
-                    "    SELECT " & _
-                    "        CAST(TD.TanggalTransaksi AS DATE) AS Tgl, " & _
-                    "        SUM(TPD.NettBayar) AS TotalRevenue " & _
-                    "    FROM TransaksiDetail TD " & _
-                    "    INNER JOIN TransaksiPoliDetail TPD ON TD.NoTransaksi = TPD.TransPoliID " & _
-                    "    WHERE TPD.DeletedBy IS NULL " & _
-                    "      AND TD.DeletedBy IS NULL " & _
-                    "      AND TPD.JenisTindakan = 'Tindakan' " & _
-                    "      AND TPD.StatusPembayaran = 'PAID' " & _
-                    "      AND TD.JenisPoli = '{0}' " & _
-                    "      AND TD.TanggalTransaksi BETWEEN '{1}' AND '{2}' " & _
-                    "      AND EXISTS ( " & _
-                    "          SELECT 1 FROM ( " & _
-                    "              SELECT TransPoliID FROM TransaksiPoliBayar WHERE ISNULL(JumlahBayar, 0) > 0 " & _
-                    "              UNION ALL " & _
-                    "              SELECT TransPoliID FROM TransaksiPoliBayarAwal WHERE ISNULL(JumlahBayar, 0) > 0 " & _
-                    "          ) PB WHERE PB.TransPoliID = TPD.TransPoliID " & _
-                    "      ) " & _
-                    "    GROUP BY CAST(TD.TanggalTransaksi AS DATE) " & _
-                    ") R ON S.Tgl = R.Tgl " & _
-                    "ORDER BY Tgl ASC", jenisPoli, strAwal, strAkhir)
-
-        ' 2. QUERY SELLING & REVENUE
+        'Pra Cut Off
         'Dim sqlSellingRevenue As String = String.Format( _
-        '    "SELECT " & _
-        '    "    ISNULL(S.Tgl, R.Tgl) AS Tgl, " & _
-        '    "    ISNULL(S.TotalSelling, 0) AS SELLING, " & _
-        '    "    ISNULL(R.TotalRevenue, 0) AS REVENUE " & _
-        '    "FROM ( " & _
-        '    "    SELECT " & _
-        '    "        Tgl, " & _
-        '    "        SUM(TotalHarga) AS TotalSelling " & _
-        '    "    FROM ( " & _
-        '    "        /* 1. Selling Paket Tindakan */ " & _
-        '    "        SELECT " & _
-        '    "            CAST(TD.TanggalTransaksi AS DATE) AS Tgl, " & _
-        '    "            TPT.HargaNett AS TotalHarga " & _
-        '    "        FROM TransaksiPaketTindakan TPT " & _
-        '    "        INNER JOIN TransaksiDetail TD ON CAST(TPT.NoTransaksi AS VARCHAR(50)) = CAST(TD.NoUrut AS VARCHAR(50)) " & _
-        '    "        WHERE TPT.DeletedDate IS NULL " & _
-        '    "          AND TD.JenisPoli = '{0}' " & _
-        '    "          AND TD.DeletedBy IS NULL " & _
-        '    "          AND TD.TanggalTransaksi >= '{1}' AND TD.TanggalTransaksi < '{2}' " & _
-        '    " " & _
-        '    "        UNION ALL " & _
-        '    " " & _
-        '    "        /* 2. Selling Tindakan Poli */ " & _
-        '    "        SELECT " & _
-        '    "            CAST(TD.TanggalTransaksi AS DATE) AS Tgl, " & _
-        '    "            TPD.NettBayar AS TotalHarga " & _
-        '    "        FROM TransaksiPoliDetail TPD " & _
-        '    "        INNER JOIN TransaksiPoli TP ON CAST(TPD.TransPoliID AS VARCHAR(50)) = CAST(TP.TransPoliID AS VARCHAR(50)) " & _
-        '    "        INNER JOIN TransaksiDetail TD ON CAST(TP.NoUrut AS VARCHAR(50)) = CAST(TD.NoUrut AS VARCHAR(50)) " & _
-        '    "        WHERE TPD.DeletedDate IS NULL " & _
-        '    "          AND TD.JenisPoli = '{0}' " & _
-        '    "          AND TD.DeletedBy IS NULL " & _
-        '    "          AND TD.TanggalTransaksi >= '{1}' AND TD.TanggalTransaksi < '{2}' " & _
-        '    "    ) CombinedSelling " & _
-        '    "    GROUP BY Tgl " & _
-        '    ") S " & _
-        '    "FULL OUTER JOIN ( " & _
-        '    "    /* Revenue / Pembayaran Paid */ " & _
-        '    "    SELECT " & _
-        '    "        CAST(TD.TanggalTransaksi AS DATE) AS Tgl, " & _
-        '    "        SUM(TPD.NettBayar) AS TotalRevenue " & _
-        '    "    FROM TransaksiDetail TD " & _
-        '    "    INNER JOIN TransaksiPoli TP ON CAST(TD.NoUrut AS VARCHAR(50)) = CAST(TP.NoUrut AS VARCHAR(50)) " & _
-        '    "    INNER JOIN TransaksiPoliDetail TPD ON CAST(TP.TransPoliID AS VARCHAR(50)) = CAST(TPD.TransPoliID AS VARCHAR(50)) " & _
-        '    "    WHERE TPD.DeletedBy IS NULL " & _
-        '    "      AND TD.DeletedBy IS NULL " & _
-        '    "      AND TPD.JenisTindakan = 'Tindakan' " & _
-        '    "      AND TPD.StatusPembayaran = 'PAID' " & _
-        '    "      AND TD.JenisPoli = '{0}' " & _
-        '    "      AND TD.TanggalTransaksi >= '{1}' AND TD.TanggalTransaksi < '{2}' " & _
-        '    "      AND EXISTS ( " & _
-        '    "          SELECT 1 FROM ( " & _
-        '    "              SELECT CAST(TransPoliID AS VARCHAR(50)) AS TransPoliID FROM TransaksiPoliBayar WHERE ISNULL(JumlahBayar, 0) > 0 " & _
-        '    "              UNION ALL " & _
-        '    "              SELECT CAST(TransPoliID AS VARCHAR(50)) AS TransPoliID FROM TransaksiPoliBayarAwal WHERE ISNULL(JumlahBayar, 0) > 0 " & _
-        '    "          ) PB WHERE PB.TransPoliID = CAST(TPD.TransPoliID AS VARCHAR(50)) " & _
-        '    "      ) " & _
-        '    "    GROUP BY CAST(TD.TanggalTransaksi AS DATE) " & _
-        '    ") R ON S.Tgl = R.Tgl " & _
-        '    "ORDER BY Tgl ASC", jenisPoli, strAwal, strAkhir)
+        '            "SELECT " & _
+        '            "    ISNULL(S.Tgl, R.Tgl) AS Tgl, " & _
+        '            "    ISNULL(S.TotalSelling, 0) AS SELLING, " & _
+        '            "    ISNULL(R.TotalRevenue, 0) AS REVENUE " & _
+        '            "FROM ( " & _
+        '            "    SELECT Tgl, SUM(TotalHarga) AS TotalSelling " & _
+        '            "    FROM ( " & _
+        '            "        SELECT CAST(TPT.CreatedDate AS DATE) AS Tgl, TPT.HargaNett AS TotalHarga " & _
+        '            "        FROM TransaksiPaketTindakan TPT " & _
+        '            "        INNER JOIN TransaksiDetail TD ON TPT.NoTransaksi = TD.NoUrut " & _
+        '            "        WHERE TPT.DeletedDate IS NULL AND TD.JenisPoli = '{0}' AND TD.DeletedBy IS NULL AND TPT.CreatedDate BETWEEN '{1}' AND '{2}' " & _
+        '            "        UNION ALL " & _
+        '            "        SELECT CAST(TPD.CreatedDate AS DATE) AS Tgl, TPD.NettBayar AS TotalHarga " & _
+        '            "        FROM TransaksiPoliDetail TPD " & _
+        '            "        INNER JOIN TransaksiPoli TP ON TPD.TransPoliID = TP.TransPoliID " & _
+        '            "        INNER JOIN TransaksiDetail TD ON TP.NoUrut = TD.NoUrut " & _
+        '            "        WHERE TPD.DeletedDate IS NULL AND TD.JenisPoli = '{0}' AND TD.DeletedBy IS NULL AND TPD.CreatedDate BETWEEN '{1}' AND '{2}' " & _
+        '            "    ) CombinedSelling " & _
+        '            "    GROUP BY Tgl " & _
+        '            ") S " & _
+        '            "FULL OUTER JOIN ( " & _
+        '            "    SELECT " & _
+        '            "        CAST(TD.TanggalTransaksi AS DATE) AS Tgl, " & _
+        '            "        SUM(TPD.NettBayar) AS TotalRevenue " & _
+        '            "    FROM TransaksiDetail TD " & _
+        '            "    INNER JOIN TransaksiPoliDetail TPD ON TD.NoTransaksi = TPD.TransPoliID " & _
+        '            "    WHERE TPD.DeletedBy IS NULL " & _
+        '            "      AND TD.DeletedBy IS NULL " & _
+        '            "      AND TPD.JenisTindakan = 'Tindakan' " & _
+        '            "      AND TPD.StatusPembayaran = 'PAID' " & _
+        '            "      AND TD.JenisPoli = '{0}' " & _
+        '            "      AND TD.TanggalTransaksi BETWEEN '{1}' AND '{2}' " & _
+        '            "      AND EXISTS ( " & _
+        '            "          SELECT 1 FROM ( " & _
+        '            "              SELECT TransPoliID FROM TransaksiPoliBayar WHERE ISNULL(JumlahBayar, 0) > 0 " & _
+        '            "              UNION ALL " & _
+        '            "              SELECT TransPoliID FROM TransaksiPoliBayarAwal WHERE ISNULL(JumlahBayar, 0) > 0 " & _
+        '            "          ) PB WHERE PB.TransPoliID = TPD.TransPoliID " & _
+        '            "      ) " & _
+        '            "    GROUP BY CAST(TD.TanggalTransaksi AS DATE) " & _
+        '            ") R ON S.Tgl = R.Tgl " & _
+        '            "ORDER BY Tgl ASC", jenisPoli, strAwal, strAkhir)
+
+        Dim sqlSellingRevenue As String = String.Format( _
+            "SELECT " & _
+            "    ISNULL(S.Tgl, R.Tgl) AS Tgl, " & _
+            "    ISNULL(S.TotalSelling, 0) AS SELLING, " & _
+            "    ISNULL(R.TotalRevenue, 0) AS REVENUE " & _
+            "FROM ( " & _
+            "    SELECT Tgl, SUM(TotalHarga) AS TotalSelling " & _
+            "    FROM ( " & _
+            "        SELECT CAST(TPT.CreatedDate AS DATE) AS Tgl, TPT.HargaNett AS TotalHarga " & _
+            "        FROM TransaksiPaketTindakan TPT " & _
+            "        INNER JOIN TransaksiDetail TD ON CAST(TPT.NoTransaksi AS VARCHAR(100)) = CAST(TD.NoUrut AS VARCHAR(100)) " & _
+            "        WHERE TPT.DeletedDate IS NULL AND TD.JenisPoli = '{0}' AND TD.DeletedBy IS NULL AND TPT.CreatedDate BETWEEN '{1}' AND '{2}' " & _
+            "        UNION ALL " & _
+            "        SELECT CAST(TPD.CreatedDate AS DATE) AS Tgl, (TPD.NettBayar + ISNULL(TP.Pembulatan, 0)) AS TotalHarga " & _
+            "        FROM TransaksiPoliDetail TPD " & _
+            "        INNER JOIN TransaksiPoli TP ON TPD.TransPoliID = TP.TransPoliID " & _
+            "        INNER JOIN TransaksiDetail TD ON CAST(TP.NoUrut AS VARCHAR(100)) = CAST(TD.NoUrut AS VARCHAR(100)) " & _
+            "        WHERE TPD.DeletedDate IS NULL AND TD.JenisPoli = '{0}' AND TD.DeletedBy IS NULL AND TPD.CreatedDate BETWEEN '{1}' AND '{2}' " & _
+            "    ) CombinedSelling " & _
+            "    GROUP BY Tgl " & _
+            ") S " & _
+            "FULL OUTER JOIN ( " & _
+            "    SELECT Tgl, SUM(NettBayar) AS TotalRevenue " & _
+            "    FROM ( " & _
+            "        SELECT CAST(TD.TanggalTransaksi AS DATE) AS Tgl, (TPD.NettBayar + ISNULL(TP.Pembulatan, 0)) AS NettBayar " & _
+            "        FROM TransaksiPoliDetail TPD " & _
+            "        INNER JOIN TransaksiPoli TP ON CAST(TPD.TransPoliID AS VARCHAR(100)) = CAST(TP.TransPoliID AS VARCHAR(100)) " & _
+            "        INNER JOIN TransaksiDetail TD ON CAST(TP.NoUrut AS VARCHAR(100)) = CAST(TD.NoUrut AS VARCHAR(100)) " & _
+            "        WHERE TPD.DeletedBy IS NULL AND TD.DeletedBy IS NULL AND TPD.StatusPembayaran = 'PAID' AND TD.JenisPoli = '{0}' " & _
+            "          AND TPD.JenisTindakan = 'Tindakan' AND TD.TanggalTransaksi BETWEEN '{1}' AND '{2}' " & _
+            "          AND ISNULL(TPD.PaketID, '0') <> '0' AND TPD.PaketID <> '' " & _
+            "          AND EXISTS ( " & _
+            "              SELECT 1 FROM TransaksiPaketTindakan TPT " & _
+            "              WHERE CAST(TPT.PaketID AS VARCHAR(100)) = CAST(TPD.PaketID AS VARCHAR(100)) " & _
+            "                AND (ISNULL(TPD.KodeVoucher, '') = '' OR TPT.KodeVoucher = TPD.KodeVoucher) " & _
+            "                AND TPT.DeletedDate IS NULL AND TPT.CreatedDate >= '2026-08-01 00:00:00' " & _
+            "          ) " & _
+            "          AND EXISTS ( " & _
+            "              SELECT 1 FROM ( " & _
+            "                  SELECT CAST(TransPoliID AS VARCHAR(100)) AS TransPoliID FROM TransaksiPoliBayar WHERE ISNULL(JumlahBayar, 0) > 0 " & _
+            "                  UNION ALL " & _
+            "                  SELECT CAST(TransPoliID AS VARCHAR(100)) AS TransPoliID FROM TransaksiPoliBayarAwal WHERE ISNULL(JumlahBayar, 0) > 0 " & _
+            "              ) PB WHERE PB.TransPoliID = CAST(TPD.TransPoliID AS VARCHAR(100)) " & _
+            "          ) " & _
+            "        UNION ALL " & _
+            "        SELECT CAST(TD.TanggalTransaksi AS DATE) AS Tgl, (TPD.NettBayar + ISNULL(TP.Pembulatan, 0)) AS NettBayar " & _
+            "        FROM TransaksiDetail TD " & _
+            "        INNER JOIN TransaksiPoliDetail TPD ON CAST(TD.NoTransaksi AS VARCHAR(100)) = CAST(TPD.TransPoliID AS VARCHAR(100)) " & _
+            "        INNER JOIN TransaksiPoli TP ON CAST(TPD.TransPoliID AS VARCHAR(100)) = CAST(TP.TransPoliID AS VARCHAR(100)) " & _
+            "        WHERE TPD.DeletedBy IS NULL AND TD.DeletedBy IS NULL AND TPD.StatusPembayaran = 'PAID' AND TD.JenisPoli = '{0}' " & _
+            "          AND TPD.JenisTindakan = 'Tindakan' AND TD.TanggalTransaksi BETWEEN '{1}' AND '{2}' " & _
+            "          AND (ISNULL(TPD.PaketID, '') = '' OR TPD.PaketID = '0') " & _
+            "          AND EXISTS ( " & _
+            "              SELECT 1 FROM ( " & _
+            "                  SELECT CAST(TransPoliID AS VARCHAR(100)) AS TransPoliID FROM TransaksiPoliBayar WHERE ISNULL(JumlahBayar, 0) > 0 " & _
+            "                  UNION ALL " & _
+            "                  SELECT CAST(TransPoliID AS VARCHAR(100)) AS TransPoliID FROM TransaksiPoliBayarAwal WHERE ISNULL(JumlahBayar, 0) > 0 " & _
+            "              ) PB WHERE PB.TransPoliID = CAST(TPD.TransPoliID AS VARCHAR(100)) " & _
+            "          ) " & _
+            "    ) CombinedRevenue " & _
+            "    GROUP BY Tgl " & _
+            ") R ON S.Tgl = R.Tgl " & _
+            "ORDER BY Tgl ASC", jenisPoli, strAwal, strAkhir)
+
 
         Dim dtRaw As DataTable = ReadSQL(sqlSellingRevenue)
 
@@ -421,7 +424,6 @@ Public Class FormRevenueSelling
 
         ' Tambahkan kolom pendukung laporan
         dtRaw.Columns.Add("Yesterday_Collection", GetType(Decimal))
-        dtRaw.Columns.Add("Today_Collection", GetType(Decimal))
         dtRaw.Columns.Add("ActualCollectionMTD", GetType(Decimal))
         dtRaw.Columns.Add("ActualAchievement", GetType(Decimal))
         dtRaw.Columns.Add("Gap_To_Target", GetType(Decimal))
@@ -480,7 +482,6 @@ Public Class FormRevenueSelling
 
             ' Assignment Nilai Kolom
             row("Yesterday_Collection") = yesterdayCol
-            row("Today_Collection") = todayCol
             row("ActualCollectionMTD") = runningTotalMTD
 
             row("TargetBulanan") = nominalTarget
@@ -513,6 +514,12 @@ Public Class FormRevenueSelling
             End If
         Next
 
+        Dim nilaiTodayCollection As Decimal = 0
+        If dtRaw.Rows.Count > 0 Then
+            Dim lastRow As DataRow = dtRaw.Rows(dtRaw.Rows.Count - 1)
+            nilaiTodayCollection = If(IsDBNull(lastRow("REVENUE")), 0, CDec(lastRow("REVENUE")))
+        End If
+
         ' BUKA REPORT & RUN DESIGNER
         Dim report As New DevExpress.XtraReports.UI.XtraReport
         report = DevExpress.XtraReports.UI.XtraReport.FromFile(Application.StartupPath & "\reports\LaporanRevenueSelling.repx", True)
@@ -521,6 +528,20 @@ Public Class FormRevenueSelling
         If bandHeader IsNot Nothing Then
             If bandHeader.Controls("lblPoli") IsNot Nothing Then bandHeader.Controls("lblPoli").Text = jenisPoli
             If bandHeader.Controls("lblPeriode") IsNot Nothing Then bandHeader.Controls("lblPeriode").Text = tglAwal.ToString("dd MMM yyyy") & " - " & tglAkhir.ToString("dd MMM yyyy")
+        End If
+
+        ' Untuk Cell Tabel Gunakan XRTableCell (bukan XRLabel)
+        Dim lblTodayCollection As DevExpress.XtraReports.UI.XRTableCell = CType(report.FindControl("lblTodayCollection", True), DevExpress.XtraReports.UI.XRTableCell)
+
+        If lblTodayCollection IsNot Nothing Then
+            ' Tambahkan string "Rp " sebelum angka ribuan
+            lblTodayCollection.Text = "Rp " & nilaiTodayCollection.ToString("N0")
+        Else
+            ' Fallback jika di Report berupa XRLabel biasa
+            Dim lblTodayLabel As DevExpress.XtraReports.UI.XRLabel = CType(report.FindControl("lblTodayCollection", True), DevExpress.XtraReports.UI.XRLabel)
+            If lblTodayLabel IsNot Nothing Then
+                lblTodayLabel.Text = "Rp " & nilaiTodayCollection.ToString("N0")
+            End If
         End If
 
         report.DataSource = dtRaw
@@ -783,37 +804,57 @@ Public Class FormRevenueSelling
                     "    FROM ( " & _
                     "        SELECT CAST(TPT.CreatedDate AS DATE) AS Tgl, TPT.HargaNett AS TotalHarga " & _
                     "        FROM TransaksiPaketTindakan TPT " & _
-                    "        INNER JOIN TransaksiDetail TD ON TPT.NoTransaksi = TD.NoUrut " & _
+                    "        INNER JOIN TransaksiDetail TD ON CAST(TPT.NoTransaksi AS VARCHAR(100)) = CAST(TD.NoUrut AS VARCHAR(100)) " & _
                     "        WHERE TPT.DeletedDate IS NULL AND TD.JenisPoli = '{0}' AND TD.DeletedBy IS NULL AND TPT.CreatedDate BETWEEN '{1}' AND '{2}' " & _
                     "        UNION ALL " & _
-                    "        SELECT CAST(TPD.CreatedDate AS DATE) AS Tgl, TPD.NettBayar AS TotalHarga " & _
+                    "        SELECT CAST(TPD.CreatedDate AS DATE) AS Tgl, (TPD.NettBayar + ISNULL(TP.Pembulatan, 0)) AS TotalHarga " & _
                     "        FROM TransaksiPoliDetail TPD " & _
                     "        INNER JOIN TransaksiPoli TP ON TPD.TransPoliID = TP.TransPoliID " & _
-                    "        INNER JOIN TransaksiDetail TD ON TP.NoUrut = TD.NoUrut " & _
+                    "        INNER JOIN TransaksiDetail TD ON CAST(TP.NoUrut AS VARCHAR(100)) = CAST(TD.NoUrut AS VARCHAR(100)) " & _
                     "        WHERE TPD.DeletedDate IS NULL AND TD.JenisPoli = '{0}' AND TD.DeletedBy IS NULL AND TPD.CreatedDate BETWEEN '{1}' AND '{2}' " & _
                     "    ) CombinedSelling " & _
                     "    GROUP BY Tgl " & _
                     ") S " & _
                     "FULL OUTER JOIN ( " & _
-                    "    SELECT " & _
-                    "        CAST(TD.TanggalTransaksi AS DATE) AS Tgl, " & _
-                    "        SUM(TPD.NettBayar) AS TotalRevenue " & _
-                    "    FROM TransaksiDetail TD " & _
-                    "    INNER JOIN TransaksiPoliDetail TPD ON TD.NoTransaksi = TPD.TransPoliID " & _
-                    "    WHERE TPD.DeletedBy IS NULL " & _
-                    "      AND TD.DeletedBy IS NULL " & _
-                    "      AND TPD.JenisTindakan = 'Tindakan' " & _
-                    "      AND TPD.StatusPembayaran = 'PAID' " & _
-                    "      AND TD.JenisPoli = '{0}' " & _
-                    "      AND TD.TanggalTransaksi BETWEEN '{1}' AND '{2}' " & _
-                    "      AND EXISTS ( " & _
-                    "          SELECT 1 FROM ( " & _
-                    "              SELECT TransPoliID FROM TransaksiPoliBayar WHERE ISNULL(JumlahBayar, 0) > 0 " & _
-                    "              UNION ALL " & _
-                    "              SELECT TransPoliID FROM TransaksiPoliBayarAwal WHERE ISNULL(JumlahBayar, 0) > 0 " & _
-                    "          ) PB WHERE PB.TransPoliID = TPD.TransPoliID " & _
-                    "      ) " & _
-                    "    GROUP BY CAST(TD.TanggalTransaksi AS DATE) " & _
+                    "    SELECT Tgl, SUM(NettBayar) AS TotalRevenue " & _
+                    "    FROM ( " & _
+                    "        SELECT CAST(TD.TanggalTransaksi AS DATE) AS Tgl, (TPD.NettBayar + ISNULL(TP.Pembulatan, 0)) AS NettBayar " & _
+                    "        FROM TransaksiPoliDetail TPD " & _
+                    "        INNER JOIN TransaksiPoli TP ON CAST(TPD.TransPoliID AS VARCHAR(100)) = CAST(TP.TransPoliID AS VARCHAR(100)) " & _
+                    "        INNER JOIN TransaksiDetail TD ON CAST(TP.NoUrut AS VARCHAR(100)) = CAST(TD.NoUrut AS VARCHAR(100)) " & _
+                    "        WHERE TPD.DeletedBy IS NULL AND TD.DeletedBy IS NULL AND TPD.StatusPembayaran = 'PAID' AND TD.JenisPoli = '{0}' " & _
+                    "          AND TPD.JenisTindakan = 'Tindakan' AND TD.TanggalTransaksi BETWEEN '{1}' AND '{2}' " & _
+                    "          AND ISNULL(TPD.PaketID, '0') <> '0' AND TPD.PaketID <> '' " & _
+                    "          AND EXISTS ( " & _
+                    "              SELECT 1 FROM TransaksiPaketTindakan TPT " & _
+                    "              WHERE CAST(TPT.PaketID AS VARCHAR(100)) = CAST(TPD.PaketID AS VARCHAR(100)) " & _
+                    "                AND (ISNULL(TPD.KodeVoucher, '') = '' OR TPT.KodeVoucher = TPD.KodeVoucher) " & _
+                    "                AND TPT.DeletedDate IS NULL AND TPT.CreatedDate >= '2026-08-01 00:00:00' " & _
+                    "          ) " & _
+                    "          AND EXISTS ( " & _
+                    "              SELECT 1 FROM ( " & _
+                    "                  SELECT CAST(TransPoliID AS VARCHAR(100)) AS TransPoliID FROM TransaksiPoliBayar WHERE ISNULL(JumlahBayar, 0) > 0 " & _
+                    "                  UNION ALL " & _
+                    "                  SELECT CAST(TransPoliID AS VARCHAR(100)) AS TransPoliID FROM TransaksiPoliBayarAwal WHERE ISNULL(JumlahBayar, 0) > 0 " & _
+                    "              ) PB WHERE PB.TransPoliID = CAST(TPD.TransPoliID AS VARCHAR(100)) " & _
+                    "          ) " & _
+                    "        UNION ALL " & _
+                    "        SELECT CAST(TD.TanggalTransaksi AS DATE) AS Tgl, (TPD.NettBayar + ISNULL(TP.Pembulatan, 0)) AS NettBayar " & _
+                    "        FROM TransaksiDetail TD " & _
+                    "        INNER JOIN TransaksiPoliDetail TPD ON CAST(TD.NoTransaksi AS VARCHAR(100)) = CAST(TPD.TransPoliID AS VARCHAR(100)) " & _
+                    "        INNER JOIN TransaksiPoli TP ON CAST(TPD.TransPoliID AS VARCHAR(100)) = CAST(TP.TransPoliID AS VARCHAR(100)) " & _
+                    "        WHERE TPD.DeletedBy IS NULL AND TD.DeletedBy IS NULL AND TPD.StatusPembayaran = 'PAID' AND TD.JenisPoli = '{0}' " & _
+                    "          AND TPD.JenisTindakan = 'Tindakan' AND TD.TanggalTransaksi BETWEEN '{1}' AND '{2}' " & _
+                    "          AND (ISNULL(TPD.PaketID, '') = '' OR TPD.PaketID = '0') " & _
+                    "          AND EXISTS ( " & _
+                    "              SELECT 1 FROM ( " & _
+                    "                  SELECT CAST(TransPoliID AS VARCHAR(100)) AS TransPoliID FROM TransaksiPoliBayar WHERE ISNULL(JumlahBayar, 0) > 0 " & _
+                    "                  UNION ALL " & _
+                    "                  SELECT CAST(TransPoliID AS VARCHAR(100)) AS TransPoliID FROM TransaksiPoliBayarAwal WHERE ISNULL(JumlahBayar, 0) > 0 " & _
+                    "              ) PB WHERE PB.TransPoliID = CAST(TPD.TransPoliID AS VARCHAR(100)) " & _
+                    "          ) " & _
+                    "    ) CombinedRevenue " & _
+                    "    GROUP BY Tgl " & _
                     ") R ON S.Tgl = R.Tgl " & _
                     "ORDER BY Tgl ASC", namaPoliDB, strAwal, strAkhir)
 

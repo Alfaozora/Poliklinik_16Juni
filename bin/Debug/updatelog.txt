@@ -5,6 +5,7 @@ Version : 2.0.0.59 (01 Agustus 2026)
 # [New Feature] Sending Laporan Pendapatan V3 ke Dashboard
 # [New Feature] Bridging Okupansi Booking
 # [Bug Fix] Perbaikan Querry untuk laporan Revenue
+# [Usability Improvement] Perbaikan dalam sending data ke dashboard pendapatan dan selling revenue (pembelian paket sejak 1 Agustus 2026)
 
 Version : 2.0.0.58 (07 Juli 2026)
 # [New Feature] Penambahan Qty untuk Informed Consent
