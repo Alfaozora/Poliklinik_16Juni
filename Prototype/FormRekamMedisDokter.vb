@@ -5203,25 +5203,25 @@ Public Class FormRekamMedisDokter
             ' Paket Reguler
             If filterPaketReguler Then
                 queryUnion2 = "SELECT DISTINCT " & _
-                    "TPD.TransPoliIDDetail AS ID, " & _
-                    "TPD.TindakanID, " & _
-                    "TPD.PaketID, " & _
-                    "TPTD.NamaTindakan, " & _
-                    "TPT.JenisPaket AS JenisTindakan, " & _
-                    "TPBA.admin AS CreatedBy, " & _
-                    "TPBA.transaksitime AS CreatedDate, " & _
-                    "'PAID' AS StatusPembayaran, '-' AS Penjamin, " & _
-                    "TPT.KodeVoucher, " & _
-                    "TPT.Kuota AS Kuota " & _
-                    "FROM TransaksiPoliDetail TPD " & _
-                    "INNER JOIN TransaksiPoli TP ON TP.TransPoliID = TPD.TransPoliID " & _
-                    "INNER JOIN TransaksiPaketTindakan TPT ON TPT.PaketID = TPD.PaketID AND TPT.KodeVoucher = TPD.KodeVoucher " & _
-                    "LEFT JOIN TransaksiPaketTindakanDetail TPTD ON TPTD.PaketID = TPD.PaketID AND TPTD.KodeVoucher = TPD.KodeVoucher " & _
-                    "OUTER APPLY (SELECT TOP 1 admin, transaksitime FROM TransaksiPoliBayarAwal " & _
-                    "WHERE TransPoliID = TPD.TransPoliID ORDER BY transaksitime DESC) TPBA " & _
-                    "WHERE TPT.JenisPaket = 'Paket Reguler' " & _
-                    "AND TP.NoUrut = '" & idTransaksi & "' " & _
-                    "AND TPD.DeletedDate IS NULL"
+                              "TPD.TransPoliIDDetail AS ID, " & _
+                              "TPD.TindakanID, " & _
+                              "TPD.PaketID, " & _
+                              "TPTD.NamaTindakan, " & _
+                              "TPT.JenisPaket AS JenisTindakan, " & _
+                              "TPBA.admin AS CreatedBy, " & _
+                              "TPBA.transaksitime AS CreatedDate, " & _
+                              "'PAID' AS StatusPembayaran, '-' AS Penjamin, " & _
+                              "TPT.KodeVoucher, " & _
+                              "TPT.Kuota AS Kuota " & _
+                              "FROM TransaksiPoliDetail TPD " & _
+                              "INNER JOIN TransaksiPoli TP ON TP.TransPoliID = TPD.TransPoliID " & _
+                              "INNER JOIN TransaksiPaketTindakan TPT ON TPT.PaketID = TPD.PaketID AND TPT.KodeVoucher = TPD.KodeVoucher " & _
+                              "LEFT JOIN TransaksiPaketTindakanDetail TPTD ON TPTD.PaketID = TPD.PaketID AND TPTD.KodeVoucher = TPD.KodeVoucher AND TPTD.TindakanID = TPD.TindakanID " & _
+                              "OUTER APPLY (SELECT TOP 1 admin, transaksitime FROM TransaksiPoliBayarAwal " & _
+                              "WHERE TransPoliID = TPD.TransPoliID ORDER BY transaksitime DESC) TPBA " & _
+                              "WHERE TPT.JenisPaket = 'Paket Reguler' " & _
+                              "AND TP.NoUrut = '" & idTransaksi & "' " & _
+                              "AND TPD.DeletedDate IS NULL"
             End If
 
             ' Tindakan langsung dari TransaksiPoliDetail
@@ -13944,6 +13944,19 @@ Public Class FormRekamMedisDokter
         If Not IsUserAllowed(currentUser) Then
             MsgBox("Akses ditolak! Hanya user Dokter yang dapat memotong paket tindakan.", MsgBoxStyle.Critical, "Warning!")
             Exit Sub
+        End If
+
+        ' Validasi jika beda hari
+        If jenisTransaksi = "UMUM" Or jenisTransaksi = "POLI" Then
+            If CheckSQL("SELECT * FROM TransaksiPoli WHERE NoUrut = '" & idTransaksi & "' AND CAST(TglPoli AS DATE) = CAST(GETDATE() AS DATE)") = False Then
+                MsgBox("Gagal. Transaksi sudah melewati hari yang ditentukan.", MsgBoxStyle.Exclamation, "Warning!")
+                Exit Sub
+            End If
+        ElseIf jenisTransaksi = "GIGI" Then
+            If CheckSQL("SELECT * FROM TransaksiGigi WHERE NoUrut = '" & idTransaksi & "' AND CAST(TglGigi AS DATE) = CAST(GETDATE() AS DATE)") = False Then
+                MsgBox("Gagal. Transaksi sudah melewati hari yang ditentukan.", MsgBoxStyle.Exclamation, "Warning!")
+                Exit Sub
+            End If
         End If
 
         Dim frm As New DialogBoxPaketTindakan

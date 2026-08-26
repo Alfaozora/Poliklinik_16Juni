@@ -362,7 +362,7 @@ Public Class FormRevenueSelling
             "        FROM TransaksiPoliDetail TPD " & _
             "        INNER JOIN TransaksiPoli TP ON TPD.TransPoliID = TP.TransPoliID " & _
             "        INNER JOIN TransaksiDetail TD ON CAST(TP.NoUrut AS VARCHAR(100)) = CAST(TD.NoUrut AS VARCHAR(100)) " & _
-            "        WHERE TPD.DeletedDate IS NULL AND TD.JenisPoli = '{0}' AND TD.DeletedBy IS NULL AND TPD.CreatedDate BETWEEN '{1}' AND '{2}' " & _
+            "        WHERE TPD.DeletedDate IS NULL AND TD.JenisPoli = '{0}' AND TPD.StatusPembayaran = 'PAID' AND TD.DeletedBy IS NULL AND TPD.CreatedDate BETWEEN '{1}' AND '{2}' " & _
             "    ) CombinedSelling " & _
             "    GROUP BY Tgl " & _
             ") S " & _
@@ -475,7 +475,7 @@ Public Class FormRevenueSelling
             Dim yesterdayCol As Decimal = runningTotalMTD
 
             ' PERBAIKAN: Gunakan revenueHariIni agar Actual Collection sesuai dengan Revenue
-            Dim todayCol As Decimal = revenueHariIni
+            Dim todayCol As Decimal = sellingHariIni
 
             ' Update MTD = Yesterday + Today
             runningTotalMTD += todayCol
@@ -811,7 +811,7 @@ Public Class FormRevenueSelling
                     "        FROM TransaksiPoliDetail TPD " & _
                     "        INNER JOIN TransaksiPoli TP ON TPD.TransPoliID = TP.TransPoliID " & _
                     "        INNER JOIN TransaksiDetail TD ON CAST(TP.NoUrut AS VARCHAR(100)) = CAST(TD.NoUrut AS VARCHAR(100)) " & _
-                    "        WHERE TPD.DeletedDate IS NULL AND TD.JenisPoli = '{0}' AND TD.DeletedBy IS NULL AND TPD.CreatedDate BETWEEN '{1}' AND '{2}' " & _
+                    "        WHERE TPD.DeletedDate IS NULL AND TD.JenisPoli = '{0}' AND TPD.StatusPembayaran = 'PAID' AND TD.DeletedBy IS NULL AND TPD.CreatedDate BETWEEN '{1}' AND '{2}' " & _
                     "    ) CombinedSelling " & _
                     "    GROUP BY Tgl " & _
                     ") S " & _

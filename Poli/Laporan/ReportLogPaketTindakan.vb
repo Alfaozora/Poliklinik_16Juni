@@ -365,17 +365,27 @@ Public Class ReportLogPaketTindakan
         Dim view As DevExpress.XtraGrid.Views.Grid.GridView = CType(sender, DevExpress.XtraGrid.Views.Grid.GridView)
 
         If e.RowHandle >= 0 Then
-            Dim jenisPaket As String = view.GetRowCellValue(e.RowHandle, "Jenis Paket").ToString()
             Dim kuota As Integer = Convert.ToInt32(view.GetRowCellValue(e.RowHandle, "Kuota"))
+            Dim objTglBerakhir As Object = view.GetRowCellValue(e.RowHandle, "Tgl Berakhir")
 
-            ' Jika kuota tinggal sedikit (misalnya ≤ 2), warnai dengan merah muda
+            ' 1. Jika kuota 0 -> LightCoral (Merah Murni/Habis)
             If kuota = 0 Then
                 e.Appearance.BackColor = Color.LightCoral
-                'e.Appearance.ForeColor = Color.DarkRed
-                'e.Appearance.Font = New Font(e.Appearance.Font, FontStyle.Bold)
-            Else
-                e.Appearance.BackColor = Color.LightGreen
+                Exit Sub
             End If
+
+            ' 2. Jika kuota masih ada DAN tanggal berakhir terlewati -> Khaki / Yellow (Kuning/Kadaluwarsa)
+            If objTglBerakhir IsNot DBNull.Value AndAlso objTglBerakhir IsNot Nothing Then
+                Dim tglBerakhir As Date = Convert.ToDateTime(objTglBerakhir).Date
+
+                If tglBerakhir < Date.Today Then
+                    e.Appearance.BackColor = Color.Khaki
+                    Exit Sub
+                End If
+            End If
+
+            ' 3. Jika kuota masih ada DAN belum terlewati -> LightGreen (Hijau/Aktif)
+            e.Appearance.BackColor = Color.LightGreen
         End If
     End Sub
 
