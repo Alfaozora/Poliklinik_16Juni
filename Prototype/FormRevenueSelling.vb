@@ -358,18 +358,19 @@ Public Class FormRevenueSelling
             "        INNER JOIN TransaksiDetail TD ON CAST(TPT.NoTransaksi AS VARCHAR(100)) = CAST(TD.NoUrut AS VARCHAR(100)) " & _
             "        WHERE TPT.DeletedDate IS NULL AND TD.JenisPoli = '{0}' AND TD.DeletedBy IS NULL AND TPT.CreatedDate BETWEEN '{1}' AND '{2}' " & _
             "        UNION ALL " & _
-            "        SELECT CAST(TPD.CreatedDate AS DATE) AS Tgl, (TPD.NettBayar + ISNULL(TP.Pembulatan, 0)) AS TotalHarga " & _
+            "        SELECT CAST(TPD.CreatedDate AS DATE) AS Tgl, (TPD.NettBayar + CASE WHEN TPD.JenisTindakan = 'Konsultasi Dokter Jaminan' THEN 0 ELSE ISNULL(TP.Pembulatan, 0) END) AS TotalHarga " & _
             "        FROM TransaksiPoliDetail TPD " & _
             "        INNER JOIN TransaksiPoli TP ON TPD.TransPoliID = TP.TransPoliID " & _
             "        INNER JOIN TransaksiDetail TD ON CAST(TP.NoUrut AS VARCHAR(100)) = CAST(TD.NoUrut AS VARCHAR(100)) " & _
             "        WHERE TPD.DeletedDate IS NULL AND TD.JenisPoli = '{0}' AND TPD.StatusPembayaran = 'PAID' AND TD.DeletedBy IS NULL AND TPD.CreatedDate BETWEEN '{1}' AND '{2}' " & _
+            "          AND (TPD.JenisTindakan <> 'Konsultasi Dokter Jaminan' OR ISNULL(TPD.NettBayar, 0) > 0) " & _
             "    ) CombinedSelling " & _
             "    GROUP BY Tgl " & _
             ") S " & _
             "FULL OUTER JOIN ( " & _
             "    SELECT Tgl, SUM(NettBayar) AS TotalRevenue " & _
             "    FROM ( " & _
-            "        SELECT CAST(TD.TanggalTransaksi AS DATE) AS Tgl, (TPD.NettBayar + ISNULL(TP.Pembulatan, 0)) AS NettBayar " & _
+            "        SELECT CAST(TD.TanggalTransaksi AS DATE) AS Tgl, (TPD.NettBayar + CASE WHEN TPD.JenisTindakan = 'Konsultasi Dokter Jaminan' THEN 0 ELSE ISNULL(TP.Pembulatan, 0) END) AS NettBayar " & _
             "        FROM TransaksiPoliDetail TPD " & _
             "        INNER JOIN TransaksiPoli TP ON CAST(TPD.TransPoliID AS VARCHAR(100)) = CAST(TP.TransPoliID AS VARCHAR(100)) " & _
             "        INNER JOIN TransaksiDetail TD ON CAST(TP.NoUrut AS VARCHAR(100)) = CAST(TD.NoUrut AS VARCHAR(100)) " & _
@@ -390,13 +391,14 @@ Public Class FormRevenueSelling
             "              ) PB WHERE PB.TransPoliID = CAST(TPD.TransPoliID AS VARCHAR(100)) " & _
             "          ) " & _
             "        UNION ALL " & _
-            "        SELECT CAST(TD.TanggalTransaksi AS DATE) AS Tgl, (TPD.NettBayar + ISNULL(TP.Pembulatan, 0)) AS NettBayar " & _
+            "        SELECT CAST(TD.TanggalTransaksi AS DATE) AS Tgl, (TPD.NettBayar + CASE WHEN TPD.JenisTindakan = 'Konsultasi Dokter Jaminan' THEN 0 ELSE ISNULL(TP.Pembulatan, 0) END) AS NettBayar " & _
             "        FROM TransaksiDetail TD " & _
             "        INNER JOIN TransaksiPoliDetail TPD ON CAST(TD.NoTransaksi AS VARCHAR(100)) = CAST(TPD.TransPoliID AS VARCHAR(100)) " & _
             "        INNER JOIN TransaksiPoli TP ON CAST(TPD.TransPoliID AS VARCHAR(100)) = CAST(TP.TransPoliID AS VARCHAR(100)) " & _
             "        WHERE TPD.DeletedBy IS NULL AND TD.DeletedBy IS NULL AND TPD.StatusPembayaran = 'PAID' AND TD.JenisPoli = '{0}' " & _
-            "          AND TPD.JenisTindakan = 'Tindakan' AND TD.TanggalTransaksi BETWEEN '{1}' AND '{2}' " & _
+            "          AND TPD.JenisTindakan IN ('Tindakan', 'Konsultasi Dokter Jaminan') AND TD.TanggalTransaksi BETWEEN '{1}' AND '{2}' " & _
             "          AND (ISNULL(TPD.PaketID, '') = '' OR TPD.PaketID = '0') " & _
+            "          AND (TPD.JenisTindakan <> 'Konsultasi Dokter Jaminan' OR ISNULL(TPD.NettBayar, 0) > 0) " & _
             "          AND EXISTS ( " & _
             "              SELECT 1 FROM ( " & _
             "                  SELECT CAST(TransPoliID AS VARCHAR(100)) AS TransPoliID FROM TransaksiPoliBayar WHERE ISNULL(JumlahBayar, 0) > 0 " & _
@@ -507,8 +509,8 @@ Public Class FormRevenueSelling
 
             ' Daily Needs
             Dim sisaTarget As Decimal = nominalTarget - runningTotalMTD
-            If sisaTarget > 0 Then
-                row("DailyNeeds") = If(sisaHariKerja > 0, sisaTarget / CDec(sisaHariKerja), sisaTarget)
+            If sisaHariKerja > 0 Then
+                row("DailyNeeds") = sisaTarget / CDec(sisaHariKerja)
             Else
                 row("DailyNeeds") = 0
             End If
@@ -517,7 +519,7 @@ Public Class FormRevenueSelling
         Dim nilaiTodayCollection As Decimal = 0
         If dtRaw.Rows.Count > 0 Then
             Dim lastRow As DataRow = dtRaw.Rows(dtRaw.Rows.Count - 1)
-            nilaiTodayCollection = If(IsDBNull(lastRow("REVENUE")), 0, CDec(lastRow("REVENUE")))
+            nilaiTodayCollection = If(IsDBNull(lastRow("SELLING")), 0, CDec(lastRow("SELLING")))
         End If
 
         ' BUKA REPORT & RUN DESIGNER
@@ -807,18 +809,19 @@ Public Class FormRevenueSelling
                     "        INNER JOIN TransaksiDetail TD ON CAST(TPT.NoTransaksi AS VARCHAR(100)) = CAST(TD.NoUrut AS VARCHAR(100)) " & _
                     "        WHERE TPT.DeletedDate IS NULL AND TD.JenisPoli = '{0}' AND TD.DeletedBy IS NULL AND TPT.CreatedDate BETWEEN '{1}' AND '{2}' " & _
                     "        UNION ALL " & _
-                    "        SELECT CAST(TPD.CreatedDate AS DATE) AS Tgl, (TPD.NettBayar + ISNULL(TP.Pembulatan, 0)) AS TotalHarga " & _
+                    "        SELECT CAST(TPD.CreatedDate AS DATE) AS Tgl, (TPD.NettBayar + CASE WHEN TPD.JenisTindakan = 'Konsultasi Dokter Jaminan' THEN 0 ELSE ISNULL(TP.Pembulatan, 0) END) AS TotalHarga " & _
                     "        FROM TransaksiPoliDetail TPD " & _
                     "        INNER JOIN TransaksiPoli TP ON TPD.TransPoliID = TP.TransPoliID " & _
                     "        INNER JOIN TransaksiDetail TD ON CAST(TP.NoUrut AS VARCHAR(100)) = CAST(TD.NoUrut AS VARCHAR(100)) " & _
                     "        WHERE TPD.DeletedDate IS NULL AND TD.JenisPoli = '{0}' AND TPD.StatusPembayaran = 'PAID' AND TD.DeletedBy IS NULL AND TPD.CreatedDate BETWEEN '{1}' AND '{2}' " & _
+                    "          AND (TPD.JenisTindakan <> 'Konsultasi Dokter Jaminan' OR ISNULL(TPD.NettBayar, 0) > 0) " & _
                     "    ) CombinedSelling " & _
                     "    GROUP BY Tgl " & _
                     ") S " & _
                     "FULL OUTER JOIN ( " & _
                     "    SELECT Tgl, SUM(NettBayar) AS TotalRevenue " & _
                     "    FROM ( " & _
-                    "        SELECT CAST(TD.TanggalTransaksi AS DATE) AS Tgl, (TPD.NettBayar + ISNULL(TP.Pembulatan, 0)) AS NettBayar " & _
+                    "        SELECT CAST(TD.TanggalTransaksi AS DATE) AS Tgl, (TPD.NettBayar + CASE WHEN TPD.JenisTindakan = 'Konsultasi Dokter Jaminan' THEN 0 ELSE ISNULL(TP.Pembulatan, 0) END) AS NettBayar " & _
                     "        FROM TransaksiPoliDetail TPD " & _
                     "        INNER JOIN TransaksiPoli TP ON CAST(TPD.TransPoliID AS VARCHAR(100)) = CAST(TP.TransPoliID AS VARCHAR(100)) " & _
                     "        INNER JOIN TransaksiDetail TD ON CAST(TP.NoUrut AS VARCHAR(100)) = CAST(TD.NoUrut AS VARCHAR(100)) " & _
@@ -839,13 +842,14 @@ Public Class FormRevenueSelling
                     "              ) PB WHERE PB.TransPoliID = CAST(TPD.TransPoliID AS VARCHAR(100)) " & _
                     "          ) " & _
                     "        UNION ALL " & _
-                    "        SELECT CAST(TD.TanggalTransaksi AS DATE) AS Tgl, (TPD.NettBayar + ISNULL(TP.Pembulatan, 0)) AS NettBayar " & _
+                    "        SELECT CAST(TD.TanggalTransaksi AS DATE) AS Tgl, (TPD.NettBayar + CASE WHEN TPD.JenisTindakan = 'Konsultasi Dokter Jaminan' THEN 0 ELSE ISNULL(TP.Pembulatan, 0) END) AS NettBayar " & _
                     "        FROM TransaksiDetail TD " & _
                     "        INNER JOIN TransaksiPoliDetail TPD ON CAST(TD.NoTransaksi AS VARCHAR(100)) = CAST(TPD.TransPoliID AS VARCHAR(100)) " & _
                     "        INNER JOIN TransaksiPoli TP ON CAST(TPD.TransPoliID AS VARCHAR(100)) = CAST(TP.TransPoliID AS VARCHAR(100)) " & _
                     "        WHERE TPD.DeletedBy IS NULL AND TD.DeletedBy IS NULL AND TPD.StatusPembayaran = 'PAID' AND TD.JenisPoli = '{0}' " & _
-                    "          AND TPD.JenisTindakan = 'Tindakan' AND TD.TanggalTransaksi BETWEEN '{1}' AND '{2}' " & _
+                    "          AND TPD.JenisTindakan IN ('Tindakan', 'Konsultasi Dokter Jaminan') AND TD.TanggalTransaksi BETWEEN '{1}' AND '{2}' " & _
                     "          AND (ISNULL(TPD.PaketID, '') = '' OR TPD.PaketID = '0') " & _
+                    "          AND (TPD.JenisTindakan <> 'Konsultasi Dokter Jaminan' OR ISNULL(TPD.NettBayar, 0) > 0) " & _
                     "          AND EXISTS ( " & _
                     "              SELECT 1 FROM ( " & _
                     "                  SELECT CAST(TransPoliID AS VARCHAR(100)) AS TransPoliID FROM TransaksiPoliBayar WHERE ISNULL(JumlahBayar, 0) > 0 " & _

@@ -106,52 +106,41 @@ Module ModuleInformedConsent
 
             Dim jsonDetailReguler As String = ReadSQLNIK("SELECT DetailTindakan FROM TransaksiPaketTindakan WHERE PaketID = '" & idTindakan & "'")
 
-            'MsgBox("JSON Detail Tindakan :" & vbCrLf & jsonDetailReguler)
-
             If String.IsNullOrEmpty(jsonDetailReguler) Then
                 MsgBox("Detail tindakan paket tidak ditemukan.", MsgBoxStyle.Exclamation, "Warning")
                 Return False
             End If
 
             Dim arrReg As JArray = JArray.Parse(jsonDetailReguler)
+            Dim butuhIC As Boolean = False
 
-            'MsgBox("Jumlah detail tindakan : " & arrReg.Count)
 
             For Each item As JObject In arrReg
-                'MsgBox("Item JSON :" & vbCrLf & item.ToString())
-
                 Dim tindakanIDDetail As String = item("TindakanID").ToString()
-
-                'MsgBox("TindakanID Detail : " & tindakanIDDetail)
-
-                ' Cek apakah tindakan ini wajib IC
                 Dim wajibICDetail As String = ReadSQLNIK("SELECT ISNULL(StatusInformedConsent,0) FROM MasterTindakan WHERE TindakanID = '" & tindakanIDDetail & "'")
 
-                'MsgBox("Status Informed Consent : " & wajibICDetail)
-
                 If CBool(wajibICDetail) Then
-                    'MsgBox("Tindakan WAJIB informed consent")
-                    ' 🔥 Kirim TindakanIDDetail (bukan idPaket)
-                    Dim urlWebService As String = baseURL & "api/lumiera-luzelle/ic/paket/" & kodeVoucherPaket & "/" & tindakanIDDetail
-                    'MsgBox("URL Web Service :" & vbCrLf & urlWebService)
-                    Dim response As String = GetDataAPIRM(urlWebService)
-                    'MsgBox("Response API :" & vbCrLf & response)
-                    Dim json As JObject = JObject.Parse(response)
-                    'MsgBox("Status API : " & json("status").ToString())
-                    If json("status").ToString() <> "success" Then
-                        'MsgBox("Message API :" & vbCrLf & json("message").ToString())
-                        MsgBox(json("message").ToString(), MsgBoxStyle.Exclamation, "Warning")
-                        Return False
-                    Else
-                        MsgBox("Validasi informed consent SUCCESS")
-                    End If
-                Else
-
-                    'MsgBox("Tindakan TIDAK wajib informed consent")
+                    butuhIC = True
+                    Exit For
                 End If
 
             Next
-            'MsgBox("Semua validasi selesai SUCCESS")
+
+            ' 2. Jika ada tindakan butuh IC, lakukan 1x validasi ke API berdasarkan Kode Voucher
+            If butuhIC Then
+                ' Opsional: Jika endpoint API tetap butuh tindakanID, kirim endpoint khusus voucher/paket 
+                ' Atau gunakan 1 URL validasi voucher tanpa mengikat 1 tindakanID spesifik
+                Dim urlWebService As String = baseURL & "api/lumiera-luzelle/ic/paket/" & kodeVoucherPaket
+
+                Dim response As String = GetDataAPIRM(urlWebService)
+                Dim json As JObject = JObject.Parse(response)
+
+                If json("status").ToString() <> "success" Then
+                    MsgBox(json("message").ToString(), MsgBoxStyle.Exclamation, "Warning")
+                    Return False
+                End If
+            End If
+
             Return True
         Catch ex As Exception
             MsgBox("Gagal validasi informed consent:" & vbCrLf & ex.Message, MsgBoxStyle.Critical, "ERROR")

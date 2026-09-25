@@ -51,11 +51,13 @@ Partial Class FormKodeVoucher
         Me.Label2 = New System.Windows.Forms.Label
         Me.TextBoxNamaVoc = New System.Windows.Forms.TextBox
         Me.Label1 = New System.Windows.Forms.Label
-        Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         Me.SplitContainer2 = New System.Windows.Forms.SplitContainer
         Me.DataGridView1 = New System.Windows.Forms.DataGridView
-        Me.ButtonNext = New System.Windows.Forms.Button
         Me.ButtonPrev = New System.Windows.Forms.Button
+        Me.ButtonNext = New System.Windows.Forms.Button
+        Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
+        Me.ButtonLaporan = New System.Windows.Forms.Button
+        Me.ComboBoxNamaVoc = New System.Windows.Forms.ComboBox
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
@@ -75,6 +77,8 @@ Partial Class FormKodeVoucher
         '
         'SplitContainer1.Panel1
         '
+        Me.SplitContainer1.Panel1.Controls.Add(Me.ComboBoxNamaVoc)
+        Me.SplitContainer1.Panel1.Controls.Add(Me.ButtonLaporan)
         Me.SplitContainer1.Panel1.Controls.Add(Me.Label11)
         Me.SplitContainer1.Panel1.Controls.Add(Me.ComboBoxJenisPemakaian)
         Me.SplitContainer1.Panel1.Controls.Add(Me.ButtonGenerateVoc)
@@ -427,6 +431,21 @@ Partial Class FormKodeVoucher
         Me.DataGridView1.Size = New System.Drawing.Size(1021, 234)
         Me.DataGridView1.TabIndex = 1
         '
+        'ButtonPrev
+        '
+        Me.ButtonPrev.Anchor = System.Windows.Forms.AnchorStyles.Right
+        Me.ButtonPrev.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonPrev.FlatAppearance.BorderSize = 0
+        Me.ButtonPrev.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(180, Byte), Integer))
+        Me.ButtonPrev.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonPrev.ForeColor = System.Drawing.Color.White
+        Me.ButtonPrev.Location = New System.Drawing.Point(866, 3)
+        Me.ButtonPrev.Name = "ButtonPrev"
+        Me.ButtonPrev.Size = New System.Drawing.Size(63, 23)
+        Me.ButtonPrev.TabIndex = 524
+        Me.ButtonPrev.Text = "< Prev"
+        Me.ButtonPrev.UseVisualStyleBackColor = False
+        '
         'ButtonNext
         '
         Me.ButtonNext.Anchor = System.Windows.Forms.AnchorStyles.Right
@@ -442,20 +461,33 @@ Partial Class FormKodeVoucher
         Me.ButtonNext.Text = "Next >"
         Me.ButtonNext.UseVisualStyleBackColor = False
         '
-        'ButtonPrev
+        'ButtonLaporan
         '
-        Me.ButtonPrev.Anchor = System.Windows.Forms.AnchorStyles.Right
-        Me.ButtonPrev.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
-        Me.ButtonPrev.FlatAppearance.BorderSize = 0
-        Me.ButtonPrev.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(180, Byte), Integer))
-        Me.ButtonPrev.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.ButtonPrev.ForeColor = System.Drawing.Color.White
-        Me.ButtonPrev.Location = New System.Drawing.Point(866, 3)
-        Me.ButtonPrev.Name = "ButtonPrev"
-        Me.ButtonPrev.Size = New System.Drawing.Size(63, 23)
-        Me.ButtonPrev.TabIndex = 524
-        Me.ButtonPrev.Text = "< Prev"
-        Me.ButtonPrev.UseVisualStyleBackColor = False
+        Me.ButtonLaporan.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonLaporan.FlatAppearance.BorderSize = 0
+        Me.ButtonLaporan.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(180, Byte), Integer))
+        Me.ButtonLaporan.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonLaporan.ForeColor = System.Drawing.Color.White
+        Me.ButtonLaporan.Location = New System.Drawing.Point(891, 142)
+        Me.ButtonLaporan.Name = "ButtonLaporan"
+        Me.ButtonLaporan.Size = New System.Drawing.Size(107, 25)
+        Me.ButtonLaporan.TabIndex = 523
+        Me.ButtonLaporan.Text = "Cetak Laporan"
+        Me.ButtonLaporan.UseVisualStyleBackColor = False
+        '
+        'ComboBoxNamaVoc
+        '
+        Me.ComboBoxNamaVoc.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource
+        Me.ComboBoxNamaVoc.BackColor = System.Drawing.SystemColors.Window
+        Me.ComboBoxNamaVoc.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBoxNamaVoc.Font = New System.Drawing.Font("Segoe UI", 9.75!)
+        Me.ComboBoxNamaVoc.FormattingEnabled = True
+        Me.ComboBoxNamaVoc.Items.AddRange(New Object() {"NOMINAL", "PERCENT"})
+        Me.ComboBoxNamaVoc.Location = New System.Drawing.Point(666, 142)
+        Me.ComboBoxNamaVoc.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.ComboBoxNamaVoc.Name = "ComboBoxNamaVoc"
+        Me.ComboBoxNamaVoc.Size = New System.Drawing.Size(219, 25)
+        Me.ComboBoxNamaVoc.TabIndex = 524
         '
         'FormKodeVoucher
         '
@@ -508,4 +540,6 @@ Partial Class FormKodeVoucher
     Friend WithEvents SplitContainer2 As System.Windows.Forms.SplitContainer
     Friend WithEvents DataGridView1 As System.Windows.Forms.DataGridView
     Friend WithEvents ButtonPrev As System.Windows.Forms.Button
+    Friend WithEvents ButtonLaporan As System.Windows.Forms.Button
+    Friend WithEvents ComboBoxNamaVoc As System.Windows.Forms.ComboBox
 End Class

@@ -1,4 +1,7 @@
-﻿Public Class FormKodeVoucher
+﻿Imports System.IO
+Imports DevExpress.XtraReports.UI
+
+Public Class FormKodeVoucher
     Private userInput As String = PoliKlinik.Lbluser.Text
 
     Private currentPage As Integer = 1
@@ -7,7 +10,31 @@
         Me.MdiParent = PoliKlinik
         Me.Dock = DockStyle.Fill
         Me.WindowState = FormWindowState.Maximized
+        LoadComboNamaVoucher()
         LoadVoucher(currentPage)
+    End Sub
+
+    Private Sub LoadComboNamaVoucher()
+        Try
+            Dim sql As String = "SELECT DISTINCT NamaVoucher " & _
+                               "FROM MasterVoucher " & _
+                               "WHERE JumlahTerpakai >= 1 AND DeletedBy IS NULL " & _
+                               "ORDER BY NamaVoucher ASC"
+
+            Dim dt As DataTable = ReadSQL(sql)
+
+            ComboBoxNamaVoc.DataSource = Nothing
+            ComboBoxNamaVoc.Items.Clear()
+
+            If dt IsNot Nothing AndAlso dt.Rows.Count > 0 Then
+                ComboBoxNamaVoc.DataSource = dt
+                ComboBoxNamaVoc.DisplayMember = "NamaVoucher"
+                ComboBoxNamaVoc.ValueMember = "NamaVoucher"
+                ComboBoxNamaVoc.SelectedIndex = -1
+            End If
+        Catch ex As Exception
+            MsgBox("Gagal memuat daftar nama voucher: " & ex.Message, MsgBoxStyle.Critical, "Error Load Combo")
+        End Try
     End Sub
 
     Private Sub TextBoxMinVoc_KeyPress(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles TextBoxMinVoc.KeyPress
@@ -61,6 +88,7 @@
     Private Sub ResetForm()
         TextBoxKodeVoc.Clear()
         TextBoxNamaVoc.Clear()
+        ComboBoxNamaVoc.SelectedIndex = -1
         ComboBoxNominalVoc.SelectedIndex = -1
         TextBoxNominalVoc.Clear()
         TextBoxMinVoc.Clear()
@@ -477,5 +505,99 @@
             currentPage -= 1
             LoadVoucher(currentPage)
         End If
+    End Sub
+
+    Private Sub ButtonLaporan_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonLaporan.Click
+        Try
+            If ComboBoxNamaVoc.SelectedItem Is Nothing OrElse String.IsNullOrEmpty(ComboBoxNamaVoc.Text.Trim()) Then
+                MsgBox("Silakan pilih Nama Voucher terlebih dahulu.", MsgBoxStyle.Exclamation, "Peringatan")
+                ComboBoxNamaVoc.Focus()
+                Exit Sub
+            End If
+
+            Dim selectedNamaVoc As String = ComboBoxNamaVoc.Text.Trim()
+            Dim cleanNamaVoc As String = selectedNamaVoc.Replace("'", "''")
+
+            Dim filePath As String = Application.StartupPath & "\reports\LaporanVoucher.repx"
+
+            If Not System.IO.File.Exists(filePath) Then
+                MsgBox("File template laporan tidak ditemukan pada lokasi:" & vbCrLf & filePath, MsgBoxStyle.Critical, "Error File")
+                Exit Sub
+            End If
+
+            ' 1. Query Header
+            Dim sqlHeader As String = ""
+            sqlHeader &= "SELECT "
+            sqlHeader &= "    MV.NamaVoucher, "
+            sqlHeader &= "    MV.Tipe, "
+            sqlHeader &= "    MV.Nilai, "
+            sqlHeader &= "    SUM(MV.JumlahTerpakai) AS TotalTerpakai, "
+            sqlHeader &= "    CAST(MV.TanggalAkhir AS DATE) AS ExpDate "
+            sqlHeader &= "FROM MasterVoucher MV "
+            sqlHeader &= "WHERE MV.DeletedBy IS NULL "
+            sqlHeader &= "  AND MV.NamaVoucher = '" & cleanNamaVoc & "' "
+            sqlHeader &= "GROUP BY "
+            sqlHeader &= "    MV.NamaVoucher, "
+            sqlHeader &= "    MV.Tipe, "
+            sqlHeader &= "    MV.Nilai, "
+            sqlHeader &= "    CAST(MV.TanggalAkhir AS DATE) "
+            sqlHeader &= "HAVING SUM(MV.JumlahTerpakai) >= 1 "
+            sqlHeader &= "ORDER BY TotalTerpakai DESC, MV.NamaVoucher ASC"
+
+            ' 2. Query Detail (Penambahan NoBaris/NoUrut otomatis via ROW_NUMBER)
+            Dim sqlDetail As String = ""
+            sqlDetail &= "SELECT "
+            sqlDetail &= "    ROW_NUMBER() OVER(ORDER BY TD.TanggalTransaksi ASC) AS NoBaris, "
+            sqlDetail &= "    MV.NamaVoucher, "
+            sqlDetail &= "    MP.Nama, "
+            sqlDetail &= "    TD.NoUrut, "
+            sqlDetail &= "    TD.TanggalTransaksi, "
+            sqlDetail &= "    TD.JenisPoli, "
+            sqlDetail &= "    TPD.KodeVoucher, "
+            sqlDetail &= "    TPD.NamaTindakan, "
+            sqlDetail &= "    TPD.BiayaTindakan, "
+            sqlDetail &= "    TPD.DiscTindakan "
+            sqlDetail &= "FROM MasterVoucher MV "
+            sqlDetail &= "INNER JOIN TransaksiPoliDetail TPD ON MV.KodeVoucher = TPD.KodeVoucher "
+            sqlDetail &= "INNER JOIN TransaksiDetail TD ON TPD.TransPoliID = TD.NoTransaksi "
+            sqlDetail &= "INNER JOIN MasterPasien MP ON TD.IDInternet = MP.NoRekamMedis "
+            sqlDetail &= "WHERE MV.DeletedBy IS NULL "
+            sqlDetail &= "  AND TPD.DeletedBy IS NULL "
+            sqlDetail &= "  AND MV.NamaVoucher = '" & cleanNamaVoc & "' "
+            sqlDetail &= "ORDER BY TD.TanggalTransaksi ASC"
+
+            Dim dtHeader As DataTable = ReadSQL(sqlHeader)
+            Dim dtDetail As DataTable = ReadSQL(sqlDetail)
+
+            If dtHeader Is Nothing OrElse dtHeader.Rows.Count = 0 Then
+                MsgBox("Data voucher '" & selectedNamaVoc & "' tidak ditemukan atau belum pernah digunakan.", MsgBoxStyle.Information, "Informasi")
+                Exit Sub
+            End If
+
+            ' 3. Masukkan ke DataSet & Buat DataRelation
+            Dim dsReport As New DataSet("DSVoucher")
+            dtHeader.TableName = "HeaderVoucher"
+            dtDetail.TableName = "DetailTransaksi"
+
+            dsReport.Tables.Add(dtHeader.Copy())
+            dsReport.Tables.Add(dtDetail.Copy())
+
+            ' KUNCI agar detail bisa melooping: Hubungkan Header & Detail via NamaVoucher
+            Dim rel As New DataRelation("HeaderToDetail", _
+                                        dsReport.Tables("HeaderVoucher").Columns("NamaVoucher"), _
+                                        dsReport.Tables("DetailTransaksi").Columns("NamaVoucher"))
+            dsReport.Relations.Add(rel)
+
+            ' 4. Bind ke XtraReport
+            Dim report As DevExpress.XtraReports.UI.XtraReport = DevExpress.XtraReports.UI.XtraReport.FromFile(filePath, True)
+            report.DataSource = dsReport
+            report.DataMember = "HeaderVoucher" ' Set main table ke Header
+
+            'report.RunDesigner()
+            report.ShowPreview()
+
+        Catch ex As Exception
+            MsgBox("Terjadi kesalahan saat memuat laporan: " & ex.Message, MsgBoxStyle.Critical, "Error Report")
+        End Try
     End Sub
 End Class

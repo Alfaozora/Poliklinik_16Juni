@@ -34,6 +34,7 @@ Partial Class FormInputInformedConsent
         Me.CheckBoxSaksiPasien = New System.Windows.Forms.CheckBox
         Me.Label20 = New System.Windows.Forms.Label
         Me.GroupBox3 = New System.Windows.Forms.GroupBox
+        Me.ButtonReset = New System.Windows.Forms.Button
         Me.ButtonKalkulasi = New System.Windows.Forms.Button
         Me.Label18 = New System.Windows.Forms.Label
         Me.TextBoxQty = New System.Windows.Forms.TextBox
@@ -74,7 +75,6 @@ Partial Class FormInputInformedConsent
         Me.Label1 = New System.Windows.Forms.Label
         Me.ButtonCancel = New System.Windows.Forms.Button
         Me.ButtonSave = New System.Windows.Forms.Button
-        Me.ButtonReset = New System.Windows.Forms.Button
         Me.Panel1.SuspendLayout()
         Me.SplitContainerInformedConcent.Panel1.SuspendLayout()
         Me.SplitContainerInformedConcent.Panel2.SuspendLayout()
@@ -127,7 +127,7 @@ Partial Class FormInputInformedConsent
         Me.SplitContainerInformedConcent.Panel2.Controls.Add(Me.ButtonCancel)
         Me.SplitContainerInformedConcent.Panel2.Controls.Add(Me.ButtonSave)
         Me.SplitContainerInformedConcent.Size = New System.Drawing.Size(838, 413)
-        Me.SplitContainerInformedConcent.SplitterDistance = 361
+        Me.SplitContainerInformedConcent.SplitterDistance = 360
         Me.SplitContainerInformedConcent.SplitterWidth = 5
         Me.SplitContainerInformedConcent.TabIndex = 500
         '
@@ -253,6 +253,20 @@ Partial Class FormInputInformedConsent
         Me.GroupBox3.TabIndex = 451
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "Detail Informasi"
+        '
+        'ButtonReset
+        '
+        Me.ButtonReset.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonReset.FlatAppearance.BorderSize = 0
+        Me.ButtonReset.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonReset.Font = New System.Drawing.Font("Segoe UI", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ButtonReset.ForeColor = System.Drawing.Color.White
+        Me.ButtonReset.Location = New System.Drawing.Point(440, 593)
+        Me.ButtonReset.Name = "ButtonReset"
+        Me.ButtonReset.Size = New System.Drawing.Size(84, 27)
+        Me.ButtonReset.TabIndex = 529
+        Me.ButtonReset.Text = "Reset Awal"
+        Me.ButtonReset.UseVisualStyleBackColor = False
         '
         'ButtonKalkulasi
         '
@@ -689,7 +703,7 @@ Partial Class FormInputInformedConsent
         Me.ButtonCancel.Location = New System.Drawing.Point(443, 0)
         Me.ButtonCancel.Name = "ButtonCancel"
         Me.ButtonCancel.Padding = New System.Windows.Forms.Padding(10, 0, 0, 0)
-        Me.ButtonCancel.Size = New System.Drawing.Size(120, 47)
+        Me.ButtonCancel.Size = New System.Drawing.Size(120, 48)
         Me.ButtonCancel.TabIndex = 6
         Me.ButtonCancel.Text = "  Cancel"
         Me.ButtonCancel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -712,26 +726,12 @@ Partial Class FormInputInformedConsent
         Me.ButtonSave.Location = New System.Drawing.Point(563, 0)
         Me.ButtonSave.Name = "ButtonSave"
         Me.ButtonSave.Padding = New System.Windows.Forms.Padding(10, 0, 0, 0)
-        Me.ButtonSave.Size = New System.Drawing.Size(275, 47)
+        Me.ButtonSave.Size = New System.Drawing.Size(275, 48)
         Me.ButtonSave.TabIndex = 5
         Me.ButtonSave.Text = "  Send Informed Consent to Website"
         Me.ButtonSave.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.ButtonSave.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
         Me.ButtonSave.UseVisualStyleBackColor = False
-        '
-        'ButtonReset
-        '
-        Me.ButtonReset.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
-        Me.ButtonReset.FlatAppearance.BorderSize = 0
-        Me.ButtonReset.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.ButtonReset.Font = New System.Drawing.Font("Segoe UI", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.ButtonReset.ForeColor = System.Drawing.Color.White
-        Me.ButtonReset.Location = New System.Drawing.Point(440, 593)
-        Me.ButtonReset.Name = "ButtonReset"
-        Me.ButtonReset.Size = New System.Drawing.Size(84, 27)
-        Me.ButtonReset.TabIndex = 529
-        Me.ButtonReset.Text = "Reset Awal"
-        Me.ButtonReset.UseVisualStyleBackColor = False
         '
         'FormInputInformedConsent
         '
