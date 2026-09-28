@@ -227,6 +227,7 @@ Partial Class FormMasterPasien
         Me.ButtonScanQR = New System.Windows.Forms.Button
         Me.ButtonSimpanMenu1 = New System.Windows.Forms.Button
         Me.SplitContainer9 = New System.Windows.Forms.SplitContainer
+        Me.ButtonAmbilGambar = New System.Windows.Forms.Button
         Me.PanelTop.SuspendLayout()
         Me.PanelSide.SuspendLayout()
         Me.TabControlMenu.SuspendLayout()
@@ -505,12 +506,12 @@ Partial Class FormMasterPasien
         Me.ButtonUploadFoto.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonUploadFoto.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
         Me.ButtonUploadFoto.ForeColor = System.Drawing.Color.White
-        Me.ButtonUploadFoto.Location = New System.Drawing.Point(30, 231)
+        Me.ButtonUploadFoto.Location = New System.Drawing.Point(18, 231)
         Me.ButtonUploadFoto.Name = "ButtonUploadFoto"
         Me.ButtonUploadFoto.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.ButtonUploadFoto.Size = New System.Drawing.Size(150, 25)
+        Me.ButtonUploadFoto.Size = New System.Drawing.Size(66, 25)
         Me.ButtonUploadFoto.TabIndex = 422
-        Me.ButtonUploadFoto.Text = "Upload Foto"
+        Me.ButtonUploadFoto.Text = "Upload"
         Me.ButtonUploadFoto.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
         Me.ToolTipBtnMenu.SetToolTip(Me.ButtonUploadFoto, "Cek BPJS")
         Me.ButtonUploadFoto.UseVisualStyleBackColor = False
@@ -599,6 +600,7 @@ Partial Class FormMasterPasien
         '
         'GroupBox2
         '
+        Me.GroupBox2.Controls.Add(Me.ButtonAmbilGambar)
         Me.GroupBox2.Controls.Add(Me.ButtonUploadFoto)
         Me.GroupBox2.Controls.Add(Me.PictureBoxFotoPasien)
         Me.GroupBox2.Font = New System.Drawing.Font("Segoe UI Semibold", 11.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -2374,10 +2376,10 @@ Partial Class FormMasterPasien
         'TabPage2
         '
         Me.TabPage2.Controls.Add(Me.PanelLayoutMenu2TopMain)
-        Me.TabPage2.Location = New System.Drawing.Point(4, 27)
+        Me.TabPage2.Location = New System.Drawing.Point(4, 25)
         Me.TabPage2.Name = "TabPage2"
         Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage2.Size = New System.Drawing.Size(942, 563)
+        Me.TabPage2.Size = New System.Drawing.Size(942, 565)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Tab Menu 2"
         Me.TabPage2.UseVisualStyleBackColor = True
@@ -2395,7 +2397,7 @@ Partial Class FormMasterPasien
         Me.PanelLayoutMenu2TopMain.Dock = System.Windows.Forms.DockStyle.Fill
         Me.PanelLayoutMenu2TopMain.Location = New System.Drawing.Point(3, 3)
         Me.PanelLayoutMenu2TopMain.Name = "PanelLayoutMenu2TopMain"
-        Me.PanelLayoutMenu2TopMain.Size = New System.Drawing.Size(936, 557)
+        Me.PanelLayoutMenu2TopMain.Size = New System.Drawing.Size(936, 559)
         Me.PanelLayoutMenu2TopMain.TabIndex = 3
         '
         'TextBoxHPKontakDarurat
@@ -2459,10 +2461,10 @@ Partial Class FormMasterPasien
         'TabPage3
         '
         Me.TabPage3.Controls.Add(Me.PanelLayoutMenu3TopMain)
-        Me.TabPage3.Location = New System.Drawing.Point(4, 27)
+        Me.TabPage3.Location = New System.Drawing.Point(4, 25)
         Me.TabPage3.Name = "TabPage3"
         Me.TabPage3.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage3.Size = New System.Drawing.Size(942, 563)
+        Me.TabPage3.Size = New System.Drawing.Size(942, 565)
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "Tab Menu 3"
         Me.TabPage3.UseVisualStyleBackColor = True
@@ -2484,7 +2486,7 @@ Partial Class FormMasterPasien
         Me.PanelLayoutMenu3TopMain.Dock = System.Windows.Forms.DockStyle.Fill
         Me.PanelLayoutMenu3TopMain.Location = New System.Drawing.Point(3, 3)
         Me.PanelLayoutMenu3TopMain.Name = "PanelLayoutMenu3TopMain"
-        Me.PanelLayoutMenu3TopMain.Size = New System.Drawing.Size(936, 557)
+        Me.PanelLayoutMenu3TopMain.Size = New System.Drawing.Size(936, 559)
         Me.PanelLayoutMenu3TopMain.TabIndex = 5
         '
         'TextBoxNoKaryawanPerusahaan
@@ -2586,10 +2588,10 @@ Partial Class FormMasterPasien
         'TabPage4
         '
         Me.TabPage4.Controls.Add(Me.PanelLayoutMenu4TopMain)
-        Me.TabPage4.Location = New System.Drawing.Point(4, 27)
+        Me.TabPage4.Location = New System.Drawing.Point(4, 25)
         Me.TabPage4.Name = "TabPage4"
         Me.TabPage4.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage4.Size = New System.Drawing.Size(942, 563)
+        Me.TabPage4.Size = New System.Drawing.Size(942, 565)
         Me.TabPage4.TabIndex = 3
         Me.TabPage4.Text = "Tab Menu 4"
         Me.TabPage4.UseVisualStyleBackColor = True
@@ -2601,7 +2603,7 @@ Partial Class FormMasterPasien
         Me.PanelLayoutMenu4TopMain.Dock = System.Windows.Forms.DockStyle.Fill
         Me.PanelLayoutMenu4TopMain.Location = New System.Drawing.Point(3, 3)
         Me.PanelLayoutMenu4TopMain.Name = "PanelLayoutMenu4TopMain"
-        Me.PanelLayoutMenu4TopMain.Size = New System.Drawing.Size(936, 557)
+        Me.PanelLayoutMenu4TopMain.Size = New System.Drawing.Size(936, 559)
         Me.PanelLayoutMenu4TopMain.TabIndex = 7
         '
         'PanelButton
@@ -2723,6 +2725,27 @@ Partial Class FormMasterPasien
         Me.SplitContainer9.SplitterDistance = 45
         Me.SplitContainer9.SplitterWidth = 5
         Me.SplitContainer9.TabIndex = 461
+        '
+        'ButtonAmbilGambar
+        '
+        Me.ButtonAmbilGambar.BackColor = System.Drawing.Color.FromArgb(CType(CType(25, Byte), Integer), CType(CType(135, Byte), Integer), CType(CType(84, Byte), Integer))
+        Me.ButtonAmbilGambar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
+        Me.ButtonAmbilGambar.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonAmbilGambar.FlatAppearance.BorderSize = 0
+        Me.ButtonAmbilGambar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonAmbilGambar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.ButtonAmbilGambar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonAmbilGambar.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.ButtonAmbilGambar.ForeColor = System.Drawing.Color.White
+        Me.ButtonAmbilGambar.Location = New System.Drawing.Point(90, 231)
+        Me.ButtonAmbilGambar.Name = "ButtonAmbilGambar"
+        Me.ButtonAmbilGambar.RightToLeft = System.Windows.Forms.RightToLeft.Yes
+        Me.ButtonAmbilGambar.Size = New System.Drawing.Size(104, 25)
+        Me.ButtonAmbilGambar.TabIndex = 424
+        Me.ButtonAmbilGambar.Text = "Ambil Gambar"
+        Me.ButtonAmbilGambar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.ToolTipBtnMenu.SetToolTip(Me.ButtonAmbilGambar, "Cek BPJS")
+        Me.ButtonAmbilGambar.UseVisualStyleBackColor = False
         '
         'FormMasterPasien
         '
@@ -2999,4 +3022,5 @@ Partial Class FormMasterPasien
     Friend WithEvents ButtonUploadFoto As System.Windows.Forms.Button
     Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox
     Friend WithEvents TextBoxKetKhusus As System.Windows.Forms.TextBox
+    Friend WithEvents ButtonAmbilGambar As System.Windows.Forms.Button
 End Class
