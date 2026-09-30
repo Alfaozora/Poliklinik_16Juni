@@ -1,5 +1,6 @@
 Version : 2.0.0.60 (25 September 2026)
 # [Usability Improvement] Menambahkan GroupID Ketika Pemotongan paket
+# [Usability Improvement] Perbaikan dalam laporan mutasi paket
 
 Version : 2.0.0.59 (01 Agustus 2026)
 # [Usability Improvement] Jurnal Pemakaian dan Pembelian Paket
