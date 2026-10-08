@@ -487,6 +487,122 @@ Module Test
         End Try
     End Function
 
+    Public Function SendDataWhatsappOfficial( _
+            ByVal urlApi As String, _
+            ByVal apiKey As String, _
+            ByVal recipientNumber As String, _
+            ByVal filePath As String, _
+            ByVal fileName As String, _
+            ByVal patientName As String, _
+            ByVal clinicName As String, _
+            ByVal transactionNumber As String, _
+            ByVal transactionDate As String, _
+            ByVal templateName As String _
+        ) As Boolean
+
+        Try
+            If Not File.Exists(filePath) Then
+                MsgBox("File PDF tidak ditemukan: " & filePath, MsgBoxStyle.Exclamation, "Error File")
+                Return False
+            End If
+
+            Dim boundary As String = "---------------------------" & DateTime.Now.Ticks.ToString("x")
+
+            Dim request As HttpWebRequest = CType(WebRequest.Create(urlApi), HttpWebRequest)
+            request.Method = "POST"
+            request.ContentType = "multipart/form-data; boundary=" & boundary
+            request.Headers.Add("X-API-Key", apiKey)
+            request.Timeout = 30000
+
+            Dim jsonParams As String = "{" & _
+                """patient_name"": """ & patientName.Replace("""", "\""") & """," & _
+                """clinic_name_top"": """ & clinicName.Replace("""", "\""") & """," & _
+                """transaction_number"": """ & transactionNumber.Replace("""", "\""") & """," & _
+                """transaction_date"": """ & transactionDate & """," & _
+                """clinic_name_bottom"": """ & clinicName.Replace("""", "\""") & """" & _
+                "}"
+
+            Using memStream As New MemoryStream()
+                WriteMultipartFormField(memStream, boundary, "to", recipientNumber)
+                WriteMultipartFormField(memStream, boundary, "template_name", templateName)
+                WriteMultipartFormField(memStream, boundary, "language_code", "en")
+                WriteMultipartFormField(memStream, boundary, "header_type", "document")
+                WriteMultipartFormField(memStream, boundary, "filename", fileName)
+                WriteMultipartFormField(memStream, boundary, "body_parameters", jsonParams)
+
+                ' Field File
+                Dim fileHeader As String = "--" & boundary & vbCrLf & _
+                    "Content-Disposition: form-data; name=""file""; filename=""" & Path.GetFileName(filePath) & """" & vbCrLf & _
+                    "Content-Type: application/pdf" & vbCrLf & vbCrLf
+
+                Dim fileHeaderBytes As Byte() = Encoding.UTF8.GetBytes(fileHeader)
+                memStream.Write(fileHeaderBytes, 0, fileHeaderBytes.Length)
+
+                Dim fileBytes As Byte() = File.ReadAllBytes(filePath)
+                memStream.Write(fileBytes, 0, fileBytes.Length)
+
+                ' Penutup Boundary
+                Dim trailer As Byte() = Encoding.ASCII.GetBytes(vbCrLf & "--" & boundary & "--" & vbCrLf)
+                memStream.Write(trailer, 0, trailer.Length)
+
+                ' Kirim Stream
+                request.ContentLength = memStream.Length
+                Using requestStream As Stream = request.GetRequestStream()
+                    memStream.Position = 0
+                    Dim buffer(1024) As Byte
+                    Dim bytesRead As Integer = 0
+                    While True
+                        bytesRead = memStream.Read(buffer, 0, buffer.Length)
+                        If bytesRead = 0 Then Exit While
+                        requestStream.Write(buffer, 0, bytesRead)
+                    End While
+                End Using
+            End Using
+
+            ' 🟢 BACA RESPON SERVER SECARA LENGKAP
+            Using response As HttpWebResponse = CType(request.GetResponse(), HttpWebResponse)
+                Using reader As New StreamReader(response.GetResponseStream())
+                    Dim responseString As String = reader.ReadToEnd()
+
+                    ' Cek apakah dalam teks JSON mengandung "success" atau "accepted"
+                    If responseString.ToLower().Contains("""status"": ""success""") OrElse _
+                       responseString.ToLower().Contains("""message_status"": ""accepted""") OrElse _
+                       responseString.ToLower().Contains("success") Then
+                        Return True
+                    Else
+                        Return False
+                    End If
+                End Using
+            End Using
+
+        Catch ex As WebException
+            If ex.Response IsNot Nothing Then
+                Using reader As New StreamReader(ex.Response.GetResponseStream())
+                    Dim responseString As String = reader.ReadToEnd()
+
+                    ' Fallback jika masuk ke WebException namun respon JSON sebenarnya sukses
+                    If responseString.ToLower().Contains("""status"": ""success""") OrElse _
+                       responseString.ToLower().Contains("""message_status"": ""accepted""") Then
+                        Return True
+                    End If
+                End Using
+            End If
+            Return False
+        Catch ex As Exception
+            Return False
+        End Try
+    End Function
+
+    ' 🟢 HELPER KHUSUS VB.NET 2008 UNTUK MEMBUAT FIELD MULTIPART
+    Private Sub WriteMultipartFormField(ByRef stream As Stream, ByVal boundary As String, ByVal fieldName As String, ByVal fieldValue As String)
+        Dim header As String = "--" & boundary & vbCrLf & _
+            "Content-Disposition: form-data; name=""" & fieldName & """" & vbCrLf & vbCrLf & _
+            fieldValue & vbCrLf
+
+        Dim headerBytes As Byte() = Encoding.UTF8.GetBytes(header)
+        stream.Write(headerBytes, 0, headerBytes.Length)
+    End Sub
+
     Public Sub WriteThemysql(ByVal txt As String, ByVal Tconn As TLcon)
         Dim lblconnect As String = ""
         With Tconn

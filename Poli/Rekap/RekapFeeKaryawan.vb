@@ -594,7 +594,8 @@ Public Class RekapFeeKaryawan
         queryString.AppendLine("LEFT JOIN MasterPasien tblPasien ON tblTrans.IDInternet=tblPasien.NoRekamMedis")
         queryString.AppendLine("WHERE b.DeletedDate IS NULL AND c.JenisTindakan NOT LIKE '%Konsul%' AND c.StatusFeeTindakan='1'")
         queryString.AppendLine("  AND (b.NettBayar > 0 OR b.KodeVoucher IS NOT NULL)")
-        queryString.AppendLine("  AND (c.JenisDokter LIKE '%" & jenisPelaksana & "%' OR c.FeePerawat > 0)")
+        ' --- PERBAIKAN FILTER QUERY SQL (Memungkinkan Persentase Perawat Tertarik) ---
+        queryString.AppendLine("  AND (c.JenisDokter LIKE '%" & jenisPelaksana & "%' OR c.FeePerawat > 0 OR ISNULL(c.PersentaseFeePerawat, 0) > 0)")
         queryString.AppendLine("  AND EXISTS (SELECT 1 FROM TransaksiPoliBayarAwal d WHERE d.TransPoliID = tblTrans.TransPoliID AND d.JenisBayar IN ('TUNAI', 'DEBET', 'CARD', 'VOUCHER', 'TAGIHAN'))")
         queryString.AppendLine("UNION ALL")
         queryString.AppendLine("SELECT b.TransPoliIDDetail AS ID, tblTrans.[Tgl Transaksi], tblPasien.Nama, tblTrans.NoUrut, b.NamaTindakan, b.NettBayar, c.FeeDokter, c.FeePerawat, c.JenisDokter, c.StatusBHP, c.PersentaseFeeKaryawan, c.PersentaseFeePerawat, c.StatusPersentaseFee, c.StatusNominalFee, c.FeePerTindakan, b.TotalBayarBHP, b.ClosedFeeDokter, b.ClosedFeePerawat, tblTrans.ClosingTindakanDokter, tblTrans.ClosingTindakanPerawat")
@@ -604,7 +605,8 @@ Public Class RekapFeeKaryawan
         queryString.AppendLine("LEFT JOIN MasterPasien tblPasien ON tblTrans.IDInternet=tblPasien.NoRekamMedis")
         queryString.AppendLine("WHERE b.DeletedDate IS NULL AND c.JenisTindakan NOT LIKE '%Konsul%' AND c.StatusFeeTindakan='1'")
         queryString.AppendLine("  AND (b.NettBayar > 0 OR b.KodeVoucher IS NOT NULL)")
-        queryString.AppendLine("  AND (c.JenisDokter LIKE '%" & jenisPelaksana & "%' OR c.FeePerawat > 0)")
+        ' --- PERBAIKAN FILTER QUERY SQL (Memungkinkan Persentase Perawat Tertarik) ---
+        queryString.AppendLine("  AND (c.JenisDokter LIKE '%" & jenisPelaksana & "%' OR c.FeePerawat > 0 OR ISNULL(c.PersentaseFeePerawat, 0) > 0)")
         queryString.AppendLine("  AND EXISTS (SELECT 1 FROM TransaksiPoliBayar e WHERE e.TransPoliID = tblTrans.TransPoliID AND e.JenisBayar IN ('TUNAI', 'DEBET', 'CARD', 'VOUCHER', 'TAGIHAN'))")
 
         Dim tblTindakan As DataTable = ReadSQL(queryString.ToString())
@@ -628,40 +630,68 @@ Public Class RekapFeeKaryawan
                 NominalBHP = CDbl(ConvertToInteger(rowTindakan("TotalBayarBHP").ToString()))
             End If
 
-            If rowTindakan("JenisDokter").ToString.Contains(jenisPelaksana) = True Then
-                ' Cek Persentase / Nominal
+            ' --- PERBAIKAN LOGIKA PERHITUNGAN FEE ---
+            If jenisPelaksana = "Dokter" Then
                 If statusPersentase = True Then
-                    ' Cek BHP / Non BHP
-                    If statusBHP = True Then
-                        NominalFee = CDbl(rowTindakan("NettBayar").ToString) - NominalBHP
-                    Else
-                        NominalFee = CDbl(rowTindakan("NettBayar").ToString)
-                    End If
-
-                    ' Ambil Persentase Dokter (dari kolom PersentaseFeeKaryawan)
+                    Dim dasarNominal As Double = If(statusBHP, CDbl(rowTindakan("NettBayar").ToString) - NominalBHP, CDbl(rowTindakan("NettBayar").ToString))
                     Dim PersentaseFeeDokter As Double = CDbl(rowTindakan("PersentaseFeeKaryawan").ToString)
-
-                    ' Ambil Persentase Perawat dengan aman (Cegah error DBNull)
-                    Dim PersentaseFeePwt As Double = 0
-                    If Not IsDBNull(rowTindakan("PersentaseFeePerawat")) AndAlso rowTindakan("PersentaseFeePerawat").ToString() <> "" Then
-                        PersentaseFeePwt = CDbl(rowTindakan("PersentaseFeePerawat").ToString)
-                    End If
-
-                    ' Hitung Pembagian Fee
-                    If jenisPelaksana = "Dokter" Then
-                        NominalFee = ((NominalFee - CDbl(rowTindakan("FeePerawat"))) * PersentaseFeeDokter) / 100
-                    ElseIf jenisPelaksana = "Perawat" Then
-                        NominalFee = (NominalFee * PersentaseFeePwt) / 100
-                    End If
-
+                    NominalFee = ((dasarNominal - CDbl(rowTindakan("FeePerawat"))) * PersentaseFeeDokter) / 100
                 ElseIf statusNominal = True Then
-                    If jenisPelaksana = "Dokter" Then NominalFee = CDbl(rowTindakan("FeePerTindakan").ToString) - CDbl(rowTindakan("FeePerawat"))
-                    If jenisPelaksana = "Perawat" Then NominalFee = CDbl(rowTindakan("FeePerTindakan").ToString)
+                    NominalFee = CDbl(rowTindakan("FeePerTindakan").ToString) - CDbl(rowTindakan("FeePerawat"))
                 End If
 
-            ElseIf CDbl(rowTindakan("FeePerawat")) > 0 And rowTindakan("JenisDokter").ToString.Trim <> jenisPelaksana And jenisPelaksana = "Perawat" Then
-                NominalFee = CDbl(rowTindakan("FeePerawat").ToString)
+            ElseIf jenisPelaksana = "Perawat" Then
+                ' Ambil Persentase Perawat dengan aman
+                Dim PersentaseFeePwt As Double = 0
+                If Not IsDBNull(rowTindakan("PersentaseFeePerawat")) AndAlso rowTindakan("PersentaseFeePerawat").ToString() <> "" Then
+                    PersentaseFeePwt = CDbl(rowTindakan("PersentaseFeePerawat").ToString)
+                End If
+
+                If statusPersentase = True AndAlso PersentaseFeePwt > 0 Then
+                    ' Perhitungan Persentase Perawat
+                    Dim dasarNominal As Double = If(statusBHP, CDbl(rowTindakan("NettBayar").ToString) - NominalBHP, CDbl(rowTindakan("NettBayar").ToString))
+                    NominalFee = (dasarNominal * PersentaseFeePwt) / 100
+                ElseIf statusNominal = True AndAlso rowTindakan("JenisDokter").ToString.Contains("Perawat") Then
+                    NominalFee = CDbl(rowTindakan("FeePerTindakan").ToString)
+                ElseIf CDbl(rowTindakan("FeePerawat")) > 0 Then
+                    NominalFee = CDbl(rowTindakan("FeePerawat").ToString)
+                End If
             End If
+
+            'If rowTindakan("JenisDokter").ToString.Contains(jenisPelaksana) = True Then
+            '    ' Cek Persentase / Nominal
+            '    If statusPersentase = True Then
+            '        ' Cek BHP / Non BHP
+            '        If statusBHP = True Then
+            '            NominalFee = CDbl(rowTindakan("NettBayar").ToString) - NominalBHP
+            '        Else
+            '            NominalFee = CDbl(rowTindakan("NettBayar").ToString)
+            '        End If
+
+            '        ' Ambil Persentase Dokter (dari kolom PersentaseFeeKaryawan)
+            '        Dim PersentaseFeeDokter As Double = CDbl(rowTindakan("PersentaseFeeKaryawan").ToString)
+
+            '        ' Ambil Persentase Perawat dengan aman (Cegah error DBNull)
+            '        Dim PersentaseFeePwt As Double = 0
+            '        If Not IsDBNull(rowTindakan("PersentaseFeePerawat")) AndAlso rowTindakan("PersentaseFeePerawat").ToString() <> "" Then
+            '            PersentaseFeePwt = CDbl(rowTindakan("PersentaseFeePerawat").ToString)
+            '        End If
+
+            '        ' Hitung Pembagian Fee
+            '        If jenisPelaksana = "Dokter" Then
+            '            NominalFee = ((NominalFee - CDbl(rowTindakan("FeePerawat"))) * PersentaseFeeDokter) / 100
+            '        ElseIf jenisPelaksana = "Perawat" Then
+            '            NominalFee = (NominalFee * PersentaseFeePwt) / 100
+            '        End If
+
+            '    ElseIf statusNominal = True Then
+            '        If jenisPelaksana = "Dokter" Then NominalFee = CDbl(rowTindakan("FeePerTindakan").ToString) - CDbl(rowTindakan("FeePerawat"))
+            '        If jenisPelaksana = "Perawat" Then NominalFee = CDbl(rowTindakan("FeePerTindakan").ToString)
+            '    End If
+
+            'ElseIf CDbl(rowTindakan("FeePerawat")) > 0 And rowTindakan("JenisDokter").ToString.Trim <> jenisPelaksana And jenisPelaksana = "Perawat" Then
+            '    NominalFee = CDbl(rowTindakan("FeePerawat").ToString)
+            'End If
 
             Dim newRow As DataRow = tblGridControl.NewRow
             newRow("Transaksi ID") = rowTindakan("ID")
