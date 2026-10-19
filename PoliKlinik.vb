@@ -1620,4 +1620,9 @@ Public Class PoliKlinik
         FormBrigdingPosWeb.Show()
         FormBrigdingPosWeb.Focus()
     End Sub
+
+    Private Sub LaporanToolStripMenuItem1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles LaporanToolStripMenuItem1.Click
+        FormLaporanPasien.Show()
+        FormLaporanPasien.Focus()
+    End Sub
 End Class

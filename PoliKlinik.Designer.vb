@@ -281,6 +281,7 @@ Partial Class PoliKlinik
         Me.TimerShutdown = New System.Windows.Forms.Timer(Me.components)
         Me.TimerKirimReminderWA = New System.Windows.Forms.Timer(Me.components)
         Me.TimerBirthday = New System.Windows.Forms.Timer(Me.components)
+        Me.LaporanToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip.SuspendLayout()
         Me.StatusStrip.SuspendLayout()
         Me.SuspendLayout()
@@ -535,7 +536,7 @@ Partial Class PoliKlinik
         '
         'LaporanKlinikToolStripMenuItem
         '
-        Me.LaporanKlinikToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.Daftar10DiagnosaTerbanyakToolStripMenuItem, Me.LaporanDaftarDiagnosaToolStripMenuItem, Me.DaftarKunjunganPasienToolStripMenuItem, Me.LaporanRiwayatPaketTindakanToolStripMenuItem, Me.LaporanRevenueDanSellingToolStripMenuItem, Me.LaporanPenggunaanAlatToolStripMenuItem})
+        Me.LaporanKlinikToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.Daftar10DiagnosaTerbanyakToolStripMenuItem, Me.LaporanDaftarDiagnosaToolStripMenuItem, Me.DaftarKunjunganPasienToolStripMenuItem, Me.LaporanRiwayatPaketTindakanToolStripMenuItem, Me.LaporanRevenueDanSellingToolStripMenuItem, Me.LaporanPenggunaanAlatToolStripMenuItem, Me.LaporanToolStripMenuItem1})
         Me.LaporanKlinikToolStripMenuItem.Name = "LaporanKlinikToolStripMenuItem"
         Me.LaporanKlinikToolStripMenuItem.Size = New System.Drawing.Size(263, 22)
         Me.LaporanKlinikToolStripMenuItem.Tag = "0309"
@@ -2066,6 +2067,12 @@ Partial Class PoliKlinik
         '
         Me.TimerBirthday.Interval = 300000
         '
+        'LaporanToolStripMenuItem1
+        '
+        Me.LaporanToolStripMenuItem1.Name = "LaporanToolStripMenuItem1"
+        Me.LaporanToolStripMenuItem1.Size = New System.Drawing.Size(299, 22)
+        Me.LaporanToolStripMenuItem1.Text = "Laporan Pasien"
+        '
         'PoliKlinik
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -2348,4 +2355,5 @@ Partial Class PoliKlinik
     Friend WithEvents LaporanRevenueDanSellingToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents LaporanPenggunaanAlatToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents BridgingPOSWebToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents LaporanToolStripMenuItem1 As System.Windows.Forms.ToolStripMenuItem
 End Class
