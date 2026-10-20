@@ -20,6 +20,8 @@
 
         ComboBoxTahun.SelectedIndex = 0
 
+        ButtonCari.Enabled = RBTindakanPasien.Checked
+
         LoadDataPoli()
     End Sub
 
@@ -52,6 +54,11 @@
 
         If ComboBoxBulan.SelectedIndex = -1 OrElse ComboBoxTahun.SelectedIndex = -1 Then
             MsgBox("Silahkan pilih Bulan dan Tahun terlebih dahulu.", MsgBoxStyle.Exclamation, "Peringatan")
+            Exit Sub
+        End If
+
+        If RBTindakanPasien.Checked AndAlso String.IsNullOrEmpty(TextBoxIdTindakan.Text.Trim()) Then
+            MsgBox("Silahkan pilih Tindakan terlebih dahulu melalui tombol pencarian.", MsgBoxStyle.Exclamation, "Peringatan")
             Exit Sub
         End If
 
@@ -122,6 +129,29 @@
                 "GROUP BY MP.NoRekamMedis, MP.Nama, MP.TglLahir, MP.NoHandphone, PP.TransaksiPertama " & _
                 "ORDER BY MP.Nama ASC", strAwal, strAkhir, jenisPoli)
 
+        ElseIf RBTindakanPasien.Checked Then
+            repxFileName = "\reports\LaporanTindakanPasien.repx"
+            Dim idTindakan As String = TextBoxIdTindakan.Text.Trim().Replace("'", "''")
+
+            sqlReport = String.Format( _
+                "SELECT " & _
+                "    MP.NoRekamMedis, " & _
+                "    MP.Nama, " & _
+                "    MT.NamaTindakan, " & _
+                "    COUNT(TPD.TransPoliIDDetail) AS TotalPakaiTindakan, " & _
+                "    MAX(TD.TanggalTransaksi) AS TglTerakhirKunjungan " & _
+                "FROM TransaksiDetail TD " & _
+                "INNER JOIN MasterPasien MP ON TD.IDInternet = MP.NoRekamMedis " & _
+                "INNER JOIN TransaksiPoliDetail TPD ON TD.NoTransaksi = TPD.TransPoliID " & _
+                "INNER JOIN MasterTindakan MT ON TPD.TindakanID = MT.TindakanID " & _
+                "WHERE TD.DeletedBy IS NULL " & _
+                "  AND TPD.DeletedBy IS NULL " & _
+                "  AND TPD.StatusPembayaran = 'PAID' " & _
+                "  AND TD.TanggalTransaksi BETWEEN '{0}' AND '{1}' " & _
+                "  AND TPD.TindakanID = '{2}' " & _
+                "GROUP BY MP.NoRekamMedis, MP.Nama, MT.NamaTindakan " & _
+                "ORDER BY COUNT(TPD.TransPoliIDDetail) DESC, MP.Nama ASC", strAwal, strAkhir, idTindakan)
+
         Else
             MsgBox("Silahkan pilih salah satu jenis laporan terlebih dahulu.", MsgBoxStyle.Exclamation, "Peringatan")
             Exit Sub
@@ -148,13 +178,69 @@
                 Next
 
                 report.DataSource = dtData
-                'report.ShowPreview()
-                report.RunDesigner()
+                report.ShowPreview()
+                'report.RunDesigner()
             Else
                 MsgBox("Tidak ada data pasien untuk " & jenisPoli & " pada periode " & ComboBoxBulan.Text & " " & tahun.ToString() & ".", MsgBoxStyle.Information, "Informasi")
             End If
         Catch ex As Exception
             MsgBox("Gagal menampilkan laporan: " & ex.Message, MsgBoxStyle.Critical, "Error")
         End Try
+    End Sub
+
+    Private Sub ButtonCari_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCari.Click
+        Try
+            Dim jenisPoli As String = ""
+            If ComboBoxPoli.SelectedIndex <> -1 Then
+                jenisPoli = ComboBoxPoli.Text.Trim()
+            End If
+
+            Dim queryString As String = "SELECT TindakanID, NamaTindakan, JenisTindakan, " & _
+                                        "PARSENAME(CONVERT(varchar, CONVERT(money, BiayaTindakan), 1), 2) AS [BiayaTindakan] " & _
+                                        "FROM MasterTindakan " & _
+                                        "WHERE Closed = 0 AND JenisTindakan NOT LIKE '%Konsultasi%' AND JenisTindakan NOT LIKE '%Administrasi%'"
+
+            If jenisPoli <> "" AndAlso jenisPoli <> "SEMUA POLI" Then
+                queryString &= " AND PoliTujuan LIKE '%" & jenisPoli.Replace("'", "''") & "%'"
+            End If
+
+            Dim queryOrderString As String = " ORDER BY JenisTindakan, NamaTindakan"
+
+            Find.Show()
+            Find.Query(queryString, queryOrderString, "FindTindakanLaporanPasien", 1)
+
+        Catch ex As Exception
+            MsgBox("Gagal membuka pencarian tindakan: " & ex.Message, MsgBoxStyle.Critical, "Error")
+        End Try
+    End Sub
+
+    Public Sub LoadTindakanPoli(ByRef Trow As DataRowView)
+        Try
+            If Trow IsNot Nothing Then
+                If Val(Trow("TindakanID")) > 0 Then
+                    TextBoxIdTindakan.Text = Trow("TindakanID").ToString()
+                    TextBoxTindakan.Text = Trow("NamaTindakan").ToString()
+                End If
+            End If
+        Catch ex As Exception
+            MsgBox("Gagal memuat data tindakan: " & ex.Message, MsgBoxStyle.Critical, "Error")
+        End Try
+    End Sub
+
+    Public Sub SetTindakanPilihan(ByVal idTindakan As String, ByVal namaTindakan As String)
+        TextBoxTindakan.Text = namaTindakan
+        TextBoxTindakan.Tag = idTindakan
+    End Sub
+
+    Private Sub RBTindakanPasien_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RBTindakanPasien.CheckedChanged
+        ComboBoxPoli.Enabled = Not RBTindakanPasien.Checked
+        ButtonCari.Enabled = RBTindakanPasien.Checked
+
+        If RBTindakanPasien.Checked Then
+            ComboBoxPoli.Text = "SEMUA POLI"
+        Else
+            TextBoxIdTindakan.Clear()
+            TextBoxTindakan.Clear()
+        End If
     End Sub
 End Class

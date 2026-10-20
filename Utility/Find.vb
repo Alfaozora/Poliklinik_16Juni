@@ -411,6 +411,8 @@ Public Class Find
                     FormRekamMedisDokter.LoadTindakanRiwayatLaboratorium(Grdrow)
                 Case "FindTindakanPoliPerencanaan"
                     FormRekamMedisDokter.LoadTindakanPoli(Grdrow)
+                Case "FindTindakanLaporanPasien"
+                    FormLaporanPasien.LoadTindakanPoli(Grdrow)
                 Case "FindPenjaminTindakanRekamMedis"
                     FormRekamMedisDokter.LabelPenjaminAsuransiLain.Text = Grdrow("CompanyNama").ToString
                 Case "FindMasterDokter"

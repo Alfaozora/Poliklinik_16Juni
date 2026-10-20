@@ -34,8 +34,13 @@ Partial Class FormLaporanPasien
         Me.ComboBoxBulan = New System.Windows.Forms.ComboBox
         Me.Label1 = New System.Windows.Forms.Label
         Me.ButtonTampilkan = New System.Windows.Forms.Button
+        Me.GroupBox3 = New System.Windows.Forms.GroupBox
+        Me.TextBoxTindakan = New System.Windows.Forms.TextBox
+        Me.ButtonCari = New System.Windows.Forms.Button
+        Me.TextBoxIdTindakan = New System.Windows.Forms.TextBox
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
+        Me.GroupBox3.SuspendLayout()
         Me.SuspendLayout()
         '
         'GroupBox1
@@ -101,6 +106,7 @@ Partial Class FormLaporanPasien
         '
         'GroupBox2
         '
+        Me.GroupBox2.Controls.Add(Me.GroupBox3)
         Me.GroupBox2.Controls.Add(Me.ComboBoxPoli)
         Me.GroupBox2.Controls.Add(Me.Label2)
         Me.GroupBox2.Controls.Add(Me.ComboBoxTahun)
@@ -174,23 +180,69 @@ Partial Class FormLaporanPasien
         Me.ButtonTampilkan.Text = "Tampilkan"
         Me.ButtonTampilkan.UseVisualStyleBackColor = False
         '
+        'GroupBox3
+        '
+        Me.GroupBox3.Controls.Add(Me.TextBoxIdTindakan)
+        Me.GroupBox3.Controls.Add(Me.ButtonCari)
+        Me.GroupBox3.Controls.Add(Me.TextBoxTindakan)
+        Me.GroupBox3.Location = New System.Drawing.Point(10, 58)
+        Me.GroupBox3.Name = "GroupBox3"
+        Me.GroupBox3.Size = New System.Drawing.Size(332, 61)
+        Me.GroupBox3.TabIndex = 5
+        Me.GroupBox3.TabStop = False
+        Me.GroupBox3.Text = "Tindakan"
+        '
+        'TextBoxTindakan
+        '
+        Me.TextBoxTindakan.Location = New System.Drawing.Point(59, 21)
+        Me.TextBoxTindakan.Multiline = True
+        Me.TextBoxTindakan.Name = "TextBoxTindakan"
+        Me.TextBoxTindakan.ReadOnly = True
+        Me.TextBoxTindakan.Size = New System.Drawing.Size(213, 25)
+        Me.TextBoxTindakan.TabIndex = 0
+        '
+        'ButtonCari
+        '
+        Me.ButtonCari.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonCari.FlatAppearance.BorderSize = 0
+        Me.ButtonCari.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonCari.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ButtonCari.ForeColor = System.Drawing.Color.White
+        Me.ButtonCari.Location = New System.Drawing.Point(12, 21)
+        Me.ButtonCari.Name = "ButtonCari"
+        Me.ButtonCari.Size = New System.Drawing.Size(41, 25)
+        Me.ButtonCari.TabIndex = 6
+        Me.ButtonCari.Text = "Cari"
+        Me.ButtonCari.UseVisualStyleBackColor = False
+        '
+        'TextBoxIdTindakan
+        '
+        Me.TextBoxIdTindakan.Location = New System.Drawing.Point(278, 21)
+        Me.TextBoxIdTindakan.Multiline = True
+        Me.TextBoxIdTindakan.Name = "TextBoxIdTindakan"
+        Me.TextBoxIdTindakan.ReadOnly = True
+        Me.TextBoxIdTindakan.Size = New System.Drawing.Size(35, 25)
+        Me.TextBoxIdTindakan.TabIndex = 7
+        '
         'FormLaporanPasien
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.SystemColors.ControlLightLight
-        Me.ClientSize = New System.Drawing.Size(620, 324)
+        Me.ClientSize = New System.Drawing.Size(620, 257)
         Me.Controls.Add(Me.ButtonTampilkan)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.GroupBox1)
-        Me.MaximumSize = New System.Drawing.Size(636, 363)
-        Me.MinimumSize = New System.Drawing.Size(636, 363)
+        Me.MaximumSize = New System.Drawing.Size(636, 296)
+        Me.MinimumSize = New System.Drawing.Size(636, 296)
         Me.Name = "FormLaporanPasien"
         Me.Text = "Form Laporan Pasien"
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
+        Me.GroupBox3.ResumeLayout(False)
+        Me.GroupBox3.PerformLayout()
         Me.ResumeLayout(False)
 
     End Sub
@@ -206,4 +258,8 @@ Partial Class FormLaporanPasien
     Friend WithEvents ComboBoxPoli As System.Windows.Forms.ComboBox
     Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents ButtonTampilkan As System.Windows.Forms.Button
+    Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox
+    Friend WithEvents ButtonCari As System.Windows.Forms.Button
+    Friend WithEvents TextBoxTindakan As System.Windows.Forms.TextBox
+    Friend WithEvents TextBoxIdTindakan As System.Windows.Forms.TextBox
 End Class
