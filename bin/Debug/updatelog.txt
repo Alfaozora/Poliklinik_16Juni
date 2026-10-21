@@ -2,6 +2,9 @@ Version : 2.0.0.61 (03 Oktober 2026)
 # [Usability Improvement] Menambahkan digit maximum pada textbox pembayaran menjadi 12 digit
 # [New Feature] Fitur baru WhatsApp official sebagai alternatif kirim pesan
 # [New Feature] Menambahkan kolom referral pada masterpasien
+# [New Feature] Penambahan laporan pasien
+# [Bug Fix] Perbaikan tanggal transaksi saat cetak ulang invoice
+# [Bug Fix] Perbaikan Logo Lumiera saat di cek stik
 
 Version : 2.0.0.60 (25 September 2026)
 # [Usability Improvement] Menambahkan GroupID Ketika Pemotongan paket

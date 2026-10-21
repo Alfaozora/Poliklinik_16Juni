@@ -816,6 +816,15 @@ Public Class FormCetakInvoice
 
         Dim transPoliID As String = dtTransPoliID.Rows(0)("TransPoliID").ToString()
 
+        Dim dtTransDetail As DataTable = ReadSQL("SELECT TOP 1 ValidatorURL, TanggalTransaksi FROM TransaksiDetail WHERE NoUrut = '" & TextBoxNomorTransaksi.Text & "'")
+        Dim tglTransaksiAsli As String = Format(DateAndTime.Now, "dd-MMM-yyyy")
+
+        If dtTransDetail IsNot Nothing AndAlso dtTransDetail.Rows.Count > 0 Then
+            If Not IsDBNull(dtTransDetail.Rows(0)("TanggalTransaksi")) Then
+                tglTransaksiAsli = Format(CDate(dtTransDetail.Rows(0)("TanggalTransaksi")), "dd-MMM-yyyy")
+            End If
+        End If
+
         ' --- PERBAIKAN 1: Masukkan PaketID ke GROUP BY agar Paket tidak saling menggabung ---
         Dim queryQty As String = ""
 
@@ -897,7 +906,7 @@ Public Class FormCetakInvoice
             Tnew("Nama") = TrowPasien("Nama")
             Tnew("Umur") = TrowPasien("TanggalLengkap") & " / " & Umur(Tdate.Date)
             Tnew("Alamat") = TrowPasien("Alamat")
-            Tnew("Tanggal") = Format(DateAndTime.Now, "dd-MMM-yyyy")
+            Tnew("Tanggal") = tglTransaksiAsli
             Tnew("NoTransaksi") = TextBoxNomorTransaksi.Text
             Tnew("DrPengirim") = TextBoxNamaDokter.Text
             Tnew("StatusAmbil") = ""

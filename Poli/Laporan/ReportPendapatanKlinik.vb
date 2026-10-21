@@ -309,11 +309,13 @@ Public Class ReportPendapatanKlinik
         CheckBoxPaket.Enabled = True
     End Sub
 
+    'NEW
     Private Sub SetGridLaporanPendapatan()
         Dim tblOmset As DataTable = CreateTableLaporanPendapatan()
 
         GridControlLaporanPendapatan.DataSource = tblOmset
 
+        ' Sembunyikan kolom-kolom internal
         GridViewLaporanPendapatan.Columns("No").Visible = False
         GridViewLaporanPendapatan.Columns("NoJenisBayar").Visible = False
         GridViewLaporanPendapatan.Columns("NIP").Visible = False
@@ -325,16 +327,59 @@ Public Class ReportPendapatanKlinik
         GridViewLaporanPendapatan.Columns("JenisTransaksi").Visible = False
         GridViewLaporanPendapatan.Columns("Jenis Bayar").Visible = False
 
-        ' Buang pengelompokan sisa mode Paket (lihat ViewDataLaporanPendapatanPaket)
+        ' =========================================================
+        ' SETTING FORMAT TAMPILAN KOLOM QTY & HARGA SATUAN DI GRID
+        ' =========================================================
+        If GridViewLaporanPendapatan.Columns("Qty") IsNot Nothing Then
+            GridViewLaporanPendapatan.Columns("Qty").VisibleIndex = 6
+            GridViewLaporanPendapatan.Columns("Qty").Caption = "Qty"
+            GridViewLaporanPendapatan.Columns("Qty").DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric
+            GridViewLaporanPendapatan.Columns("Qty").DisplayFormat.FormatString = "{0:N0}"
+            GridViewLaporanPendapatan.Columns("Qty").AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center
+        End If
+
+        If GridViewLaporanPendapatan.Columns("HargaSatuan") IsNot Nothing Then
+            GridViewLaporanPendapatan.Columns("HargaSatuan").VisibleIndex = 7
+            GridViewLaporanPendapatan.Columns("HargaSatuan").Caption = "Harga Satuan"
+            GridViewLaporanPendapatan.Columns("HargaSatuan").DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric
+            GridViewLaporanPendapatan.Columns("HargaSatuan").DisplayFormat.FormatString = "Rp {0:N0}"
+            GridViewLaporanPendapatan.Columns("HargaSatuan").AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far
+        End If
+
+        ' Buang pengelompokan sisa mode Paket
         GridViewLaporanPendapatan.Columns("Detail Pembayaran").GroupIndex = -1
 
-        ' Berlaku untuk mode biasa DAN mode Paket — keduanya memakai CreateTableLaporanPendapatan
-        ' sehingga GridColumn-nya dipakai ulang saat DataSource diganti. Mode Voucher punya struktur
-        ' kolom sendiri (lihat GetDataLaporanPendapatanVoucher) jadi ia memanggil sendiri.
-        ' "pemeriksaan" dipilih sebagai tempat keterangan: kolom teks terlebar yang tampil DAN persis
-        ' di sebelah kiri "Tagihan", jadi keterangan dan angkanya terbaca sebagai satu kalimat.
+        ' Pasang total footer di bagian bawah grid
         PasangTotalLaporanPendapatan("pemeriksaan", "Tagihan")
     End Sub
+
+    'OLD
+    'Private Sub SetGridLaporanPendapatan()
+    '    Dim tblOmset As DataTable = CreateTableLaporanPendapatan()
+
+    '    GridControlLaporanPendapatan.DataSource = tblOmset
+
+    '    GridViewLaporanPendapatan.Columns("No").Visible = False
+    '    GridViewLaporanPendapatan.Columns("NoJenisBayar").Visible = False
+    '    GridViewLaporanPendapatan.Columns("NIP").Visible = False
+    '    GridViewLaporanPendapatan.Columns("Tgl Lahir").Visible = False
+    '    GridViewLaporanPendapatan.Columns("Alamat").Visible = False
+    '    GridViewLaporanPendapatan.Columns("Translabid").Visible = False
+    '    GridViewLaporanPendapatan.Columns("mesin").Visible = False
+    '    GridViewLaporanPendapatan.Columns("kartu").Visible = False
+    '    GridViewLaporanPendapatan.Columns("JenisTransaksi").Visible = False
+    '    GridViewLaporanPendapatan.Columns("Jenis Bayar").Visible = False
+
+    '    ' Buang pengelompokan sisa mode Paket (lihat ViewDataLaporanPendapatanPaket)
+    '    GridViewLaporanPendapatan.Columns("Detail Pembayaran").GroupIndex = -1
+
+    '    ' Berlaku untuk mode biasa DAN mode Paket — keduanya memakai CreateTableLaporanPendapatan
+    '    ' sehingga GridColumn-nya dipakai ulang saat DataSource diganti. Mode Voucher punya struktur
+    '    ' kolom sendiri (lihat GetDataLaporanPendapatanVoucher) jadi ia memanggil sendiri.
+    '    ' "pemeriksaan" dipilih sebagai tempat keterangan: kolom teks terlebar yang tampil DAN persis
+    '    ' di sebelah kiri "Tagihan", jadi keterangan dan angkanya terbaca sebagai satu kalimat.
+    '    PasangTotalLaporanPendapatan("pemeriksaan", "Tagihan")
+    'End Sub
 
     ' Sub total (footer tiap grup) + grand total (footer paling bawah) untuk grid Laporan Pendapatan.
     '
@@ -397,33 +442,61 @@ Public Class ReportPendapatanKlinik
         GridViewLaporanPendapatan.GroupSummary.Add(DevExpress.Data.SummaryItemType.Count, kolomKeterangan, kolomLabel, "SUB TOTAL ({0} baris)")
     End Sub
 
-    Function CreateTableLaporanPendapatan() As DataTable
-        Dim Thasil As New DataTable
+    'NEW
+    Public Function CreateTableLaporanPendapatan() As DataTable
+        Dim rowTable As New DataTable
 
-        insertRowToTbls(Thasil, "tyinterger", "No")
-        insertRowToTbls(Thasil, "Typstring", "NoJenisBayar")
-        insertRowToTbls(Thasil, "Typstring", "No Transaksi")
-        insertRowToTbls(Thasil, "typdate", "Tgl Transaksi")
-        insertRowToTbls(Thasil, "Typstring", "NIP")
-        insertRowToTbls(Thasil, "Typstring", "Nama")
-        insertRowToTbls(Thasil, "typdate", "Tgl Lahir")
-        insertRowToTbls(Thasil, "Typstring", "Alamat") '
-        insertRowToTbls(Thasil, "Typstring", "pemeriksaan")
-        insertRowToTbls(Thasil, "tyinterger", "Tagihan")
-        insertRowToTbls(Thasil, "tyinterger", "Translabid")
-        insertRowToTbls(Thasil, "Typstring", "mesin")
-        insertRowToTbls(Thasil, "Typstring", "kartu")
-        insertRowToTbls(Thasil, "Typstring", "JenisTransaksi")
-        insertRowToTbls(Thasil, "Typstring", "Jenis Poli")
-        insertRowToTbls(Thasil, "Typstring", "Jenis Bayar")
-        insertRowToTbls(Thasil, "Typstring", "Detail Pembayaran")
+        rowTable.Columns.Add("No", GetType(Integer))
+        rowTable.Columns.Add("No Transaksi", GetType(String))
+        rowTable.Columns.Add("Tgl Transaksi", GetType(String))
+        rowTable.Columns.Add("Nama", GetType(String))
+        rowTable.Columns.Add("Tgl Lahir", GetType(String))
+        rowTable.Columns.Add("pemeriksaan", GetType(String))
+        rowTable.Columns.Add("Qty", GetType(Integer))
+        rowTable.Columns.Add("HargaSatuan", GetType(Decimal))
+        rowTable.Columns.Add("Tagihan", GetType(Decimal))
+        rowTable.Columns.Add("JenisTransaksi", GetType(String))
+        rowTable.Columns.Add("Jenis Poli", GetType(String))
+        rowTable.Columns.Add("Jenis Bayar", GetType(String))
+        rowTable.Columns.Add("NoJenisBayar", GetType(String))
+        rowTable.Columns.Add("Detail Pembayaran", GetType(String))
+        rowTable.Columns.Add("NIP", GetType(String))
+        rowTable.Columns.Add("Alamat", GetType(String))
+        rowTable.Columns.Add("Translabid", GetType(String))
+        rowTable.Columns.Add("mesin", GetType(String))
+        rowTable.Columns.Add("kartu", GetType(String))
 
-        For Each Tcol As DataColumn In Thasil.Columns
-            Tcol.ReadOnly = True
-        Next
-
-        Return Thasil
+        Return rowTable
     End Function
+
+    'OLD
+    'Function CreateTableLaporanPendapatan() As DataTable
+    '    Dim Thasil As New DataTable
+
+    '    insertRowToTbls(Thasil, "tyinterger", "No")
+    '    insertRowToTbls(Thasil, "Typstring", "NoJenisBayar")
+    '    insertRowToTbls(Thasil, "Typstring", "No Transaksi")
+    '    insertRowToTbls(Thasil, "typdate", "Tgl Transaksi")
+    '    insertRowToTbls(Thasil, "Typstring", "NIP")
+    '    insertRowToTbls(Thasil, "Typstring", "Nama")
+    '    insertRowToTbls(Thasil, "typdate", "Tgl Lahir")
+    '    insertRowToTbls(Thasil, "Typstring", "Alamat") '
+    '    insertRowToTbls(Thasil, "Typstring", "pemeriksaan")
+    '    insertRowToTbls(Thasil, "tyinterger", "Tagihan")
+    '    insertRowToTbls(Thasil, "tyinterger", "Translabid")
+    '    insertRowToTbls(Thasil, "Typstring", "mesin")
+    '    insertRowToTbls(Thasil, "Typstring", "kartu")
+    '    insertRowToTbls(Thasil, "Typstring", "JenisTransaksi")
+    '    insertRowToTbls(Thasil, "Typstring", "Jenis Poli")
+    '    insertRowToTbls(Thasil, "Typstring", "Jenis Bayar")
+    '    insertRowToTbls(Thasil, "Typstring", "Detail Pembayaran")
+
+    '    For Each Tcol As DataColumn In Thasil.Columns
+    '        Tcol.ReadOnly = True
+    '    Next
+
+    '    Return Thasil
+    'End Function
 
     Private Sub SetClearRekapTagihan()
         ' Set ComboBox Poli Tujuan
@@ -1765,6 +1838,7 @@ Public Class ReportPendapatanKlinik
         End If
     End Sub
 
+    'NEW
     Function GetDataRekapTagihanPoliUmum() As DataTable
         ' Set Tanggal Transaksi
         Dim tglTransaksiAwal As Date = TglAwalTransaksiRekapTagihan.Value
@@ -1773,72 +1847,159 @@ Public Class ReportPendapatanKlinik
         ' Set Jenis Pembayaran
         Dim jenisBayar As String = "'Tagihan'"
 
-        ' Set Jenis Poli / Transaksi
+        ' Set Jenis Poli / Transaksi Filter
         Dim jenisPoliOrTransaksi As String = ""
         If tipeJurnal = "Poli" Then
             If ComboBoxJenisPoliOrTransaksi.Text <> "SEMUA TRANSAKSI" Then
-                jenisPoliOrTransaksi = "WHERE JenisPoli = '" & ComboBoxJenisPoliOrTransaksi.Text & "'"
+                jenisPoliOrTransaksi = " AND tblDetail.JenisPoli = '" & ComboBoxJenisPoliOrTransaksi.Text & "' "
             End If
         ElseIf tipeJurnal = "Transaksi" Then
-            jenisPoliOrTransaksi = "WHERE JenisTransaksi = '" & ComboBoxJenisPoliOrTransaksi.Text & "'"
+            jenisPoliOrTransaksi = " AND tblDetail.JenisTransaksi = '" & ComboBoxJenisPoliOrTransaksi.Text & "' "
         End If
 
-        ' Set Tabel Result
-        Dim tblResult As New DataTable
+        ' Filter Perusahaan
+        Dim filterCompany As String = ""
+        If TextBoxNamaPerusahaanRekapTagihan.Text.Trim().Length > 0 Then
+            filterCompany = " AND tblBayar.NoJenisBayar = '" & TextBoxNamaPerusahaanRekapTagihan.Text.Trim() & "' "
+        End If
 
+        Dim tblResult As New DataTable
         Dim queryBuilder As New StringBuilder()
 
-        ' WITH clause for FilteredTransPoli
         queryBuilder.AppendLine("WITH FilteredTransPoli AS (")
-        queryBuilder.AppendLine("    SELECT TransPoliID, RekapID")
+        queryBuilder.AppendLine("    SELECT TransPoliID, RekapID, NoUrut, TglPoli, IDInternet")
         queryBuilder.AppendLine("    FROM TransaksiPoli")
         queryBuilder.AppendLine("    WHERE (CONVERT(DATE, TglPoli) BETWEEN '" & Format(tglTransaksiAwal.Date, "yyyyMMdd") & "' AND '" & Format(tglTransaksiAkhir.Date, "yyyyMMdd") & "') AND Deleted = 0")
+        queryBuilder.AppendLine("),")
+
+        queryBuilder.AppendLine("FilteredBayar AS (")
+        queryBuilder.AppendLine("    SELECT tb.TransPoliIDBayar, tb.TransPoliID, tb.JenisBayar, tb.NoJenisBayar AS CompanyTagihan, ")
+        queryBuilder.AppendLine("           tb.JumlahBayar, tb.Kembali, tb.kartu, tb.mesin, tb.NoInvoicePembayaran, '0' AS IsAwal")
+        queryBuilder.AppendLine("    FROM TransaksiPoliBayar tb")
+        queryBuilder.AppendLine("    INNER JOIN FilteredTransPoli ft ON tb.TransPoliID = ft.TransPoliID")
+        queryBuilder.AppendLine("    WHERE tb.JumlahBayar > 0 AND tb.JenisBayar IN (" & jenisBayar & ")" & filterCompany)
+        queryBuilder.AppendLine("    UNION ALL")
+        queryBuilder.AppendLine("    SELECT tba.TransPoliIDBayar, tba.TransPoliID, tba.JenisBayar, tba.NoJenisBayar AS CompanyTagihan, ")
+        queryBuilder.AppendLine("           tba.JumlahBayar, tba.Kembali, tba.kartu, tba.mesin, tba.NoInvoicePembayaran, '1' AS IsAwal")
+        queryBuilder.AppendLine("    FROM TransaksiPoliBayarAwal tba")
+        queryBuilder.AppendLine("    INNER JOIN FilteredTransPoli ft ON tba.TransPoliID = ft.TransPoliID")
+        queryBuilder.AppendLine("    WHERE tba.JumlahBayar > 0 AND tba.JenisBayar IN (" & jenisBayar & ")" & filterCompany)
         queryBuilder.AppendLine(")")
 
-        ' Main SELECT statement
-        queryBuilder.AppendLine("SELECT ROW_NUMBER() OVER (PARTITION BY tblDetail.JenisPoli, tblBayar.JenisBayar, tblBayar.CompanyTagihan, tblBayar.mesin ORDER BY tblPoli.TglPoli, tblPoli.NoUrut) AS NomorUrutTransaksi, tblBayar.TransPoliIDBayar AS 'ID',")
-        queryBuilder.AppendLine("       tblPoli.NoUrut AS 'No Transaksi', CONVERT(DATE, tblPoli.TglPoli) AS 'Tgl Transaksi',")
-        queryBuilder.AppendLine("       tblDetail.JenisPoli, tblBayar.DataListTindakan, tblPasien.Nama, CONVERT(DATE, tblPasien.TglLahir) AS 'Tgl Lahir', tblPasien.NoRekamMedis,")
-        queryBuilder.AppendLine("       tblBayar.JenisBayar, tblBayar.CompanyTagihan, tblBayar.kartu AS 'JenisKartu',")
-        queryBuilder.AppendLine("       tblBayar.mesin AS 'JenisMesin', tblDetail.JenisTransaksi,")
-        queryBuilder.AppendLine("       tblBayar.JumlahBayar - tblBayar.Kembali AS TotalBayar, tblPoli.RekapID, tblBayar.NoInvoicePembayaran, tblBayar.JenisKasir")
-        queryBuilder.AppendLine("FROM (")
-        queryBuilder.AppendLine("    SELECT tb.TransPoliIDBayar, tb.TransPoliID,")
-        queryBuilder.AppendLine("           STUFF((SELECT ', ' + ISNULL(tblTindakan.NamaTindakan, '')")
-        queryBuilder.AppendLine("                  FROM TransaksiPoliDetail tblTindakan")
-        queryBuilder.AppendLine("                  WHERE tblTindakan.Awal = '0' AND tblTindakan.TransPoliID = tb.TransPoliID")
-        queryBuilder.AppendLine("                  FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS DataListTindakan,")
-        queryBuilder.AppendLine("           tb.JenisBayar, CASE WHEN tb.JenisBayar = 'TAGIHAN' THEN tb.NoJenisBayar ELSE '' END AS 'CompanyTagihan', tb.JumlahBayar, tb.Kembali, tb.kartu, tb.mesin, tb.NoInvoicePembayaran, 'Transaksi Tindakan' AS JenisKasir")
-        queryBuilder.AppendLine("    FROM TransaksiPoliBayar tb")
-        queryBuilder.AppendLine("         INNER JOIN FilteredTransPoli ft ON tb.TransPoliID = ft.TransPoliID")
-        queryBuilder.AppendLine("    WHERE tb.JumlahBayar > 0 AND tb.JenisBayar IN (" & jenisBayar & ")")
-        If TextBoxNamaPerusahaanRekapTagihan.Text.Length > 0 Then   ' saringan perusahaan TIDAK boleh bergantung CheckBoxTagihan (lihat catatan di ViewDataRekapTagihan)
-            queryBuilder.AppendLine("    AND tb.NoJenisBayar = '" & TextBoxNamaPerusahaanRekapTagihan.Text & "'")
-        End If
-        queryBuilder.AppendLine("    UNION ALL")
-        queryBuilder.AppendLine("    SELECT tba.TransPoliIDBayar, tba.TransPoliID,")
-        queryBuilder.AppendLine("           STUFF((SELECT ', ' + ISNULL(tblTindakan.NamaTindakan, '')")
-        queryBuilder.AppendLine("                  FROM TransaksiPoliDetail tblTindakan")
-        queryBuilder.AppendLine("                  WHERE tblTindakan.Awal = '1' AND tblTindakan.TransPoliID = tba.TransPoliID")
-        queryBuilder.AppendLine("                  FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS DataListTindakan,")
-        queryBuilder.AppendLine("           tba.JenisBayar, CASE WHEN tba.JenisBayar = 'TAGIHAN' THEN tba.NoJenisBayar ELSE '' END AS 'CompanyTagihan', tba.JumlahBayar, tba.Kembali, tba.kartu, tba.mesin, tba.NoInvoicePembayaran, 'Transaksi Awal' AS JenisKasir")
-        queryBuilder.AppendLine("    FROM TransaksiPoliBayarAwal tba")
-        queryBuilder.AppendLine("         INNER JOIN FilteredTransPoli ft ON tba.TransPoliID = ft.TransPoliID")
-        queryBuilder.AppendLine("    WHERE tba.JumlahBayar > 0 AND tba.JenisBayar IN (" & jenisBayar & ")")
-        If TextBoxNamaPerusahaanRekapTagihan.Text.Length > 0 Then   ' saringan perusahaan TIDAK boleh bergantung CheckBoxTagihan (lihat catatan di ViewDataRekapTagihan)
-            queryBuilder.AppendLine("    AND tba.NoJenisBayar = '" & TextBoxNamaPerusahaanRekapTagihan.Text & "'")
-        End If
-        queryBuilder.AppendLine(") AS tblBayar")
-        queryBuilder.AppendLine("LEFT JOIN TransaksiPoli tblPoli ON tblBayar.TransPoliID = tblPoli.TransPoliID")
-        queryBuilder.AppendLine("LEFT JOIN TransaksiDetail tblDetail ON tblPoli.NoUrut = tblDetail.NoUrut")
-        queryBuilder.AppendLine("LEFT JOIN MasterPasien tblPasien ON tblPoli.IDInternet = tblPasien.NoRekamMedis")
+        ' Main Query Detail per Tindakan
+        queryBuilder.AppendLine("SELECT ")
+        queryBuilder.AppendLine("    ROW_NUMBER() OVER (PARTITION BY tblDetail.JenisPoli, tblBayar.JenisBayar ORDER BY ft.TglPoli, ft.NoUrut) AS NomorUrutTransaksi,")
+        queryBuilder.AppendLine("    ft.NoUrut AS [No Transaksi],")
+        queryBuilder.AppendLine("    CONVERT(DATE, ft.TglPoli) AS [Tgl Transaksi],")
+        queryBuilder.AppendLine("    tblDetail.JenisPoli,")
+        queryBuilder.AppendLine("    tblPasien.Nama,")
+        queryBuilder.AppendLine("    CONVERT(DATE, tblPasien.TglLahir) AS [Tgl Lahir],")
+        queryBuilder.AppendLine("    tblPasien.NoRekamMedis,")
+        queryBuilder.AppendLine("    TPD.NamaTindakan AS [DataListTindakan],")
+        queryBuilder.AppendLine("    COUNT(TPD.TransPoliIDDetail) AS [Qty],")
+        queryBuilder.AppendLine("    TPD.BiayaTindakan AS [HargaSatuan],")
+        queryBuilder.AppendLine("    SUM(TPD.NettBayar) AS [TotalBayar],")
+        queryBuilder.AppendLine("    tblBayar.JenisBayar,")
+        queryBuilder.AppendLine("    tblBayar.CompanyTagihan,")
+        queryBuilder.AppendLine("    tblBayar.kartu AS [JenisKartu],")
+        queryBuilder.AppendLine("    tblBayar.mesin AS [JenisMesin],")
+        queryBuilder.AppendLine("    tblDetail.JenisTransaksi,")
+        queryBuilder.AppendLine("    ft.RekapID,")
+        queryBuilder.AppendLine("    tblBayar.NoInvoicePembayaran")
+        queryBuilder.AppendLine("FROM FilteredBayar tblBayar")
+        queryBuilder.AppendLine("INNER JOIN FilteredTransPoli ft ON tblBayar.TransPoliID = ft.TransPoliID")
+        queryBuilder.AppendLine("LEFT JOIN TransaksiDetail tblDetail ON ft.NoUrut = tblDetail.NoUrut")
+        queryBuilder.AppendLine("LEFT JOIN MasterPasien tblPasien ON ft.IDInternet = tblPasien.NoRekamMedis")
+        queryBuilder.AppendLine("INNER JOIN TransaksiPoliDetail TPD ON ft.TransPoliID = TPD.TransPoliID AND TPD.Awal = tblBayar.IsAwal")
+        queryBuilder.AppendLine("WHERE TPD.DeletedBy IS NULL ")
         queryBuilder.AppendLine(jenisPoliOrTransaksi)
-        queryBuilder.AppendLine("ORDER BY tblBayar.JenisBayar, tblDetail.JenisPoli")
+        queryBuilder.AppendLine("GROUP BY ")
+        queryBuilder.AppendLine("    tblDetail.JenisPoli, tblBayar.JenisBayar, ft.TglPoli, ft.NoUrut,")
+        queryBuilder.AppendLine("    tblPasien.Nama, tblPasien.TglLahir, tblPasien.NoRekamMedis,")
+        queryBuilder.AppendLine("    TPD.NamaTindakan, TPD.BiayaTindakan, tblBayar.CompanyTagihan,")
+        queryBuilder.AppendLine("    tblBayar.kartu, tblBayar.mesin, tblDetail.JenisTransaksi, ft.RekapID, tblBayar.NoInvoicePembayaran")
+        queryBuilder.AppendLine("ORDER BY tblBayar.JenisBayar, tblDetail.JenisPoli, ft.TglPoli, ft.NoUrut;")
 
         tblResult = ReadSQL(queryBuilder.ToString())
 
         Return tblResult
     End Function
+
+    'OLD
+    'Function GetDataRekapTagihanPoliUmum() As DataTable
+    '    ' Set Tanggal Transaksi
+    '    Dim tglTransaksiAwal As Date = TglAwalTransaksiRekapTagihan.Value
+    '    Dim tglTransaksiAkhir As Date = TglAkhirTransaksiRekapTagihan.Value
+
+    '    ' Set Jenis Pembayaran
+    '    Dim jenisBayar As String = "'Tagihan'"
+
+    '    ' Set Jenis Poli / Transaksi
+    '    Dim jenisPoliOrTransaksi As String = ""
+    '    If tipeJurnal = "Poli" Then
+    '        If ComboBoxJenisPoliOrTransaksi.Text <> "SEMUA TRANSAKSI" Then
+    '            jenisPoliOrTransaksi = "WHERE JenisPoli = '" & ComboBoxJenisPoliOrTransaksi.Text & "'"
+    '        End If
+    '    ElseIf tipeJurnal = "Transaksi" Then
+    '        jenisPoliOrTransaksi = "WHERE JenisTransaksi = '" & ComboBoxJenisPoliOrTransaksi.Text & "'"
+    '    End If
+
+    '    ' Set Tabel Result
+    '    Dim tblResult As New DataTable
+
+    '    Dim queryBuilder As New StringBuilder()
+
+    '    ' WITH clause for FilteredTransPoli
+    '    queryBuilder.AppendLine("WITH FilteredTransPoli AS (")
+    '    queryBuilder.AppendLine("    SELECT TransPoliID, RekapID")
+    '    queryBuilder.AppendLine("    FROM TransaksiPoli")
+    '    queryBuilder.AppendLine("    WHERE (CONVERT(DATE, TglPoli) BETWEEN '" & Format(tglTransaksiAwal.Date, "yyyyMMdd") & "' AND '" & Format(tglTransaksiAkhir.Date, "yyyyMMdd") & "') AND Deleted = 0")
+    '    queryBuilder.AppendLine(")")
+
+    '    ' Main SELECT statement
+    '    queryBuilder.AppendLine("SELECT ROW_NUMBER() OVER (PARTITION BY tblDetail.JenisPoli, tblBayar.JenisBayar, tblBayar.CompanyTagihan, tblBayar.mesin ORDER BY tblPoli.TglPoli, tblPoli.NoUrut) AS NomorUrutTransaksi, tblBayar.TransPoliIDBayar AS 'ID',")
+    '    queryBuilder.AppendLine("       tblPoli.NoUrut AS 'No Transaksi', CONVERT(DATE, tblPoli.TglPoli) AS 'Tgl Transaksi',")
+    '    queryBuilder.AppendLine("       tblDetail.JenisPoli, tblBayar.DataListTindakan, tblPasien.Nama, CONVERT(DATE, tblPasien.TglLahir) AS 'Tgl Lahir', tblPasien.NoRekamMedis,")
+    '    queryBuilder.AppendLine("       tblBayar.JenisBayar, tblBayar.CompanyTagihan, tblBayar.kartu AS 'JenisKartu',")
+    '    queryBuilder.AppendLine("       tblBayar.mesin AS 'JenisMesin', tblDetail.JenisTransaksi,")
+    '    queryBuilder.AppendLine("       tblBayar.JumlahBayar - tblBayar.Kembali AS TotalBayar, tblPoli.RekapID, tblBayar.NoInvoicePembayaran, tblBayar.JenisKasir")
+    '    queryBuilder.AppendLine("FROM (")
+    '    queryBuilder.AppendLine("    SELECT tb.TransPoliIDBayar, tb.TransPoliID,")
+    '    queryBuilder.AppendLine("           STUFF((SELECT ', ' + ISNULL(tblTindakan.NamaTindakan, '')")
+    '    queryBuilder.AppendLine("                  FROM TransaksiPoliDetail tblTindakan")
+    '    queryBuilder.AppendLine("                  WHERE tblTindakan.Awal = '0' AND tblTindakan.TransPoliID = tb.TransPoliID")
+    '    queryBuilder.AppendLine("                  FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS DataListTindakan,")
+    '    queryBuilder.AppendLine("           tb.JenisBayar, CASE WHEN tb.JenisBayar = 'TAGIHAN' THEN tb.NoJenisBayar ELSE '' END AS 'CompanyTagihan', tb.JumlahBayar, tb.Kembali, tb.kartu, tb.mesin, tb.NoInvoicePembayaran, 'Transaksi Tindakan' AS JenisKasir")
+    '    queryBuilder.AppendLine("    FROM TransaksiPoliBayar tb")
+    '    queryBuilder.AppendLine("         INNER JOIN FilteredTransPoli ft ON tb.TransPoliID = ft.TransPoliID")
+    '    queryBuilder.AppendLine("    WHERE tb.JumlahBayar > 0 AND tb.JenisBayar IN (" & jenisBayar & ")")
+    '    If TextBoxNamaPerusahaanRekapTagihan.Text.Length > 0 Then   ' saringan perusahaan TIDAK boleh bergantung CheckBoxTagihan (lihat catatan di ViewDataRekapTagihan)
+    '        queryBuilder.AppendLine("    AND tb.NoJenisBayar = '" & TextBoxNamaPerusahaanRekapTagihan.Text & "'")
+    '    End If
+    '    queryBuilder.AppendLine("    UNION ALL")
+    '    queryBuilder.AppendLine("    SELECT tba.TransPoliIDBayar, tba.TransPoliID,")
+    '    queryBuilder.AppendLine("           STUFF((SELECT ', ' + ISNULL(tblTindakan.NamaTindakan, '')")
+    '    queryBuilder.AppendLine("                  FROM TransaksiPoliDetail tblTindakan")
+    '    queryBuilder.AppendLine("                  WHERE tblTindakan.Awal = '1' AND tblTindakan.TransPoliID = tba.TransPoliID")
+    '    queryBuilder.AppendLine("                  FOR XML PATH(''), TYPE).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS DataListTindakan,")
+    '    queryBuilder.AppendLine("           tba.JenisBayar, CASE WHEN tba.JenisBayar = 'TAGIHAN' THEN tba.NoJenisBayar ELSE '' END AS 'CompanyTagihan', tba.JumlahBayar, tba.Kembali, tba.kartu, tba.mesin, tba.NoInvoicePembayaran, 'Transaksi Awal' AS JenisKasir")
+    '    queryBuilder.AppendLine("    FROM TransaksiPoliBayarAwal tba")
+    '    queryBuilder.AppendLine("         INNER JOIN FilteredTransPoli ft ON tba.TransPoliID = ft.TransPoliID")
+    '    queryBuilder.AppendLine("    WHERE tba.JumlahBayar > 0 AND tba.JenisBayar IN (" & jenisBayar & ")")
+    '    If TextBoxNamaPerusahaanRekapTagihan.Text.Length > 0 Then   ' saringan perusahaan TIDAK boleh bergantung CheckBoxTagihan (lihat catatan di ViewDataRekapTagihan)
+    '        queryBuilder.AppendLine("    AND tba.NoJenisBayar = '" & TextBoxNamaPerusahaanRekapTagihan.Text & "'")
+    '    End If
+    '    queryBuilder.AppendLine(") AS tblBayar")
+    '    queryBuilder.AppendLine("LEFT JOIN TransaksiPoli tblPoli ON tblBayar.TransPoliID = tblPoli.TransPoliID")
+    '    queryBuilder.AppendLine("LEFT JOIN TransaksiDetail tblDetail ON tblPoli.NoUrut = tblDetail.NoUrut")
+    '    queryBuilder.AppendLine("LEFT JOIN MasterPasien tblPasien ON tblPoli.IDInternet = tblPasien.NoRekamMedis")
+    '    queryBuilder.AppendLine(jenisPoliOrTransaksi)
+    '    queryBuilder.AppendLine("ORDER BY tblBayar.JenisBayar, tblDetail.JenisPoli")
+
+    '    tblResult = ReadSQL(queryBuilder.ToString())
+
+    '    Return tblResult
+    'End Function
 
     Function GetDataRekapTagihanPoliGigi() As DataTable
         ' Set Tanggal Transaksi
@@ -2622,10 +2783,25 @@ Public Class ReportPendapatanKlinik
                 Dim newRow As DataRow = rowTable.NewRow
                 newRow("No") = rowData("NomorUrutTransaksi")
                 newRow("No Transaksi") = rowData("No Transaksi")
-                newRow("Tgl Transaksi") = rowData("Tgl Transaksi")
+
+                ' Format Tanggal Transaksi ke ISO Standard yyyy-MM-dd
+                If IsDate(rowData("Tgl Transaksi")) Then
+                    newRow("Tgl Transaksi") = Convert.ToDateTime(rowData("Tgl Transaksi")).ToString("yyyy-MM-dd")
+                Else
+                    newRow("Tgl Transaksi") = rowData("Tgl Transaksi")
+                End If
+
+                ' Format Tanggal Lahir ke ISO Standard yyyy-MM-dd
+                If IsDate(rowData("Tgl Lahir")) Then
+                    newRow("Tgl Lahir") = Convert.ToDateTime(rowData("Tgl Lahir")).ToString("yyyy-MM-dd")
+                Else
+                    newRow("Tgl Lahir") = rowData("Tgl Lahir")
+                End If
+
                 newRow("Nama") = rowData("Nama").ToString.ToUpper
-                newRow("Tgl Lahir") = rowData("Tgl Lahir")
                 newRow("pemeriksaan") = rowData("DataListTindakan")
+                newRow("Qty") = rowData("Qty")
+                newRow("HargaSatuan") = rowData("HargaSatuan")
                 newRow("Tagihan") = rowData("TotalBayar")
                 newRow("JenisTransaksi") = rowData("JenisTransaksi")
                 newRow("Jenis Poli") = rowData("JenisPoli")
@@ -2659,6 +2835,66 @@ Public Class ReportPendapatanKlinik
 
     End Sub
 
+    'OLD
+    'Public Sub LoadInvoiceTagihan(ByRef NomorInvoice As String)
+    '    ' Set Data Header
+    '    SetHeaderRekapInvoice(NomorInvoice)
+
+    '    Dim tblPoliUmum As DataTable = GetDataRekapTagihanPoliUmum(NomorInvoice)
+    '    Dim tblPoliGigi As DataTable = GetDataRekapTagihanPoliGigi(NomorInvoice)
+
+    '    ' Buat tabel gabungan dengan struktur yang sama
+    '    Dim tblRekapTagihan As DataTable = tblPoliUmum.Clone()
+
+    '    ' Gabungkan data dari kedua tabel
+    '    tblRekapTagihan.Merge(tblPoliUmum)
+    '    tblRekapTagihan.Merge(tblPoliGigi)
+
+    '    If tblRekapTagihan.Rows.Count > 0 Then
+    '        Dim rowTable As DataTable = CreateTableLaporanPendapatan()
+    '        rowTable.Rows.Clear()
+
+    '        For Each rowData As DataRow In tblRekapTagihan.Rows
+    '            Dim newRow As DataRow = rowTable.NewRow
+    '            newRow("No") = rowData("NomorUrutTransaksi")
+    '            newRow("No Transaksi") = rowData("No Transaksi")
+    '            newRow("Tgl Transaksi") = rowData("Tgl Transaksi")
+    '            newRow("Nama") = rowData("Nama").ToString.ToUpper
+    '            newRow("Tgl Lahir") = rowData("Tgl Lahir")
+    '            newRow("pemeriksaan") = rowData("DataListTindakan")
+    '            newRow("Tagihan") = rowData("TotalBayar")
+    '            newRow("JenisTransaksi") = rowData("JenisTransaksi")
+    '            newRow("Jenis Poli") = rowData("JenisPoli")
+    '            newRow("Jenis Bayar") = rowData("JenisBayar")
+    '            newRow("NoJenisBayar") = KeteranganJenisBayar(rowData)
+    '            newRow("Detail Pembayaran") = KeteranganDetailPembayaran(rowData)
+    '            rowTable.Rows.Add(newRow)
+    '        Next
+
+    '        GridControlRekapInvoice.DataSource = rowTable
+
+    '        Dim view As DevExpress.XtraGrid.Views.Grid.GridView = GridViewRekapInvoice
+
+    '        view.BeginUpdate()
+
+    '        view.OptionsView.RowAutoHeight = True
+    '        view.OptionsView.ShowAutoFilterRow = False
+    '        view.OptionsView.ColumnAutoWidth = False
+
+    '        view.Columns("pemeriksaan").AppearanceCell.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap
+    '        view.Columns("pemeriksaan").AppearanceCell.Options.UseTextOptions = True
+
+    '        view.Columns("pemeriksaan").ColumnEdit = New DevExpress.XtraEditors.Repository.RepositoryItemMemoEdit()
+
+    '        view.EndUpdate()
+
+    '        view.BestFitColumns()
+    '    Else
+    '        MessageBox.Show("Tidak Ada Data.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+    '    End If
+
+    'End Sub
+
     Private Sub SetHeaderRekapInvoice(ByRef NomorInvoice As String)
         Dim tblDataHeader As DataTable = ReadSQL("SELECT * FROM RekapTagihan WHERE notagihancompany = '" & NomorInvoice & "'")
 
@@ -2678,64 +2914,46 @@ Public Class ReportPendapatanKlinik
 
     Function GetDataRekapTagihanPoliUmum(ByRef NomorInvoice As String) As DataTable
 
-        ' Set Tabel Result
         Dim tblResult As New DataTable
-
         Dim queryBuilder As New StringBuilder()
 
         queryBuilder.AppendLine("DECLARE @NoInvoicePembayaran NVARCHAR(50) = '" & NomorInvoice & "'")
 
-        queryBuilder.AppendLine("SELECT ROW_NUMBER() OVER (PARTITION BY tblDetail.JenisPoli, tblBayar.JenisBayar, tblBayar.CompanyTagihan, tblBayar.mesin ")
-        queryBuilder.AppendLine("ORDER BY tblPoli.TglPoli, tblPoli.NoUrut) AS NomorUrutTransaksi, ")
-
-        queryBuilder.AppendLine("tblBayar.TransPoliIDBayar AS 'ID', tblPoli.NoUrut AS 'No Transaksi', ")
-        queryBuilder.AppendLine("CONVERT(DATE, tblPoli.TglPoli) AS 'Tgl Transaksi', ")
-        queryBuilder.AppendLine("tblDetail.JenisPoli, tblBayar.DataListTindakan, ")
-
-        queryBuilder.AppendLine("tblPasien.Nama, CONVERT(DATE, tblPasien.TglLahir) AS 'Tgl Lahir', ")
-        queryBuilder.AppendLine("tblPasien.NoRekamMedis, ")
-
-        queryBuilder.AppendLine("tblBayar.JenisBayar, tblBayar.CompanyTagihan, ")
-        queryBuilder.AppendLine("tblBayar.kartu AS 'JenisKartu', tblBayar.mesin AS 'JenisMesin', ")
-
-        queryBuilder.AppendLine("tblDetail.JenisTransaksi, ")
-        queryBuilder.AppendLine("(tblBayar.JumlahBayar - tblBayar.Kembali) AS TotalBayar, ")
-
-        queryBuilder.AppendLine("tblPoli.RekapID, tblBayar.NoInvoicePembayaran, tblBayar.JenisKasir ")
-
+        queryBuilder.AppendLine("SELECT ")
+        queryBuilder.AppendLine("    ROW_NUMBER() OVER (PARTITION BY tblDetail.JenisPoli, tblBayar.JenisBayar, tblBayar.CompanyTagihan, tblBayar.mesin ")
+        queryBuilder.AppendLine("                       ORDER BY tblPoli.TglPoli, tblPoli.NoUrut) AS NomorUrutTransaksi, ")
+        queryBuilder.AppendLine("    tblBayar.TransPoliIDBayar AS 'ID', ")
+        queryBuilder.AppendLine("    tblPoli.NoUrut AS [No Transaksi], ")
+        queryBuilder.AppendLine("    CONVERT(DATE, tblPoli.TglPoli) AS [Tgl Transaksi], ")
+        queryBuilder.AppendLine("    tblDetail.JenisPoli, ")
+        queryBuilder.AppendLine("    TPD.NamaTindakan AS [DataListTindakan], ")
+        queryBuilder.AppendLine("    COUNT(TPD.TransPoliIDDetail) AS [Qty], ")
+        queryBuilder.AppendLine("    TPD.BiayaTindakan AS [HargaSatuan], ")
+        queryBuilder.AppendLine("    SUM(TPD.NettBayar) AS [TotalBayar], ")
+        queryBuilder.AppendLine("    tblPasien.Nama, ")
+        queryBuilder.AppendLine("    CONVERT(DATE, tblPasien.TglLahir) AS [Tgl Lahir], ")
+        queryBuilder.AppendLine("    tblPasien.NoRekamMedis, ")
+        queryBuilder.AppendLine("    tblBayar.JenisBayar, ")
+        queryBuilder.AppendLine("    tblBayar.CompanyTagihan, ")
+        queryBuilder.AppendLine("    tblBayar.kartu AS [JenisKartu], ")
+        queryBuilder.AppendLine("    tblBayar.mesin AS [JenisMesin], ")
+        queryBuilder.AppendLine("    tblDetail.JenisTransaksi, ")
+        queryBuilder.AppendLine("    tblPoli.RekapID, ")
+        queryBuilder.AppendLine("    tblBayar.NoInvoicePembayaran, ")
+        queryBuilder.AppendLine("    tblBayar.JenisKasir ")
         queryBuilder.AppendLine("FROM ( ")
 
         ' =========================
         ' TRANSAKSI BAYAR
         ' =========================
         queryBuilder.AppendLine("    SELECT tb.TransPoliIDBayar, tb.TransPoliID, ")
-
-        queryBuilder.AppendLine("    STUFF(( ")
-        queryBuilder.AppendLine("        SELECT CHAR(13) + CHAR(10) + ")
-        queryBuilder.AppendLine("               d.NamaTindakan + ' (' + CAST(d.Qty AS VARCHAR) + 'x) ' ")
-        queryBuilder.AppendLine("        FROM ( ")
-        queryBuilder.AppendLine("            SELECT tblTindakan.NamaTindakan, COUNT(*) AS Qty ")
-        queryBuilder.AppendLine("            FROM TransaksiPoliDetail tblTindakan ")
-        queryBuilder.AppendLine("            WHERE tblTindakan.Awal = '0' ")
-        queryBuilder.AppendLine("              AND tblTindakan.TransPoliID = tb.TransPoliID ")
-        queryBuilder.AppendLine("            GROUP BY tblTindakan.NamaTindakan ")
-        queryBuilder.AppendLine("        ) d ")
-        queryBuilder.AppendLine("        FOR XML PATH(''), TYPE ")
-        queryBuilder.AppendLine("    ).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS DataListTindakan, ")
-
-        queryBuilder.AppendLine("    tb.JenisBayar, ")
-        queryBuilder.AppendLine("    CASE WHEN tb.JenisBayar = 'TAGIHAN' THEN tb.NoJenisBayar ELSE '' END AS CompanyTagihan, ")
-        queryBuilder.AppendLine("    tb.JumlahBayar, tb.Kembali, tb.kartu, tb.mesin, tb.NoInvoicePembayaran, ")
-        queryBuilder.AppendLine("    'Transaksi Tindakan' AS JenisKasir ")
-
+        queryBuilder.AppendLine("           tb.JenisBayar, ")
+        queryBuilder.AppendLine("           CASE WHEN tb.JenisBayar = 'TAGIHAN' THEN tb.NoJenisBayar ELSE '' END AS CompanyTagihan, ")
+        queryBuilder.AppendLine("           tb.JumlahBayar, tb.Kembali, tb.kartu, tb.mesin, tb.NoInvoicePembayaran, ")
+        queryBuilder.AppendLine("           'Transaksi Tindakan' AS JenisKasir, '0' AS IsAwal ")
         queryBuilder.AppendLine("    FROM TransaksiPoliBayar tb ")
         queryBuilder.AppendLine("    WHERE tb.JumlahBayar > 0 ")
         queryBuilder.AppendLine("      AND tb.NoInvoicePembayaran = @NoInvoicePembayaran ")
-        ' Hanya baris TAGIHAN yang benar-benar ditagihkan lewat form ini. Kolom NoInvoicePembayaran
-        ' ternyata juga dipakai proses lain: terukur 5 baris DEBET/CARD (Rp 4.950.000) membawa nomor
-        ' invoice tanpa RekapBy/RekapDate. Tanpa saringan ini grid menampilkan Rp 6.375.000 untuk
-        ' invoice 0133/MMC-HBT/I/2025 yang headernya Rp 1.425.000 — cetakannya sudah menyaring, jadi
-        ' grid dan kertas berbeda angka.
         queryBuilder.AppendLine("      AND tb.JenisBayar = 'TAGIHAN' ")
 
         queryBuilder.AppendLine("    UNION ALL ")
@@ -2744,25 +2962,10 @@ Public Class ReportPendapatanKlinik
         ' TRANSAKSI AWAL
         ' =========================
         queryBuilder.AppendLine("    SELECT tba.TransPoliIDBayar, tba.TransPoliID, ")
-
-        queryBuilder.AppendLine("    STUFF(( ")
-        queryBuilder.AppendLine("        SELECT CHAR(13) + CHAR(10) + ")
-        queryBuilder.AppendLine("               d.NamaTindakan + ' (' + CAST(d.Qty AS VARCHAR) + 'x) ' ")
-        queryBuilder.AppendLine("        FROM ( ")
-        queryBuilder.AppendLine("            SELECT tblTindakan.NamaTindakan, COUNT(*) AS Qty ")
-        queryBuilder.AppendLine("            FROM TransaksiPoliDetail tblTindakan ")
-        queryBuilder.AppendLine("            WHERE tblTindakan.Awal = '1' ")
-        queryBuilder.AppendLine("              AND tblTindakan.TransPoliID = tba.TransPoliID ")
-        queryBuilder.AppendLine("            GROUP BY tblTindakan.NamaTindakan ")
-        queryBuilder.AppendLine("        ) d ")
-        queryBuilder.AppendLine("        FOR XML PATH(''), TYPE ")
-        queryBuilder.AppendLine("    ).value('.', 'NVARCHAR(MAX)'), 1, 2, '') AS DataListTindakan, ")
-
-        queryBuilder.AppendLine("    tba.JenisBayar, ")
-        queryBuilder.AppendLine("    CASE WHEN tba.JenisBayar = 'TAGIHAN' THEN tba.NoJenisBayar ELSE '' END AS CompanyTagihan, ")
-        queryBuilder.AppendLine("    tba.JumlahBayar, tba.Kembali, tba.kartu, tba.mesin, tba.NoInvoicePembayaran, ")
-        queryBuilder.AppendLine("    'Transaksi Awal' AS JenisKasir ")
-
+        queryBuilder.AppendLine("           tba.JenisBayar, ")
+        queryBuilder.AppendLine("           CASE WHEN tba.JenisBayar = 'TAGIHAN' THEN tba.NoJenisBayar ELSE '' END AS CompanyTagihan, ")
+        queryBuilder.AppendLine("           tba.JumlahBayar, tba.Kembali, tba.kartu, tba.mesin, tba.NoInvoicePembayaran, ")
+        queryBuilder.AppendLine("           'Transaksi Awal' AS JenisKasir, '1' AS IsAwal ")
         queryBuilder.AppendLine("    FROM TransaksiPoliBayarAwal tba ")
         queryBuilder.AppendLine("    WHERE tba.JumlahBayar > 0 ")
         queryBuilder.AppendLine("      AND tba.NoInvoicePembayaran = @NoInvoicePembayaran ")
@@ -2773,10 +2976,20 @@ Public Class ReportPendapatanKlinik
         queryBuilder.AppendLine("LEFT JOIN TransaksiPoli tblPoli ON tblBayar.TransPoliID = tblPoli.TransPoliID ")
         queryBuilder.AppendLine("LEFT JOIN TransaksiDetail tblDetail ON tblPoli.NoUrut = tblDetail.NoUrut ")
         queryBuilder.AppendLine("LEFT JOIN MasterPasien tblPasien ON tblPoli.IDInternet = tblPasien.NoRekamMedis ")
+        ' JOIN KE DETAIL TINDAKAN
+        queryBuilder.AppendLine("INNER JOIN TransaksiPoliDetail TPD ON tblPoli.TransPoliID = TPD.TransPoliID AND TPD.Awal = tblBayar.IsAwal ")
 
         queryBuilder.AppendLine("WHERE tblDetail.DeletedDate IS NULL ")
+        queryBuilder.AppendLine("  AND TPD.DeletedBy IS NULL ")
 
-        queryBuilder.AppendLine("ORDER BY tblBayar.JenisBayar, tblDetail.JenisPoli;")
+        queryBuilder.AppendLine("GROUP BY ")
+        queryBuilder.AppendLine("    tblDetail.JenisPoli, tblBayar.JenisBayar, tblBayar.CompanyTagihan, tblBayar.mesin, ")
+        queryBuilder.AppendLine("    tblPoli.TglPoli, tblPoli.NoUrut, tblBayar.TransPoliIDBayar, ")
+        queryBuilder.AppendLine("    TPD.NamaTindakan, TPD.BiayaTindakan, tblPasien.Nama, tblPasien.TglLahir, ")
+        queryBuilder.AppendLine("    tblPasien.NoRekamMedis, tblBayar.kartu, tblDetail.JenisTransaksi, ")
+        queryBuilder.AppendLine("    tblPoli.RekapID, tblBayar.NoInvoicePembayaran, tblBayar.JenisKasir ")
+
+        queryBuilder.AppendLine("ORDER BY tblBayar.JenisBayar, tblDetail.JenisPoli, tblPoli.NoUrut;")
 
         tblResult = ReadSQL(queryBuilder.ToString())
 
@@ -2902,23 +3115,94 @@ Public Class ReportPendapatanKlinik
         End If
     End Sub
 
+    'NEW
     Private Sub CetakRekapTagihan()
-        Dim tblRekapInvoice As DataTable = GridControlRekapInvoice.DataSource
-        tblRekapInvoice.AcceptChanges()
+        Try
+            Dim tblRekapInvoice As DataTable = GridControlRekapInvoice.DataSource
+            If tblRekapInvoice Is Nothing OrElse tblRekapInvoice.Rows.Count = 0 Then
+                MessageBox.Show("Tidak ada data rekap tagihan untuk dicetak.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                Exit Sub
+            End If
 
-        Report = XtraReport.FromFile(Application.StartupPath + "\reports\Klinik\Laporan\LaporanRekapTagihanKlinik.repx", True)
+            tblRekapInvoice.AcceptChanges()
 
-        Report.Bands.Item(BandKind.ReportHeader).Controls("xrLabelJudulLaporan").Text = "Rekap Tagihan Pemeriksaan Klinik"
-        Report.Bands.Item(BandKind.ReportHeader).Controls("xrLabelLokasiLaporan").Text = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'NamaPoli'")
-        Report.Bands.Item(BandKind.ReportHeader).Controls("xrLabelNamaPerusahaan").Text = TextBoxNamaPerusahaanInvoice.Text
-        Report.Bands.Item(BandKind.ReportHeader).Controls("xrLabelNomorInvoice").Text = TextBoxNomorInvoice.Text
-        Report.Bands.Item(BandKind.PageFooter).Controls("xrLabelInfoCetak").Text = Format(DateAndTime.Now, "dd-MMM-yyyy HH:mm:ss") & " By " & userInput
-        Report.DataSource = tblRekapInvoice
+            ' 1. Konfirmasi User
+            Dim confirmResult As DialogResult = MessageBox.Show( _
+                "Apakah Anda yakin ingin mencetak Rekap Tagihan ke Web PDF?", _
+                "Konfirmasi Cetak Rekap Tagihan", _
+                MessageBoxButtons.YesNo, _
+                MessageBoxIcon.Question, _
+                MessageBoxDefaultButton.Button2)
 
-        'Report.RunDesigner()
-        Report.ShowPreview()
-        'Report.Print()
+            If confirmResult = DialogResult.No Then Exit Sub
+
+            ' 2. Persiapan Data Header Laporan
+            Dim namaPoli As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'NamaPoli'")
+            Dim namaPerusahaan As String = TextBoxNamaPerusahaanInvoice.Text
+            Dim nomorInvoice As String = TextBoxNomorInvoice.Text
+
+            Dim userAktif As String = "System"
+            If Not String.IsNullOrEmpty(userInput) Then
+                userAktif = userInput
+            End If
+
+            ' 3. Menyusun Payload JSON
+            Dim payloadObject = New With { _
+                .judul = "Rekap Tagihan Pemeriksaan Klinik", _
+                .lokasi = namaPoli, _
+                .perusahaan = namaPerusahaan, _
+                .nomor_invoice = nomorInvoice, _
+                .info_cetak = Format(DateAndTime.Now, "dd-MMM-yyyy HH:mm:ss") & " By " & userAktif, _
+                .user = userAktif, _
+                .details = tblRekapInvoice _
+            }
+
+            Dim jsonPayload As String = JsonConvert.SerializeObject(payloadObject)
+
+            ' 4. Pengambilan URL Endpoint API dari MsConfig
+            Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+            If Not baseURL.EndsWith("/") Then baseURL &= "/"
+            Dim apiUrl As String = baseURL & "api/laporan/rekap-tagihan-pdf"
+
+            Application.DoEvents()
+
+            ' 5. Tembak API Menggunakan Fungsi Khusus PDF
+            Dim pdfBytes As Byte() = DownloadPdfFromAPI(jsonPayload, apiUrl)
+
+            ' 6. Handling Response & Buka PDF di Browser
+            If pdfBytes IsNot Nothing AndAlso pdfBytes.Length > 0 Then
+                Dim fileName As String = "Rekap_Tagihan_" & nomorInvoice.Replace("/", "_") & "_" & DateTime.Now.ToString("yyyyMMdd_HHmmss") & ".pdf"
+                Dim tempPath As String = Path.Combine(Path.GetTempPath(), fileName)
+                File.WriteAllBytes(tempPath, pdfBytes)
+
+                OpenPdfInBrowser(tempPath)
+            Else
+                MessageBox.Show("Gagal mengunduh file PDF dari server Web.", "Gagal Cetak PDF", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End If
+
+        Catch ex As Exception
+            MessageBox.Show("Terjadi kesalahan sistem: " & ex.Message, "Error Application", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
     End Sub
+
+    'OLD
+    'Private Sub CetakRekapTagihan()
+    '    Dim tblRekapInvoice As DataTable = GridControlRekapInvoice.DataSource
+    '    tblRekapInvoice.AcceptChanges()
+
+    '    Report = XtraReport.FromFile(Application.StartupPath + "\reports\Klinik\Laporan\LaporanRekapTagihanKlinik.repx", True)
+
+    '    Report.Bands.Item(BandKind.ReportHeader).Controls("xrLabelJudulLaporan").Text = "Rekap Tagihan Pemeriksaan Klinik"
+    '    Report.Bands.Item(BandKind.ReportHeader).Controls("xrLabelLokasiLaporan").Text = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'NamaPoli'")
+    '    Report.Bands.Item(BandKind.ReportHeader).Controls("xrLabelNamaPerusahaan").Text = TextBoxNamaPerusahaanInvoice.Text
+    '    Report.Bands.Item(BandKind.ReportHeader).Controls("xrLabelNomorInvoice").Text = TextBoxNomorInvoice.Text
+    '    Report.Bands.Item(BandKind.PageFooter).Controls("xrLabelInfoCetak").Text = Format(DateAndTime.Now, "dd-MMM-yyyy HH:mm:ss") & " By " & userInput
+    '    Report.DataSource = tblRekapInvoice
+
+    '    'Report.RunDesigner()
+    '    Report.ShowPreview()
+    '    'Report.Print()
+    'End Sub
 
     Private Sub ButtonCetakInvoiceTagihan_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCetakInvoiceTagihan.Click
         If TextBoxNomorInvoice.Text <> "" Then

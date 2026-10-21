@@ -1927,7 +1927,7 @@ Public Class ReportLogPaketTindakan
         Dim stringTglAwal As String = Format(tglAwal, "dd MMMM yyyy")
         Dim stringTglAkhir As String = Format(tglAkhir, "dd MMMM yyyy")
 
-        Report.Bands.Item(BandKind.ReportHeader).Controls("xrLabelJudulLaporan").Text = "Laporan 10 Tindakan Terbanyak"
+        Report.Bands.Item(BandKind.ReportHeader).Controls("xrLabelJudulLaporan").Text = "Laporan Jumlah Tindakan"
 
         'If ComboBoxPoli.Text <> "" Then
         '    Report.Bands.Item(BandKind.ReportHeader).Controls("xrLabelSubJudul").Text = "Poli: " & ComboBoxPoli.Text
