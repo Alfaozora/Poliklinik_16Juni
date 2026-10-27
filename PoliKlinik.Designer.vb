@@ -65,6 +65,7 @@ Partial Class PoliKlinik
         Me.LaporanRiwayatPaketTindakanToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.LaporanRevenueDanSellingToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.LaporanPenggunaanAlatToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
+        Me.LaporanToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
         Me.LaporanToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.RekapPendapatanToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
         Me.ReservasiDanReminderToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem
@@ -281,7 +282,6 @@ Partial Class PoliKlinik
         Me.TimerShutdown = New System.Windows.Forms.Timer(Me.components)
         Me.TimerKirimReminderWA = New System.Windows.Forms.Timer(Me.components)
         Me.TimerBirthday = New System.Windows.Forms.Timer(Me.components)
-        Me.LaporanToolStripMenuItem1 = New System.Windows.Forms.ToolStripMenuItem
         Me.MenuStrip.SuspendLayout()
         Me.StatusStrip.SuspendLayout()
         Me.SuspendLayout()
@@ -583,6 +583,13 @@ Partial Class PoliKlinik
         Me.LaporanPenggunaanAlatToolStripMenuItem.Size = New System.Drawing.Size(299, 22)
         Me.LaporanPenggunaanAlatToolStripMenuItem.Tag = "030906"
         Me.LaporanPenggunaanAlatToolStripMenuItem.Text = "Laporan Penggunaan Alat"
+        '
+        'LaporanToolStripMenuItem1
+        '
+        Me.LaporanToolStripMenuItem1.Name = "LaporanToolStripMenuItem1"
+        Me.LaporanToolStripMenuItem1.Size = New System.Drawing.Size(299, 22)
+        Me.LaporanToolStripMenuItem1.Tag = "030907"
+        Me.LaporanToolStripMenuItem1.Text = "Laporan Pasien"
         '
         'LaporanToolStripMenuItem
         '
@@ -2066,12 +2073,6 @@ Partial Class PoliKlinik
         'TimerBirthday
         '
         Me.TimerBirthday.Interval = 300000
-        '
-        'LaporanToolStripMenuItem1
-        '
-        Me.LaporanToolStripMenuItem1.Name = "LaporanToolStripMenuItem1"
-        Me.LaporanToolStripMenuItem1.Size = New System.Drawing.Size(299, 22)
-        Me.LaporanToolStripMenuItem1.Text = "Laporan Pasien"
         '
         'PoliKlinik
         '

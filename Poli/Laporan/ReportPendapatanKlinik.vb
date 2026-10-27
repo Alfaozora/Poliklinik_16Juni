@@ -3118,7 +3118,8 @@ Public Class ReportPendapatanKlinik
     'NEW
     Private Sub CetakRekapTagihan()
         Try
-            Dim tblRekapInvoice As DataTable = GridControlRekapInvoice.DataSource
+            ' 1. Validasi Data Rekap Tagihan pada Grid
+            Dim tblRekapInvoice As DataTable = TryCast(GridControlRekapInvoice.DataSource, DataTable)
             If tblRekapInvoice Is Nothing OrElse tblRekapInvoice.Rows.Count = 0 Then
                 MessageBox.Show("Tidak ada data rekap tagihan untuk dicetak.", "Informasi", MessageBoxButtons.OK, MessageBoxIcon.Information)
                 Exit Sub
@@ -3126,27 +3127,177 @@ Public Class ReportPendapatanKlinik
 
             tblRekapInvoice.AcceptChanges()
 
-            ' 1. Konfirmasi User
+            ' Konfirmasi Cetak
             Dim confirmResult As DialogResult = MessageBox.Show( _
-                "Apakah Anda yakin ingin mencetak Rekap Tagihan ke Web PDF?", _
-                "Konfirmasi Cetak Rekap Tagihan", _
+                "Apakah Anda yakin ingin mencetak Rekap Tagihan beserta Invoice Transaksi ke Web PDF?", _
+                "Konfirmasi Cetak", _
                 MessageBoxButtons.YesNo, _
                 MessageBoxIcon.Question, _
                 MessageBoxDefaultButton.Button2)
 
             If confirmResult = DialogResult.No Then Exit Sub
 
-            ' 2. Persiapan Data Header Laporan
+            ' 2. Pengambilan Data Header Rekap
             Dim namaPoli As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'NamaPoli'")
-            Dim namaPerusahaan As String = TextBoxNamaPerusahaanInvoice.Text
-            Dim nomorInvoice As String = TextBoxNomorInvoice.Text
+            Dim namaPerusahaan As String = TextBoxNamaPerusahaanInvoice.Text.Trim()
+            Dim nomorInvoice As String = TextBoxNomorInvoice.Text.Trim()
+            Dim userAktif As String = If(Not String.IsNullOrEmpty(userInput), userInput, "System")
 
-            Dim userAktif As String = "System"
-            If Not String.IsNullOrEmpty(userInput) Then
-                userAktif = userInput
+            ' 3. Ambil Daftar No Transaksi Unik dari Grid
+            Dim listNoTrx As New List(Of String)
+            For Each row As DataRow In tblRekapInvoice.Rows
+                If Not IsDBNull(row("No Transaksi")) Then
+                    Dim noTrx As String = row("No Transaksi").ToString().Trim()
+                    If Not String.IsNullOrEmpty(noTrx) AndAlso Not listNoTrx.Contains(noTrx) Then
+                        listNoTrx.Add(noTrx)
+                    End If
+                End If
+            Next
+
+            If listNoTrx.Count = 0 Then
+                MessageBox.Show("No Transaksi tidak ditemukan dalam tabel rekap.", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+                Exit Sub
             End If
 
-            ' 3. Menyusun Payload JSON
+            ' 4. Ambil Detail Invoice Per No Transaksi
+            Dim listInvoices As New List(Of Object)
+            Dim listTransPoliID As New List(Of String)
+
+            For Each noTrx As String In listNoTrx
+                Dim dtTransPoli As DataTable = ReadSQL("SELECT TransPoliID, NoUrut, IDInternet FROM TransaksiPoli WITH(NOLOCK) WHERE NoUrut = '" & noTrx & "'")
+
+                If dtTransPoli IsNot Nothing AndAlso dtTransPoli.Rows.Count > 0 Then
+                    Dim transPoliID As String = dtTransPoli.Rows(0)("TransPoliID").ToString()
+                    listTransPoliID.Add("'" & transPoliID & "'")
+
+                    ' Query Informasi Pasien & Dokter
+                    Dim sqlPasien As String = _
+                        "SELECT MP.NoRekamMedis, MP.Nama, MP.TglLahir, MP.DomisiliAlamat AS Alamat, " & _
+                        "TD.TanggalTransaksi, TP.DokterPoli AS Dokter, TD.ValidatorURL " & _
+                        "FROM MasterPasien MP WITH(NOLOCK) " & _
+                        "INNER JOIN TransaksiDetail TD WITH(NOLOCK) ON MP.NoRekamMedis = TD.IDInternet " & _
+                        "INNER JOIN TransaksiPoli TP WITH(NOLOCK) ON TD.NoTransaksi = TP.TransPoliID " & _
+                        "WHERE TD.NoUrut = '" & noTrx & "'"
+
+                    Dim dtPasien As DataTable = ReadSQL(sqlPasien)
+
+                    ' Cek Filter Awal (Pelayanan Dokter)
+                    Dim filterAwal As String = "0"
+                    Dim namaDokter As String = ""
+
+                    If dtPasien IsNot Nothing AndAlso dtPasien.Rows.Count > 0 Then
+                        Dim rowP As DataRow = dtPasien.Rows(0)
+                        If Not IsDBNull(rowP("Dokter")) Then namaDokter = rowP("Dokter").ToString().Trim()
+                        If String.IsNullOrEmpty(namaDokter) OrElse namaDokter = "0" Then filterAwal = "1" Else filterAwal = "0"
+                    End If
+
+                    ' Query Detail Item Tindakan Transaksi Poli
+                    Dim sqlDetail As String = _
+                        "SELECT TPD.TindakanID, ISNULL(TPD.PaketID, 0) AS PaketID, TPD.NamaTindakan AS Tindakan, TPD.JenisTindakan AS Jenis, " & _
+                        "TPD.BiayaTindakan AS [BiayaTindakan], COUNT(*) AS Qty, SUM(TPD.BiayaTindakan) AS SubTotal, " & _
+                        "ISNULL(TPD.DiscTindakan, 0) AS DiscNilai, SUM(ISNULL(TPD.DiscTindakan, 0)) AS TotalDiskon, " & _
+                        "SUM(TPD.BiayaTindakan - ISNULL(TPD.DiscTindakan, 0)) AS NettBayar " & _
+                        "FROM TransaksiPoliDetail TPD WITH(NOLOCK) " & _
+                        "WHERE TPD.TransPoliID = '" & transPoliID & "' AND TPD.DeletedBy IS NULL AND TPD.Awal = '" & filterAwal & "' " & _
+                        "GROUP BY TPD.TindakanID, ISNULL(TPD.PaketID, 0), TPD.NamaTindakan, TPD.JenisTindakan, TPD.BiayaTindakan, TPD.DiscTindakan"
+
+                    Dim dtTindakan As DataTable = ReadSQL(sqlDetail)
+
+                    ' Query Pembayaran
+                    Dim dtBayar As DataTable = ReadSQL("SELECT JenisBayar, NoJenisBayar, JumlahBayar, Kembali, kartu, mesin FROM TransaksiPoliBayar WITH(NOLOCK) WHERE TransPoliID = '" & transPoliID & "'")
+
+                    If dtPasien IsNot Nothing AndAlso dtPasien.Rows.Count > 0 Then
+                        Dim rowP As DataRow = dtPasien.Rows(0)
+
+                        listInvoices.Add(New With { _
+                            .no_transaksi = noTrx, _
+                            .no_rm = rowP("NoRekamMedis").ToString(), _
+                            .nama_pasien = rowP("Nama").ToString(), _
+                            .tgl_lahir = If(Not IsDBNull(rowP("TglLahir")), Convert.ToDateTime(rowP("TglLahir")).ToString("yyyy-MM-dd"), ""), _
+                            .alamat = rowP("Alamat").ToString(), _
+                            .tgl_transaksi = If(Not IsDBNull(rowP("TanggalTransaksi")), Convert.ToDateTime(rowP("TanggalTransaksi")).ToString("yyyy-MM-dd"), ""), _
+                            .dokter = namaDokter, _
+                            .validator_url = rowP("ValidatorURL").ToString(), _
+                            .details = dtTindakan, _
+                            .pembayaran = dtBayar _
+                        })
+                    End If
+                End If
+            Next
+
+            ' 5. Query Log Penggunaan Paket Global Berdasarkan KodeVoucher Unik
+            Dim dtPenggunaanPaketGlobal As New DataTable()
+
+            If listTransPoliID.Count > 0 Then
+                Dim strInTransPoliID As String = String.Join(",", listTransPoliID.ToArray())
+
+                Dim sqlPenggunaanPaketGlobal As String = _
+                    "WITH CurrentVoucherUnik AS ( " & _
+                    "    SELECT DISTINCT TPD.PaketID, TPD.KodeVoucher " & _
+                    "    FROM TransaksiPoliDetail TPD WITH(NOLOCK) " & _
+                    "    WHERE TPD.TransPoliID IN (" & strInTransPoliID & ") " & _
+                    "      AND TPD.KodeVoucher IS NOT NULL AND TPD.KodeVoucher <> '' " & _
+                    "      AND TPD.DeletedBy IS NULL " & _
+                    "), " & _
+                    "TotalKuotaDetail AS ( " & _
+                    "    SELECT PaketID, KodeVoucher, SUM(Jumlah) AS TotalKuota " & _
+                    "    FROM TransaksiPaketTindakanDetail WITH(NOLOCK) " & _
+                    "    GROUP BY PaketID, KodeVoucher " & _
+                    ") " & _
+                    "SELECT " & _
+                    "    LPP.NoTransaksi AS NoTransaksiPakai, " & _
+                    "    MP_LOG.Nama AS NamaPengguna, " & _
+                    "    TPT.NoTransaksi AS NoTransaksiBeli, " & _
+                    "    TPT.NoRekamMedis AS NoRMPemilik, " & _
+                    "    (MP_PEMILIK.Nama + ' (' + TPT.NoRekamMedis + ')') AS PemilikPaketFull, " & _
+                    "    TPT.CreatedDate AS TglBeli, " & _
+                    "    TPT.TanggalAkhirPaket AS TglBerakhir, " & _
+                    "    ISNULL(TPT.HargaNett, 0) AS HargaNett, " & _
+                    "    TPT.NamaPaket, " & _
+                    "    ISNULL(MT.NamaTindakan, ISNULL(TPTD.NamaTindakan, TPT.NamaPaket)) AS NamaTindakan, " & _
+                    "    LPP.KodeVoucher, " & _
+                    "    LPP.PaketID, " & _
+                    "    LPP.TanggalTransaksi AS TglPakai, " & _
+                    "    ISNULL(NULLIF(MPT.Kuota, 0), ISNULL(TKD.TotalKuota, 10)) AS KuotaAwal, " & _
+                    "    ROW_NUMBER() OVER ( " & _
+                    "        PARTITION BY LPP.PaketID, LPP.KodeVoucher " & _
+                    "        ORDER BY LPP.TanggalTransaksi ASC, LPP.ID ASC " & _
+                    "    ) AS PemakaianKe " & _
+                    "FROM LogPenggunaanPaket LPP WITH(NOLOCK) " & _
+                    "INNER JOIN CurrentVoucherUnik CV " & _
+                    "    ON LPP.PaketID = CV.PaketID AND LPP.KodeVoucher = CV.KodeVoucher " & _
+                    "INNER JOIN TransaksiPaketTindakan TPT WITH(NOLOCK) " & _
+                    "    ON LPP.PaketID = TPT.PaketID AND LPP.KodeVoucher = TPT.KodeVoucher " & _
+                    "INNER JOIN MasterPasien MP_PEMILIK WITH(NOLOCK) " & _
+                    "    ON MP_PEMILIK.NoRekamMedis = TPT.NoRekamMedis " & _
+                    "INNER JOIN MasterPasien MP_LOG WITH(NOLOCK) " & _
+                    "    ON MP_LOG.NoRekamMedis = LPP.NoRekamMedis " & _
+                    "LEFT JOIN MasterPaketTindakan MPT WITH(NOLOCK) " & _
+                    "    ON MPT.PaketID = TPT.PaketID " & _
+                    "LEFT JOIN TotalKuotaDetail TKD " & _
+                    "    ON TKD.PaketID = LPP.PaketID AND TKD.KodeVoucher = LPP.KodeVoucher " & _
+                    "LEFT JOIN TransaksiPaketTindakanDetail TPTD WITH(NOLOCK) " & _
+                    "    ON TPTD.PaketID = LPP.PaketID " & _
+                    "   AND TPTD.KodeVoucher = LPP.KodeVoucher " & _
+                    "   AND TPTD.TindakanID = LPP.TindakanID " & _
+                    "OUTER APPLY ( " & _
+                    "    SELECT TOP 1 TPD_SUB.TindakanID " & _
+                    "    FROM TransaksiPoli TP_SUB WITH(NOLOCK) " & _
+                    "    INNER JOIN TransaksiPoliDetail TPD_SUB WITH(NOLOCK) " & _
+                    "        ON TPD_SUB.TransPoliID = TP_SUB.TransPoliID " & _
+                    "    WHERE TP_SUB.NoUrut = LPP.NoTransaksi " & _
+                    "      AND TPD_SUB.KodeVoucher = LPP.KodeVoucher " & _
+                    "      AND TPD_SUB.DeletedBy IS NULL " & _
+                    ") TPD_LOG " & _
+                    "LEFT JOIN MasterTindakan MT WITH(NOLOCK) " & _
+                    "    ON MT.TindakanID = ISNULL(NULLIF(TPD_LOG.TindakanID, 0), LPP.TindakanID) " & _
+                    "WHERE LPP.DeletedBy IS NULL " & _
+                    "ORDER BY LPP.KodeVoucher ASC, LPP.TanggalTransaksi ASC, LPP.ID ASC"
+
+                dtPenggunaanPaketGlobal = ReadSQL(sqlPenggunaanPaketGlobal)
+            End If
+
+            ' 6. Menyusun Payload JSON Ke Web API Laravel
             Dim payloadObject = New With { _
                 .judul = "Rekap Tagihan Pemeriksaan Klinik", _
                 .lokasi = namaPoli, _
@@ -3154,30 +3305,31 @@ Public Class ReportPendapatanKlinik
                 .nomor_invoice = nomorInvoice, _
                 .info_cetak = Format(DateAndTime.Now, "dd-MMM-yyyy HH:mm:ss") & " By " & userAktif, _
                 .user = userAktif, _
-                .details = tblRekapInvoice _
+                .details = tblRekapInvoice, _
+                .invoices = listInvoices, _
+                .penggunaan_paket_global = dtPenggunaanPaketGlobal _
             }
 
             Dim jsonPayload As String = JsonConvert.SerializeObject(payloadObject)
 
-            ' 4. Pengambilan URL Endpoint API dari MsConfig
+            ' 7. Menghubungi Web API Endpoint
             Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
             If Not baseURL.EndsWith("/") Then baseURL &= "/"
             Dim apiUrl As String = baseURL & "api/laporan/rekap-tagihan-pdf"
 
             Application.DoEvents()
 
-            ' 5. Tembak API Menggunakan Fungsi Khusus PDF
             Dim pdfBytes As Byte() = DownloadPdfFromAPI(jsonPayload, apiUrl)
 
-            ' 6. Handling Response & Buka PDF di Browser
+            ' 8. Simpan Temporary File & Buka PDF di Browser
             If pdfBytes IsNot Nothing AndAlso pdfBytes.Length > 0 Then
-                Dim fileName As String = "Rekap_Tagihan_" & nomorInvoice.Replace("/", "_") & "_" & DateTime.Now.ToString("yyyyMMdd_HHmmss") & ".pdf"
+                Dim fileName As String = "Rekap_Tagihan_Plus_Invoices_" & DateTime.Now.ToString("yyyyMMdd_HHmmss") & ".pdf"
                 Dim tempPath As String = Path.Combine(Path.GetTempPath(), fileName)
                 File.WriteAllBytes(tempPath, pdfBytes)
 
                 OpenPdfInBrowser(tempPath)
             Else
-                MessageBox.Show("Gagal mengunduh file PDF dari server Web.", "Gagal Cetak PDF", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                MessageBox.Show("Gagal mengunduh file PDF dari Web Service.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
             End If
 
         Catch ex As Exception
