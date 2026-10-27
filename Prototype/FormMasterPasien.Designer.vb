@@ -38,9 +38,12 @@ Partial Class FormMasterPasien
         Me.ButtonGetNomorIHS = New System.Windows.Forms.Button
         Me.ButtonCariNoRM = New System.Windows.Forms.Button
         Me.ButtonUploadFoto = New System.Windows.Forms.Button
+        Me.ButtonAmbilGambar = New System.Windows.Forms.Button
         Me.TabControlMenu = New System.Windows.Forms.TabControl
         Me.TabPage1 = New System.Windows.Forms.TabPage
         Me.PanelLayoutMenu1TopMain = New System.Windows.Forms.Panel
+        Me.GroupBox3 = New System.Windows.Forms.GroupBox
+        Me.TextBoxKetKhusus = New System.Windows.Forms.TextBox
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
         Me.PictureBoxFotoPasien = New System.Windows.Forms.PictureBox
         Me.GroupBoxAlergiPemeriksaanAwal = New System.Windows.Forms.GroupBox
@@ -156,6 +159,8 @@ Partial Class FormMasterPasien
         Me.TextBoxKodePosKTP = New System.Windows.Forms.TextBox
         Me.CheckBoxCopyAlamatDomisili = New System.Windows.Forms.CheckBox
         Me.GroupBoxBiodataDiri = New System.Windows.Forms.GroupBox
+        Me.ComboBoxReferral = New System.Windows.Forms.ComboBox
+        Me.Label21 = New System.Windows.Forms.Label
         Me.TextBoxNomorCahaya = New System.Windows.Forms.TextBox
         Me.ComboBoxStatusKeluarga = New System.Windows.Forms.ComboBox
         Me.Label8 = New System.Windows.Forms.Label
@@ -225,11 +230,13 @@ Partial Class FormMasterPasien
         Me.ButtonScanQR = New System.Windows.Forms.Button
         Me.ButtonSimpanMenu1 = New System.Windows.Forms.Button
         Me.SplitContainer9 = New System.Windows.Forms.SplitContainer
+        Me.TextBoxReferral = New System.Windows.Forms.TextBox
         Me.PanelTop.SuspendLayout()
         Me.PanelSide.SuspendLayout()
         Me.TabControlMenu.SuspendLayout()
         Me.TabPage1.SuspendLayout()
         Me.PanelLayoutMenu1TopMain.SuspendLayout()
+        Me.GroupBox3.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         CType(Me.PictureBoxFotoPasien, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBoxAlergiPemeriksaanAwal.SuspendLayout()
@@ -502,15 +509,36 @@ Partial Class FormMasterPasien
         Me.ButtonUploadFoto.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonUploadFoto.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
         Me.ButtonUploadFoto.ForeColor = System.Drawing.Color.White
-        Me.ButtonUploadFoto.Location = New System.Drawing.Point(30, 231)
+        Me.ButtonUploadFoto.Location = New System.Drawing.Point(18, 231)
         Me.ButtonUploadFoto.Name = "ButtonUploadFoto"
         Me.ButtonUploadFoto.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.ButtonUploadFoto.Size = New System.Drawing.Size(150, 25)
+        Me.ButtonUploadFoto.Size = New System.Drawing.Size(66, 25)
         Me.ButtonUploadFoto.TabIndex = 422
-        Me.ButtonUploadFoto.Text = "Upload Foto"
+        Me.ButtonUploadFoto.Text = "Upload"
         Me.ButtonUploadFoto.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
         Me.ToolTipBtnMenu.SetToolTip(Me.ButtonUploadFoto, "Cek BPJS")
         Me.ButtonUploadFoto.UseVisualStyleBackColor = False
+        '
+        'ButtonAmbilGambar
+        '
+        Me.ButtonAmbilGambar.BackColor = System.Drawing.Color.FromArgb(CType(CType(25, Byte), Integer), CType(CType(135, Byte), Integer), CType(CType(84, Byte), Integer))
+        Me.ButtonAmbilGambar.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
+        Me.ButtonAmbilGambar.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonAmbilGambar.FlatAppearance.BorderSize = 0
+        Me.ButtonAmbilGambar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonAmbilGambar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.ButtonAmbilGambar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonAmbilGambar.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.ButtonAmbilGambar.ForeColor = System.Drawing.Color.White
+        Me.ButtonAmbilGambar.Location = New System.Drawing.Point(90, 231)
+        Me.ButtonAmbilGambar.Name = "ButtonAmbilGambar"
+        Me.ButtonAmbilGambar.RightToLeft = System.Windows.Forms.RightToLeft.Yes
+        Me.ButtonAmbilGambar.Size = New System.Drawing.Size(104, 25)
+        Me.ButtonAmbilGambar.TabIndex = 424
+        Me.ButtonAmbilGambar.Text = "Ambil Gambar"
+        Me.ButtonAmbilGambar.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.ToolTipBtnMenu.SetToolTip(Me.ButtonAmbilGambar, "Cek BPJS")
+        Me.ButtonAmbilGambar.UseVisualStyleBackColor = False
         '
         'TabControlMenu
         '
@@ -542,6 +570,7 @@ Partial Class FormMasterPasien
         '
         Me.PanelLayoutMenu1TopMain.AutoScroll = True
         Me.PanelLayoutMenu1TopMain.BackColor = System.Drawing.Color.White
+        Me.PanelLayoutMenu1TopMain.Controls.Add(Me.GroupBox3)
         Me.PanelLayoutMenu1TopMain.Controls.Add(Me.Button1)
         Me.PanelLayoutMenu1TopMain.Controls.Add(Me.GroupBox2)
         Me.PanelLayoutMenu1TopMain.Controls.Add(Me.GroupBoxAlergiPemeriksaanAwal)
@@ -572,8 +601,30 @@ Partial Class FormMasterPasien
         Me.PanelLayoutMenu1TopMain.Size = New System.Drawing.Size(936, 557)
         Me.PanelLayoutMenu1TopMain.TabIndex = 6
         '
+        'GroupBox3
+        '
+        Me.GroupBox3.Controls.Add(Me.TextBoxKetKhusus)
+        Me.GroupBox3.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Bold)
+        Me.GroupBox3.Location = New System.Drawing.Point(577, 632)
+        Me.GroupBox3.Name = "GroupBox3"
+        Me.GroupBox3.Size = New System.Drawing.Size(330, 205)
+        Me.GroupBox3.TabIndex = 535
+        Me.GroupBox3.TabStop = False
+        Me.GroupBox3.Text = "Keterangan Khusus Pasien"
+        '
+        'TextBoxKetKhusus
+        '
+        Me.TextBoxKetKhusus.BackColor = System.Drawing.SystemColors.ButtonHighlight
+        Me.TextBoxKetKhusus.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.TextBoxKetKhusus.Location = New System.Drawing.Point(17, 30)
+        Me.TextBoxKetKhusus.Multiline = True
+        Me.TextBoxKetKhusus.Name = "TextBoxKetKhusus"
+        Me.TextBoxKetKhusus.Size = New System.Drawing.Size(300, 159)
+        Me.TextBoxKetKhusus.TabIndex = 440
+        '
         'GroupBox2
         '
+        Me.GroupBox2.Controls.Add(Me.ButtonAmbilGambar)
         Me.GroupBox2.Controls.Add(Me.ButtonUploadFoto)
         Me.GroupBox2.Controls.Add(Me.PictureBoxFotoPasien)
         Me.GroupBox2.Font = New System.Drawing.Font("Segoe UI Semibold", 11.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -772,7 +823,7 @@ Partial Class FormMasterPasien
         Me.GroupBox1.Controls.Add(Me.Label57)
         Me.GroupBox1.Controls.Add(Me.Label58)
         Me.GroupBox1.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Bold)
-        Me.GroupBox1.Location = New System.Drawing.Point(577, 894)
+        Me.GroupBox1.Location = New System.Drawing.Point(577, 1122)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(330, 606)
         Me.GroupBox1.TabIndex = 504
@@ -1180,7 +1231,7 @@ Partial Class FormMasterPasien
         Me.GroupBox9.Controls.Add(Me.TextBoxRiwayatPenyakitDahulu)
         Me.GroupBox9.Controls.Add(Me.Label25)
         Me.GroupBox9.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Bold)
-        Me.GroupBox9.Location = New System.Drawing.Point(577, 628)
+        Me.GroupBox9.Location = New System.Drawing.Point(577, 845)
         Me.GroupBox9.Name = "GroupBox9"
         Me.GroupBox9.Size = New System.Drawing.Size(330, 260)
         Me.GroupBox9.TabIndex = 499
@@ -1877,6 +1928,9 @@ Partial Class FormMasterPasien
         '
         'GroupBoxBiodataDiri
         '
+        Me.GroupBoxBiodataDiri.Controls.Add(Me.TextBoxReferral)
+        Me.GroupBoxBiodataDiri.Controls.Add(Me.ComboBoxReferral)
+        Me.GroupBoxBiodataDiri.Controls.Add(Me.Label21)
         Me.GroupBoxBiodataDiri.Controls.Add(Me.TextBoxNomorCahaya)
         Me.GroupBoxBiodataDiri.Controls.Add(Me.ComboBoxStatusKeluarga)
         Me.GroupBoxBiodataDiri.Controls.Add(Me.Label8)
@@ -1911,6 +1965,29 @@ Partial Class FormMasterPasien
         Me.GroupBoxBiodataDiri.TabIndex = 489
         Me.GroupBoxBiodataDiri.TabStop = False
         Me.GroupBoxBiodataDiri.Text = "Biodata Diri"
+        '
+        'ComboBoxReferral
+        '
+        Me.ComboBoxReferral.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
+        Me.ComboBoxReferral.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems
+        Me.ComboBoxReferral.Font = New System.Drawing.Font("Segoe UI", 9.75!)
+        Me.ComboBoxReferral.FormattingEnabled = True
+        Me.ComboBoxReferral.Items.AddRange(New Object() {"Event", "Instagram Ads", "TikTok", "Kol/Affliate", "Lain-Lain"})
+        Me.ComboBoxReferral.Location = New System.Drawing.Point(331, 214)
+        Me.ComboBoxReferral.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.ComboBoxReferral.Name = "ComboBoxReferral"
+        Me.ComboBoxReferral.Size = New System.Drawing.Size(112, 25)
+        Me.ComboBoxReferral.TabIndex = 500
+        '
+        'Label21
+        '
+        Me.Label21.AutoSize = True
+        Me.Label21.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label21.Location = New System.Drawing.Point(274, 219)
+        Me.Label21.Name = "Label21"
+        Me.Label21.Size = New System.Drawing.Size(54, 17)
+        Me.Label21.TabIndex = 499
+        Me.Label21.Text = "Referral"
         '
         'TextBoxNomorCahaya
         '
@@ -2699,6 +2776,15 @@ Partial Class FormMasterPasien
         Me.SplitContainer9.SplitterWidth = 5
         Me.SplitContainer9.TabIndex = 461
         '
+        'TextBoxReferral
+        '
+        Me.TextBoxReferral.Font = New System.Drawing.Font("Segoe UI", 9.75!)
+        Me.TextBoxReferral.Location = New System.Drawing.Point(447, 214)
+        Me.TextBoxReferral.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.TextBoxReferral.Name = "TextBoxReferral"
+        Me.TextBoxReferral.Size = New System.Drawing.Size(90, 25)
+        Me.TextBoxReferral.TabIndex = 501
+        '
         'FormMasterPasien
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)
@@ -2721,6 +2807,8 @@ Partial Class FormMasterPasien
         Me.TabPage1.ResumeLayout(False)
         Me.PanelLayoutMenu1TopMain.ResumeLayout(False)
         Me.PanelLayoutMenu1TopMain.PerformLayout()
+        Me.GroupBox3.ResumeLayout(False)
+        Me.GroupBox3.PerformLayout()
         Me.GroupBox2.ResumeLayout(False)
         CType(Me.PictureBoxFotoPasien, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBoxAlergiPemeriksaanAwal.ResumeLayout(False)
@@ -2970,4 +3058,10 @@ Partial Class FormMasterPasien
     Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
     Friend WithEvents PictureBoxFotoPasien As System.Windows.Forms.PictureBox
     Friend WithEvents ButtonUploadFoto As System.Windows.Forms.Button
+    Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox
+    Friend WithEvents TextBoxKetKhusus As System.Windows.Forms.TextBox
+    Friend WithEvents ButtonAmbilGambar As System.Windows.Forms.Button
+    Friend WithEvents ComboBoxReferral As System.Windows.Forms.ComboBox
+    Friend WithEvents Label21 As System.Windows.Forms.Label
+    Friend WithEvents TextBoxReferral As System.Windows.Forms.TextBox
 End Class

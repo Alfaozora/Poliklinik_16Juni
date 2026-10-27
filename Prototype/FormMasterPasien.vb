@@ -32,6 +32,7 @@ Public Class FormMasterPasien
             Windows.Forms.Control.CheckForIllegalCrossThreadCalls = False
             Me.MdiParent = PoliKlinik
             Me.Dock = DockStyle.Fill
+            TextBoxReferral.Enabled = False
 
             ' Hide tab header button
             'TabControl1.Appearance = TabAppearance.FlatButtons
@@ -474,14 +475,22 @@ Public Class FormMasterPasien
                 Return False
             End If
 
-            ' Cek pemakaian NIK
-            Dim tblCheckNIK As DataTable = ReadSQL("SELECT Nama, NoRekamMedis, NoID FROM MasterPasien WHERE NoNIK = '" & TextBoxNomorNIK.Text & "' AND NoRekamMedis <> '" & TextBoxNoRM.Text & "'")
-            If tblCheckNIK.Rows.Count > 0 Then
-                Dim dataNIK As DataRow = tblCheckNIK.Rows(0)
+            ' Ambil nilai tanpa spasi ekstra di awal/akhir
+            'Dim nikCek As String = TextBoxNomorNIK.Text.Trim()
+            'Dim rmCek As String = TextBoxNoRM.Text.Trim()
 
-                MsgBox("Nomor NIK sudah dipakai atas nama " & dataNIK("Nama") & " dengan nomor rekam medis " & dataNIK("NoRekamMedis") & ".", MsgBoxStyle.Critical, "Warning!")
-                Return False
-            End If
+            '' Lakukan pengecekan HANYA jika NIK diisi (bukan kosong atau tanda strip)
+            'If nikCek <> "" AndAlso nikCek <> "-" Then
+
+            '    Dim tblCheckNIK As DataTable = ReadSQL("SELECT Nama, NoRekamMedis, NoID FROM MasterPasien WHERE NoNIK = '" & nikCek & "' AND NoRekamMedis <> '" & rmCek & "'")
+
+            '    If tblCheckNIK.Rows.Count > 0 Then
+            '        Dim dataNIK As DataRow = tblCheckNIK.Rows(0)
+            '        MsgBox("Nomor NIK sudah dipakai atas nama " & dataNIK("Nama") & " dengan nomor rekam medis " & dataNIK("NoRekamMedis") & ".", MsgBoxStyle.Critical, "Warning!")
+            '        Return False
+            '    End If
+
+            'End If
         End If
 
         ' Validasi Inputan BPJS
@@ -662,6 +671,8 @@ Public Class FormMasterPasien
             Dim riwayatPenyakitKeluarga As String = TextBoxRiwayatPenyakitKeluarga.Text.Trim()
             Dim riwayatKebiasaan As String = TextBoxRiwayatKebiasaan.Text.Trim()
 
+            Dim keteranganKhusus As String = TextBoxKetKhusus.Text.Trim()
+
             ' IHS Number
             Dim noIHS As String = ""
             If IsPlaceholder(TextBoxNomorIHS) = False Then noIHS = TextBoxNomorIHS.Text
@@ -672,26 +683,39 @@ Public Class FormMasterPasien
             Dim folderPath As String = Application.StartupPath & "\Uploads\FotoPasien"
 
             If PictureBoxFotoPasien.Tag IsNot Nothing AndAlso PictureBoxFotoPasien.Tag.ToString().Trim() <> "" Then
-                If Not IO.Directory.Exists(folderPath) Then
-                    IO.Directory.CreateDirectory(folderPath)
+                Dim currentTag As String = PictureBoxFotoPasien.Tag.ToString().Trim()
+
+                ' Jika Tag berisi file temporer/baru yang diupload dari tempat lain
+                If System.IO.File.Exists(currentTag) AndAlso Not currentTag.StartsWith(folderPath, StringComparison.OrdinalIgnoreCase) Then
+                    If Not IO.Directory.Exists(folderPath) Then
+                        IO.Directory.CreateDirectory(folderPath)
+                    End If
+
+                    Dim ekstensi As String = IO.Path.GetExtension(currentTag)
+                    Dim namaFileUnik As String = Guid.NewGuid().ToString() & ekstensi
+                    Dim targetPath As String = IO.Path.Combine(folderPath, namaFileUnik)
+
+                    IO.File.Copy(currentTag, targetPath, True)
+                    fotoPath = "Uploads\FotoPasien\" & namaFileUnik
+                Else
+                    ' Jika Tag berisi path foto lama yang sudah tersimpan di folder Uploads
+                    fotoPath = currentTag
                 End If
+            End If
 
-                ' Simpan gambar ke folder dan buat nama unik
-                Dim ekstensi As String = IO.Path.GetExtension(PictureBoxFotoPasien.Tag.ToString())
-                Dim namaFileUnik As String = Guid.NewGuid().ToString() & ekstensi
-                Dim targetPath As String = IO.Path.Combine(folderPath, namaFileUnik)
-
-                IO.File.Copy(PictureBoxFotoPasien.Tag.ToString(), targetPath, True)
-
-                fotoPath = "Uploads\FotoPasien\" & namaFileUnik
+            Dim referral As String = ""
+            If ComboBoxReferral.Text.Trim() = "Lain-Lain" Then
+                referral = TextBoxReferral.Text.Trim()
+            Else
+                referral = ComboBoxReferral.Text.Trim()
             End If
 
             If jenisProses = "CREATE" Then
                 noRekamMedis = generateNomorRekamMedis()
 
                 ' Input ke dalam tabel master pasien
-                Dim query As String = "INSERT INTO MasterPasien (noRekamMedis, NoDokumenRekamMedis, NoIHS, NoNIK, NoNIP, NoKartuBPJS, NoKartuInhealth, NoKartuJPK, NoKartuCahaya, Nama, TempatLahir, TglLahir, JenisKelamin, GolonganDarah, DomisiliAlamat, DomisiliRT, DomisiliRW, DomisiliKelurahan, DomisiliKecamatan, DomisiliKabupaten, DomisiliProvinsi, DomisiliKodePos, KtpAlamat, KtpRT, KtpRW, KtpKelurahan, KtpKecamatan, KtpKabupaten, KtpProvinsi, KtpKodePos, NoTelepon, NoHandphone, Email, PendidikanTerakhir, StatusPerkawinan, Agama, Kewarganegaraan, KeteranganKewarganegaraanAsing, StatusKeluarga, Pekerjaan, KontakDaruratNama, KontakDaruratAlamat, KontakDaruratNoTelepon, RiwayatPenyakitDahulu, RiwayatPenyakitKeluarga, RiwayatKebiasaan, PasienTanpaNIK, CreatedBy, CreatedDate, FotoPath) " & _
-                                      "VALUES (@noRekamMedis, @noDokumenRekamMedis, @noIHS, @noNIK, @noNIP, @noKartuBPJS, @noInhealth, @noJPK, @noCahaya, @namaPasien, @tempatLahirPasien, @tglLahirPasien, @jenisKelaminPasien, @golDarahPasien, @domisiliAlamat, @domisiliRT, @domisiliRW, @domisiliKelurahan, @domisiliKecamatan, @domisiliKabupaten, @domisiliProvinsi, @domisiliKodePos, @ktpAlamat, @ktpRT, @ktpRW, @ktpKelurahan, @ktpKecamatan, @ktpKabupaten, @ktpProvinsi, @ktpKodePos, @noTelepon, @noHandphone, @email, @pendidikanTerakhir, @statusPerkawinan, @agama, @kewarganegaraan, @kewarganegaraanKeterangan, @statusKeluarga, @pekerjaan, @kontakDaruratNama, @kontakDaruratAlamat, @kontakDaruratNoTelepon, @riwayatPenyakitDahulu, @riwayatPenyakitKeluarga, @riwayatKebiasaan, " & Convert.ToInt32(CheckBoxStatusNIK.Checked) & ", @userInput, GETDATE(), @fotoPath)"
+                Dim query As String = "INSERT INTO MasterPasien (noRekamMedis, NoDokumenRekamMedis, NoIHS, NoNIK, NoNIP, NoKartuBPJS, NoKartuInhealth, NoKartuJPK, NoKartuCahaya, Nama, TempatLahir, TglLahir, JenisKelamin, GolonganDarah, DomisiliAlamat, DomisiliRT, DomisiliRW, DomisiliKelurahan, DomisiliKecamatan, DomisiliKabupaten, DomisiliProvinsi, DomisiliKodePos, KtpAlamat, KtpRT, KtpRW, KtpKelurahan, KtpKecamatan, KtpKabupaten, KtpProvinsi, KtpKodePos, NoTelepon, NoHandphone, Email, PendidikanTerakhir, StatusPerkawinan, Agama, Kewarganegaraan, KeteranganKewarganegaraanAsing, StatusKeluarga, Pekerjaan, KontakDaruratNama, KontakDaruratAlamat, KontakDaruratNoTelepon, RiwayatPenyakitDahulu, RiwayatPenyakitKeluarga, RiwayatKebiasaan, PasienTanpaNIK, CreatedBy, CreatedDate, FotoPath, KeteranganKhusus, Referral) " & _
+                      "VALUES (@noRekamMedis, @noDokumenRekamMedis, @noIHS, @noNIK, @noNIP, @noKartuBPJS, @noInhealth, @noJPK, @noCahaya, @namaPasien, @tempatLahirPasien, @tglLahirPasien, @jenisKelaminPasien, @golDarahPasien, @domisiliAlamat, @domisiliRT, @domisiliRW, @domisiliKelurahan, @domisiliKecamatan, @domisiliKabupaten, @domisiliProvinsi, @domisiliKodePos, @ktpAlamat, @ktpRT, @ktpRW, @ktpKelurahan, @ktpKecamatan, @ktpKabupaten, @ktpProvinsi, @ktpKodePos, @noTelepon, @noHandphone, @email, @pendidikanTerakhir, @statusPerkawinan, @agama, @kewarganegaraan, @kewarganegaraanKeterangan, @statusKeluarga, @pekerjaan, @kontakDaruratNama, @kontakDaruratAlamat, @kontakDaruratNoTelepon, @riwayatPenyakitDahulu, @riwayatPenyakitKeluarga, @riwayatKebiasaan, " & Convert.ToInt32(CheckBoxStatusNIK.Checked) & ", @userInput, GETDATE(), @fotoPath, @KeteranganKhusus, @referral)"
 
                 ' Memanggil fungsi WriteParameterizedSQL untuk eksekusi query
                 WriteParameterizedLokalSQL(query, 4, _
@@ -742,7 +766,9 @@ Public Class FormMasterPasien
                      New SqlParameter("@riwayatPenyakitKeluarga", riwayatPenyakitKeluarga), _
                      New SqlParameter("@riwayatKebiasaan", riwayatKebiasaan), _
                      New SqlParameter("@userInput", userInput), _
-                     New SqlParameter("@fotoPath", fotoPath))
+                     New SqlParameter("@fotoPath", fotoPath), _
+                     New SqlParameter("@KeteranganKhusus", keteranganKhusus), _
+                     New SqlParameter("@referral", referral))
 
                 ' Insert ke dalam tabel general consent jika ada
                 If LabelSignatureDate.Text <> "-" Then
@@ -829,7 +855,9 @@ Public Class FormMasterPasien
                                   "PasienTanpaNIK = " & Convert.ToInt32(CheckBoxStatusNIK.Checked) & ", " & _
                                   "ChangeBy = @userInput, " & _
                                   "ChangeDate = GETDATE(), " & _
-                                  "FotoPath = @fotoPath " & _
+                                  "FotoPath = @fotoPath, " & _
+                                  "KeteranganKhusus = @KeteranganKhusus, " & _
+                                  "Referral = @referral " & _
                                   "WHERE NoRekamMedis = @noRekamMedis"
 
                 WriteParameterizedLokalSQL(queryUpdate, 4, _
@@ -880,7 +908,9 @@ Public Class FormMasterPasien
                      New SqlParameter("@riwayatPenyakitKeluarga", riwayatPenyakitKeluarga), _
                      New SqlParameter("@riwayatKebiasaan", riwayatKebiasaan), _
                      New SqlParameter("@userInput", userInput), _
-                     New SqlParameter("@fotoPath", fotoPath))
+                     New SqlParameter("@fotoPath", fotoPath), _
+                     New SqlParameter("@KeteranganKhusus", keteranganKhusus), _
+                     New SqlParameter("@referral", referral))
 
                 ' Input/Create ke dalam tabel MasterPasienBPJS
                 If noKartuBPJS.Length <> 0 AndAlso CheckBridgingPcareActive() = True Then
@@ -1110,6 +1140,8 @@ Public Class FormMasterPasien
         PictureBoxSignatureGC.Image = Nothing
         LabelSignatureDate.Text = "-"
 
+        TextBoxKetKhusus.ResetText()
+
         'Foto Pasien
         Dim defaultFotoPath As String = Application.StartupPath & "\Uploads\BlankProfile.png"
         PictureBoxFotoPasien.Image = Image.FromFile(defaultFotoPath)
@@ -1117,6 +1149,9 @@ Public Class FormMasterPasien
 
         ' Load Placeholder
         SetPlaceholder()
+
+        TextBoxReferral.ResetText()
+        ComboBoxReferral.ResetText()
     End Sub
 
     Public Sub LoadPasien(ByRef rowPasien As DataRowView)
@@ -1201,6 +1236,29 @@ Public Class FormMasterPasien
         ' Alergi
         LoadDataAlergi(Trow("NoRekamMedis"), GridControlAlergi)
 
+        'Keterangan Khusus
+        If IsDBNull(Trow("KeteranganKhusus")) = False Then TextBoxKetKhusus.Text = Trow("KeteranganKhusus")
+
+        If IsDBNull(Trow("Referral")) = False AndAlso Trow("Referral").ToString().Trim() <> "" Then
+            Dim referralValue As String = Trow("Referral").ToString().Trim()
+
+            ' Cek apakah nilai referral ada di dalam item ComboBoxReferral
+            If ComboBoxReferral.Items.Contains(referralValue) Then
+                ComboBoxReferral.Text = referralValue
+                TextBoxReferral.ResetText()
+                TextBoxReferral.Enabled = False
+            Else
+                ' Jika nilainya tidak ada di daftar ComboBox, berarti dimasukkan via pilihan "Lain-Lain"
+                ComboBoxReferral.Text = "Lain-Lain"
+                TextBoxReferral.Text = referralValue
+                TextBoxReferral.Enabled = True
+            End If
+        Else
+            ComboBoxReferral.SelectedIndex = -1
+            TextBoxReferral.ResetText()
+            TextBoxReferral.Enabled = False
+        End If
+
         ' Riwayat Penyakit
         If IsDBNull(Trow("RiwayatPenyakitDahulu")) = False Then TextBoxRiwayatPenyakitDahulu.Text = Trow("RiwayatPenyakitDahulu")
         If IsDBNull(Trow("RiwayatPenyakitKeluarga")) = False Then TextBoxRiwayatPenyakitKeluarga.Text = Trow("RiwayatPenyakitKeluarga")
@@ -1254,22 +1312,24 @@ Public Class FormMasterPasien
 
         ' Tampilkan Foto Pasien di PictureBoxFotoPasien
         If IsDBNull(Trow("FotoPath")) = False AndAlso Trow("FotoPath").ToString <> "" Then
-            Dim fotoPath As String = Trow("FotoPath").ToString
+            Dim fotoPathDB As String = Trow("FotoPath").ToString
 
-            If System.IO.File.Exists(fotoPath) Then
-                ' Hapus gambar lama dulu kalau ada, untuk menghindari memory lock
+            If System.IO.File.Exists(fotoPathDB) Then
                 If PictureBoxFotoPasien.Image IsNot Nothing Then
                     PictureBoxFotoPasien.Image.Dispose()
                     PictureBoxFotoPasien.Image = Nothing
                 End If
 
-                PictureBoxFotoPasien.Image = Image.FromFile(fotoPath)
+                PictureBoxFotoPasien.Image = Image.FromFile(fotoPathDB)
+                PictureBoxFotoPasien.Tag = fotoPathDB
                 PictureBoxFotoPasien.SizeMode = PictureBoxSizeMode.StretchImage
             Else
                 PictureBoxFotoPasien.Image = Nothing
+                PictureBoxFotoPasien.Tag = Nothing
             End If
         Else
             PictureBoxFotoPasien.Image = Nothing
+            PictureBoxFotoPasien.Tag = Nothing
         End If
     End Sub
 
@@ -1880,6 +1940,25 @@ Public Class FormMasterPasien
             PictureBoxFotoPasien.Image = Image.FromFile(originalFilePath)
             PictureBoxFotoPasien.Tag = originalFilePath
             PictureBoxFotoPasien.SizeMode = PictureBoxSizeMode.Zoom
+        End If
+    End Sub
+
+    Private Sub ButtonAmbilGambar_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonAmbilGambar.Click
+        Try
+            Dim frmCam As New FormCamera()
+            frmCam.ShowDialog(Me)
+        Catch ex As Exception
+            MsgBox(ex.Message, MsgBoxStyle.Critical, "Error Open Camera")
+        End Try
+    End Sub
+
+    Private Sub ComboBoxReferral_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBoxReferral.SelectedIndexChanged
+        If ComboBoxReferral.Text.Trim() = "Lain-Lain" Then
+            TextBoxReferral.Enabled = True
+            TextBoxReferral.Focus()
+        Else
+            TextBoxReferral.Enabled = False
+            TextBoxReferral.Clear() ' Opsional: bersihkan teks jika memilih opsi lain
         End If
     End Sub
 End Class

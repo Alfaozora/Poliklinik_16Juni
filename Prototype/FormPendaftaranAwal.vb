@@ -10,6 +10,7 @@ Imports System.Collections.Generic
 Imports Newtonsoft.Json.Linq
 Imports System.Globalization
 Imports DevExpress.XtraGrid.Columns
+Imports System.Text
 
 Public Class FormPendaftaranAwal
     Private formName As String = "FORM PENDAFTARAN AWAL"
@@ -75,6 +76,7 @@ Public Class FormPendaftaranAwal
         Private _nohp As String
         Private _kodefaskes As String
         Private _namafaskes As String
+        Private _stage As String
 
         Public Property nomorantrean() As String
             Get
@@ -172,6 +174,15 @@ Public Class FormPendaftaranAwal
             End Get
             Set(ByVal value As String)
                 _tanggalperiksa = value
+            End Set
+        End Property
+
+        Public Property stage() As String
+            Get
+                Return _stage
+            End Get
+            Set(ByVal value As String)
+                _stage = value
             End Set
         End Property
 
@@ -455,6 +466,24 @@ Public Class FormPendaftaranAwal
     '    Return accessData
     'End Function
 
+
+    Function EncryptAES(ByVal plainText As String, ByVal key As String) As String
+        Dim aes As New RijndaelManaged()
+        aes.Key = Encoding.UTF8.GetBytes(key.PadRight(32)) ' 256-bit
+        aes.IV = Encoding.UTF8.GetBytes(key.Substring(0, 16))
+
+        Dim encryptor = aes.CreateEncryptor(aes.Key, aes.IV)
+
+        Using ms As New MemoryStream()
+            Using cs As New CryptoStream(ms, encryptor, CryptoStreamMode.Write)
+                Using sw As New StreamWriter(cs)
+                    sw.Write(plainText)
+                End Using
+            End Using
+            Return Convert.ToBase64String(ms.ToArray())
+        End Using
+    End Function
+
     Private Sub ButtonFindPasien_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonFindPasien.Click
         FindPasien.SetForm("PendaftaranAwal")
         FindPasien.ShowDialog()
@@ -517,7 +546,7 @@ Public Class FormPendaftaranAwal
         TabControlMenu1.Enabled = False
 
         ButtonTambahTindakan.Visible = True
-        ButtonScanQR.Visible = True
+        ButtonScanQR.Visible = False
         ButtonTambahPaket.Visible = False
 
         ' Clear Footer
@@ -923,9 +952,9 @@ Public Class FormPendaftaranAwal
                             ' =========================
                             ' PEMAKAIAN PAKET → wajib IC
                             ' =========================
-                            If ValidasiInformedConsentPaket(NoRM, idTindakan, userInput) = False Then
-                                Exit Sub
-                            End If
+                            'If ValidasiInformedConsentPaket(NoRM, idTindakan, idTransaksi, userInput) = False Then
+                            '    Exit Sub
+                            'End If
 
                             SimpanPenggunaanPaket()
                         Else
@@ -1187,6 +1216,26 @@ Public Class FormPendaftaranAwal
         End If
     End Sub
 
+    Function GetNamaTindakanDariDetailPaket(ByVal paketID As String, ByVal tindakanID As String) As String
+        Dim namaTindakan As String = ""
+
+        Dim detailJson As String = ReadSQLNIK( _
+            "SELECT DetailTindakan FROM MasterPaketTindakan WHERE PaketID = '" & paketID & "'")
+
+        If detailJson <> "" Then
+            Dim dt As DataTable = JsonToDataTable(detailJson)
+
+            For Each row As DataRow In dt.Rows
+                If row("TindakanID").ToString() = tindakanID Then
+                    namaTindakan = row("NamaTindakan").ToString()
+                    Exit For
+                End If
+            Next
+        End If
+
+        Return namaTindakan
+    End Function
+
     Public Sub SimpanPenggunaanPaket()
         If ValidasiInputPendaftaran() = True Then
             Dim idTransaksi As String = ""
@@ -1289,10 +1338,21 @@ Public Class FormPendaftaranAwal
                             Dim idTransaksiTindakan As String = nomorUrutTransaksi
 
                             Dim namaTindakan As String = ""
-                            Dim listTindakanApi As List(Of String) = GetListTindakanDariPaket(rowTindakan("PaketID").ToString())
+                            Dim listTindakanApi As New List(Of String)
+                            Dim tindakanID As String = ""
 
-                            If listTindakanApi.Count > 0 Then
-                                namaTindakan = listTindakanApi(0)
+                            Dim jenisPaket As String = rowTindakan("Jenis Paket").ToString()
+
+                            If jenisPaket = "Paket Reguler" Then
+                                tindakanID = rowTindakan("TindakanID").ToString()
+                                listTindakanApi = GetListTindakanDariPaket(rowTindakan("PaketID").ToString())
+                                If listTindakanApi.Count > 0 Then
+                                    namaTindakan = listTindakanApi(0)
+                                End If
+                            ElseIf jenisPaket = "Paket Per-Tindakan" Then
+                                tindakanID = rowTindakan("TindakanID").ToString()
+                                namaTindakan = GetNamaTindakanDariDetailPaket(rowTindakan("PaketID").ToString(), tindakanID)
+                                listTindakanApi.Add(namaTindakan)
                             End If
 
                             Dim jsonConsent As String = _
@@ -1322,6 +1382,8 @@ Public Class FormPendaftaranAwal
                             End If
 
                             usage.Add("id_paket", rowTindakan("PaketID").ToString())
+                            usage.Add("kode_voucher", rowTindakan("KodeVoucher").ToString())
+                            usage.Add("id_tindakan", tindakanID)
                             usage.Add("tindakan", listTindakanApi)
 
                             If isPembelianBaru = True Then
@@ -1334,6 +1396,7 @@ Public Class FormPendaftaranAwal
                                 usage.Add("tgl_perawatan", Nothing)
                             Else
                                 usage.Add("qty", qty)
+                                usage.Add("qty_total", Nothing)
                                 usage.Add("tgl_pembelian", Nothing)
                                 usage.Add("tgl_perawatan", tglPerawatan)
                             End If
@@ -1359,10 +1422,21 @@ Public Class FormPendaftaranAwal
 
                             Dim jsonParam As String = JsonConvert.SerializeObject(payload)
 
-                            Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
-                            Dim urlWebService As String = baseURL & "api/lumiera-luzelle/treatment-package"
+                            Dim secretKey As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_payloadEnkrip'")
 
-                            Dim responseApi As String = InsertDataAPIRM(jsonParam, urlWebService)
+                            Dim encrypted As String = EncryptAES(jsonParam, secretKey)
+
+                            If String.IsNullOrEmpty(encrypted) Then
+                                MsgBox("Encrypt gagal!")
+                                Exit Sub
+                            End If
+
+                            Dim postData As String = "{""payload"":""" & encrypted & """}"
+
+                            Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+                            Dim urlWebService As String = baseURL & "api/lumiera-luzelle/treatment-package/dev"
+
+                            Dim responseApi As String = InsertDataAPIRMInformConsent(postData, urlWebService)
 
                             If responseApi.ToLower().Contains("""success"":true") Then
                                 MsgBox("Pemotongan paket berhasil dikirim ke API")
@@ -1607,7 +1681,7 @@ Public Class FormPendaftaranAwal
                 TabControlMenu1.Enabled = True
 
                 ButtonTambahTindakan.Visible = True
-                ButtonScanQR.Visible = True
+                ButtonScanQR.Visible = False
                 ButtonTambahPaket.Visible = False
             End If
         Catch ex As Exception
@@ -1787,51 +1861,142 @@ Public Class FormPendaftaranAwal
         End Try
     End Function
 
+    'New Antrian Online
+    Private Function SafeJson(ByVal item As JObject, ByVal key As String) As String
+        If item(key) IsNot Nothing AndAlso item(key).Type <> JTokenType.Null Then
+            Return item(key).ToString()
+        End If
+        Return ""
+    End Function
+
     Public Sub GetDataAntreanOnline()
         Try
-            Dim urlWebService As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'web_service_get_data_antrol'")
+            Dim urlWebService As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
             Dim Tawal As Date = TglAwalAntrean.Value
+            Dim loc As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'NoPoli'")
 
-            Dim responseString As String = GetDataAntrianOnline(urlWebService & "0/" & Format(Tawal.Date, "yyyy-MM-dd") & "/1")
-            ' Debug isi response
-            'MessageBox.Show(responseString, "Raw JSON Response")
+            Dim url As String = urlWebService & "api/antrian?kode_klinik=" & loc & "&visit_date=" & Format(Tawal.Date, "yyyy-MM-dd")
 
-            Dim rootList As List(Of RootAntrean) = JsonConvert.DeserializeObject(Of List(Of RootAntrean))(responseString)
-            If rootList Is Nothing OrElse rootList.Count = 0 Then
-                MessageBox.Show("Data kosong dari server.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                Exit Sub
-            End If
-            Dim rootObj As RootAntrean = rootList(0)
+            Dim responseString As String = GetDataAPIRM(url)
 
+            ' 🔍 Debug
+            'MessageBox.Show(responseString)
 
-            ' Cek status code dari metadata
-            If rootObj Is Nothing OrElse rootObj.metadata Is Nothing Then
-                MessageBox.Show("Format response tidak sesuai!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Dim jsonObj As JObject = JObject.Parse(responseString)
+
+            If jsonObj("status") Is Nothing OrElse jsonObj("status").ToString() <> "success" Then
+                MessageBox.Show("Gagal ambil data", "Error")
                 Exit Sub
             End If
 
-            If rootObj.metadata.code = 200 Then
-                DataGridViewAntrean.Rows.Clear()
-
-                For Each item As AntreanItem In rootObj.response
-                    Dim tglPeriksa As String = ""
-                    Try
-                        tglPeriksa = ConvertDateStringAntreanOnline(item.tanggalperiksa)
-                    Catch ex As Exception
-                        tglPeriksa = item.tanggalperiksa
-                    End Try
-
-                    DataGridViewAntrean.Rows.Add(New String() {item.namapeserta, item.nik, item.namapoli, item.jenispeserta, item.nomorantrean, tglPeriksa.Split(" "c)(0), item.statusantrean, item.sumberantrean, If(item.nomorkartu, ""), item.jeniskelamin, item.tanggallahir, If(item.alamat, ""), If(item.nohp, ""), If(item.kodedokter, ""), If(item.namadokter, ""), If(item.kodepoli, ""), If(item.namapoli, ""), If(item.keluhan, ""), If(item.kodefaskes, ""), If(item.namafaskes, "")})
-                Next
-
-                DataGridViewAntrean.CurrentCell = Nothing
-            Else
-                MsgBox("Data tidak ditemukan: " & rootObj.metadata.message, MsgBoxStyle.Critical, "Warning!")
+            If jsonObj("data") Is Nothing Then
+                MessageBox.Show("Data kosong", "Info")
+                Exit Sub
             End If
+
+            Dim dataArray As JArray = jsonObj("data")
+
+            DataGridViewAntrean.Rows.Clear()
+
+            For Each item As JObject In dataArray
+                'MessageBox.Show(item.ToString())
+
+                Dim antrean As New AntreanItem()
+
+                ' 🔄 mapping manual
+                antrean.nomorantrean = SafeJson(item, "nomor_antrean")
+                antrean.namapeserta = SafeJson(item, "nama_pasien")
+                antrean.nik = SafeJson(item, "nik")
+                antrean.nomorkartu = SafeJson(item, "nomor_bpjs")
+                antrean.keluhan = SafeJson(item, "keluhan")
+                antrean.jenispeserta = SafeJson(item, "jenis_pasien")
+                antrean.kodedokter = SafeJson(item, "kode_dokter")
+                antrean.namadokter = SafeJson(item, "nama_dokter")
+                antrean.kodepoli = SafeJson(item, "kode_poli")
+                antrean.namapoli = SafeJson(item, "nama_poli")
+                antrean.sumberantrean = SafeJson(item, "sumber_antrean")
+                antrean.statusantrean = SafeJson(item, "status")
+                antrean.tanggalperiksa = SafeJson(item, "tanggal_antrean")
+                antrean.stage = SafeJson(item, "current_stage")
+
+                ' 📊 tampil ke grid
+                DataGridViewAntrean.Rows.Add(New String() { _
+                    antrean.namapeserta, _
+                    antrean.nik, _
+                    antrean.namapoli, _
+                    antrean.jenispeserta, _
+                    antrean.nomorantrean, _
+                    antrean.tanggalperiksa, _
+                    antrean.statusantrean, _
+                    antrean.sumberantrean, _
+                    antrean.nomorkartu, _
+                    antrean.jeniskelamin, _
+                    antrean.tanggallahir, _
+                    antrean.alamat, _
+                    antrean.nohp, _
+                    antrean.kodedokter, _
+                    antrean.namadokter, _
+                    antrean.kodepoli, _
+                    antrean.keluhan, _
+                    antrean.kodefaskes, _
+                    antrean.namafaskes, _
+                    antrean.stage _
+                })
+
+            Next
+
+            DataGridViewAntrean.CurrentCell = Nothing
+
         Catch ex As Exception
             MessageBox.Show("Terjadi kesalahan: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
+
+    'Public Sub GetDataAntreanOnline()
+    '    Try
+    '        Dim urlWebService As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'web_service_get_data_antrol'")
+    '        Dim Tawal As Date = TglAwalAntrean.Value
+
+    '        Dim responseString As String = GetDataAntrianOnline(urlWebService & "0/" & Format(Tawal.Date, "yyyy-MM-dd") & "/1")
+    '        ' Debug isi response
+    '        'MessageBox.Show(responseString, "Raw JSON Response")
+
+    '        Dim rootList As List(Of RootAntrean) = JsonConvert.DeserializeObject(Of List(Of RootAntrean))(responseString)
+    '        If rootList Is Nothing OrElse rootList.Count = 0 Then
+    '            MessageBox.Show("Data kosong dari server.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+    '            Exit Sub
+    '        End If
+    '        Dim rootObj As RootAntrean = rootList(0)
+
+
+    '        ' Cek status code dari metadata
+    '        If rootObj Is Nothing OrElse rootObj.metadata Is Nothing Then
+    '            MessageBox.Show("Format response tidak sesuai!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+    '            Exit Sub
+    '        End If
+
+    '        If rootObj.metadata.code = 200 Then
+    '            DataGridViewAntrean.Rows.Clear()
+
+    '            For Each item As AntreanItem In rootObj.response
+    '                Dim tglPeriksa As String = ""
+    '                Try
+    '                    tglPeriksa = ConvertDateStringAntreanOnline(item.tanggalperiksa)
+    '                Catch ex As Exception
+    '                    tglPeriksa = item.tanggalperiksa
+    '                End Try
+
+    '                DataGridViewAntrean.Rows.Add(New String() {item.namapeserta, item.nik, item.namapoli, item.jenispeserta, item.nomorantrean, tglPeriksa.Split(" "c)(0), item.statusantrean, item.sumberantrean, If(item.nomorkartu, ""), item.jeniskelamin, item.tanggallahir, If(item.alamat, ""), If(item.nohp, ""), If(item.kodedokter, ""), If(item.namadokter, ""), If(item.kodepoli, ""), If(item.namapoli, ""), If(item.keluhan, ""), If(item.kodefaskes, ""), If(item.namafaskes, "")})
+    '            Next
+
+    '            DataGridViewAntrean.CurrentCell = Nothing
+    '        Else
+    '            MsgBox("Data tidak ditemukan: " & rootObj.metadata.message, MsgBoxStyle.Critical, "Warning!")
+    '        End If
+    '    Catch ex As Exception
+    '        MessageBox.Show("Terjadi kesalahan: " & ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+    '    End Try
+    'End Sub
 
 
     Private Sub CreateDataGridViewAntreanOnline()
@@ -1852,10 +2017,10 @@ Public Class FormPendaftaranAwal
         DataGridViewAntrean.Columns.Add("ColumnKodeDokter", "Kode Dokter")
         DataGridViewAntrean.Columns.Add("ColumnNamaDokter", "Nama Dokter")
         DataGridViewAntrean.Columns.Add("ColumnKodePoli", "Kode Poli")
-        DataGridViewAntrean.Columns.Add("ColumnNamaPoli", "Nama Poli")
         DataGridViewAntrean.Columns.Add("ColumnKeluhan", "Keluhan")
         DataGridViewAntrean.Columns.Add("ColumnKodeFaskes", "Kode Faskes")
         DataGridViewAntrean.Columns.Add("ColumnNamaFaskes", "Nama Faskes")
+        DataGridViewAntrean.Columns.Add("ColumnStage", "Stage")
 
         ' Hide
         DataGridViewAntrean.Columns("ColumnNomorKartu").Visible = False
@@ -1866,10 +2031,10 @@ Public Class FormPendaftaranAwal
         DataGridViewAntrean.Columns("ColumnKodeDokter").Visible = False
         'DataGridViewAntrean.Columns("ColumnNamaDokter").Visible = False
         DataGridViewAntrean.Columns("ColumnKodePoli").Visible = False
-        DataGridViewAntrean.Columns("ColumnNamaPoli").Visible = False
         DataGridViewAntrean.Columns("ColumnKeluhan").Visible = False
         DataGridViewAntrean.Columns("ColumnKodeFaskes").Visible = False
         DataGridViewAntrean.Columns("ColumnNamaFaskes").Visible = False
+        DataGridViewAntrean.Columns("ColumnStage").Visible = False
 
         ' Setting
         DataGridViewAntrean.DefaultCellStyle.Font = New Font("Segoe UI", 9, FontStyle.Regular)
@@ -1907,221 +2072,399 @@ Public Class FormPendaftaranAwal
         SearchDataGridView(DataGridViewAntrean, TextBoxSearchAntreanOnline.Text)
     End Sub
 
+    'Antrian NEW
+    Private Function SafeCellValue(ByVal row As DataGridViewRow, ByVal columnName As String) As String
+        Try
+            If row.Cells(columnName).Value IsNot Nothing Then
+                Return row.Cells(columnName).Value.ToString()
+            End If
+        Catch ex As Exception
+        End Try
+        Return ""
+    End Function
+
     Private Sub DataGridViewAntrean_CellDoubleClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles DataGridViewAntrean.CellDoubleClick
-        If e.RowIndex >= 0 Then
-            Dim nomorNIK As String = DataGridViewAntrean.Rows(e.RowIndex).Cells("ColumnNomorNIK").Value.ToString()
-            Dim kodePoli As String = DataGridViewAntrean.Rows(e.RowIndex).Cells("ColumnKodePoli").Value.ToString()
-            Dim kodeDokter As String = DataGridViewAntrean.Rows(e.RowIndex).Cells("ColumnKodeDokter").Value.ToString()
-            Dim nomorAntrean As String = DataGridViewAntrean.Rows(e.RowIndex).Cells("ColumnNomorAntrean").Value.ToString()
-
-            ' Validasi jika status sudah terlayani
-            If ValidasiAntrean(nomorAntrean, nomorNIK, kodePoli, kodeDokter) = False Then Exit Sub
-
-            Dim kolom() As String = {"ColumnNomorAntrean", "ColumnNomorNIK", "ColumnNomorKartu", "ColumnNamaPasien", "ColumnJenisKelamin", "ColumnTanggalLahir", "ColumnAlamat", "ColumnNomorHP", "ColumnKodeDokter", "ColumnNamaDokter", "ColumnKodePoli", "ColumnNamaPoli", "ColumnKeluhan", "ColumnKodeFaskes", "ColumnNamaFaskes"}
-            Dim kunci() As String = {"Nomor Antrean", "Nomor NIK", "Nomor Kartu BPJS", "Nama Pasien", "Jenis Kelamin", "Tgl Lahir", "Alamat", "Nomor HP", "Kode Dokter", "Nama Dokter", "Kode Poli", "Nama Poli", "Keluhan", "Kode Faskes", "Nama Faskes"}
-
-            Dim dataDictionary As New Dictionary(Of String, Object)()
-
-            For i As Integer = 0 To kolom.Length - 1
-                dataDictionary.Add(kunci(i), DataGridViewAntrean.Rows(e.RowIndex).Cells(kolom(i)).Value.ToString())
-            Next
-
-            Dim jenisPeserta As String = DataGridViewAntrean.Rows(e.RowIndex).Cells("ColumnJenisPeserta").Value.ToString()
-
-            If jenisPeserta = "BPJS" Then
-                ' Jika Pasien BPJS
-                DialogBoxKonfirmasiPendaftaran.DataDictionary = dataDictionary
-                DialogBoxKonfirmasiPendaftaran.ShowDialog()
-            ElseIf jenisPeserta = "NON-BPJS" Then
-                ' Jika Pasien NON-BPJS
-                If CheckSQL("SELECT * FROM MasterPasien WHERE NoNIK = '" & nomorNIK & "'") = True Then
-                    ' Jika Pasien Sudah Terdaftar di Master Pasien
-                    dataDictionary.Add("Text Button Start Proses", "Mulai Pendaftaran")
-                    dataDictionary.Add("Jenis Proses", "Antrean - Pendaftaran")
-
-                    DialogBoxPanggilPasien.DataDictionary = dataDictionary
-                    DialogBoxPanggilPasien.ShowDialog()
-                Else
-                    ' Jika Pasien Belum Terdaftar di Master Pasien
-                    Select Case MsgBox("Nomor NIK " & nomorNIK & " belum terdaftar di master pasien. Silahkan tambah data terlebih dahulu.", MsgBoxStyle.OkCancel, "Validasi.")
-                        Case MsgBoxResult.Ok
-                            ' Create tabel pasien baru
-                            Dim tblPasienBaru As DataTable = New DataTable
-                            tblPasienBaru.Columns.Add("Nama", GetType(String))
-                            tblPasienBaru.Columns.Add("Nomor NIK", GetType(String))
-                            tblPasienBaru.Columns.Add("Nomor BPJS", GetType(String))
-                            tblPasienBaru.Columns.Add("Jenis Kelamin", GetType(String))
-                            tblPasienBaru.Columns.Add("Tanggal Lahir", GetType(String))
-                            tblPasienBaru.Columns.Add("Alamat", GetType(String))
-
-                            ' Set Row Data Pasien Baru
-                            Dim rowPasien As DataRow = tblPasienBaru.NewRow()
-
-                            ' Set URL Web Service
-                            Dim urlWebService As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'web_service_get_data_peserta_antrol'")
-
-                            urlWebService = urlWebService & nomorNIK
-
-                            Dim responseString As String = GetDataAntrianOnline(urlWebService)
-                            Dim jsonObject() = Newtonsoft.Json.JsonConvert.DeserializeObject(Of JsonGetPesertaAntrol())(responseString)
-
-                            For Each rowData As JsonGetPesertaAntrol In jsonObject
-                                Dim codeMetaData As Integer = Convert.ToInt32(rowData.metaData.code)
-
-                                If codeMetaData = "200" Then
-                                    rowPasien("Nama") = rowData.response.nama
-                                    rowPasien("Nomor NIK") = rowData.response.nik
-                                    rowPasien("Nomor BPJS") = rowData.response.nomorkartu
-                                    rowPasien("Jenis Kelamin") = rowData.response.jeniskelamin
-                                    'rowPasien("Tanggal Lahir") = rowData.response.tanggallahir
-                                    If rowData.response.tanggallahir IsNot Nothing AndAlso rowData.response.tanggallahir.Trim() <> "" Then
-                                        rowPasien("Tanggal Lahir") = rowData.response.tanggallahir
-                                    Else
-                                        rowPasien("Tanggal Lahir") = "01/01/1900"
-                                    End If
-                                    rowPasien("Alamat") = rowData.response.alamat
-                                Else
-                                    rowPasien("Nomor NIK") = nomorNIK
-                                End If
-                            Next
-
-                            FormMasterPasien.Show()
-                            FormMasterPasien.BringToFront()
-                            FormMasterPasien.SetPasienFromPendaftaran(rowPasien)
-                        Case MsgBoxResult.Cancel
-                            MsgBox("Batal menambahkan data ke master pasien.", MsgBoxStyle.Exclamation, "Warning!")
-                    End Select
-                End If
+        Try
+            If e.RowIndex < 0 Then
+                Exit Sub
             End If
 
-            ' Validasi apakah NIK sudah ada di master pasien
-            'If CheckSQL("SELECT * FROM MasterPasien WHERE NoNIK = '" & nomorNIK & "'") = True Then
-            '    '# Set data dictionary yang akan dikirim ke form popup
-            '    Dim dataDictionary As New Dictionary(Of String, Object)()
+            Dim row As DataGridViewRow = DataGridViewAntrean.Rows(e.RowIndex)
 
-            '    dataDictionary.Add("Text Button Start Proses", "Mulai Pendaftaran")
-            '    dataDictionary.Add("Jenis Proses", "Antrean - Pendaftaran")
-            '    dataDictionary.Add("Nomor Antrean", nomorAntrean)
-            '    dataDictionary.Add("Nomor NIK", nomorNIK)
+            Dim nomorAntrean As String = SafeCellValue(row, "ColumnNomorAntrean")
+            Dim nomorNIK As String = SafeCellValue(row, "ColumnNomorNIK")
+            Dim kodePoli As String = SafeCellValue(row, "ColumnKodePoli")
+            Dim kodeDokter As String = SafeCellValue(row, "ColumnKodeDokter")
+            Dim jenisPeserta As String = SafeCellValue(row, "ColumnJenisPeserta")
+            Dim stage As String = SafeCellValue(row, "ColumnStage")
 
-            '    DialogBoxPanggilPasien.DataDictionary = dataDictionary
-            '    DialogBoxPanggilPasien.ShowDialog()
-            'Else
-            '    Select Case MsgBox("Nomor NIK " & nomorNIK & " belum terdaftar di master pasien. Silahkan tambah data terlebih dahulu.", MsgBoxStyle.OkCancel, "Validasi.")
-            '        Case MsgBoxResult.Ok
-            '            ' Create tabel pasien baru
-            '            Dim tblPasienBaru As DataTable = New DataTable
-            '            tblPasienBaru.Columns.Add("Nama", GetType(String))
-            '            tblPasienBaru.Columns.Add("Nomor NIK", GetType(String))
-            '            tblPasienBaru.Columns.Add("Nomor BPJS", GetType(String))
-            '            tblPasienBaru.Columns.Add("Jenis Kelamin", GetType(String))
-            '            tblPasienBaru.Columns.Add("Tanggal Lahir", GetType(String))
-            '            tblPasienBaru.Columns.Add("Alamat", GetType(String))
+            ' 🔒 Validasi stage
+            If (If(stage, "")).ToLower() <> "pendaftaran" Then
+                Exit Sub
+            End If
 
-            '            ' Set Row Data Pasien Baru
-            '            Dim rowPasien As DataRow = tblPasienBaru.NewRow()
+            ' 📦 Dictionary
+            Dim dataDictionary As New Dictionary(Of String, Object)
 
-            '            ' Set URL Web Service
-            '            Dim urlWebService As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'web_service_get_data_peserta_antrol'")
+            dataDictionary("Nomor Antrean") = nomorAntrean
+            dataDictionary("Nomor NIK") = nomorNIK
+            dataDictionary("Nomor Kartu BPJS") = SafeCellValue(row, "ColumnNomorKartu")
+            dataDictionary("Nama Pasien") = SafeCellValue(row, "ColumnNamaPasien")
+            dataDictionary("Jenis Kelamin") = SafeCellValue(row, "ColumnJenisKelamin")
+            dataDictionary("Tgl Lahir") = SafeCellValue(row, "ColumnTanggalLahir")
+            dataDictionary("Alamat") = SafeCellValue(row, "ColumnAlamat")
+            dataDictionary("Nomor HP") = SafeCellValue(row, "ColumnNomorHP")
+            dataDictionary("Kode Dokter") = kodeDokter
+            dataDictionary("Nama Dokter") = SafeCellValue(row, "ColumnNamaDokter")
+            dataDictionary("Kode Poli") = kodePoli
+            dataDictionary("Nama Poli") = SafeCellValue(row, "ColumnNamaPoli")
+            dataDictionary("Keluhan") = SafeCellValue(row, "ColumnKeluhan")
 
-            '            urlWebService = urlWebService & nomorNIK
+            ' 🔥 BPJS / NON BPJS
+            If (If(jenisPeserta, "")).ToUpper() = "BPJS" Then
+                Dim dlg As New DialogBoxKonfirmasiPendaftaran()
+                dlg.DataDictionary = dataDictionary
+                dlg.ShowDialog()
+            Else
 
-            '            Dim responseString As String = GetDataAntrianOnline(urlWebService)
-            '            Dim jsonObject() = Newtonsoft.Json.JsonConvert.DeserializeObject(Of JsonGetPesertaAntrol())(responseString)
+                Dim cek As String = ReadSQLNIK("SELECT COUNT(*) FROM MasterPasien WHERE NoNIK = '" & nomorNIK & "'")
 
-            '            For Each rowData As JsonGetPesertaAntrol In jsonObject
-            '                Dim codeMetaData As Integer = Convert.ToInt32(rowData.metaData.code)
+                If Val(cek) > 0 Then
 
-            '                If codeMetaData = "200" Then
-            '                    rowPasien("Nama") = rowData.response.nama
-            '                    rowPasien("Nomor NIK") = rowData.response.nik
-            '                    rowPasien("Nomor BPJS") = rowData.response.nomorkartu
-            '                    rowPasien("Jenis Kelamin") = rowData.response.jeniskelamin
-            '                    rowPasien("Tanggal Lahir") = rowData.response.tanggallahir
-            '                    rowPasien("Alamat") = rowData.response.alamat
-            '                Else
-            '                    rowPasien("Nomor NIK") = nomorNIK
-            '                End If
-            '            Next
+                    dataDictionary("Text Button Start Proses") = "Mulai Pendaftaran"
+                    dataDictionary("Jenis Proses") = "Antrean - Pendaftaran"
 
-            '            FormMasterPasien.Show()
-            '            FormMasterPasien.BringToFront()
-            '            FormMasterPasien.SetPasienFromPendaftaran(rowPasien)
-            '        Case MsgBoxResult.Cancel
-            '            MsgBox("Batal menambahkan data ke master pasien.", MsgBoxStyle.Exclamation, "Warning!")
-            '    End Select
-            'End If
-        End If
+                    Dim dlg2 As New DialogBoxPanggilPasien()
+                    dlg2.DataDictionary = dataDictionary
+                    dlg2.ShowDialog()
 
-        'If e.RowIndex >= 0 Then
-        '    Dim statusAntrean As String = DataGridViewAntrean.Rows(e.RowIndex).Cells("ColumnStatus").Value.ToString()
-        '    Dim nomorAntrean As String = DataGridViewAntrean.Rows(e.RowIndex).Cells("ColumnNomorAntrean").Value.ToString()
-        '    Dim nomorNIK As String = DataGridViewAntrean.Rows(e.RowIndex).Cells("ColumnNomorNIK").Value.ToString()
+                Else
 
-        '    If statusAntrean = "Dibatalkan" Then
-        '        MsgBox("Eror : Status transaksi sudah dibatalkan.", MsgBoxStyle.Exclamation, "Error!")
-        '        Exit Sub
-        '    End If
+                    Select Case MsgBox("NIK belum terdaftar. Tambah sekarang?", MsgBoxStyle.OkCancel)
 
-        '    ' Validasi apakah NIK sudah ada di master pasien
-        '    If CheckSQL("SELECT * FROM MasterPasien WHERE NoNIK = '" & nomorNIK & "'") = True Then
-        '        '# Set data dictionary yang akan dikirim ke form popup
-        '        Dim dataDictionary As New Dictionary(Of String, Object)()
+                        Case MsgBoxResult.Ok
+                            Dim tbl As New DataTable
+                            tbl.Columns.Add("Nama")
+                            tbl.Columns.Add("Nomor NIK")
+                            tbl.Columns.Add("Nomor BPJS")
 
-        '        dataDictionary.Add("Text Button Start Proses", "Mulai Pendaftaran")
-        '        dataDictionary.Add("Jenis Proses", "Antrean - Pendaftaran")
-        '        dataDictionary.Add("Nomor Antrean", nomorAntrean)
-        '        dataDictionary.Add("Nomor NIK", nomorNIK)
+                            Dim r As DataRow = tbl.NewRow()
+                            r("Nama") = SafeCellValue(row, "ColumnNamaPasien")
+                            r("Nomor NIK") = nomorNIK
+                            r("Nomor BPJS") = SafeCellValue(row, "ColumnNomorKartu")
 
-        '        DialogBoxPanggilPasien.DataDictionary = dataDictionary
-        '        DialogBoxPanggilPasien.ShowDialog()
-        '    Else
-        '        Select Case MsgBox("Nomor NIK " & nomorNIK & " belum terdaftar di master pasien. Silahkan tambah data terlebih dahulu.", MsgBoxStyle.OkCancel, "Validasi.")
-        '            Case MsgBoxResult.Ok
-        '                ' Create tabel pasien baru
-        '                Dim tblPasienBaru As DataTable = New DataTable
-        '                tblPasienBaru.Columns.Add("Nama", GetType(String))
-        '                tblPasienBaru.Columns.Add("Nomor NIK", GetType(String))
-        '                tblPasienBaru.Columns.Add("Nomor BPJS", GetType(String))
-        '                tblPasienBaru.Columns.Add("Jenis Kelamin", GetType(String))
-        '                tblPasienBaru.Columns.Add("Tanggal Lahir", GetType(String))
-        '                tblPasienBaru.Columns.Add("Alamat", GetType(String))
+                            FormMasterPasien.Show()
+                            FormMasterPasien.SetPasienFromPendaftaran(r)
+                    End Select
+                End If
 
-        '                ' Set Row Data Pasien Baru
-        '                Dim rowPasien As DataRow = tblPasienBaru.NewRow()
-
-        '                ' Set URL Web Service
-        '                Dim urlWebService As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'web_service_get_data_peserta_antrol'")
-
-        '                urlWebService = urlWebService & nomorNIK
-
-        '                Dim responseString As String = GetDataAntrianOnline(urlWebService)
-        '                Dim jsonObject() = Newtonsoft.Json.JsonConvert.DeserializeObject(Of JsonGetPesertaAntrol())(responseString)
-
-        '                For Each rowData As JsonGetPesertaAntrol In jsonObject
-        '                    Dim codeMetaData As Integer = Convert.ToInt32(rowData.metaData.code)
-
-        '                    If codeMetaData = "200" Then
-        '                        rowPasien("Nama") = rowData.response.nama
-        '                        rowPasien("Nomor NIK") = rowData.response.nik
-        '                        rowPasien("Nomor BPJS") = rowData.response.nomorkartu
-        '                        rowPasien("Jenis Kelamin") = rowData.response.jeniskelamin
-        '                        rowPasien("Tanggal Lahir") = rowData.response.tanggallahir
-        '                        rowPasien("Alamat") = rowData.response.alamat
-        '                    Else
-        '                        rowPasien("Nomor NIK") = nomorNIK
-        '                    End If
-        '                Next
-
-        '                FormMasterPasien.Show()
-        '                FormMasterPasien.BringToFront()
-        '                FormMasterPasien.SetPasienFromPendaftaran(rowPasien)
-        '            Case MsgBoxResult.Cancel
-        '                MsgBox("Batal menambahkan data ke master pasien.", MsgBoxStyle.Exclamation, "Warning!")
-        '        End Select
-        '    End If
-        'End If
+            End If
+        Catch ex As Exception
+            MessageBox.Show("ERROR FINAL:" & vbCrLf & ex.Message & vbCrLf & ex.StackTrace)
+        End Try
     End Sub
+
+    'Private Sub DataGridViewAntrean_CellDoubleClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles DataGridViewAntrean.CellDoubleClick
+    '    Try
+    '        If e.RowIndex < 0 Then Exit Sub
+
+    '        Dim row As DataGridViewRow = DataGridViewAntrean.Rows(e.RowIndex)
+
+    '        Dim nomorAntrean As String = SafeCellValue(row, "ColumnNomorAntrean")
+    '        Dim nomorNIK As String = SafeCellValue(row, "ColumnNomorNIK")
+    '        Dim kodePoli As String = SafeCellValue(row, "ColumnKodePoli")
+    '        Dim kodeDokter As String = SafeCellValue(row, "ColumnKodeDokter")
+    '        Dim jenisPeserta As String = SafeCellValue(row, "ColumnJenisPeserta")
+    '        Dim stage As String = SafeCellValue(row, "ColumnStage")
+
+    '        'MsgBox(stage)
+    '        ' 🔒 Validasi stage
+    '        If stage.ToLower() <> "pendaftaran" Then
+    '            MsgBox("Antrean bukan tahap pendaftaran!", MsgBoxStyle.Exclamation)
+    '            Exit Sub
+    '        End If
+
+    '        ' 🔒 Validasi existing logic
+    '        If ValidasiAntrean(nomorAntrean, nomorNIK, kodePoli, kodeDokter) = False Then Exit Sub
+
+    '        ' 📦 Dictionary
+    '        Dim dataDictionary As New Dictionary(Of String, Object)
+
+    '        dataDictionary("Nomor Antrean") = nomorAntrean
+    '        dataDictionary("Nomor NIK") = nomorNIK
+    '        dataDictionary("Nomor Kartu BPJS") = SafeCellValue(row, "ColumnNomorKartu")
+    '        dataDictionary("Nama Pasien") = SafeCellValue(row, "ColumnNamaPasien")
+    '        dataDictionary("Jenis Kelamin") = SafeCellValue(row, "ColumnJenisKelamin")
+    '        dataDictionary("Tgl Lahir") = SafeCellValue(row, "ColumnTanggalLahir")
+    '        dataDictionary("Alamat") = SafeCellValue(row, "ColumnAlamat")
+    '        dataDictionary("Nomor HP") = SafeCellValue(row, "ColumnNomorHP")
+    '        dataDictionary("Kode Dokter") = kodeDokter
+    '        dataDictionary("Nama Dokter") = SafeCellValue(row, "ColumnNamaDokter")
+    '        dataDictionary("Kode Poli") = kodePoli
+    '        dataDictionary("Nama Poli") = SafeCellValue(row, "ColumnNamaPoli")
+    '        dataDictionary("Keluhan") = SafeCellValue(row, "ColumnKeluhan")
+
+    '        ' 🔥 FIX uppercase
+    '        If jenisPeserta.ToUpper() = "BPJS" Then
+
+    '            DialogBoxKonfirmasiPendaftaran.DataDictionary = dataDictionary
+    '            DialogBoxKonfirmasiPendaftaran.ShowDialog()
+
+    '        Else
+
+    '            If CheckSQL("SELECT * FROM MasterPasien WHERE NoNIK = '" & nomorNIK & "'") Then
+
+    '                dataDictionary("Text Button Start Proses") = "Mulai Pendaftaran"
+    '                dataDictionary("Jenis Proses") = "Antrean - Pendaftaran"
+
+    '                DialogBoxPanggilPasien.DataDictionary = dataDictionary
+    '                DialogBoxPanggilPasien.ShowDialog()
+
+    '            Else
+
+    '                Select Case MsgBox("NIK belum terdaftar. Tambah sekarang?", MsgBoxStyle.OkCancel)
+
+    '                    Case MsgBoxResult.Ok
+
+    '                        Dim tbl As New DataTable
+    '                        tbl.Columns.Add("Nama")
+    '                        tbl.Columns.Add("Nomor NIK")
+    '                        tbl.Columns.Add("Nomor BPJS")
+
+    '                        Dim r As DataRow = tbl.NewRow()
+
+    '                        r("Nama") = SafeCellValue(row, "ColumnNamaPasien")
+    '                        r("Nomor NIK") = nomorNIK
+    '                        r("Nomor BPJS") = SafeCellValue(row, "ColumnNomorKartu")
+
+    '                        FormMasterPasien.Show()
+    '                        FormMasterPasien.SetPasienFromPendaftaran(r)
+
+    '                End Select
+    '            End If
+    '        End If
+
+    '    Catch ex As Exception
+    '        MessageBox.Show("Error: " & ex.Message)
+    '    End Try
+    'End Sub
+
+    'OLD
+    'Private Sub DataGridViewAntrean_CellDoubleClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles DataGridViewAntrean.CellDoubleClick
+    '    If e.RowIndex >= 0 Then
+    '        Dim nomorNIK As String = DataGridViewAntrean.Rows(e.RowIndex).Cells("ColumnNomorNIK").Value.ToString()
+    '        Dim kodePoli As String = DataGridViewAntrean.Rows(e.RowIndex).Cells("ColumnKodePoli").Value.ToString()
+    '        Dim kodeDokter As String = DataGridViewAntrean.Rows(e.RowIndex).Cells("ColumnKodeDokter").Value.ToString()
+    '        Dim nomorAntrean As String = DataGridViewAntrean.Rows(e.RowIndex).Cells("ColumnNomorAntrean").Value.ToString()
+
+    '        ' Validasi jika status sudah terlayani
+    '        If ValidasiAntrean(nomorAntrean, nomorNIK, kodePoli, kodeDokter) = False Then Exit Sub
+
+    '        Dim kolom() As String = {"ColumnNomorAntrean", "ColumnNomorNIK", "ColumnNomorKartu", "ColumnNamaPasien", "ColumnJenisKelamin", "ColumnTanggalLahir", "ColumnAlamat", "ColumnNomorHP", "ColumnKodeDokter", "ColumnNamaDokter", "ColumnKodePoli", "ColumnNamaPoli", "ColumnKeluhan", "ColumnKodeFaskes", "ColumnNamaFaskes"}
+    '        Dim kunci() As String = {"Nomor Antrean", "Nomor NIK", "Nomor Kartu BPJS", "Nama Pasien", "Jenis Kelamin", "Tgl Lahir", "Alamat", "Nomor HP", "Kode Dokter", "Nama Dokter", "Kode Poli", "Nama Poli", "Keluhan", "Kode Faskes", "Nama Faskes"}
+
+    '        Dim dataDictionary As New Dictionary(Of String, Object)()
+
+    '        For i As Integer = 0 To kolom.Length - 1
+    '            dataDictionary.Add(kunci(i), DataGridViewAntrean.Rows(e.RowIndex).Cells(kolom(i)).Value.ToString())
+    '        Next
+
+    '        Dim jenisPeserta As String = DataGridViewAntrean.Rows(e.RowIndex).Cells("ColumnJenisPeserta").Value.ToString()
+
+    '        If jenisPeserta = "BPJS" Then
+    '            ' Jika Pasien BPJS
+    '            DialogBoxKonfirmasiPendaftaran.DataDictionary = dataDictionary
+    '            DialogBoxKonfirmasiPendaftaran.ShowDialog()
+    '        ElseIf jenisPeserta = "NON-BPJS" Then
+    '            ' Jika Pasien NON-BPJS
+    '            If CheckSQL("SELECT * FROM MasterPasien WHERE NoNIK = '" & nomorNIK & "'") = True Then
+    '                ' Jika Pasien Sudah Terdaftar di Master Pasien
+    '                dataDictionary.Add("Text Button Start Proses", "Mulai Pendaftaran")
+    '                dataDictionary.Add("Jenis Proses", "Antrean - Pendaftaran")
+
+    '                DialogBoxPanggilPasien.DataDictionary = dataDictionary
+    '                DialogBoxPanggilPasien.ShowDialog()
+    '            Else
+    '                ' Jika Pasien Belum Terdaftar di Master Pasien
+    '                Select Case MsgBox("Nomor NIK " & nomorNIK & " belum terdaftar di master pasien. Silahkan tambah data terlebih dahulu.", MsgBoxStyle.OkCancel, "Validasi.")
+    '                    Case MsgBoxResult.Ok
+    '                        ' Create tabel pasien baru
+    '                        Dim tblPasienBaru As DataTable = New DataTable
+    '                        tblPasienBaru.Columns.Add("Nama", GetType(String))
+    '                        tblPasienBaru.Columns.Add("Nomor NIK", GetType(String))
+    '                        tblPasienBaru.Columns.Add("Nomor BPJS", GetType(String))
+    '                        tblPasienBaru.Columns.Add("Jenis Kelamin", GetType(String))
+    '                        tblPasienBaru.Columns.Add("Tanggal Lahir", GetType(String))
+    '                        tblPasienBaru.Columns.Add("Alamat", GetType(String))
+
+    '                        ' Set Row Data Pasien Baru
+    '                        Dim rowPasien As DataRow = tblPasienBaru.NewRow()
+
+    '                        ' Set URL Web Service
+    '                        Dim urlWebService As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'web_service_get_data_peserta_antrol'")
+
+    '                        urlWebService = urlWebService & nomorNIK
+
+    '                        Dim responseString As String = GetDataAntrianOnline(urlWebService)
+    '                        Dim jsonObject() = Newtonsoft.Json.JsonConvert.DeserializeObject(Of JsonGetPesertaAntrol())(responseString)
+
+    '                        For Each rowData As JsonGetPesertaAntrol In jsonObject
+    '                            Dim codeMetaData As Integer = Convert.ToInt32(rowData.metaData.code)
+
+    '                            If codeMetaData = "200" Then
+    '                                rowPasien("Nama") = rowData.response.nama
+    '                                rowPasien("Nomor NIK") = rowData.response.nik
+    '                                rowPasien("Nomor BPJS") = rowData.response.nomorkartu
+    '                                rowPasien("Jenis Kelamin") = rowData.response.jeniskelamin
+    '                                'rowPasien("Tanggal Lahir") = rowData.response.tanggallahir
+    '                                If rowData.response.tanggallahir IsNot Nothing AndAlso rowData.response.tanggallahir.Trim() <> "" Then
+    '                                    rowPasien("Tanggal Lahir") = rowData.response.tanggallahir
+    '                                Else
+    '                                    rowPasien("Tanggal Lahir") = "01/01/1900"
+    '                                End If
+    '                                rowPasien("Alamat") = rowData.response.alamat
+    '                            Else
+    '                                rowPasien("Nomor NIK") = nomorNIK
+    '                            End If
+    '                        Next
+
+    '                        FormMasterPasien.Show()
+    '                        FormMasterPasien.BringToFront()
+    '                        FormMasterPasien.SetPasienFromPendaftaran(rowPasien)
+    '                    Case MsgBoxResult.Cancel
+    '                        MsgBox("Batal menambahkan data ke master pasien.", MsgBoxStyle.Exclamation, "Warning!")
+    '                End Select
+    '            End If
+    '        End If
+
+    '        ' Validasi apakah NIK sudah ada di master pasien
+    '        'If CheckSQL("SELECT * FROM MasterPasien WHERE NoNIK = '" & nomorNIK & "'") = True Then
+    '        '    '# Set data dictionary yang akan dikirim ke form popup
+    '        '    Dim dataDictionary As New Dictionary(Of String, Object)()
+
+    '        '    dataDictionary.Add("Text Button Start Proses", "Mulai Pendaftaran")
+    '        '    dataDictionary.Add("Jenis Proses", "Antrean - Pendaftaran")
+    '        '    dataDictionary.Add("Nomor Antrean", nomorAntrean)
+    '        '    dataDictionary.Add("Nomor NIK", nomorNIK)
+
+    '        '    DialogBoxPanggilPasien.DataDictionary = dataDictionary
+    '        '    DialogBoxPanggilPasien.ShowDialog()
+    '        'Else
+    '        '    Select Case MsgBox("Nomor NIK " & nomorNIK & " belum terdaftar di master pasien. Silahkan tambah data terlebih dahulu.", MsgBoxStyle.OkCancel, "Validasi.")
+    '        '        Case MsgBoxResult.Ok
+    '        '            ' Create tabel pasien baru
+    '        '            Dim tblPasienBaru As DataTable = New DataTable
+    '        '            tblPasienBaru.Columns.Add("Nama", GetType(String))
+    '        '            tblPasienBaru.Columns.Add("Nomor NIK", GetType(String))
+    '        '            tblPasienBaru.Columns.Add("Nomor BPJS", GetType(String))
+    '        '            tblPasienBaru.Columns.Add("Jenis Kelamin", GetType(String))
+    '        '            tblPasienBaru.Columns.Add("Tanggal Lahir", GetType(String))
+    '        '            tblPasienBaru.Columns.Add("Alamat", GetType(String))
+
+    '        '            ' Set Row Data Pasien Baru
+    '        '            Dim rowPasien As DataRow = tblPasienBaru.NewRow()
+
+    '        '            ' Set URL Web Service
+    '        '            Dim urlWebService As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'web_service_get_data_peserta_antrol'")
+
+    '        '            urlWebService = urlWebService & nomorNIK
+
+    '        '            Dim responseString As String = GetDataAntrianOnline(urlWebService)
+    '        '            Dim jsonObject() = Newtonsoft.Json.JsonConvert.DeserializeObject(Of JsonGetPesertaAntrol())(responseString)
+
+    '        '            For Each rowData As JsonGetPesertaAntrol In jsonObject
+    '        '                Dim codeMetaData As Integer = Convert.ToInt32(rowData.metaData.code)
+
+    '        '                If codeMetaData = "200" Then
+    '        '                    rowPasien("Nama") = rowData.response.nama
+    '        '                    rowPasien("Nomor NIK") = rowData.response.nik
+    '        '                    rowPasien("Nomor BPJS") = rowData.response.nomorkartu
+    '        '                    rowPasien("Jenis Kelamin") = rowData.response.jeniskelamin
+    '        '                    rowPasien("Tanggal Lahir") = rowData.response.tanggallahir
+    '        '                    rowPasien("Alamat") = rowData.response.alamat
+    '        '                Else
+    '        '                    rowPasien("Nomor NIK") = nomorNIK
+    '        '                End If
+    '        '            Next
+
+    '        '            FormMasterPasien.Show()
+    '        '            FormMasterPasien.BringToFront()
+    '        '            FormMasterPasien.SetPasienFromPendaftaran(rowPasien)
+    '        '        Case MsgBoxResult.Cancel
+    '        '            MsgBox("Batal menambahkan data ke master pasien.", MsgBoxStyle.Exclamation, "Warning!")
+    '        '    End Select
+    '        'End If
+    '    End If
+
+    '    'If e.RowIndex >= 0 Then
+    '    '    Dim statusAntrean As String = DataGridViewAntrean.Rows(e.RowIndex).Cells("ColumnStatus").Value.ToString()
+    '    '    Dim nomorAntrean As String = DataGridViewAntrean.Rows(e.RowIndex).Cells("ColumnNomorAntrean").Value.ToString()
+    '    '    Dim nomorNIK As String = DataGridViewAntrean.Rows(e.RowIndex).Cells("ColumnNomorNIK").Value.ToString()
+
+    '    '    If statusAntrean = "Dibatalkan" Then
+    '    '        MsgBox("Eror : Status transaksi sudah dibatalkan.", MsgBoxStyle.Exclamation, "Error!")
+    '    '        Exit Sub
+    '    '    End If
+
+    '    '    ' Validasi apakah NIK sudah ada di master pasien
+    '    '    If CheckSQL("SELECT * FROM MasterPasien WHERE NoNIK = '" & nomorNIK & "'") = True Then
+    '    '        '# Set data dictionary yang akan dikirim ke form popup
+    '    '        Dim dataDictionary As New Dictionary(Of String, Object)()
+
+    '    '        dataDictionary.Add("Text Button Start Proses", "Mulai Pendaftaran")
+    '    '        dataDictionary.Add("Jenis Proses", "Antrean - Pendaftaran")
+    '    '        dataDictionary.Add("Nomor Antrean", nomorAntrean)
+    '    '        dataDictionary.Add("Nomor NIK", nomorNIK)
+
+    '    '        DialogBoxPanggilPasien.DataDictionary = dataDictionary
+    '    '        DialogBoxPanggilPasien.ShowDialog()
+    '    '    Else
+    '    '        Select Case MsgBox("Nomor NIK " & nomorNIK & " belum terdaftar di master pasien. Silahkan tambah data terlebih dahulu.", MsgBoxStyle.OkCancel, "Validasi.")
+    '    '            Case MsgBoxResult.Ok
+    '    '                ' Create tabel pasien baru
+    '    '                Dim tblPasienBaru As DataTable = New DataTable
+    '    '                tblPasienBaru.Columns.Add("Nama", GetType(String))
+    '    '                tblPasienBaru.Columns.Add("Nomor NIK", GetType(String))
+    '    '                tblPasienBaru.Columns.Add("Nomor BPJS", GetType(String))
+    '    '                tblPasienBaru.Columns.Add("Jenis Kelamin", GetType(String))
+    '    '                tblPasienBaru.Columns.Add("Tanggal Lahir", GetType(String))
+    '    '                tblPasienBaru.Columns.Add("Alamat", GetType(String))
+
+    '    '                ' Set Row Data Pasien Baru
+    '    '                Dim rowPasien As DataRow = tblPasienBaru.NewRow()
+
+    '    '                ' Set URL Web Service
+    '    '                Dim urlWebService As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'web_service_get_data_peserta_antrol'")
+
+    '    '                urlWebService = urlWebService & nomorNIK
+
+    '    '                Dim responseString As String = GetDataAntrianOnline(urlWebService)
+    '    '                Dim jsonObject() = Newtonsoft.Json.JsonConvert.DeserializeObject(Of JsonGetPesertaAntrol())(responseString)
+
+    '    '                For Each rowData As JsonGetPesertaAntrol In jsonObject
+    '    '                    Dim codeMetaData As Integer = Convert.ToInt32(rowData.metaData.code)
+
+    '    '                    If codeMetaData = "200" Then
+    '    '                        rowPasien("Nama") = rowData.response.nama
+    '    '                        rowPasien("Nomor NIK") = rowData.response.nik
+    '    '                        rowPasien("Nomor BPJS") = rowData.response.nomorkartu
+    '    '                        rowPasien("Jenis Kelamin") = rowData.response.jeniskelamin
+    '    '                        rowPasien("Tanggal Lahir") = rowData.response.tanggallahir
+    '    '                        rowPasien("Alamat") = rowData.response.alamat
+    '    '                    Else
+    '    '                        rowPasien("Nomor NIK") = nomorNIK
+    '    '                    End If
+    '    '                Next
+
+    '    '                FormMasterPasien.Show()
+    '    '                FormMasterPasien.BringToFront()
+    '    '                FormMasterPasien.SetPasienFromPendaftaran(rowPasien)
+    '    '            Case MsgBoxResult.Cancel
+    '    '                MsgBox("Batal menambahkan data ke master pasien.", MsgBoxStyle.Exclamation, "Warning!")
+    '    '        End Select
+    '    '    End If
+    '    'End If
+    'End Sub
 
     Private Sub InsertDataBPJS(ByRef noKartu As String, ByRef jenisProses As String)
         Try
@@ -2334,6 +2677,35 @@ Public Class FormPendaftaranAwal
         End If
     End Sub
 
+    Private Function JsonToDataTable(ByVal json As String) As DataTable
+        Dim dt As New DataTable
+
+        Try
+            Dim arr = Newtonsoft.Json.Linq.JArray.Parse(json)
+
+            If arr.Count > 0 Then
+                ' buat kolom dari properti JSON
+                For Each prop In arr(0).Children(Of Newtonsoft.Json.Linq.JProperty)()
+                    dt.Columns.Add(prop.Name)
+                Next
+            End If
+
+            ' isi baris
+            For Each item In arr
+                Dim row As DataRow = dt.NewRow()
+                For Each prop In item.Children(Of Newtonsoft.Json.Linq.JProperty)()
+                    row(prop.Name) = prop.Value.ToString()
+                Next
+                dt.Rows.Add(row)
+            Next
+
+        Catch ex As Exception
+            MsgBox("Gagal parsing DetailTindakan: " & ex.Message)
+        End Try
+
+        Return dt
+    End Function
+
     Public Sub LoadTindakanPaketQR(ByRef rowPaket() As DataRow)
         'If ValidasiTambahPaketTindakan(rowPaket) = True Then
         '    Dim tblTindakan As DataTable = GridControlTindakanPoli.DataSource
@@ -2375,52 +2747,86 @@ Public Class FormPendaftaranAwal
 
                         SelectedPaketID = Trow("PaketID").ToString()
 
-                        If tblPaket.Columns.Contains("StatusInformedConsent") Then
-                            If Not IsDBNull(Trow("StatusInformedConsent")) Then
-                                If CBool(Trow("StatusInformedConsent")) = True Then
-                                    NeedInformedConsent = True
-                                    PanelInformConsent.Visible = True
+                        Dim jenisPaket As String = Trow("JenisPaket").ToString()
+
+                        If jenisPaket = "Paket Per-Tindakan" Then
+
+                            Dim detailJson As String = ""
+
+                            If Not IsDBNull(Trow("DetailTindakan")) Then
+                                detailJson = Trow("DetailTindakan").ToString()
+                            End If
+
+                            If detailJson <> "" Then
+                                Dim dtTindakan As DataTable = JsonToDataTable(detailJson)
+
+                                For Each rowT As DataRow In dtTindakan.Rows
+                                    Dim tindakanID As String = rowT("TindakanID").ToString()
+
+                                    Dim statusConsent As Object = ReadSQLNIK( _
+                                        "SELECT StatusInformedConsent FROM MasterTindakan " & _
+                                        "WHERE TindakanID = '" & tindakanID & "'")
+
+                                    If statusConsent IsNot Nothing AndAlso _
+                                       Not IsDBNull(statusConsent) AndAlso _
+                                       CBool(statusConsent) = True Then
+
+                                        NeedInformedConsent = True
+                                        PanelInformConsent.Visible = True
+                                        Exit For
+                                    End If
+                                Next
+                            End If
+
+                        Else
+                            ' Paket biasa (bukan per-tindakan)
+                            If tblPaket.Columns.Contains("StatusInformedConsent") Then
+                                If Not IsDBNull(Trow("StatusInformedConsent")) Then
+                                    If CBool(Trow("StatusInformedConsent")) = True Then
+                                        NeedInformedConsent = True
+                                        PanelInformConsent.Visible = True
+                                    End If
                                 End If
                             End If
                         End If
+
+                        Dim jenisTindakan As String = ""
+                        If rowPaket(i)("TindakanID").ToString() = "0" Then
+                            jenisTindakan = "Paket"
+                        Else
+                            jenisTindakan = rowPaket(i)("Keterangan Paket")
+                        End If
+
+                        'Dim Tnew As DataRow = tblTindakan.NewRow
+                        'Tnew("PaketID") = rowPaket(i)("PaketID")
+                        'Tnew("TindakanID") = rowPaket(i)("TindakanID")
+                        'Tnew("Tindakan") = rowPaket(i)("Nama Paket")
+                        'Tnew("Jenis") = jenisTindakan
+                        'Tnew("Biaya Tindakan") = rowPaket(i)("Harga Nett")
+                        'Tnew("DiscTindakan") = 100
+                        'Tnew("DiscNilai") = rowPaket(i)("Harga Nett")
+                        'Tnew("NettBayar") = 0
+
+                        'Tnew("KodeVoucher") = rowPaket(i)("KodeVoucher")
+                        'Tnew("Klasifikasi") = rowPaket(i)("Jenis Paket")
+                        'Tnew("Penjamin") = rowPaket(i)("Penjamin")
+                        'tblTindakan.Rows.Add(Tnew)
+
+                        Dim Tnew As DataRow = tblTindakan.NewRow
+                        Tnew("PaketID") = rowPaket(i)("PaketID")
+                        Tnew("TindakanID") = rowPaket(i)("TindakanID")
+                        Tnew("Nama Paket") = rowPaket(i)("Nama Paket")
+                        Tnew("Keterangan Paket") = rowPaket(i)("Keterangan Paket")
+
+                        Tnew("Penjamin") = rowPaket(i)("Penjamin")
+                        Tnew("Harga Awal") = rowPaket(i)("Harga Nett")
+                        Tnew("Diskon") = rowPaket(i)("Harga Nett")
+                        Tnew("Harga Nett") = 0
+
+                        Tnew("KodeVoucher") = rowPaket(i)("KodeVoucher")
+                        Tnew("Jenis Paket") = rowPaket(i)("Jenis Paket")
+                        tblTindakan.Rows.Add(Tnew)
                     End If
-
-                    Dim jenisTindakan As String = ""
-                    If rowPaket(i)("TindakanID").ToString() = "0" Then
-                        jenisTindakan = "Paket"
-                    Else
-                        jenisTindakan = rowPaket(i)("Keterangan Paket")
-                    End If
-
-                    'Dim Tnew As DataRow = tblTindakan.NewRow
-                    'Tnew("PaketID") = rowPaket(i)("PaketID")
-                    'Tnew("TindakanID") = rowPaket(i)("TindakanID")
-                    'Tnew("Tindakan") = rowPaket(i)("Nama Paket")
-                    'Tnew("Jenis") = jenisTindakan
-                    'Tnew("Biaya Tindakan") = rowPaket(i)("Harga Nett")
-                    'Tnew("DiscTindakan") = 100
-                    'Tnew("DiscNilai") = rowPaket(i)("Harga Nett")
-                    'Tnew("NettBayar") = 0
-
-                    'Tnew("KodeVoucher") = rowPaket(i)("KodeVoucher")
-                    'Tnew("Klasifikasi") = rowPaket(i)("Jenis Paket")
-                    'Tnew("Penjamin") = rowPaket(i)("Penjamin")
-                    'tblTindakan.Rows.Add(Tnew)
-
-                    Dim Tnew As DataRow = tblTindakan.NewRow
-                    Tnew("PaketID") = rowPaket(i)("PaketID")
-                    Tnew("TindakanID") = rowPaket(i)("TindakanID")
-                    Tnew("Nama Paket") = rowPaket(i)("Nama Paket")
-                    Tnew("Keterangan Paket") = rowPaket(i)("Keterangan Paket")
-
-                    Tnew("Penjamin") = rowPaket(i)("Penjamin")
-                    Tnew("Harga Awal") = rowPaket(i)("Harga Nett")
-                    Tnew("Diskon") = rowPaket(i)("Harga Nett")
-                    Tnew("Harga Nett") = 0
-
-                    Tnew("KodeVoucher") = rowPaket(i)("KodeVoucher")
-                    Tnew("Jenis Paket") = rowPaket(i)("Jenis Paket")
-                    tblTindakan.Rows.Add(Tnew)
                 Next
                 tblTindakan.AcceptChanges()
 
@@ -2659,7 +3065,7 @@ Public Class FormPendaftaranAwal
                 End If
 
                 ButtonTambahTindakan.Visible = True
-                ButtonScanQR.Visible = True
+                ButtonScanQR.Visible = False
                 ButtonTambahPaket.Visible = False
 
                 ' Visible Tab Pemeriksaan Fisik

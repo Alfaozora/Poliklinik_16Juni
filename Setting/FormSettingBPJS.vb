@@ -117,9 +117,24 @@ Public Class FormSettingBPJS
     End Sub
 
     Private Sub UpdateCredentialsAntrol()
+        'Update HYU
+        Dim baseUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+        Dim _loc As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'NoPoli'")
+        Dim apiKey As String = TextBoxAPIKeyAntrian.Text
+        Dim url As String = baseUrl & "api/klinik/store"
+
+        Dim parameterKlinik As String = "{" & _
+              """kode_klinik"" : """ & _loc & """," & _
+              """nama_klinik"" : """ & "DHARMAHUSADA" & """," & _
+              """api_key"": """ & apiKey & """" & _
+             "}"
+
+        Dim response As String = InsertDataAPIRM(parameterKlinik, url)
+
+        MsgBox(response)
+
         '# Variabel SINA
         Dim uriUpdate As String = "http://sina.mitramedicare.com/v3/controller/update_pcare_credentials.php"
-        Dim _loc As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'NoPoli'")
         Dim _usernamePcare As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'pcare_username'")
         Dim _passwordPcare As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'pcare_password'")
         Dim _jenisBridging As String = "" ' DEV / PROD

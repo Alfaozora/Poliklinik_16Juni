@@ -380,6 +380,8 @@ Partial Class LabAdminOnline
         Me.dtchanged = New System.Windows.Forms.DateTimePicker
         Me.Label15 = New System.Windows.Forms.Label
         Me.groupcustomer = New System.Windows.Forms.GroupBox
+        Me.GroupBox10 = New System.Windows.Forms.GroupBox
+        Me.ButtonInBodyPdf = New System.Windows.Forms.Button
         Me.GroupBoxDL = New System.Windows.Forms.GroupBox
         Me.exportpdfDL = New System.Windows.Forms.Button
         Me.QR_Code_Trans = New System.Windows.Forms.PictureBox
@@ -408,6 +410,7 @@ Partial Class LabAdminOnline
         Me.Label3 = New System.Windows.Forms.Label
         Me.Label2 = New System.Windows.Forms.Label
         Me.Label1 = New System.Windows.Forms.Label
+        Me.ButtonCetakInBody = New System.Windows.Forms.Button
         Me.MenuStrip1.SuspendLayout()
         Me.groupdetail.SuspendLayout()
         Me.drecg.SuspendLayout()
@@ -440,6 +443,7 @@ Partial Class LabAdminOnline
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
         Me.groupcustomer.SuspendLayout()
+        Me.GroupBox10.SuspendLayout()
         Me.GroupBoxDL.SuspendLayout()
         CType(Me.QR_Code_Trans, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
@@ -450,7 +454,7 @@ Partial Class LabAdminOnline
         Me.MenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.NewToolStripMenuItem, Me.DownloadHasilToolStripMenuItem, Me.ResendToMesinToolStripMenuItem, Me.CetakBarcodeToolStripMenuItem, Me.CetakLabelMenuStrip, Me.PreviewHasilLabToolStripMenuItem, Me.PrintSementaraToolStripMenuItem, Me.SendingWhatsappEmailToolStripMenuItem})
         Me.MenuStrip1.Location = New System.Drawing.Point(0, 0)
         Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(1200, 24)
+        Me.MenuStrip1.Size = New System.Drawing.Size(1240, 24)
         Me.MenuStrip1.TabIndex = 4
         Me.MenuStrip1.Text = "MenuStrip1"
         '
@@ -469,7 +473,7 @@ Partial Class LabAdminOnline
         'ResendToMesinToolStripMenuItem
         '
         Me.ResendToMesinToolStripMenuItem.Name = "ResendToMesinToolStripMenuItem"
-        Me.ResendToMesinToolStripMenuItem.Size = New System.Drawing.Size(107, 20)
+        Me.ResendToMesinToolStripMenuItem.Size = New System.Drawing.Size(108, 20)
         Me.ResendToMesinToolStripMenuItem.Text = "Resend To Mesin"
         '
         'CetakBarcodeToolStripMenuItem
@@ -509,7 +513,7 @@ Partial Class LabAdminOnline
         Me.groupdetail.Dock = System.Windows.Forms.DockStyle.Fill
         Me.groupdetail.Location = New System.Drawing.Point(0, 142)
         Me.groupdetail.Name = "groupdetail"
-        Me.groupdetail.Size = New System.Drawing.Size(1200, 398)
+        Me.groupdetail.Size = New System.Drawing.Size(1240, 398)
         Me.groupdetail.TabIndex = 7
         Me.groupdetail.TabStop = False
         Me.groupdetail.Text = "Detail"
@@ -529,7 +533,7 @@ Partial Class LabAdminOnline
         Me.drecg.Location = New System.Drawing.Point(3, 16)
         Me.drecg.Name = "drecg"
         Me.drecg.SelectedIndex = 0
-        Me.drecg.Size = New System.Drawing.Size(1194, 313)
+        Me.drecg.Size = New System.Drawing.Size(1234, 313)
         Me.drecg.TabIndex = 67
         '
         'TabLab
@@ -538,7 +542,7 @@ Partial Class LabAdminOnline
         Me.TabLab.Location = New System.Drawing.Point(4, 22)
         Me.TabLab.Name = "TabLab"
         Me.TabLab.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabLab.Size = New System.Drawing.Size(1186, 287)
+        Me.TabLab.Size = New System.Drawing.Size(1226, 287)
         Me.TabLab.TabIndex = 3
         Me.TabLab.Text = "Laboratorium"
         Me.TabLab.UseVisualStyleBackColor = True
@@ -553,7 +557,7 @@ Partial Class LabAdminOnline
         Me.GroupBox7.Dock = System.Windows.Forms.DockStyle.Fill
         Me.GroupBox7.Location = New System.Drawing.Point(3, 3)
         Me.GroupBox7.Name = "GroupBox7"
-        Me.GroupBox7.Size = New System.Drawing.Size(1180, 281)
+        Me.GroupBox7.Size = New System.Drawing.Size(1220, 281)
         Me.GroupBox7.TabIndex = 2
         Me.GroupBox7.TabStop = False
         Me.GroupBox7.Text = "Laboratorium"
@@ -614,7 +618,7 @@ Partial Class LabAdminOnline
         Me.gridlab.Location = New System.Drawing.Point(3, 16)
         Me.gridlab.MainView = Me.GridView2
         Me.gridlab.Name = "gridlab"
-        Me.gridlab.Size = New System.Drawing.Size(1174, 262)
+        Me.gridlab.Size = New System.Drawing.Size(1214, 262)
         Me.gridlab.TabIndex = 2
         Me.gridlab.ViewCollection.AddRange(New DevExpress.XtraGrid.Views.Base.BaseView() {Me.GridView2})
         '
@@ -650,7 +654,7 @@ Partial Class LabAdminOnline
         Me.TabPage1.Location = New System.Drawing.Point(4, 22)
         Me.TabPage1.Name = "TabPage1"
         Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage1.Size = New System.Drawing.Size(1186, 287)
+        Me.TabPage1.Size = New System.Drawing.Size(1226, 287)
         Me.TabPage1.TabIndex = 4
         Me.TabPage1.Text = "THORAX"
         Me.TabPage1.UseVisualStyleBackColor = True
@@ -898,7 +902,7 @@ Partial Class LabAdminOnline
         Me.TabPage3.Location = New System.Drawing.Point(4, 22)
         Me.TabPage3.Name = "TabPage3"
         Me.TabPage3.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage3.Size = New System.Drawing.Size(1186, 287)
+        Me.TabPage3.Size = New System.Drawing.Size(1226, 287)
         Me.TabPage3.TabIndex = 6
         Me.TabPage3.Text = "ECG"
         Me.TabPage3.UseVisualStyleBackColor = True
@@ -1044,7 +1048,7 @@ Partial Class LabAdminOnline
         Me.TabPage4.Location = New System.Drawing.Point(4, 22)
         Me.TabPage4.Name = "TabPage4"
         Me.TabPage4.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage4.Size = New System.Drawing.Size(1186, 287)
+        Me.TabPage4.Size = New System.Drawing.Size(1226, 287)
         Me.TabPage4.TabIndex = 7
         Me.TabPage4.Text = "AUDIOMETRI"
         Me.TabPage4.UseVisualStyleBackColor = True
@@ -1156,7 +1160,7 @@ Partial Class LabAdminOnline
         Me.TabPage5.Location = New System.Drawing.Point(4, 22)
         Me.TabPage5.Name = "TabPage5"
         Me.TabPage5.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage5.Size = New System.Drawing.Size(1186, 287)
+        Me.TabPage5.Size = New System.Drawing.Size(1226, 287)
         Me.TabPage5.TabIndex = 8
         Me.TabPage5.Text = "USG"
         Me.TabPage5.UseVisualStyleBackColor = True
@@ -1231,7 +1235,7 @@ Partial Class LabAdminOnline
         Me.txusg.Location = New System.Drawing.Point(3, 58)
         Me.txusg.Multiline = True
         Me.txusg.Name = "txusg"
-        Me.txusg.Size = New System.Drawing.Size(1180, 226)
+        Me.txusg.Size = New System.Drawing.Size(1220, 226)
         Me.txusg.TabIndex = 142
         '
         'TabPage6
@@ -1249,7 +1253,7 @@ Partial Class LabAdminOnline
         Me.TabPage6.Location = New System.Drawing.Point(4, 22)
         Me.TabPage6.Name = "TabPage6"
         Me.TabPage6.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage6.Size = New System.Drawing.Size(1186, 287)
+        Me.TabPage6.Size = New System.Drawing.Size(1226, 287)
         Me.TabPage6.TabIndex = 9
         Me.TabPage6.Text = "TREADMILL"
         Me.TabPage6.UseVisualStyleBackColor = True
@@ -1364,7 +1368,7 @@ Partial Class LabAdminOnline
         Me.TabPage7.Location = New System.Drawing.Point(4, 22)
         Me.TabPage7.Name = "TabPage7"
         Me.TabPage7.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage7.Size = New System.Drawing.Size(1186, 287)
+        Me.TabPage7.Size = New System.Drawing.Size(1226, 287)
         Me.TabPage7.TabIndex = 10
         Me.TabPage7.Text = "SPIROMETRI"
         Me.TabPage7.UseVisualStyleBackColor = True
@@ -1470,7 +1474,7 @@ Partial Class LabAdminOnline
         Me.TabPage8.Controls.Add(Me.SplitContainerPemeriksaanFisik)
         Me.TabPage8.Location = New System.Drawing.Point(4, 22)
         Me.TabPage8.Name = "TabPage8"
-        Me.TabPage8.Size = New System.Drawing.Size(1186, 287)
+        Me.TabPage8.Size = New System.Drawing.Size(1226, 287)
         Me.TabPage8.TabIndex = 11
         Me.TabPage8.Text = "PEMERIKSAAN FISIK"
         Me.TabPage8.UseVisualStyleBackColor = True
@@ -1491,7 +1495,7 @@ Partial Class LabAdminOnline
         '
         Me.SplitContainerPemeriksaanFisik.Panel2.AutoScroll = True
         Me.SplitContainerPemeriksaanFisik.Panel2.Controls.Add(Me.PanelDetailPemeriksaanFisik)
-        Me.SplitContainerPemeriksaanFisik.Size = New System.Drawing.Size(1186, 287)
+        Me.SplitContainerPemeriksaanFisik.Size = New System.Drawing.Size(1226, 287)
         Me.SplitContainerPemeriksaanFisik.SplitterDistance = 105
         Me.SplitContainerPemeriksaanFisik.SplitterWidth = 5
         Me.SplitContainerPemeriksaanFisik.TabIndex = 179
@@ -1573,7 +1577,7 @@ Partial Class LabAdminOnline
         Me.PanelDetailPemeriksaanFisik.Dock = System.Windows.Forms.DockStyle.Fill
         Me.PanelDetailPemeriksaanFisik.Location = New System.Drawing.Point(0, 0)
         Me.PanelDetailPemeriksaanFisik.Name = "PanelDetailPemeriksaanFisik"
-        Me.PanelDetailPemeriksaanFisik.Size = New System.Drawing.Size(1076, 287)
+        Me.PanelDetailPemeriksaanFisik.Size = New System.Drawing.Size(1116, 287)
         Me.PanelDetailPemeriksaanFisik.TabIndex = 179
         '
         'GroupBox9
@@ -4439,7 +4443,7 @@ Partial Class LabAdminOnline
         Me.TabPage9.Location = New System.Drawing.Point(4, 22)
         Me.TabPage9.Name = "TabPage9"
         Me.TabPage9.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage9.Size = New System.Drawing.Size(1186, 287)
+        Me.TabPage9.Size = New System.Drawing.Size(1226, 287)
         Me.TabPage9.TabIndex = 12
         Me.TabPage9.Text = "PRINT ALL"
         Me.TabPage9.UseVisualStyleBackColor = True
@@ -4492,7 +4496,7 @@ Partial Class LabAdminOnline
         Me.GroupBox3.Dock = System.Windows.Forms.DockStyle.Bottom
         Me.GroupBox3.Location = New System.Drawing.Point(3, 329)
         Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Size = New System.Drawing.Size(1194, 66)
+        Me.GroupBox3.Size = New System.Drawing.Size(1234, 66)
         Me.GroupBox3.TabIndex = 81
         Me.GroupBox3.TabStop = False
         '
@@ -4573,6 +4577,7 @@ Partial Class LabAdminOnline
         '
         'groupcustomer
         '
+        Me.groupcustomer.Controls.Add(Me.GroupBox10)
         Me.groupcustomer.Controls.Add(Me.GroupBoxDL)
         Me.groupcustomer.Controls.Add(Me.QR_Code_Trans)
         Me.groupcustomer.Controls.Add(Me.txcodepenagihan)
@@ -4603,10 +4608,32 @@ Partial Class LabAdminOnline
         Me.groupcustomer.Dock = System.Windows.Forms.DockStyle.Top
         Me.groupcustomer.Location = New System.Drawing.Point(0, 24)
         Me.groupcustomer.Name = "groupcustomer"
-        Me.groupcustomer.Size = New System.Drawing.Size(1200, 118)
+        Me.groupcustomer.Size = New System.Drawing.Size(1240, 118)
         Me.groupcustomer.TabIndex = 83
         Me.groupcustomer.TabStop = False
         Me.groupcustomer.Text = "Customer Detail"
+        '
+        'GroupBox10
+        '
+        Me.GroupBox10.Controls.Add(Me.ButtonCetakInBody)
+        Me.GroupBox10.Controls.Add(Me.ButtonInBodyPdf)
+        Me.GroupBox10.Location = New System.Drawing.Point(1103, 16)
+        Me.GroupBox10.Name = "GroupBox10"
+        Me.GroupBox10.Size = New System.Drawing.Size(120, 92)
+        Me.GroupBox10.TabIndex = 235
+        Me.GroupBox10.TabStop = False
+        Me.GroupBox10.Text = "InBody"
+        '
+        'ButtonInBodyPdf
+        '
+        Me.ButtonInBodyPdf.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonInBodyPdf.FlatStyle = System.Windows.Forms.FlatStyle.Popup
+        Me.ButtonInBodyPdf.Image = Global.PoliKlinik_Net2.My.Resources.Resources.PDF
+        Me.ButtonInBodyPdf.Location = New System.Drawing.Point(10, 15)
+        Me.ButtonInBodyPdf.Name = "ButtonInBodyPdf"
+        Me.ButtonInBodyPdf.Size = New System.Drawing.Size(100, 27)
+        Me.ButtonInBodyPdf.TabIndex = 230
+        Me.ButtonInBodyPdf.UseVisualStyleBackColor = True
         '
         'GroupBoxDL
         '
@@ -4896,11 +4923,22 @@ Partial Class LabAdminOnline
         Me.Label1.TabIndex = 0
         Me.Label1.Text = "Transaksi ID"
         '
+        'ButtonCetakInBody
+        '
+        Me.ButtonCetakInBody.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonCetakInBody.FlatStyle = System.Windows.Forms.FlatStyle.Popup
+        Me.ButtonCetakInBody.Image = Global.PoliKlinik_Net2.My.Resources.Resources.tombol_cetak
+        Me.ButtonCetakInBody.Location = New System.Drawing.Point(10, 48)
+        Me.ButtonCetakInBody.Name = "ButtonCetakInBody"
+        Me.ButtonCetakInBody.Size = New System.Drawing.Size(100, 32)
+        Me.ButtonCetakInBody.TabIndex = 236
+        Me.ButtonCetakInBody.UseVisualStyleBackColor = True
+        '
         'LabAdminOnline
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1200, 540)
+        Me.ClientSize = New System.Drawing.Size(1240, 540)
         Me.Controls.Add(Me.groupdetail)
         Me.Controls.Add(Me.groupcustomer)
         Me.Controls.Add(Me.MenuStrip1)
@@ -4958,6 +4996,7 @@ Partial Class LabAdminOnline
         Me.GroupBox3.PerformLayout()
         Me.groupcustomer.ResumeLayout(False)
         Me.groupcustomer.PerformLayout()
+        Me.GroupBox10.ResumeLayout(False)
         Me.GroupBoxDL.ResumeLayout(False)
         CType(Me.QR_Code_Trans, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
@@ -5352,4 +5391,7 @@ Partial Class LabAdminOnline
     Friend WithEvents DateTimeAmbeien As System.Windows.Forms.DateTimePicker
     Friend WithEvents DateTimeTHT As System.Windows.Forms.DateTimePicker
     Friend WithEvents ComboBoxHipertensi As System.Windows.Forms.ComboBox
+    Friend WithEvents GroupBox10 As System.Windows.Forms.GroupBox
+    Friend WithEvents ButtonInBodyPdf As System.Windows.Forms.Button
+    Friend WithEvents ButtonCetakInBody As System.Windows.Forms.Button
 End Class

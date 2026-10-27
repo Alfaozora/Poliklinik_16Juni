@@ -264,19 +264,83 @@ Public Class FormTransaksiPoli
             Tcol.ReadOnly = False
         Next
 
+        'For Each Trow As DataRow In Tbls.Rows
+        '    totalRowStruk = totalRowStruk + 75
+        '    If Trow("DiscTindakan") = "" Then Trow("DiscTindakan") = "0"
+        '    If Trow("DiscNilai") = "" Then Trow("DiscNilai") = "0"
+
+        '    ' ✅ BATASI MAX 100%
+        '    Dim discPersen As Decimal = 0
+        '    If Not IsDBNull(Trow("DiscTindakan")) Then
+        '        Decimal.TryParse(Trow("DiscTindakan").ToString(), discPersen)
+        '    End If
+
+        '    If discPersen > 100 Then
+        '        discPersen = 100
+        '        Trow("DiscTindakan") = 100
+        '    End If
+
+        '    If discPersen < 0 Then
+        '        discPersen = 0
+        '        Trow("DiscTindakan") = 0
+        '    End If
+
+        '    If Trow("DiscNilai") <> "0" Then
+        '        Trow("DiscTindakan") = Splitmoney(CDbl(Trow("DiscNilai") / Trow("Biaya Tindakan") * 100))
+        '    ElseIf Trow("DiscTindakan") <> "0" Then
+        '        Trow("DiscNilai") = Splitmoney(CDbl(Trow("Biaya Tindakan") * Trow("DiscTindakan") / 100))
+        '    End If
+
+        '    'Trow("NettBayar") = Splitmoney(Trow("Biaya Tindakan") - Trow("DiscNilai"))
+
+        '    Dim nett As Decimal = biaya - discNilai
+        '    If nett < 0 Then nett = 0
+
+        '    Trow("NettBayar") = Splitmoney(nett)
+
+
+        'Next
+
         For Each Trow As DataRow In Tbls.Rows
             totalRowStruk = totalRowStruk + 75
-            If Trow("DiscTindakan") = "" Then Trow("DiscTindakan") = "0"
-            If Trow("DiscNilai") = "" Then Trow("DiscNilai") = "0"
 
-            If Trow("DiscNilai") <> "0" Then
-                Trow("DiscTindakan") = Splitmoney(CDbl(Trow("DiscNilai") / Trow("Biaya Tindakan") * 100))
-            ElseIf Trow("DiscTindakan") <> "0" Then
-                Trow("DiscNilai") = Splitmoney(CDbl(Trow("Biaya Tindakan") * Trow("DiscTindakan") / 100))
+            ' Default
+            If Trow("DiscTindakan") = "" Then Trow("DiscTindakan") = 0
+            If Trow("DiscNilai") = "" Then Trow("DiscNilai") = 0
+
+            Dim biaya As Decimal = 0
+            Dim discNilai As Decimal = 0
+            Dim discPersen As Decimal = 0
+
+            Decimal.TryParse(Trow("Biaya Tindakan").ToString(), biaya)
+            Decimal.TryParse(Trow("DiscNilai").ToString(), discNilai)
+            Decimal.TryParse(Trow("DiscTindakan").ToString(), discPersen)
+
+            ' ✅ BATASI PERSEN
+            If discPersen > 100 Then discPersen = 100
+            If discPersen < 0 Then discPersen = 0
+
+            ' 🔁 LOGIKA DISKON
+            If discNilai > 0 Then
+                If biaya > 0 Then
+                    discPersen = (discNilai / biaya) * 100
+                    If discPersen > 100 Then discPersen = 100
+                End If
+            ElseIf discPersen > 0 Then
+                discNilai = (biaya * discPersen) / 100
             End If
 
-            Trow("NettBayar") = Splitmoney(Trow("Biaya Tindakan") - Trow("DiscNilai"))
+            ' ✅ BATASI DISKON TIDAK BOLEH > BIAYA
+            If discNilai > biaya Then discNilai = biaya
 
+            ' ✅ HITUNG NETT
+            Dim nett As Decimal = biaya - discNilai
+            If nett < 0 Then nett = 0
+
+            ' ✅ SIMPAN (baru diformat)
+            Trow("DiscTindakan") = Math.Round(discPersen, 2)
+            Trow("DiscNilai") = Math.Round(discNilai, 0)
+            Trow("NettBayar") = Math.Round(nett, 0)
 
         Next
 
@@ -460,15 +524,55 @@ Public Class FormTransaksiPoli
         Dim Tbls As DataTable = CType(gridtindakan.DataSource, DataTable)
         If Tbls Is Nothing Then Exit Sub
 
+        Dim totalDisc As Decimal = 0
+        Dim lastRow As DataRow = Nothing
+
+        For Each row As DataRow In Tbls.Rows
+            row("DiscNilai") = 0
+            row("DiscTindakan") = 0
+        Next
+
+        Dim totalBruto As Decimal = CDec(TextBoxTotalBruto.Text.Replace("Rp", "").Replace(",", "").Trim())
+        If totalBruto <= 0 Then Exit Sub
+        Dim nilaiPakai As Decimal = Math.Min(nilai, totalBruto)
+
         If voucherIsTindakan = False Then
-            ' Voucher umum (berlaku ke semua tindakan)
-            For Each row As DataRow In Tbls.Rows
-                If jenis.ToUpper() = "NOMINAL" Then
-                    row("DiscNilai") = nilai
-                ElseIf jenis.ToUpper() = "PERCENT" Then
-                    row("DiscTindakan") = nilai
+
+            If jenis.ToUpper() = "NOMINAL" Then
+
+                For Each row As DataRow In Tbls.Rows
+
+                    Dim biaya As Decimal = CDec(row("Biaya Tindakan"))
+                    Dim discItem As Decimal = (biaya / totalBruto) * nilaiPakai
+                    discItem = Math.Round(discItem, 0)
+
+                    row("DiscNilai") = discItem
+
+                    ' tracking
+                    totalDisc += discItem
+                    lastRow = row
+
+                Next
+
+                ' ✅ PENYESUAIAN SELISIH
+                Dim selisih As Decimal = nilaiPakai - totalDisc
+                If lastRow IsNot Nothing Then
+                    lastRow("DiscNilai") += selisih
                 End If
-            Next
+
+            ElseIf jenis.ToUpper() = "PERCENT" Then
+
+                For Each row As DataRow In Tbls.Rows
+
+                    Dim biaya As Decimal = CDec(row("Biaya Tindakan"))
+                    Dim discItem As Decimal = (nilai / 100D) * biaya
+
+                    row("DiscNilai") = Math.Round(discItem, 0)
+
+                Next
+
+            End If
+
             Kalkulasi()
             Exit Sub
         End If
@@ -490,9 +594,23 @@ Public Class FormTransaksiPoli
                         adaTindakan = True
 
                         If jenis.ToUpper() = "NOMINAL" Then
-                            row("DiscNilai") = nilai
+
+                            Dim biaya As Decimal = CDec(row("Biaya Tindakan"))
+                            Dim discItem As Decimal = (biaya / totalBruto) * nilaiPakai
+                            discItem = Math.Round(discItem, 0)
+
+                            row("DiscNilai") = discItem
+
+                            totalDisc += discItem
+                            lastRow = row
+
                         ElseIf jenis.ToUpper() = "PERCENT" Then
-                            row("DiscTindakan") = nilai
+
+                            Dim biaya As Decimal = CDec(row("Biaya Tindakan"))
+                            Dim discItem As Decimal = (nilai / 100D) * biaya
+
+                            row("DiscNilai") = Math.Round(discItem, 0)
+
                         End If
 
                         Exit For
@@ -500,6 +618,15 @@ Public Class FormTransaksiPoli
                 End If
             Next
         Next
+
+        ' ✅ PINDAH KE SINI (SETELAH LOOP)
+        If jenis.ToUpper() = "NOMINAL" AndAlso adaTindakan Then
+            Dim selisih As Decimal = nilaiPakai - totalDisc
+
+            If lastRow IsNot Nothing Then
+                lastRow("DiscNilai") += selisih
+            End If
+        End If
 
         If adaTindakan Then
             Kalkulasi()

@@ -51,6 +51,46 @@ Public Class ReportDaftarKunjunganPesien
         increamentDataColumn.Width = 50 ' Mengatur lebar maksimums
     End Sub
 
+    Private Sub CreateDataGridViewBirthdayPasien()
+
+        DataGridViewDaftarKunjungan.Columns.Clear()
+
+        ' Add columns
+        DataGridViewDaftarKunjungan.Columns.Add("ColumnNo", "No")
+        DataGridViewDaftarKunjungan.Columns.Add("ColumnNoRM", "No RM")
+        DataGridViewDaftarKunjungan.Columns.Add("ColumnNama", "Nama Pasien")
+        DataGridViewDaftarKunjungan.Columns.Add("ColumnTglLahir", "Tanggal Lahir")
+        DataGridViewDaftarKunjungan.Columns.Add("ColumnUmur", "Umur")
+        DataGridViewDaftarKunjungan.Columns.Add("ColumnJenisKelamin", "Jenis Kelamin")
+        DataGridViewDaftarKunjungan.Columns.Add("ColumnAlamat", "Alamat")
+
+        ' Style
+        DataGridViewDaftarKunjungan.DefaultCellStyle.Font = New Font("Segoe UI", 9, FontStyle.Regular)
+
+        DataGridViewDaftarKunjungan.ColumnHeadersDefaultCellStyle.Font = New Font("Segoe UI Semibold", 10, FontStyle.Bold)
+
+        DataGridViewDaftarKunjungan.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+
+        ' Width Column No
+        Dim colNo As DataGridViewColumn = DataGridViewDaftarKunjungan.Columns("ColumnNo")
+
+        colNo.AutoSizeMode = DataGridViewAutoSizeColumnMode.None
+        colNo.Width = 50
+
+        ' Width Tanggal Lahir
+        Dim colTgl As DataGridViewColumn = DataGridViewDaftarKunjungan.Columns("ColumnTglLahir")
+
+        colTgl.AutoSizeMode = DataGridViewAutoSizeColumnMode.None
+        colTgl.Width = 120
+
+        ' Width Umur
+        Dim colUmur As DataGridViewColumn = DataGridViewDaftarKunjungan.Columns("ColumnUmur")
+
+        colUmur.AutoSizeMode = DataGridViewAutoSizeColumnMode.None
+        colUmur.Width = 70
+
+    End Sub
+
     Private Sub Find_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
             Control.CheckForIllegalCrossThreadCalls = False
@@ -245,8 +285,74 @@ Public Class ReportDaftarKunjunganPesien
         Return True
     End Function
 
+    Private Sub CariBirthdayPasien()
+        Try
+            CreateDataGridViewBirthdayPasien()
+            DataGridViewDaftarKunjungan.Rows.Clear()
+
+            Dim query As String = ""
+
+            query &= " SELECT "
+            query &= "     NoRekamMedis, "
+            query &= "     Nama, "
+            query &= "     TglLahir, "
+            query &= "     JenisKelamin, "
+            query &= "     DomisiliAlamat "
+            query &= " FROM MasterPasien "
+            query &= " WHERE 1=1 "
+
+            ' FILTER HARIAN
+            If RadioButtonOpsiHarian.Checked = True Then
+                Dim tgl As Date = DateTimePickerTglHarian.Value
+
+                query &= " AND DAY(TglLahir) = '" & Format(tgl, "dd") & "' "
+                query &= " AND MONTH(TglLahir) = '" & Format(tgl, "MM") & "' "
+            End If
+
+            ' FILTER BULANAN
+            If RadioButtonOpsiBulanan.Checked = True Then
+                Dim bulan As Integer = ComboBoxBulan.SelectedIndex + 1
+                query &= " AND MONTH(TglLahir) = '" & bulan & "' "
+            End If
+
+            query &= " ORDER BY "
+            query &= " MONTH(TglLahir), "
+            query &= " DAY(TglLahir), "
+            query &= " Nama ASC "
+
+            Dim dt As DataTable = ReadSQL(query)
+
+            Dim no As Integer = 1
+
+            For Each row As DataRow In dt.Rows
+
+                Dim umur As Integer = DateDiff(DateInterval.Year, CDate(row("TglLahir")), Now)
+
+                DataGridViewDaftarKunjungan.Rows.Add( _
+                    no, _
+                    row("NoRekamMedis"), _
+                    row("Nama"), _
+                    Format(row("TglLahir"), "dd MMM yyyy"), _
+                    umur & " Tahun", _
+                    row("JenisKelamin"), _
+                    row("DomisiliAlamat"))
+
+                no += 1
+
+            Next
+
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+        End Try
+
+    End Sub
+
     Private Sub ButtonSearchDaftarPeserta_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonSearchDaftarPeserta.Click
-        SearchDataDaftarKunjungan()
+        If RadioButtonBirthday.Checked = True Then
+            CariBirthdayPasien()
+        Else
+            SearchDataDaftarKunjungan()
+        End If
     End Sub
 
     Private Sub CetakDataDaftarKunjungan()
@@ -338,5 +444,174 @@ Public Class ReportDaftarKunjunganPesien
         If e.ColumnIndex = 0 AndAlso e.RowIndex >= 0 Then ' Kolom nomor urut adalah kolom indeks 0
             e.Value = e.RowIndex + 1 ' Nomor urut dimulai dari 1
         End If
+    End Sub
+
+    Sub ExportCSV(ByVal dt As DataTable)
+
+        Dim sfd As New SaveFileDialog
+        sfd.Filter = "CSV File (*.csv)|*.csv"
+        sfd.FileName = "LaporanKunjungan.csv"
+
+        If sfd.ShowDialog = DialogResult.OK Then
+
+            Dim sw As New IO.StreamWriter(sfd.FileName, False, System.Text.Encoding.UTF8)
+
+            'Header
+            For i As Integer = 0 To dt.Columns.Count - 1
+                sw.Write(dt.Columns(i).ColumnName)
+                If i < dt.Columns.Count - 1 Then sw.Write(",")
+            Next
+            sw.WriteLine()
+
+            'Data
+            For Each r As DataRow In dt.Rows
+                For i As Integer = 0 To dt.Columns.Count - 1
+                    sw.Write("""" & r(i).ToString() & """")
+                    If i < dt.Columns.Count - 1 Then sw.Write(",")
+                Next
+                sw.WriteLine()
+            Next
+
+            sw.Close()
+
+            MessageBox.Show("Export CSV berhasil", "Informasi")
+
+        End If
+
+    End Sub
+
+    Private Sub ExportExcelBirthday()
+
+        Try
+
+            Dim kondisi As String = ""
+
+            ' =========================================
+            ' FILTER HARIAN
+            ' =========================================
+            If RadioButtonOpsiHarian.Checked = True Then
+
+                Dim tgl As Date = DateTimePickerTglHarian.Value
+
+                kondisi &= " AND DAY(TglLahir) = '" & Format(tgl, "dd") & "' "
+                kondisi &= " AND MONTH(TglLahir) = '" & Format(tgl, "MM") & "' "
+
+            End If
+
+            ' =========================================
+            ' FILTER BULANAN
+            ' =========================================
+            If RadioButtonOpsiBulanan.Checked = True Then
+
+                Dim bulan As Integer = ComboBoxBulan.SelectedIndex + 1
+
+                kondisi &= " AND MONTH(TglLahir) = '" & bulan & "' "
+
+            End If
+
+            Dim query As String = ""
+
+            query &= " SELECT "
+            query &= "     NoRekamMedis, "
+            query &= "     Nama, "
+            query &= "     TglLahir, "
+            query &= "     JenisKelamin, "
+            query &= "     DomisiliAlamat "
+            query &= " FROM MasterPasien "
+            query &= " WHERE 1=1 "
+            query &= kondisi
+            query &= " ORDER BY "
+            query &= " MONTH(TglLahir), "
+            query &= " DAY(TglLahir), "
+            query &= " Nama ASC "
+
+            Dim dt As DataTable = ReadSQL(query)
+
+            ' Tambah kolom umur
+            dt.Columns.Add("Umur")
+
+            For Each row As DataRow In dt.Rows
+
+                Dim umur As Integer = DateDiff(DateInterval.Year, CDate(row("TglLahir")), Now)
+
+                row("Umur") = umur & " Tahun"
+
+            Next
+
+            ExportCSV(dt)
+
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+        End Try
+
+    End Sub
+
+    Private Sub ButtonDownloadExcel_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonDownloadExcel.Click
+
+        If RadioButtonBirthday.Checked = True Then
+            ExportExcelBirthday()
+            Exit Sub
+        End If
+
+        Dim kondisi As String = ""
+
+        If RadioButtonOpsiIndividu.Checked = True Then
+
+            kondisi = " AND TP.IDInternet = '" & TextBoxNomorPeserta.Text & "' "
+
+        ElseIf RadioButtonOpsiNoTransaksi.Checked = True Then
+
+            kondisi = " AND TP.NoUrut = '" & TextBoxNomorTransaksi.Text & "' "
+
+        ElseIf RadioButtonOpsiHarian.Checked = True Then
+
+            kondisi = " AND CAST(TP.TglPoli AS DATE) = '" & Format(DateTimePickerTglHarian.Value, "yyyy-MM-dd") & "' "
+
+        ElseIf RadioButtonOpsiBulanan.Checked = True Then
+
+            Dim bulanSearch As String = Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(Replace(ComboBoxBulan.Text, _
+            "Januari", "01"), "Februari", "02"), "Maret", "03"), "April", "04"), "Mei", "05"), "Juni", "06"), _
+            "Juli", "07"), "Agustus", "08"), "September", "09"), "Oktober", "10"), "November", "11"), "Desember", "12")
+
+            Dim tahunSearch As String = ComboBoxTahun.Text
+
+            kondisi = " AND YEAR(TP.TglPoli) = '" & tahunSearch & "' AND MONTH(TP.TglPoli) = '" & bulanSearch & "' "
+
+        End If
+
+
+        Dim query As String = "SELECT " & _
+            "CAST(TP.TglPoli AS DATE) AS TglPoli, " & _
+            "TD.JenisPoli, " & _
+            "TP.NoUrut, " & _
+            "MP.Nama, " & _
+            "ISNULL(TPD.KodeVoucher,'-') AS KodeVoucher, " & _
+            "TPD.NamaTindakan, " & _
+            "TPD.NettBayar AS Nominal, " & _
+            "ISNULL(TPB.JenisBayar,'-') AS JenisBayar, " & _
+            "ISNULL(TPB.NoJenisBayar,'-') AS NoJenisBayar " & _
+        "FROM TransaksiPoli TP " & _
+        "INNER JOIN MasterPasien MP ON TP.IDInternet = MP.NoRekamMedis " & _
+        "LEFT JOIN TransaksiPoliDetail TPD ON TP.TransPoliID = TPD.TransPoliID " & _
+        "LEFT JOIN TransaksiDetail TD ON TP.NoUrut = TD.NoUrut " & _
+        "LEFT JOIN TransaksiPoliBayar TPB ON TP.TransPoliID = TPB.TransPoliID " & _
+        "WHERE ISNULL(TPD.DeletedBy,'') = '' " & _
+        kondisi & _
+        " ORDER BY TP.TglPoli, TP.NoUrut"
+
+        Dim dt As DataTable = ReadSQL(query)
+
+        ExportCSV(dt)
+
+    End Sub
+
+    Private Sub RadioButtonBirthday_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RadioButtonBirthday.CheckedChanged
+        Try
+            If RadioButtonBirthday.Checked = True Then
+                CariBirthdayPasien()
+            End If
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+        End Try
     End Sub
 End Class

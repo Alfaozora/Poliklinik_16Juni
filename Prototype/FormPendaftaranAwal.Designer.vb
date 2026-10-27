@@ -807,6 +807,7 @@ Partial Class FormPendaftaranAwal
         Me.ButtonScanQR.Text = "Scan QR"
         Me.ButtonScanQR.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
         Me.ButtonScanQR.UseVisualStyleBackColor = False
+        Me.ButtonScanQR.Visible = False
         '
         'GridControlTindakanPoli
         '
@@ -1268,7 +1269,7 @@ Partial Class FormPendaftaranAwal
         '
         Me.Label23.AutoSize = True
         Me.Label23.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label23.Location = New System.Drawing.Point(1054, 525)
+        Me.Label23.Location = New System.Drawing.Point(1086, 525)
         Me.Label23.Name = "Label23"
         Me.Label23.Size = New System.Drawing.Size(75, 17)
         Me.Label23.TabIndex = 241
@@ -1288,7 +1289,7 @@ Partial Class FormPendaftaranAwal
         '
         Me.Label16.AutoSize = True
         Me.Label16.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label16.Location = New System.Drawing.Point(948, 525)
+        Me.Label16.Location = New System.Drawing.Point(959, 525)
         Me.Label16.Name = "Label16"
         Me.Label16.Size = New System.Drawing.Size(76, 17)
         Me.Label16.TabIndex = 240
@@ -1307,10 +1308,10 @@ Partial Class FormPendaftaranAwal
         'TextBoxTotalBayar
         '
         Me.TextBoxTotalBayar.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextBoxTotalBayar.Location = New System.Drawing.Point(1057, 545)
-        Me.TextBoxTotalBayar.Maximum = New Decimal(New Integer() {99999999, 0, 0, 0})
+        Me.TextBoxTotalBayar.Location = New System.Drawing.Point(1041, 545)
+        Me.TextBoxTotalBayar.Maximum = New Decimal(New Integer() {-727379969, 232, 0, 0})
         Me.TextBoxTotalBayar.Name = "TextBoxTotalBayar"
-        Me.TextBoxTotalBayar.Size = New System.Drawing.Size(100, 29)
+        Me.TextBoxTotalBayar.Size = New System.Drawing.Size(120, 29)
         Me.TextBoxTotalBayar.TabIndex = 239
         Me.TextBoxTotalBayar.ThousandsSeparator = True
         '
@@ -1328,10 +1329,10 @@ Partial Class FormPendaftaranAwal
         'TextBoxTotalPembulatan
         '
         Me.TextBoxTotalPembulatan.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextBoxTotalPembulatan.Location = New System.Drawing.Point(951, 545)
-        Me.TextBoxTotalPembulatan.Maximum = New Decimal(New Integer() {99999999, 0, 0, 0})
+        Me.TextBoxTotalPembulatan.Location = New System.Drawing.Point(915, 545)
+        Me.TextBoxTotalPembulatan.Maximum = New Decimal(New Integer() {-727379969, 232, 0, 0})
         Me.TextBoxTotalPembulatan.Name = "TextBoxTotalPembulatan"
-        Me.TextBoxTotalPembulatan.Size = New System.Drawing.Size(100, 29)
+        Me.TextBoxTotalPembulatan.Size = New System.Drawing.Size(120, 29)
         Me.TextBoxTotalPembulatan.TabIndex = 238
         Me.TextBoxTotalPembulatan.ThousandsSeparator = True
         '
@@ -1349,7 +1350,7 @@ Partial Class FormPendaftaranAwal
         '
         Me.Label15.AutoSize = True
         Me.Label15.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label15.Location = New System.Drawing.Point(842, 525)
+        Me.Label15.Location = New System.Drawing.Point(844, 525)
         Me.Label15.Name = "Label15"
         Me.Label15.Size = New System.Drawing.Size(65, 17)
         Me.Label15.TabIndex = 237
@@ -1369,7 +1370,7 @@ Partial Class FormPendaftaranAwal
         '
         Me.Label3.AutoSize = True
         Me.Label3.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label3.Location = New System.Drawing.Point(736, 525)
+        Me.Label3.Location = New System.Drawing.Point(704, 525)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(79, 17)
         Me.Label3.TabIndex = 236
@@ -1390,7 +1391,7 @@ Partial Class FormPendaftaranAwal
         '
         Me.Label7.AutoSize = True
         Me.Label7.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Label7.Location = New System.Drawing.Point(630, 525)
+        Me.Label7.Location = New System.Drawing.Point(587, 525)
         Me.Label7.Name = "Label7"
         Me.Label7.Size = New System.Drawing.Size(70, 17)
         Me.Label7.TabIndex = 235
@@ -1399,10 +1400,10 @@ Partial Class FormPendaftaranAwal
         'TextBoxTotalBruto
         '
         Me.TextBoxTotalBruto.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextBoxTotalBruto.Location = New System.Drawing.Point(633, 545)
-        Me.TextBoxTotalBruto.Maximum = New Decimal(New Integer() {99999999, 0, 0, 0})
+        Me.TextBoxTotalBruto.Location = New System.Drawing.Point(537, 545)
+        Me.TextBoxTotalBruto.Maximum = New Decimal(New Integer() {-727379969, 232, 0, 0})
         Me.TextBoxTotalBruto.Name = "TextBoxTotalBruto"
-        Me.TextBoxTotalBruto.Size = New System.Drawing.Size(100, 29)
+        Me.TextBoxTotalBruto.Size = New System.Drawing.Size(120, 29)
         Me.TextBoxTotalBruto.TabIndex = 234
         Me.TextBoxTotalBruto.ThousandsSeparator = True
         '
@@ -1417,10 +1418,10 @@ Partial Class FormPendaftaranAwal
         'TextBoxTotalDiskon
         '
         Me.TextBoxTotalDiskon.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextBoxTotalDiskon.Location = New System.Drawing.Point(739, 545)
-        Me.TextBoxTotalDiskon.Maximum = New Decimal(New Integer() {99999999, 0, 0, 0})
+        Me.TextBoxTotalDiskon.Location = New System.Drawing.Point(663, 545)
+        Me.TextBoxTotalDiskon.Maximum = New Decimal(New Integer() {-727379969, 232, 0, 0})
         Me.TextBoxTotalDiskon.Name = "TextBoxTotalDiskon"
-        Me.TextBoxTotalDiskon.Size = New System.Drawing.Size(100, 29)
+        Me.TextBoxTotalDiskon.Size = New System.Drawing.Size(120, 29)
         Me.TextBoxTotalDiskon.TabIndex = 233
         Me.TextBoxTotalDiskon.ThousandsSeparator = True
         '
@@ -1438,10 +1439,10 @@ Partial Class FormPendaftaranAwal
         'TextBoxTotalNett
         '
         Me.TextBoxTotalNett.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.TextBoxTotalNett.Location = New System.Drawing.Point(845, 545)
-        Me.TextBoxTotalNett.Maximum = New Decimal(New Integer() {99999999, 0, 0, 0})
+        Me.TextBoxTotalNett.Location = New System.Drawing.Point(789, 545)
+        Me.TextBoxTotalNett.Maximum = New Decimal(New Integer() {-727379969, 232, 0, 0})
         Me.TextBoxTotalNett.Name = "TextBoxTotalNett"
-        Me.TextBoxTotalNett.Size = New System.Drawing.Size(100, 29)
+        Me.TextBoxTotalNett.Size = New System.Drawing.Size(120, 29)
         Me.TextBoxTotalNett.TabIndex = 232
         Me.TextBoxTotalNett.ThousandsSeparator = True
         '

@@ -367,6 +367,10 @@ Public Class Find
                     MasterTindakanKlinik.LoadDetailPaket(Grdrow("PaketID").ToString)
                 Case "FindMasterAlat"
                     MasterTindakanKlinik.LoadDetailAlat(Grdrow("AlatID").ToString)
+                Case "FindMasterAlatPreview"
+                    FormLaporanRiwayatAlat.LoadDetailAlat(Grdrow("AlatID").ToString)
+                Case "FindMasterCartridge"
+                    MasterTindakanKlinik.LoadDetailCartridge(Grdrow("CartridgeID").ToString)
                 Case "FindMasterAlatTindakan"
                     MasterTindakanKlinik.LoadDetailAlatTindakan(Grdrow("AlatID").ToString)
                 Case "FindInvoiceLab"
@@ -407,6 +411,8 @@ Public Class Find
                     FormRekamMedisDokter.LoadTindakanRiwayatLaboratorium(Grdrow)
                 Case "FindTindakanPoliPerencanaan"
                     FormRekamMedisDokter.LoadTindakanPoli(Grdrow)
+                Case "FindTindakanLaporanPasien"
+                    FormLaporanPasien.LoadTindakanPoli(Grdrow)
                 Case "FindPenjaminTindakanRekamMedis"
                     FormRekamMedisDokter.LabelPenjaminAsuransiLain.Text = Grdrow("CompanyNama").ToString
                 Case "FindMasterDokter"
@@ -509,8 +515,7 @@ Public Class Find
                     ReportTagihanLab.txkodecabang.Text = Grdrow("nocompany").ToString
                     ReportTagihanLab.txcompanycode.Text = Grdrow("companynama").ToString
                 Case "FindCabangReportTagihanPoli"
-                    ReportTagihanPoli.txkodecabang.Text = Grdrow("nocompany").ToString
-                    ReportTagihanPoli.txcompanycode.Text = Grdrow("companynama").ToString
+                    ReportTagihanPoli.TextBoxNamaPerusahaan.Text = Grdrow("Keterangan").ToString & "-" & Grdrow("ID").ToString
                 Case "FindLabCreateRujukan"
                     FormCreateRujukan.txlabrujukanid.Text = Grdrow("NoLabRujukan").ToString
                     FormCreateRujukan.txlabrujukanket.Text = Grdrow("NamaLabRujukan").ToString

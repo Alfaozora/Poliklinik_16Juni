@@ -342,6 +342,11 @@ Me.SplitContainerMedikObjektifFisik = New System.Windows.Forms.SplitContainer
 Me.ButtonSimpanPemeriksaanFisikObjektif = New System.Windows.Forms.Button
 Me.Panel19 = New System.Windows.Forms.Panel
 Me.PanelObjektifFisik = New System.Windows.Forms.Panel
+Me.Label354 = New System.Windows.Forms.Label
+Me.GroupBox7 = New System.Windows.Forms.GroupBox
+Me.ButtonCekHasilInbody = New System.Windows.Forms.Button
+Me.ComboBoxTanggalInbody = New System.Windows.Forms.ComboBox
+Me.Label365 = New System.Windows.Forms.Label
 Me.Label243 = New System.Windows.Forms.Label
 Me.GroupBox10 = New System.Windows.Forms.GroupBox
 Me.Label284 = New System.Windows.Forms.Label
@@ -730,12 +735,15 @@ Me.TextBoxKeteranganCatatanObat = New System.Windows.Forms.TextBox
 Me.DataGridViewObat = New System.Windows.Forms.DataGridView
 Me.TabTindakan = New System.Windows.Forms.TabPage
 Me.SplitContainerTabTindakan = New System.Windows.Forms.SplitContainer
+Me.Label355 = New System.Windows.Forms.Label
+Me.Panel30 = New System.Windows.Forms.Panel
+Me.ButtonPotongPerencanaan = New System.Windows.Forms.Button
+Me.ListViewPerencanaan = New System.Windows.Forms.ListView
 Me.SplitContainerTindakan = New System.Windows.Forms.SplitContainer
-Me.LabelBiaya = New System.Windows.Forms.Label
-Me.ButtonVoucher = New System.Windows.Forms.Button
-Me.TextBoxDiskonTindakan = New System.Windows.Forms.TextBox
+Me.TextBoxFlagPerencanaan = New System.Windows.Forms.TextBox
+Me.ButtonSimpanPerencanaan = New System.Windows.Forms.Button
+Me.TextBoxQty = New System.Windows.Forms.TextBox
 Me.Label353 = New System.Windows.Forms.Label
-Me.TextBoxLabel = New System.Windows.Forms.TextBox
 Me.ButtonScanQR = New System.Windows.Forms.Button
 Me.Panel26 = New System.Windows.Forms.Panel
 Me.LabelPenjaminAsuransiLain = New System.Windows.Forms.Label
@@ -755,7 +763,6 @@ Me.TextBox16 = New System.Windows.Forms.TextBox
 Me.RadioButtonPenjaminMandiriInhealth = New System.Windows.Forms.RadioButton
 Me.TextBoxJenisTindakan = New System.Windows.Forms.TextBox
 Me.Button5 = New System.Windows.Forms.Button
-Me.ComboBox1 = New System.Windows.Forms.ComboBox
 Me.Button4 = New System.Windows.Forms.Button
 Me.RadioButtonPenjaminBPJS = New System.Windows.Forms.RadioButton
 Me.Label55 = New System.Windows.Forms.Label
@@ -1338,6 +1345,7 @@ Me.SplitContainerMedikObjektifFisik.Panel2.SuspendLayout
 Me.SplitContainerMedikObjektifFisik.SuspendLayout
 Me.Panel19.SuspendLayout
 Me.PanelObjektifFisik.SuspendLayout
+Me.GroupBox7.SuspendLayout
 Me.GroupBox10.SuspendLayout
 CType(Me.TrackBarSkalaNyeriMedik,System.ComponentModel.ISupportInitialize).BeginInit
 Me.Panel12.SuspendLayout
@@ -1423,6 +1431,7 @@ Me.TabTindakan.SuspendLayout
 Me.SplitContainerTabTindakan.Panel1.SuspendLayout
 Me.SplitContainerTabTindakan.Panel2.SuspendLayout
 Me.SplitContainerTabTindakan.SuspendLayout
+Me.Panel30.SuspendLayout
 Me.SplitContainerTindakan.Panel1.SuspendLayout
 Me.SplitContainerTindakan.Panel2.SuspendLayout
 Me.SplitContainerTindakan.SuspendLayout
@@ -5475,6 +5484,8 @@ Me.Panel19.TabIndex = 0
 'PanelObjektifFisik
 '
 Me.PanelObjektifFisik.AutoScroll = true
+Me.PanelObjektifFisik.Controls.Add(Me.Label354)
+Me.PanelObjektifFisik.Controls.Add(Me.GroupBox7)
 Me.PanelObjektifFisik.Controls.Add(Me.Label243)
 Me.PanelObjektifFisik.Controls.Add(Me.GroupBox10)
 Me.PanelObjektifFisik.Controls.Add(Me.GroupBox15)
@@ -5486,6 +5497,71 @@ Me.PanelObjektifFisik.Location = New System.Drawing.Point(0, 0)
 Me.PanelObjektifFisik.Name = "PanelObjektifFisik"
 Me.PanelObjektifFisik.Size = New System.Drawing.Size(850, 325)
 Me.PanelObjektifFisik.TabIndex = 452
+'
+'Label354
+'
+Me.Label354.AutoSize = true
+Me.Label354.Font = New System.Drawing.Font("Segoe UI", 12!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
+Me.Label354.Location = New System.Drawing.Point(631, 21)
+Me.Label354.Name = "Label354"
+Me.Label354.Size = New System.Drawing.Size(231, 21)
+Me.Label354.TabIndex = 462
+Me.Label354.Text = "Riwayat Pemeriksaan InBody"
+'
+'GroupBox7
+'
+Me.GroupBox7.Controls.Add(Me.ButtonCekHasilInbody)
+Me.GroupBox7.Controls.Add(Me.ComboBoxTanggalInbody)
+Me.GroupBox7.Controls.Add(Me.Label365)
+Me.GroupBox7.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+Me.GroupBox7.Font = New System.Drawing.Font("Segoe UI", 11.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
+Me.GroupBox7.Location = New System.Drawing.Point(631, 39)
+Me.GroupBox7.Name = "GroupBox7"
+Me.GroupBox7.Size = New System.Drawing.Size(416, 165)
+Me.GroupBox7.TabIndex = 461
+Me.GroupBox7.TabStop = false
+'
+'ButtonCekHasilInbody
+'
+Me.ButtonCekHasilInbody.BackColor = System.Drawing.Color.FromArgb(CType(CType(0,Byte),Integer), CType(CType(100,Byte),Integer), CType(CType(200,Byte),Integer))
+Me.ButtonCekHasilInbody.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
+Me.ButtonCekHasilInbody.Cursor = System.Windows.Forms.Cursors.Hand
+Me.ButtonCekHasilInbody.FlatAppearance.BorderSize = 0
+Me.ButtonCekHasilInbody.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0,Byte),Integer), CType(CType(100,Byte),Integer), CType(CType(200,Byte),Integer))
+Me.ButtonCekHasilInbody.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81,Byte),Integer), CType(CType(168,Byte),Integer), CType(CType(255,Byte),Integer))
+Me.ButtonCekHasilInbody.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+Me.ButtonCekHasilInbody.Font = New System.Drawing.Font("Arial", 9!, System.Drawing.FontStyle.Bold)
+Me.ButtonCekHasilInbody.ForeColor = System.Drawing.Color.White
+Me.ButtonCekHasilInbody.Image = CType(resources.GetObject("ButtonCekHasilInbody.Image"),System.Drawing.Image)
+Me.ButtonCekHasilInbody.Location = New System.Drawing.Point(29, 75)
+Me.ButtonCekHasilInbody.Name = "ButtonCekHasilInbody"
+Me.ButtonCekHasilInbody.RightToLeft = System.Windows.Forms.RightToLeft.No
+Me.ButtonCekHasilInbody.Size = New System.Drawing.Size(94, 33)
+Me.ButtonCekHasilInbody.TabIndex = 458
+Me.ButtonCekHasilInbody.Text = "Cek Hasil"
+Me.ButtonCekHasilInbody.TextAlign = System.Drawing.ContentAlignment.MiddleRight
+Me.ButtonCekHasilInbody.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+Me.ButtonCekHasilInbody.UseVisualStyleBackColor = false
+'
+'ComboBoxTanggalInbody
+'
+Me.ComboBoxTanggalInbody.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+Me.ComboBoxTanggalInbody.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
+Me.ComboBoxTanggalInbody.FormattingEnabled = true
+Me.ComboBoxTanggalInbody.Location = New System.Drawing.Point(93, 22)
+Me.ComboBoxTanggalInbody.Name = "ComboBoxTanggalInbody"
+Me.ComboBoxTanggalInbody.Size = New System.Drawing.Size(271, 25)
+Me.ComboBoxTanggalInbody.TabIndex = 457
+'
+'Label365
+'
+Me.Label365.AutoSize = true
+Me.Label365.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+Me.Label365.Location = New System.Drawing.Point(27, 25)
+Me.Label365.Name = "Label365"
+Me.Label365.Size = New System.Drawing.Size(55, 17)
+Me.Label365.TabIndex = 437
+Me.Label365.Text = "Tanggal"
 '
 'Label243
 '
@@ -10363,6 +10439,8 @@ Me.SplitContainerTabTindakan.Orientation = System.Windows.Forms.Orientation.Hori
 'SplitContainerTabTindakan.Panel1
 '
 Me.SplitContainerTabTindakan.Panel1.AutoScroll = true
+Me.SplitContainerTabTindakan.Panel1.Controls.Add(Me.Label355)
+Me.SplitContainerTabTindakan.Panel1.Controls.Add(Me.Panel30)
 Me.SplitContainerTabTindakan.Panel1.Controls.Add(Me.SplitContainerTindakan)
 Me.SplitContainerTabTindakan.Panel1.Controls.Add(Me.Label245)
 '
@@ -10375,6 +10453,63 @@ Me.SplitContainerTabTindakan.SplitterDistance = 275
 Me.SplitContainerTabTindakan.SplitterWidth = 5
 Me.SplitContainerTabTindakan.TabIndex = 492
 '
+'Label355
+'
+Me.Label355.AutoSize = true
+Me.Label355.Font = New System.Drawing.Font("Segoe UI", 12!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
+Me.Label355.Location = New System.Drawing.Point(844, 15)
+Me.Label355.Name = "Label355"
+Me.Label355.Size = New System.Drawing.Size(218, 21)
+Me.Label355.TabIndex = 523
+Me.Label355.Text = "PERENCANAAN TINDAKAN"
+'
+'Panel30
+'
+Me.Panel30.Controls.Add(Me.ButtonPotongPerencanaan)
+Me.Panel30.Controls.Add(Me.ListViewPerencanaan)
+Me.Panel30.Location = New System.Drawing.Point(838, 39)
+Me.Panel30.Name = "Panel30"
+Me.Panel30.Size = New System.Drawing.Size(436, 216)
+Me.Panel30.TabIndex = 522
+'
+'ButtonPotongPerencanaan
+'
+Me.ButtonPotongPerencanaan.BackColor = System.Drawing.Color.FromArgb(CType(CType(0,Byte),Integer), CType(CType(100,Byte),Integer), CType(CType(200,Byte),Integer))
+Me.ButtonPotongPerencanaan.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
+Me.ButtonPotongPerencanaan.Cursor = System.Windows.Forms.Cursors.Hand
+Me.ButtonPotongPerencanaan.FlatAppearance.BorderSize = 0
+Me.ButtonPotongPerencanaan.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0,Byte),Integer), CType(CType(100,Byte),Integer), CType(CType(200,Byte),Integer))
+Me.ButtonPotongPerencanaan.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81,Byte),Integer), CType(CType(168,Byte),Integer), CType(CType(255,Byte),Integer))
+Me.ButtonPotongPerencanaan.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+Me.ButtonPotongPerencanaan.Font = New System.Drawing.Font("Arial", 9!, System.Drawing.FontStyle.Bold)
+Me.ButtonPotongPerencanaan.ForeColor = System.Drawing.Color.White
+Me.ButtonPotongPerencanaan.Location = New System.Drawing.Point(10, 183)
+Me.ButtonPotongPerencanaan.Name = "ButtonPotongPerencanaan"
+Me.ButtonPotongPerencanaan.RightToLeft = System.Windows.Forms.RightToLeft.No
+Me.ButtonPotongPerencanaan.Size = New System.Drawing.Size(151, 25)
+Me.ButtonPotongPerencanaan.TabIndex = 538
+Me.ButtonPotongPerencanaan.Text = "Gunakan Perencanaan"
+Me.ButtonPotongPerencanaan.UseVisualStyleBackColor = false
+'
+'ListViewPerencanaan
+'
+Me.ListViewPerencanaan.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom)  _
+            Or System.Windows.Forms.AnchorStyles.Left)  _
+            Or System.Windows.Forms.AnchorStyles.Right),System.Windows.Forms.AnchorStyles)
+Me.ListViewPerencanaan.AutoArrange = false
+Me.ListViewPerencanaan.CheckBoxes = true
+Me.ListViewPerencanaan.Cursor = System.Windows.Forms.Cursors.Hand
+Me.ListViewPerencanaan.Font = New System.Drawing.Font("Segoe UI Semibold", 9!, System.Drawing.FontStyle.Bold)
+Me.ListViewPerencanaan.FullRowSelect = true
+Me.ListViewPerencanaan.GridLines = true
+Me.ListViewPerencanaan.HoverSelection = true
+Me.ListViewPerencanaan.Location = New System.Drawing.Point(10, 8)
+Me.ListViewPerencanaan.Name = "ListViewPerencanaan"
+Me.ListViewPerencanaan.Size = New System.Drawing.Size(419, 169)
+Me.ListViewPerencanaan.TabIndex = 456
+Me.ListViewPerencanaan.UseCompatibleStateImageBehavior = false
+Me.ListViewPerencanaan.View = System.Windows.Forms.View.Details
+'
 'SplitContainerTindakan
 '
 Me.SplitContainerTindakan.FixedPanel = System.Windows.Forms.FixedPanel.Panel1
@@ -10383,13 +10518,13 @@ Me.SplitContainerTindakan.Name = "SplitContainerTindakan"
 '
 'SplitContainerTindakan.Panel1
 '
-Me.SplitContainerTindakan.Panel1.Controls.Add(Me.LabelBiaya)
-Me.SplitContainerTindakan.Panel1.Controls.Add(Me.ButtonVoucher)
-Me.SplitContainerTindakan.Panel1.Controls.Add(Me.TextBoxDiskonTindakan)
+Me.SplitContainerTindakan.Panel1.Controls.Add(Me.TextBoxFlagPerencanaan)
+Me.SplitContainerTindakan.Panel1.Controls.Add(Me.ButtonSimpanPerencanaan)
+Me.SplitContainerTindakan.Panel1.Controls.Add(Me.TextBoxQty)
 Me.SplitContainerTindakan.Panel1.Controls.Add(Me.Label353)
-Me.SplitContainerTindakan.Panel1.Controls.Add(Me.TextBoxLabel)
 Me.SplitContainerTindakan.Panel1.Controls.Add(Me.ButtonScanQR)
 Me.SplitContainerTindakan.Panel1.Controls.Add(Me.Panel26)
+Me.SplitContainerTindakan.Panel1.Controls.Add(Me.CheckBoxInformedConsent)
 Me.SplitContainerTindakan.Panel1.Controls.Add(Me.ButtonSimpanTindakan)
 Me.SplitContainerTindakan.Panel1.Controls.Add(Me.Label246)
 Me.SplitContainerTindakan.Panel1.Controls.Add(Me.ButtonFindTindakan)
@@ -10406,84 +10541,73 @@ Me.SplitContainerTindakan.Panel1.Controls.Add(Me.TextBox16)
 Me.SplitContainerTindakan.Panel2.Controls.Add(Me.RadioButtonPenjaminMandiriInhealth)
 Me.SplitContainerTindakan.Panel2.Controls.Add(Me.TextBoxJenisTindakan)
 Me.SplitContainerTindakan.Panel2.Controls.Add(Me.Button5)
-Me.SplitContainerTindakan.Panel2.Controls.Add(Me.ComboBox1)
 Me.SplitContainerTindakan.Panel2.Controls.Add(Me.Button4)
 Me.SplitContainerTindakan.Panel2.Controls.Add(Me.RadioButtonPenjaminBPJS)
 Me.SplitContainerTindakan.Panel2.Controls.Add(Me.Label55)
 Me.SplitContainerTindakan.Panel2.Controls.Add(Me.Panel7)
 Me.SplitContainerTindakan.Panel2.Controls.Add(Me.ButtonInputInformedConsent)
-Me.SplitContainerTindakan.Size = New System.Drawing.Size(811, 200)
+Me.SplitContainerTindakan.Size = New System.Drawing.Size(810, 216)
 Me.SplitContainerTindakan.SplitterDistance = 500
 Me.SplitContainerTindakan.TabIndex = 0
 '
-'LabelBiaya
+'TextBoxFlagPerencanaan
 '
-Me.LabelBiaya.AutoSize = true
-Me.LabelBiaya.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-Me.LabelBiaya.Location = New System.Drawing.Point(394, 139)
-Me.LabelBiaya.Name = "LabelBiaya"
-Me.LabelBiaya.Size = New System.Drawing.Size(35, 17)
-Me.LabelBiaya.TabIndex = 537
-Me.LabelBiaya.Text = "Nett"
-Me.LabelBiaya.Visible = false
+Me.TextBoxFlagPerencanaan.BackColor = System.Drawing.Color.White
+Me.TextBoxFlagPerencanaan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+Me.TextBoxFlagPerencanaan.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
+Me.TextBoxFlagPerencanaan.ForeColor = System.Drawing.Color.Black
+Me.TextBoxFlagPerencanaan.Location = New System.Drawing.Point(411, 138)
+Me.TextBoxFlagPerencanaan.Name = "TextBoxFlagPerencanaan"
+Me.TextBoxFlagPerencanaan.Size = New System.Drawing.Size(25, 25)
+Me.TextBoxFlagPerencanaan.TabIndex = 536
+Me.TextBoxFlagPerencanaan.TabStop = false
+Me.TextBoxFlagPerencanaan.Text = "0"
+Me.TextBoxFlagPerencanaan.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+Me.TextBoxFlagPerencanaan.Visible = false
 '
-'ButtonVoucher
+'ButtonSimpanPerencanaan
 '
-Me.ButtonVoucher.BackColor = System.Drawing.Color.FromArgb(CType(CType(0,Byte),Integer), CType(CType(100,Byte),Integer), CType(CType(200,Byte),Integer))
-Me.ButtonVoucher.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center
-Me.ButtonVoucher.Cursor = System.Windows.Forms.Cursors.Hand
-Me.ButtonVoucher.FlatAppearance.BorderSize = 0
-Me.ButtonVoucher.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0,Byte),Integer), CType(CType(100,Byte),Integer), CType(CType(200,Byte),Integer))
-Me.ButtonVoucher.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81,Byte),Integer), CType(CType(168,Byte),Integer), CType(CType(255,Byte),Integer))
-Me.ButtonVoucher.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-Me.ButtonVoucher.Font = New System.Drawing.Font("Arial", 9!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
-Me.ButtonVoucher.ForeColor = System.Drawing.Color.White
-Me.ButtonVoucher.Location = New System.Drawing.Point(349, 12)
-Me.ButtonVoucher.Name = "ButtonVoucher"
-Me.ButtonVoucher.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-Me.ButtonVoucher.Size = New System.Drawing.Size(99, 26)
-Me.ButtonVoucher.TabIndex = 535
-Me.ButtonVoucher.Text = "Voucher"
-Me.ButtonVoucher.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-Me.ButtonVoucher.UseVisualStyleBackColor = false
+Me.ButtonSimpanPerencanaan.BackColor = System.Drawing.Color.FromArgb(CType(CType(0,Byte),Integer), CType(CType(192,Byte),Integer), CType(CType(0,Byte),Integer))
+Me.ButtonSimpanPerencanaan.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+Me.ButtonSimpanPerencanaan.Cursor = System.Windows.Forms.Cursors.Hand
+Me.ButtonSimpanPerencanaan.FlatAppearance.BorderSize = 0
+Me.ButtonSimpanPerencanaan.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0,Byte),Integer), CType(CType(100,Byte),Integer), CType(CType(200,Byte),Integer))
+Me.ButtonSimpanPerencanaan.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81,Byte),Integer), CType(CType(168,Byte),Integer), CType(CType(255,Byte),Integer))
+Me.ButtonSimpanPerencanaan.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+Me.ButtonSimpanPerencanaan.Font = New System.Drawing.Font("Arial", 9!, System.Drawing.FontStyle.Bold)
+Me.ButtonSimpanPerencanaan.ForeColor = System.Drawing.Color.White
+Me.ButtonSimpanPerencanaan.Location = New System.Drawing.Point(287, 169)
+Me.ButtonSimpanPerencanaan.Name = "ButtonSimpanPerencanaan"
+Me.ButtonSimpanPerencanaan.RightToLeft = System.Windows.Forms.RightToLeft.No
+Me.ButtonSimpanPerencanaan.Size = New System.Drawing.Size(161, 25)
+Me.ButtonSimpanPerencanaan.TabIndex = 536
+Me.ButtonSimpanPerencanaan.Text = "Simpan Perencanaan"
+Me.ButtonSimpanPerencanaan.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+Me.ButtonSimpanPerencanaan.UseVisualStyleBackColor = false
 '
-'TextBoxDiskonTindakan
+'TextBoxQty
 '
-Me.TextBoxDiskonTindakan.BackColor = System.Drawing.Color.White
-Me.TextBoxDiskonTindakan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-Me.TextBoxDiskonTindakan.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
-Me.TextBoxDiskonTindakan.ForeColor = System.Drawing.Color.Black
-Me.TextBoxDiskonTindakan.Location = New System.Drawing.Point(162, 137)
-Me.TextBoxDiskonTindakan.Name = "TextBoxDiskonTindakan"
-Me.TextBoxDiskonTindakan.ReadOnly = true
-Me.TextBoxDiskonTindakan.Size = New System.Drawing.Size(75, 25)
-Me.TextBoxDiskonTindakan.TabIndex = 535
-Me.TextBoxDiskonTindakan.TabStop = false
+Me.TextBoxQty.BackColor = System.Drawing.Color.White
+Me.TextBoxQty.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+Me.TextBoxQty.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
+Me.TextBoxQty.ForeColor = System.Drawing.Color.Black
+Me.TextBoxQty.Location = New System.Drawing.Point(276, 137)
+Me.TextBoxQty.Name = "TextBoxQty"
+Me.TextBoxQty.Size = New System.Drawing.Size(56, 25)
+Me.TextBoxQty.TabIndex = 535
+Me.TextBoxQty.TabStop = false
+Me.TextBoxQty.Text = "1"
+Me.TextBoxQty.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
 '
 'Label353
 '
 Me.Label353.AutoSize = true
 Me.Label353.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-Me.Label353.Location = New System.Drawing.Point(68, 139)
+Me.Label353.Location = New System.Drawing.Point(240, 139)
 Me.Label353.Name = "Label353"
-Me.Label353.Size = New System.Drawing.Size(49, 17)
+Me.Label353.Size = New System.Drawing.Size(30, 17)
 Me.Label353.TabIndex = 534
-Me.Label353.Text = "Diskon"
-'
-'TextBoxLabel
-'
-Me.TextBoxLabel.BackColor = System.Drawing.Color.FromArgb(CType(CType(223,Byte),Integer), CType(CType(240,Byte),Integer), CType(CType(216,Byte),Integer))
-Me.TextBoxLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-Me.TextBoxLabel.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-Me.TextBoxLabel.ForeColor = System.Drawing.Color.Black
-Me.TextBoxLabel.Location = New System.Drawing.Point(123, 137)
-Me.TextBoxLabel.Name = "TextBoxLabel"
-Me.TextBoxLabel.ReadOnly = true
-Me.TextBoxLabel.Size = New System.Drawing.Size(40, 25)
-Me.TextBoxLabel.TabIndex = 536
-Me.TextBoxLabel.TabStop = false
-Me.TextBoxLabel.Text = "Rp"
-Me.TextBoxLabel.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+Me.Label353.Text = "Qty"
 '
 'ButtonScanQR
 '
@@ -10501,7 +10625,7 @@ Me.ButtonScanQR.Name = "ButtonScanQR"
 Me.ButtonScanQR.RightToLeft = System.Windows.Forms.RightToLeft.Yes
 Me.ButtonScanQR.Size = New System.Drawing.Size(100, 25)
 Me.ButtonScanQR.TabIndex = 533
-Me.ButtonScanQR.Text = "Scan QR"
+Me.ButtonScanQR.Text = "Potong Paket"
 Me.ButtonScanQR.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
 Me.ButtonScanQR.UseVisualStyleBackColor = false
 Me.ButtonScanQR.Visible = false
@@ -10513,11 +10637,10 @@ Me.Panel26.Controls.Add(Me.LabelPenjaminAsuransiLain)
 Me.Panel26.Controls.Add(Me.ButtonCariPenjaminAsuransiLain)
 Me.Panel26.Controls.Add(Me.RadioButtonPenjaminAsuransiLain)
 Me.Panel26.Controls.Add(Me.RadioButtonPenjaminUmum)
-Me.Panel26.Controls.Add(Me.CheckBoxInformedConsent)
 Me.Panel26.Font = New System.Drawing.Font("Segoe UI Semibold", 9!, System.Drawing.FontStyle.Bold)
 Me.Panel26.Location = New System.Drawing.Point(123, 75)
 Me.Panel26.Name = "Panel26"
-Me.Panel26.Size = New System.Drawing.Size(335, 56)
+Me.Panel26.Size = New System.Drawing.Size(374, 56)
 Me.Panel26.TabIndex = 532
 '
 'LabelPenjaminAsuransiLain
@@ -10525,9 +10648,9 @@ Me.Panel26.TabIndex = 532
 Me.LabelPenjaminAsuransiLain.AutoEllipsis = true
 Me.LabelPenjaminAsuransiLain.BackColor = System.Drawing.Color.Transparent
 Me.LabelPenjaminAsuransiLain.Font = New System.Drawing.Font("Segoe UI Semibold", 8.25!, System.Drawing.FontStyle.Bold)
-Me.LabelPenjaminAsuransiLain.Location = New System.Drawing.Point(146, 25)
+Me.LabelPenjaminAsuransiLain.Location = New System.Drawing.Point(152, 28)
 Me.LabelPenjaminAsuransiLain.Name = "LabelPenjaminAsuransiLain"
-Me.LabelPenjaminAsuransiLain.Size = New System.Drawing.Size(179, 26)
+Me.LabelPenjaminAsuransiLain.Size = New System.Drawing.Size(196, 23)
 Me.LabelPenjaminAsuransiLain.TabIndex = 534
 Me.LabelPenjaminAsuransiLain.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
 '
@@ -10562,7 +10685,7 @@ Me.CheckBoxInformedConsent.Cursor = System.Windows.Forms.Cursors.No
 Me.CheckBoxInformedConsent.Enabled = false
 Me.CheckBoxInformedConsent.Font = New System.Drawing.Font("Segoe UI Semibold", 9!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
 Me.CheckBoxInformedConsent.ForeColor = System.Drawing.SystemColors.ControlText
-Me.CheckBoxInformedConsent.Location = New System.Drawing.Point(176, 4)
+Me.CheckBoxInformedConsent.Location = New System.Drawing.Point(360, 18)
 Me.CheckBoxInformedConsent.Name = "CheckBoxInformedConsent"
 Me.CheckBoxInformedConsent.Size = New System.Drawing.Size(122, 19)
 Me.CheckBoxInformedConsent.TabIndex = 530
@@ -10580,10 +10703,10 @@ Me.ButtonSimpanTindakan.FlatAppearance.MouseOverBackColor = System.Drawing.Color
 Me.ButtonSimpanTindakan.FlatStyle = System.Windows.Forms.FlatStyle.Flat
 Me.ButtonSimpanTindakan.Font = New System.Drawing.Font("Arial", 9!, System.Drawing.FontStyle.Bold)
 Me.ButtonSimpanTindakan.ForeColor = System.Drawing.Color.White
-Me.ButtonSimpanTindakan.Location = New System.Drawing.Point(123, 168)
+Me.ButtonSimpanTindakan.Location = New System.Drawing.Point(123, 169)
 Me.ButtonSimpanTindakan.Name = "ButtonSimpanTindakan"
 Me.ButtonSimpanTindakan.RightToLeft = System.Windows.Forms.RightToLeft.No
-Me.ButtonSimpanTindakan.Size = New System.Drawing.Size(325, 25)
+Me.ButtonSimpanTindakan.Size = New System.Drawing.Size(158, 25)
 Me.ButtonSimpanTindakan.TabIndex = 452
 Me.ButtonSimpanTindakan.Text = "Simpan Data"
 Me.ButtonSimpanTindakan.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
@@ -10647,7 +10770,7 @@ Me.TextBoxBiayaTindakan.BackColor = System.Drawing.Color.White
 Me.TextBoxBiayaTindakan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
 Me.TextBoxBiayaTindakan.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
 Me.TextBoxBiayaTindakan.ForeColor = System.Drawing.Color.Black
-Me.TextBoxBiayaTindakan.Location = New System.Drawing.Point(320, 137)
+Me.TextBoxBiayaTindakan.Location = New System.Drawing.Point(162, 137)
 Me.TextBoxBiayaTindakan.Name = "TextBoxBiayaTindakan"
 Me.TextBoxBiayaTindakan.ReadOnly = true
 Me.TextBoxBiayaTindakan.Size = New System.Drawing.Size(68, 25)
@@ -10681,7 +10804,7 @@ Me.TextBoxTindakanID.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
 '
 Me.Label52.AutoSize = true
 Me.Label52.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-Me.Label52.Location = New System.Drawing.Point(237, 139)
+Me.Label52.Location = New System.Drawing.Point(79, 139)
 Me.Label52.Name = "Label52"
 Me.Label52.Size = New System.Drawing.Size(40, 17)
 Me.Label52.TabIndex = 434
@@ -10693,7 +10816,7 @@ Me.TextBox16.BackColor = System.Drawing.Color.FromArgb(CType(CType(223,Byte),Int
 Me.TextBox16.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
 Me.TextBox16.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
 Me.TextBox16.ForeColor = System.Drawing.Color.Black
-Me.TextBox16.Location = New System.Drawing.Point(281, 137)
+Me.TextBox16.Location = New System.Drawing.Point(123, 137)
 Me.TextBox16.Name = "TextBox16"
 Me.TextBox16.ReadOnly = true
 Me.TextBox16.Size = New System.Drawing.Size(40, 25)
@@ -10720,7 +10843,7 @@ Me.TextBoxJenisTindakan.BackColor = System.Drawing.Color.FromArgb(CType(CType(22
 Me.TextBoxJenisTindakan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
 Me.TextBoxJenisTindakan.Cursor = System.Windows.Forms.Cursors.No
 Me.TextBoxJenisTindakan.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
-Me.TextBoxJenisTindakan.Location = New System.Drawing.Point(17, 161)
+Me.TextBoxJenisTindakan.Location = New System.Drawing.Point(17, 131)
 Me.TextBoxJenisTindakan.Name = "TextBoxJenisTindakan"
 Me.TextBoxJenisTindakan.ReadOnly = true
 Me.TextBoxJenisTindakan.Size = New System.Drawing.Size(242, 25)
@@ -10747,19 +10870,6 @@ Me.Button5.Text = "Surgical Safety Checklist"
 Me.Button5.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
 Me.Button5.UseVisualStyleBackColor = false
 Me.Button5.Visible = false
-'
-'ComboBox1
-'
-Me.ComboBox1.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
-Me.ComboBox1.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource
-Me.ComboBox1.Font = New System.Drawing.Font("Segoe UI", 9.75!)
-Me.ComboBox1.FormattingEnabled = true
-Me.ComboBox1.Items.AddRange(New Object() {"Tanpa Asuransi / Umum", "BPJS / JKN", "Mandiri Inhealth", "Asuransi Lain"})
-Me.ComboBox1.Location = New System.Drawing.Point(37, 202)
-Me.ComboBox1.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
-Me.ComboBox1.Name = "ComboBox1"
-Me.ComboBox1.Size = New System.Drawing.Size(274, 25)
-Me.ComboBox1.TabIndex = 532
 '
 'Button4
 '
@@ -17076,7 +17186,8 @@ Me.ImageListButton24.Images.SetKeyName(0, "icons8_save_24.png")
 '
 'TimerNotifikasi
 '
-Me.TimerNotifikasi.Interval = 500
+Me.TimerNotifikasi.Enabled = true
+Me.TimerNotifikasi.Interval = 5000
 '
 'DateTimePicker1
 '
@@ -17276,6 +17387,8 @@ Me.SplitContainerMedikObjektifFisik.ResumeLayout(false)
 Me.Panel19.ResumeLayout(false)
 Me.PanelObjektifFisik.ResumeLayout(false)
 Me.PanelObjektifFisik.PerformLayout
+Me.GroupBox7.ResumeLayout(false)
+Me.GroupBox7.PerformLayout
 Me.GroupBox10.ResumeLayout(false)
 Me.GroupBox10.PerformLayout
 CType(Me.TrackBarSkalaNyeriMedik,System.ComponentModel.ISupportInitialize).EndInit
@@ -17395,6 +17508,7 @@ Me.SplitContainerTabTindakan.Panel1.ResumeLayout(false)
 Me.SplitContainerTabTindakan.Panel1.PerformLayout
 Me.SplitContainerTabTindakan.Panel2.ResumeLayout(false)
 Me.SplitContainerTabTindakan.ResumeLayout(false)
+Me.Panel30.ResumeLayout(false)
 Me.SplitContainerTindakan.Panel1.ResumeLayout(false)
 Me.SplitContainerTindakan.Panel1.PerformLayout
 Me.SplitContainerTindakan.Panel2.ResumeLayout(false)
@@ -18520,8 +18634,6 @@ End Sub
     Friend WithEvents RadioButtonPenjaminUmum As System.Windows.Forms.RadioButton
     Friend WithEvents RadioButtonPenjaminAsuransiLain As System.Windows.Forms.RadioButton
     Friend WithEvents ButtonCariPenjaminAsuransiLain As System.Windows.Forms.Button
-    Friend WithEvents ComboBox1 As System.Windows.Forms.ComboBox
-    Friend WithEvents LabelPenjaminAsuransiLain As System.Windows.Forms.Label
     Friend WithEvents TextBoxJenisTindakan As System.Windows.Forms.TextBox
     Friend WithEvents RadioButtonPenjaminMandiriInhealth As System.Windows.Forms.RadioButton
     Friend WithEvents RadioButtonPenjaminBPJS As System.Windows.Forms.RadioButton
@@ -18783,9 +18895,18 @@ End Sub
     Friend WithEvents RadioButtonPerTindakan As System.Windows.Forms.RadioButton
     Friend WithEvents RadioButtonReguler As System.Windows.Forms.RadioButton
     Friend WithEvents RadioButtonCekStik As System.Windows.Forms.RadioButton
-    Friend WithEvents ButtonVoucher As System.Windows.Forms.Button
-    Friend WithEvents TextBoxDiskonTindakan As System.Windows.Forms.TextBox
+    Friend WithEvents Label354 As System.Windows.Forms.Label
+    Friend WithEvents GroupBox7 As System.Windows.Forms.GroupBox
+    Friend WithEvents Label365 As System.Windows.Forms.Label
+    Friend WithEvents ButtonCekHasilInbody As System.Windows.Forms.Button
+    Friend WithEvents ComboBoxTanggalInbody As System.Windows.Forms.ComboBox
+    Friend WithEvents LabelPenjaminAsuransiLain As System.Windows.Forms.Label
+    Friend WithEvents TextBoxQty As System.Windows.Forms.TextBox
     Friend WithEvents Label353 As System.Windows.Forms.Label
-    Friend WithEvents TextBoxLabel As System.Windows.Forms.TextBox
-    Friend WithEvents LabelBiaya As System.Windows.Forms.Label
+    Friend WithEvents Panel30 As System.Windows.Forms.Panel
+    Friend WithEvents ButtonSimpanPerencanaan As System.Windows.Forms.Button
+    Friend WithEvents ListViewPerencanaan As System.Windows.Forms.ListView
+    Friend WithEvents Label355 As System.Windows.Forms.Label
+    Friend WithEvents ButtonPotongPerencanaan As System.Windows.Forms.Button
+    Friend WithEvents TextBoxFlagPerencanaan As System.Windows.Forms.TextBox
 End Class

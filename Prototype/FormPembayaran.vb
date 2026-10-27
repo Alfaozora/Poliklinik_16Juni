@@ -17,6 +17,19 @@ Imports Newtonsoft.Json.Linq
 Imports DevExpress.XtraPrinting
 
 Public Class FormPembayaran
+    Private Class KirimInvoiceParams
+        Public JenisTransaksi As String
+        Public NomorTransaksi As String
+        Public NamaPasien As String
+        Public NoRekamMedis As String
+    End Class
+
+    Private Class KirimInvoiceResult
+        Public IsSuccess As Boolean
+        Public Message As String
+        Public NoHp As String
+    End Class
+
     Private formName As String = "FORM PEMBAYARAN"
     Dim thread As System.Threading.Thread
     Dim tblTindakan As New DataTable
@@ -72,6 +85,23 @@ Public Class FormPembayaran
     Private _kodeVoucher As String = ""
     Private _jenisVoucher As String = ""
     Private _nilaiVoucher As Decimal = 0
+
+    Function EncryptAES(ByVal plainText As String, ByVal key As String) As String
+        Dim aes As New RijndaelManaged()
+        aes.Key = Encoding.UTF8.GetBytes(key.PadRight(32)) ' 256-bit
+        aes.IV = Encoding.UTF8.GetBytes(key.Substring(0, 16))
+
+        Dim encryptor = aes.CreateEncryptor(aes.Key, aes.IV)
+
+        Using ms As New MemoryStream()
+            Using cs As New CryptoStream(ms, encryptor, CryptoStreamMode.Write)
+                Using sw As New StreamWriter(cs)
+                    sw.Write(plainText)
+                End Using
+            End Using
+            Return Convert.ToBase64String(ms.ToArray())
+        End Using
+    End Function
 
     Public Property DataDictionary() As Dictionary(Of String, Object)
         Get
@@ -907,6 +937,270 @@ Public Class FormPembayaran
         Return hasil
     End Function
 
+    Private Function JsonToDataTable(ByVal json As String) As DataTable
+        Dim dt As New DataTable
+
+        Try
+            Dim arr = Newtonsoft.Json.Linq.JArray.Parse(json)
+
+            If arr.Count > 0 Then
+                ' buat kolom dari properti JSON
+                For Each prop In arr(0).Children(Of Newtonsoft.Json.Linq.JProperty)()
+                    dt.Columns.Add(prop.Name)
+                Next
+            End If
+
+            ' isi baris
+            For Each item In arr
+                Dim row As DataRow = dt.NewRow()
+                For Each prop In item.Children(Of Newtonsoft.Json.Linq.JProperty)()
+                    row(prop.Name) = prop.Value.ToString()
+                Next
+                dt.Rows.Add(row)
+            Next
+
+        Catch ex As Exception
+            MsgBox("Gagal parsing DetailTindakan: " & ex.Message)
+        End Try
+
+        Return dt
+    End Function
+
+    Private Sub SendInvoiceValidator(ByVal jenisInvoice As String)
+
+        Try
+
+            Dim nama As String = ""
+            Dim jenisKelamin As String = ""
+            Dim tglLahir As String = ""
+            Dim alamat As String = ""
+            Dim pelaksana As String = ""
+            Dim transPoliID As String = _idTransaksi
+
+            Dim dt As DataTable = ReadSQL("SELECT Nama,JenisKelamin,TglLahir,DomisiliAlamat FROM MasterPasien WHERE NoRekamMedis='" & _noRekamMedis & "'")
+
+            If dt.Rows.Count > 0 Then
+                nama = dt.Rows(0)("Nama").ToString
+                jenisKelamin = dt.Rows(0)("JenisKelamin").ToString
+                tglLahir = CDate(dt.Rows(0)("TglLahir")).ToString("yyyy-MM-dd")
+                alamat = dt.Rows(0)("DomisiliAlamat").ToString
+            End If
+
+
+            '========================
+            ' AMBIL DOKTER PELAKSANA
+            '========================
+            pelaksana = ReadSQLNIK("SELECT DokterPoli FROM TransaksiPoli WHERE TransPoliID='" & _idTransaksi & "'")
+
+
+            Dim tindakanList As New List(Of Object)
+
+            ' --- PERBAIKAN 1: Tambahkan JenisTindakan dan Awal pada SELECT ---
+            Dim dtTindakan As DataTable = ReadSQL("SELECT NamaTindakan, JenisTindakan, Awal, BiayaTindakan, DiscTindakan, NettBayar FROM TransaksiPoliDetail WHERE TransPoliID='" & _idTransaksi & "' AND DeletedDate IS NULL")
+
+            For Each row As DataRow In dtTindakan.Rows
+
+                Dim tindakan As New Dictionary(Of String, Object)
+
+                tindakan.Add("nama_tindakan", row("NamaTindakan").ToString())
+
+                ' --- PERBAIKAN 2: Masukkan jenis_tindakan dan awal ke dictionary ---
+                tindakan.Add("jenis_tindakan", If(IsDBNull(row("JenisTindakan")), "", row("JenisTindakan").ToString()))
+                tindakan.Add("awal", If(IsDBNull(row("Awal")), 0, Convert.ToInt32(row("Awal")))) ' dikirim sebagai Integer (1/0)
+
+                tindakan.Add("biaya", If(IsDBNull(row("BiayaTindakan")), 0, CDbl(row("BiayaTindakan"))))
+                tindakan.Add("diskon", If(IsDBNull(row("DiscTindakan")), 0, CDbl(row("DiscTindakan"))))
+                tindakan.Add("nett", If(IsDBNull(row("NettBayar")), 0, CDbl(row("NettBayar"))))
+
+                tindakanList.Add(tindakan)
+
+            Next
+
+
+            Dim payload As New Dictionary(Of String, Object)
+
+            payload.Add("nomor_registrasi", _noRekamMedis)
+            payload.Add("id_bayar", transPoliID)
+            payload.Add("nomor_transaksi", _nomorUrutTransaksi)
+            payload.Add("jenis_invoice", jenisInvoice)
+            payload.Add("nama_pasien", nama)
+            payload.Add("jenis_kelamin", jenisKelamin)
+            payload.Add("tgl_lahir", tglLahir)
+            payload.Add("alamat", alamat)
+            payload.Add("pelaksana", pelaksana)
+            payload.Add("detail_tindakan", tindakanList)
+            payload.Add("total_bayar", CDbl(TextBoxTotalBayar.Value))
+            payload.Add("nett_bayar", CDbl(TextBoxTotalBayar.Value))
+            payload.Add("tanggal_transaksi", Now.ToString("yyyy-MM-dd HH:mm:ss"))
+            payload.Add("nama_kasir", userInput)
+
+            Dim jsonParam As String = JsonConvert.SerializeObject(payload)
+
+            Dim secretKey As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_payloadEnkrip'")
+
+            Dim encrypted As String = EncryptAES(jsonParam, secretKey)
+
+            If String.IsNullOrEmpty(encrypted) Then
+                MsgBox("Encrypt gagal!")
+                Exit Sub
+            End If
+
+            Dim postData As String = "{""payload"":""" & encrypted & """}"
+
+            Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName='ws_RM'")
+            Dim urlApi As String = baseURL & "api/invoice/store/dev"
+
+            Dim response As String = InsertDataAPIRM(postData, urlApi)
+
+            If response Is Nothing OrElse response.Trim = "" Then
+                Throw New Exception("Response kosong dari server")
+            End If
+
+            If Not response.Trim.StartsWith("{") Then
+                Throw New Exception("Response bukan JSON : " & response)
+            End If
+
+            Dim obj = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(response)
+
+            If obj.ContainsKey("status") AndAlso CBool(obj("status")) Then
+
+                If obj.ContainsKey("url") AndAlso obj.ContainsKey("key") Then
+
+                    Dim urlValidator As String = obj("url").ToString()
+                    Dim keyValidator As String = obj("key").ToString()
+
+                    WriteSQL("UPDATE TransaksiDetail SET " & _
+                             "ValidatorURL='" & urlValidator.Replace("'", "''") & "'," & _
+                             "ValidatorKey='" & keyValidator.Replace("'", "''") & "' " & _
+                             "WHERE NoUrut='" & _nomorUrutTransaksi.Replace("'", "''") & "'", 4)
+
+                End If
+
+            Else
+                Throw New Exception("API gagal : " & response)
+            End If
+
+        Catch ex As Exception
+            MsgBox("Gagal kirim validator : " & ex.Message)
+        End Try
+
+    End Sub
+
+    'OLD
+    'Private Sub SendInvoiceValidator(ByVal jenisInvoice As String)
+
+    '    Try
+
+    '        Dim nama As String = ""
+    '        Dim jenisKelamin As String = ""
+    '        Dim tglLahir As String = ""
+    '        Dim alamat As String = ""
+    '        Dim pelaksana As String = ""
+    '        Dim transPoliID As String = _idTransaksi
+
+    '        Dim dt As DataTable = ReadSQL("SELECT Nama,JenisKelamin,TglLahir,DomisiliAlamat FROM MasterPasien WHERE NoRekamMedis='" & _noRekamMedis & "'")
+
+    '        If dt.Rows.Count > 0 Then
+    '            nama = dt.Rows(0)("Nama").ToString
+    '            jenisKelamin = dt.Rows(0)("JenisKelamin").ToString
+    '            tglLahir = CDate(dt.Rows(0)("TglLahir")).ToString("yyyy-MM-dd")
+    '            alamat = dt.Rows(0)("DomisiliAlamat").ToString
+    '        End If
+
+
+    '        '========================
+    '        ' AMBIL DOKTER PELAKSANA
+    '        '========================
+    '        pelaksana = ReadSQLNIK("SELECT DokterPoli FROM TransaksiPoli WHERE TransPoliID='" & _idTransaksi & "'")
+
+
+    '        Dim tindakanList As New List(Of Object)
+
+    '        Dim dtTindakan As DataTable = ReadSQL("SELECT NamaTindakan,BiayaTindakan,DiscTindakan,NettBayar FROM TransaksiPoliDetail WHERE TransPoliID='" & _idTransaksi & "' AND DeletedDate IS NULL")
+
+    '        For Each row As DataRow In dtTindakan.Rows
+
+    '            Dim tindakan As New Dictionary(Of String, Object)
+
+    '            tindakan.Add("nama_tindakan", row("NamaTindakan").ToString())
+    '            tindakan.Add("biaya", CDbl(row("BiayaTindakan")))
+    '            tindakan.Add("diskon", CDbl(row("DiscTindakan")))
+    '            tindakan.Add("nett", CDbl(row("NettBayar")))
+
+    '            tindakanList.Add(tindakan)
+
+    '        Next
+
+
+    '        Dim payload As New Dictionary(Of String, Object)
+
+    '        payload.Add("nomor_registrasi", _noRekamMedis)
+    '        payload.Add("id_bayar", transPoliID)
+    '        payload.Add("nomor_transaksi", _nomorUrutTransaksi)
+    '        payload.Add("jenis_invoice", jenisInvoice)
+    '        payload.Add("nama_pasien", nama)
+    '        payload.Add("jenis_kelamin", jenisKelamin)
+    '        payload.Add("tgl_lahir", tglLahir)
+    '        payload.Add("alamat", alamat)
+    '        payload.Add("pelaksana", pelaksana)
+    '        payload.Add("detail_tindakan", tindakanList)
+    '        payload.Add("total_bayar", CDbl(TextBoxTotalBayar.Value))
+    '        payload.Add("nett_bayar", CDbl(TextBoxTotalBayar.Value))
+    '        payload.Add("tanggal_transaksi", Now.ToString("yyyy-MM-dd HH:mm:ss"))
+    '        payload.Add("nama_kasir", userInput)
+
+    '        Dim jsonParam As String = JsonConvert.SerializeObject(payload)
+
+    '        Dim secretKey As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_payloadEnkrip'")
+
+    '        Dim encrypted As String = EncryptAES(jsonParam, secretKey)
+
+    '        If String.IsNullOrEmpty(encrypted) Then
+    '            MsgBox("Encrypt gagal!")
+    '            Exit Sub
+    '        End If
+
+    '        Dim postData As String = "{""payload"":""" & encrypted & """}"
+
+    '        Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName='ws_RM'")
+    '        Dim urlApi As String = baseURL & "api/invoice/store/dev"
+
+    '        Dim response As String = InsertDataAPIRM(postData, urlApi)
+
+    '        If response Is Nothing OrElse response.Trim = "" Then
+    '            Throw New Exception("Response kosong dari server")
+    '        End If
+
+    '        If Not response.Trim.StartsWith("{") Then
+    '            Throw New Exception("Response bukan JSON : " & response)
+    '        End If
+
+    '        Dim obj = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(response)
+
+    '        If obj.ContainsKey("status") AndAlso CBool(obj("status")) Then
+
+    '            If obj.ContainsKey("url") AndAlso obj.ContainsKey("key") Then
+
+    '                Dim urlValidator As String = obj("url").ToString()
+    '                Dim keyValidator As String = obj("key").ToString()
+
+    '                WriteSQL("UPDATE TransaksiDetail SET " & _
+    '                         "ValidatorURL='" & urlValidator.Replace("'", "''") & "'," & _
+    '                         "ValidatorKey='" & keyValidator.Replace("'", "''") & "' " & _
+    '                         "WHERE NoUrut='" & _nomorUrutTransaksi.Replace("'", "''") & "'", 4)
+
+    '            End If
+
+    '        Else
+    '            Throw New Exception("API gagal : " & response)
+    '        End If
+
+    '    Catch ex As Exception
+    '        MsgBox("Gagal kirim validator : " & ex.Message)
+    '    End Try
+
+    'End Sub
+
     Private Sub SaveDataPembayaran()
         '# Variabel Umum
         Dim NewHeader As DataTable = CreateTable()
@@ -1129,19 +1423,178 @@ Public Class FormPembayaran
                                  "VALUES('" & _noRekamMedis & "', '" & _nomorUrutTransaksi & "', '" & rowTindakan("PaketID") & "', '" & rowTindakan("Nama Paket") & "', '" & rowTindakan("Keterangan Paket") & "', '" & rowTindakan("Jenis Paket") & "', GETDATE(), DATEADD(DAY, " & rowTindakan("DurasiAktif") & ", GETDATE()), " & CDbl(rowTindakan("Harga Awal")) & ", " & _
                                  "" & CDbl(rowTindakan("Diskon")) & ", " & CDbl(rowTindakan("Harga Nett")) & ", '" & rowTindakan("Kuota") & "', '" & rowTindakan("DetailTindakan") & "', 'PAID', '" & voucherID & "', '" & penjaminTindakan & "', '" & userInput & "', GETDATE())", 4)
 
-                        Dim paket As New Dictionary(Of String, Object)
+                        Dim jenisPaket As String = rowTindakan("Jenis Paket").ToString()
 
-                        Dim qtyTotal As Integer = Convert.ToInt32(rowTindakan("Kuota"))
-                        Dim listTindakanApi As List(Of String) = GetListTindakanDariJSON(rowTindakan("DetailTindakan").ToString())
+                        ' =======================================================
+                        ' BLOK 1: JIKA PAKET REGULER
+                        ' =======================================================
+                        If jenisPaket = "Paket Reguler" Then
 
-                        paket.Add("id_paket", rowTindakan("PaketID").ToString())
-                        paket.Add("tindakan", listTindakanApi)
-                        paket.Add("qty", 0)
-                        paket.Add("qty_total", qtyTotal)
-                        paket.Add("tgl_pembelian", tglPembelian)
-                        paket.Add("tgl_perawatan", Nothing)
+                            Dim detailJson As String = rowTindakan("DetailTindakan").ToString()
+                            Dim kuotaPaket As Integer = Convert.ToInt32(rowTindakan("Kuota"))
 
-                        paketList.Add(paket)
+                            If detailJson <> "" Then
+                                Dim dtTindakan As DataTable = JsonToDataTable(detailJson)
+                                For Each rowDetail As DataRow In dtTindakan.Rows
+                                    Dim paket As New Dictionary(Of String, Object)
+                                    Dim tindakanID As String = rowDetail("TindakanID").ToString()
+                                    Dim namaTindakan As String = rowDetail("NamaTindakan").ToString()
+                                    Dim listTindakanApi As New List(Of String)
+
+                                    listTindakanApi.Add(namaTindakan)
+
+                                    paket.Add("id_paket", rowTindakan("PaketID").ToString())
+                                    paket.Add("kode_voucher", voucherID)
+                                    paket.Add("id_tindakan", tindakanID)
+                                    paket.Add("tindakan", listTindakanApi)
+                                    paket.Add("qty", 0)
+                                    paket.Add("qty_total", kuotaPaket)
+                                    paket.Add("tgl_pembelian", tglPembelian)
+                                    paket.Add("tgl_perawatan", Nothing)
+
+                                    paketList.Add(paket)
+                                Next
+                            End If
+
+                            ' -----------------------------------------------------
+                            ' 🔥 BRIDGE JURNAL BARU (Beli Paket Reguler)
+                            ' -----------------------------------------------------
+                            'Try
+                            '    Dim nominalPaket As Double = CDbl(rowTindakan("Harga Nett"))
+                            '    Dim namaPaket As String = rowTindakan("Nama Paket").ToString()
+
+                            '    'MsgBox("[DEBUG 1 - Beli Reguler] Nama Paket: " & namaPaket & vbCrLf & "Nominal (Double): " & nominalPaket)
+
+                            '    Dim namaPoliLokal As String = _namaPoli.ToString().ToUpper()
+                            '    Dim poliParam As String = ""
+
+                            '    If namaPoliLokal.Contains("KECANTIKAN") Then
+                            '        poliParam = "kecantikan"
+                            '    ElseIf namaPoliLokal.Contains("HBOT") Then
+                            '        poliParam = "hbot"
+                            '    ElseIf namaPoliLokal.Contains("FISIO") Then
+                            '        poliParam = "fisio"
+                            '    Else
+                            '        poliParam = "kecantikan"
+                            '    End If
+
+                            '    'MsgBox("[DEBUG 2 - Beli Reguler] Poli Lokal: " & namaPoliLokal & vbCrLf & "Poli Param: " & poliParam)
+
+                            '    Dim dtPembayaran As DataTable = CType(GridControlPembayaran.DataSource, DataTable)
+                            '    Dim jenisBayarJurnal As String = DapatkanJenisBayarSpesifik(dtPembayaran)
+
+                            '    Dim keteranganJurnal As String = "Pembelian Paket " & namaPaket & " " & jenisBayarJurnal & " - No. Transaksi: " & _nomorUrutTransaksi
+
+                            '    Dim jsonJurnal As String = "{" & _
+                            '        """poli"":""" & poliParam & """," & _
+                            '        """nominal"":" & nominalPaket.ToString().Replace(",", ".") & "," & _
+                            '        """jenis_bayar"":""" & jenisBayarJurnal & """," & _
+                            '        """user_input"":""" & userInput & """," & _
+                            '        BaseKeteranganJson(keteranganJurnal) & _
+                            '        "}"
+
+                            '    'MsgBox("[DEBUG 3 - Beli Reguler] JSON Payload:" & vbCrLf & jsonJurnal)
+
+                            '    Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+                            '    Dim StatusUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_jurnal_status'")
+                            '    Dim urlApiJurnal As String = baseURL & "api/jurnal/transaksi/beliPaket" & If(StatusUrl = "Dev", "/Stg", "")
+
+                            '    'MsgBox("[DEBUG 4 - Beli Reguler] URL Tujuan: " & vbCrLf & urlApiJurnal)
+
+                            '    Dim responseJurnal As String = InsertDataAPIRMOld(jsonJurnal, urlApiJurnal)
+
+                            '    'MsgBox("[DEBUG 5 - Beli Reguler] HASIL AKHIR API: " & responseJurnal, MsgBoxStyle.Information, "Info Jurnal")
+
+                            'Catch exJurnal As Exception
+                            '    'MsgBox("[DEBUG ERROR - Beli Reguler] Gagal Bridging Jurnal: " & exJurnal.Message & vbCrLf & exJurnal.StackTrace, MsgBoxStyle.Critical, "Error Jurnal")
+                            'End Try
+
+
+                            ' =======================================================
+                            ' BLOK 2: JIKA PAKET PER-TINDAKAN
+                            ' =======================================================
+                        ElseIf jenisPaket = "Paket Per-Tindakan" Then
+
+                            Dim detailJson As String = rowTindakan("DetailTindakan").ToString()
+
+                            If detailJson <> "" Then
+                                Dim dtTindakan As DataTable = JsonToDataTable(detailJson)
+                                For Each rowDetail As DataRow In dtTindakan.Rows
+                                    Dim paket As New Dictionary(Of String, Object)
+                                    Dim namaTindakan As String = rowDetail("NamaTindakan").ToString()
+                                    Dim tindakanID As String = rowDetail("TindakanID").ToString()
+                                    Dim kuotaTindakan As Integer = Convert.ToInt32(rowDetail("KuotaTindakan"))
+                                    Dim listTindakanApi As New List(Of String)
+
+                                    listTindakanApi.Add(namaTindakan)
+
+                                    paket.Add("id_paket", rowTindakan("PaketID").ToString())
+                                    paket.Add("kode_voucher", voucherID)
+                                    paket.Add("id_tindakan", tindakanID)
+                                    paket.Add("tindakan", listTindakanApi)
+                                    paket.Add("qty", 0)
+                                    paket.Add("qty_total", kuotaTindakan)
+                                    paket.Add("tgl_pembelian", tglPembelian)
+                                    paket.Add("tgl_perawatan", Nothing)
+
+                                    paketList.Add(paket)
+                                Next
+                            End If
+
+                            ' -----------------------------------------------------
+                            ' 🔥 BRIDGE JURNAL BARU (Beli Paket Per-Tindakan)
+                            ' -----------------------------------------------------
+                            'Try
+                            '    Dim nominalPaket As Double = CDbl(rowTindakan("Harga Nett"))
+                            '    Dim namaPaket As String = rowTindakan("Nama Paket").ToString()
+
+                            '    'MsgBox("[DEBUG 1 - Beli Per-Tindakan] Nama Paket: " & namaPaket & vbCrLf & "Nominal (Double): " & nominalPaket)
+
+                            '    Dim namaPoliLokal As String = _namaPoli.ToString().ToUpper()
+                            '    Dim poliParam As String = ""
+
+                            '    If namaPoliLokal.Contains("KECANTIKAN") Then
+                            '        poliParam = "kecantikan"
+                            '    ElseIf namaPoliLokal.Contains("HBOT") Then
+                            '        poliParam = "hbot"
+                            '    ElseIf namaPoliLokal.Contains("FISIO") Then
+                            '        poliParam = "fisio"
+                            '    Else
+                            '        poliParam = "kecantikan"
+                            '    End If
+
+                            '    'MsgBox("[DEBUG 2 - Beli Per-Tindakan] Poli Lokal: " & namaPoliLokal & vbCrLf & "Poli Param: " & poliParam)
+
+                            '    Dim dtPembayaran As DataTable = CType(GridControlPembayaran.DataSource, DataTable)
+                            '    Dim jenisBayarJurnal As String = DapatkanJenisBayarSpesifik(dtPembayaran)
+
+                            '    Dim keteranganJurnal As String = "Pembelian Paket " & namaPaket & " - No. Transaksi: " & _nomorUrutTransaksi
+
+                            '    Dim jsonJurnal As String = "{" & _
+                            '        """poli"":""" & poliParam & """," & _
+                            '        """nominal"":" & nominalPaket.ToString().Replace(",", ".") & "," & _
+                            '        """jenis_bayar"":""" & jenisBayarJurnal & """," & _
+                            '        """user_input"":""" & userInput & """," & _
+                            '        BaseKeteranganJson(keteranganJurnal) & _
+                            '        "}"
+
+                            '    'MsgBox("[DEBUG 3 - Beli Per-Tindakan] JSON Payload:" & vbCrLf & jsonJurnal)
+
+                            '    Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+                            '    Dim StatusUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_jurnal_status'")
+                            '    Dim urlApiJurnal As String = baseURL & "api/jurnal/transaksi/beliPaket" & If(StatusUrl = "Dev", "/Stg", "")
+
+                            '    'MsgBox("[DEBUG 4 - Beli Per-Tindakan] URL Tujuan: " & vbCrLf & urlApiJurnal)
+
+                            '    Dim responseJurnal As String = InsertDataAPIRMOld(jsonJurnal, urlApiJurnal)
+
+                            '    'MsgBox("[DEBUG 5 - Beli Per-Tindakan] HASIL AKHIR API: " & responseJurnal, MsgBoxStyle.Information, "Info Jurnal")
+
+                            'Catch exJurnal As Exception
+                            '    'MsgBox("[DEBUG ERROR - Beli Per-Tindakan] Gagal Bridging Jurnal: " & exJurnal.Message & vbCrLf & exJurnal.StackTrace, MsgBoxStyle.Critical, "Error Jurnal")
+                            'End Try
+
+                        End If
 
                         ' Insert Tabel TransaksiPaketTindakanDetail
                         Dim tblPaketDetail As DataTable = ReadSQL("SELECT * FROM MasterPaketTindakanDetail WHERE PaketID = '" & rowTindakan("PaketID") & "'")
@@ -1177,10 +1630,21 @@ Public Class FormPembayaran
 
                     Dim jsonParam As String = JsonConvert.SerializeObject(payload)
 
-                    Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
-                    Dim urlWebService As String = baseURL & "api/lumiera-luzelle/treatment-package"
+                    Dim secretKey As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_payloadEnkrip'")
 
-                    Dim responseApi As String = InsertDataAPIRM(jsonParam, urlWebService)
+                    Dim encrypted As String = EncryptAES(jsonParam, secretKey)
+
+                    If String.IsNullOrEmpty(encrypted) Then
+                        MsgBox("Encrypt gagal!")
+                        Exit Sub
+                    End If
+
+                    Dim postData As String = "{""payload"":""" & encrypted & """}"
+
+                    Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+                    Dim urlWebService As String = baseURL & "api/lumiera-luzelle/treatment-package/dev"
+
+                    Dim responseApi As String = InsertDataAPIRMInformConsent(postData, urlWebService)
 
                     If responseApi.ToLower().Contains("""success"":true") Then
                         MsgBox("Paket berhasil terkirim ke API: " & _nomorUrutTransaksi)
@@ -1208,6 +1672,9 @@ Public Class FormPembayaran
 
                 ' Insert / Update Detail Waktu Transaksi (WaktuSelesaiPendaftaran)
                 SetDetailWaktuTransaksi(_nomorUrutTransaksi, "WaktuSelesaiPendaftaran", userInput)
+
+                'Send Validator
+                SendInvoiceValidator("PEMERIKSAAN")
 
                 ' Pesan Success
                 If NoUrutBPJS = "" Then
@@ -1267,6 +1734,8 @@ Public Class FormPembayaran
                         'WriteSQL("UPDATE TransaksiPoliDetail SET  BiayaTindakan = " & CDbl(Trow("Biaya Tindakan")) & ", DiscTindakan = " & CDbl(Trow("DiscNilai")) & ", NettBayar = " & CDbl(Trow("NettBayar")) & ", admin = '" & userInput & "', transaksitime = GETDATE(), DiscPersenTindakan = " & CDbl(Trow("DiscTindakan")) & ", GroupBayar = '" & NoPembayaran & "', StatusPembayaran = 'PAID' " & _
                         '         "WHERE TransPoliIDDetail = '" & Trow("TransPoliIDDetail") & "' AND TransPoliID = '" & _idTransaksi & "' AND TindakanID = '" & Trow("TindakanID") & "' AND NamaTindakan = '" & Trow("Tindakan") & "' AND JenisTindakan = '" & Trow("Jenis") & "'", 4)
 
+                        Dim transDetailID As String = Trow("TransPoliIDDetail").ToString()
+
                         WriteSQL("UPDATE TransaksiPoliDetail SET " & _
                               "BiayaTindakan = " & CDbl(Trow("Biaya Tindakan")) & ", " & _
                               "DiscTindakan = " & CDbl(Trow("DiscNilai")) & ", " & _
@@ -1283,7 +1752,140 @@ Public Class FormPembayaran
                               "AND NamaTindakan = '" & Trow("Tindakan").ToString().Replace("'", "''") & "' " & _
                               "AND JenisTindakan = '" & Trow("Jenis").ToString().Replace("'", "''") & "'", 4)
 
-                        
+
+                        ' ===============================
+                        ' FINALISASI PEMAKAIAN ALAT
+                        ' ===============================
+                        WriteSQL( _
+                             "UPDATE LogPemakaianAlat SET Status = 1 " & _
+                             "WHERE TransaksiDetailID = '" & _
+                             Trow("TransPoliIDDetail") & "' " & _
+                             "AND Status = 0 " & _
+                             "AND IsVoid = 0", 4)
+
+                        ' ===============================
+                        ' POTONG KUOTA CARTRIDGE (FINAL)
+                        ' ===============================
+                        WriteSQL( _
+                            "UPDATE MC SET " & _
+                            "MC.KuotaTerpakai = MC.KuotaTerpakai + LPA.ShootDipakai " & _
+                            "FROM MasterCartridge MC " & _
+                            "INNER JOIN LogPemakaianAlat LPA ON MC.CartridgeID = LPA.CartridgeID " & _
+                            "WHERE LPA.TransaksiDetailID = '" & _
+                            Trow("TransPoliIDDetail") & "' " & _
+                            "AND LPA.Status = 1 " & _
+                            "AND LPA.IsVoid = 0", 4)
+
+                        Dim sqlSelect As String = _
+                            "SELECT MA.IdRuangan, MC.KodeCartridge, LPA.ShootDipakai " & _
+                            "FROM MasterAlat MA " & _
+                            "INNER JOIN MasterCartridge MC ON MA.AlatID = MC.AlatID " & _
+                            "INNER JOIN LogPemakaianAlat LPA ON MC.CartridgeID = LPA.CartridgeID " & _
+                            "WHERE LPA.TransaksiDetailID = '" & transDetailID & "' " & _
+                            "AND LPA.Status = 1 AND LPA.IsVoid = 0"
+
+                        Dim dtBridging As DataTable = ReadSQL(sqlSelect)
+
+                        If dtBridging IsNot Nothing AndAlso dtBridging.Rows.Count > 0 Then
+                            For Each row As DataRow In dtBridging.Rows
+                                Try
+                                    Dim dataContent As New Dictionary(Of String, Object)()
+                                    dataContent.Add("nau_date", DateTime.Now.ToString("yyyy-MM-dd"))
+                                    dataContent.Add("loc_code", "LLMR")
+                                    dataContent.Add("room_id", Convert.ToInt32(row("IdRuangan")))
+                                    dataContent.Add("item_code", row("KodeCartridge").ToString())
+                                    dataContent.Add("qty", Convert.ToInt32(row("ShootDipakai")))
+                                    dataContent.Add("satuan", "Shoot")
+                                    dataContent.Add("nau_notes", "Bridging otomatis API")
+
+                                    Dim finalPayload As New Dictionary(Of String, Object)()
+                                    finalPayload.Add("payload", dataContent)
+
+                                    Dim jsonString As String = Newtonsoft.Json.JsonConvert.SerializeObject(finalPayload)
+                                    MsgBox(jsonString)
+
+                                    Dim baseUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+                                    Dim apiUrl As String = baseUrl & "api/bridging/ext"
+
+                                    Dim apiResponse As String = InsertDataAPIRM(jsonString, apiUrl)
+
+                                    MsgBox("Response Server: " & apiResponse)
+
+                                Catch ex As Exception
+                                    MsgBox("Gagal mengirim data ke bridging sarpras (Masih Pengembangan): " & ex.Message, MsgBoxStyle.Critical)
+                                End Try
+
+                                ' =======================================================================
+                                ' 🔥 BRIDGE KE API JURNAL BARU (Pemakaian Alat / BHP Alat dengan Nominal Query)
+                                ' =======================================================================
+                                'Try
+                                '    ' 1. Ambil Kunci Cartridge dari row dtBridging yang sedang aktif
+                                '    Dim cartridgeID As String = row("KodeCartridge").ToString()
+                                '    'MsgBox("[DEBUG 1 - Pembayaran] Memproses Jurnal untuk KodeCartridge: " & cartridgeID & vbCrLf & "TransDetailID: " & transDetailID)
+
+                                '    ' 2. Eksekusi Query dengan mengunci TransaksiDetailID DAN KodeCartridge/CartridgeID
+                                '    Dim sqlNominal As String = _
+                                '        "SELECT CAST(ISNULL(LPA.HargaBeli * LPA.ShootDipakai, 0) AS VARCHAR) " & _
+                                '        "FROM LogPemakaianAlat LPA " & _
+                                '        "INNER JOIN MasterCartridge MC ON LPA.CartridgeID = MC.CartridgeID " & _
+                                '        "WHERE LPA.TransaksiDetailID = '" & transDetailID & "' " & _
+                                '        "AND MC.KodeCartridge = '" & cartridgeID & "'"
+
+                                '    Dim strNominal As String = ReadSQLNIK(sqlNominal)
+                                '    'MsgBox("[DEBUG 2 - Pembayaran] Hasil baca SQL strNominal: '" & strNominal & "'")
+
+                                '    Dim nominalAlat As Double = 0.0R
+
+                                '    If Not String.IsNullOrEmpty(strNominal) Then
+                                '        Double.TryParse(strNominal.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, nominalAlat)
+                                '    End If
+                                '    'MsgBox("[DEBUG 3 - Pembayaran] Hasil konversi nominalAlat (Double): " & nominalAlat)
+
+                                '    ' 3. Sinkronisasi nama poli berdasarkan form lokal
+                                '    Dim namaPoliLokal As String = _namaPoli.ToString().ToUpper()
+                                '    Dim poliParam As String = ""
+
+                                '    If namaPoliLokal.Contains("KECANTIKAN") Then
+                                '        poliParam = "kecantikan"
+                                '    ElseIf namaPoliLokal.Contains("HBOT") Then
+                                '        poliParam = "hbot"
+                                '    ElseIf namaPoliLokal.Contains("FISIO") Then
+                                '        poliParam = "fisio"
+                                '    Else
+                                '        poliParam = ""
+                                '    End If
+                                '    'MsgBox("[DEBUG 4 - Pembayaran] _namaPoli Lokal: " & namaPoliLokal & vbCrLf & "poliParam Final: " & poliParam)
+
+                                '    ' 4. Susun keterangan jurnal pemakaian alat
+                                '    Dim namaAlat As String = Trow("Tindakan").ToString()
+                                '    Dim keteranganJurnal As String = "Pemakaian BHP Alat: " & namaAlat & " [Cartridge ID: " & cartridgeID & "] - No. Transaksi: " & _nomorUrutTransaksi
+
+                                '    ' 5. Susun JSON String manual
+                                '    Dim jsonJurnal As String = "{" & _
+                                '        """poli"":""" & poliParam & """," & _
+                                '        """nominal"":" & nominalAlat.ToString().Replace(",", ".") & "," & _
+                                '        """user_input"":""" & userInput & """," & _
+                                '        BaseKeteranganJson(keteranganJurnal) & _
+                                '        "}"
+                                '    'MsgBox("[DEBUG 5 - Pembayaran] JSON Jurnal yang akan dikirim: " & vbCrLf & jsonJurnal)
+
+                                '    ' 6. Kirim ke endpoint penggunaanAlat di Laravel
+                                '    Dim baseUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+                                '    Dim StatusUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_jurnal_status'")
+                                '    Dim urlApiJurnal As String = baseUrl & "api/jurnal/transaksi/penggunaanAlat" & If(StatusUrl = "Dev", "/Stg", "")
+
+                                '    'MsgBox("[DEBUG 6 - Pembayaran] URL API Jurnal: " & vbCrLf & urlApiJurnal)
+
+                                '    Dim responseJurnal As String = InsertDataAPIRMOld(jsonJurnal, urlApiJurnal)
+
+                                '    'MsgBox("[DEBUG 7 - Pembayaran] HASIL RESPON API: " & responseJurnal, MsgBoxStyle.Information, "Info Jurnal")
+
+                                'Catch exJurnal As Exception
+                                '    'MsgBox("[DEBUG ERROR - Pembayaran] Gagal Kirim Jurnal Alat: " & exJurnal.Message & vbCrLf & exJurnal.StackTrace, MsgBoxStyle.Critical, "Error Jurnal")
+                                'End Try
+                                ' =======================================================================
+                            Next
+                        End If
 
                     End If
 
@@ -1323,11 +1925,10 @@ Public Class FormPembayaran
 
                 WriteSQL("UPDATE TransaksiPoli SET TotalTagihan = TotalTagihan + " & CDbl(txtotalbruto) & ", TotalDisc = TotalDisc + " & CDbl(txtotaldisc) & ", Pembulatan = Pembulatan + " & CDbl(txtotalpembulatan) & ", NettBayar = NettBayar + " & CDbl(TextBoxTotalTagihan.Value) & ", TotalBayar = TotalBayar + " & CDbl(TextBoxTotalBayar.Value) & ", Pengembalian = Pengembalian + " & CDbl(TextBoxTotalKembali.Value) & ", ClosedBayar = '" & Format(DateAndTime.Now, "MM/dd/yyyy") & "', Status = 'CLOSED' WHERE TransPoliID = '" & _idTransaksi & "'", 4)
 
-
                 ' ================================
                 ' UPDATE JUMLAH TERPAKAI VOUCHER
                 ' ================================
-                If _kodeVoucher.Trim() <> "" Then
+                If _kodeVoucher.Trim() <> "" AndAlso CDbl(txtotaldisc) > 0 Then
                     Try
                         Dim sqlUpdateVoucher As String = _
                             "UPDATE MasterVoucher SET " & _
@@ -1383,6 +1984,9 @@ Public Class FormPembayaran
                 'If Jeniscetak = "Struk" Then
                 '    Report.PageHeight = txtotalrow
                 'End If
+
+                'Send Validator
+                SendInvoiceValidator("TINDAKAN")
 
                 ' Pesan Success
                 MsgBox("Berhasil Menyimpan Data Transaksi." & vbCrLf & "No Transaksi : " & _nomorUrutTransaksi, MsgBoxStyle.Information, "Success!")
@@ -1783,7 +2387,7 @@ Public Class FormPembayaran
                         If Trow("JenisBayar") = "TAGIHAN" Or Trow("JenisBayar") = "TUNAI" Then
                             Report.Bands.Item(BandKind.ReportFooter).Controls(Tket).Text = Trow("JenisBayar") & " - Jumlah : " & Splitmoney(Trow("JumlahBayar"))
                         Else
-                            Report.Bands.Item(BandKind.ReportFooter).Controls(Tket).Text = Trow("JenisBayar") & " - No Kartu : " & "*".PadRight(Len(Trow("NoJenisBayar")) - 3) & Strings.Right(Trow("NoJenisBayar"), 3) & Trow("kartu") & " - Jumlah : " & Splitmoney(Trow("JumlahBayar"))
+                            Report.Bands.Item(BandKind.ReportFooter).Controls(Tket).Text = Trow("JenisBayar") & " - No Kartu : " & "*".PadRight(Len(Trow("NoJenisBayar")) - 3) & "" & Strings.Right(Trow("NoJenisBayar"), 3) & Trow("kartu") & " - Jumlah : " & Splitmoney(Trow("JumlahBayar"))
                         End If
                     Next
                 Else
@@ -1831,7 +2435,37 @@ Public Class FormPembayaran
                 CheckBoxLunasBayar.Checked = True
             End If
         End If
+
+        _kodeVoucher = String.Empty
+        _idTransaksi = String.Empty
     End Sub
+
+    Private Function DapatkanJenisBayarSpesifik(ByVal dtBayar As DataTable) As String
+        ' Default fallback
+        Dim hasilJenisBayar As String = "TUNAI"
+
+        If dtBayar Is Nothing OrElse dtBayar.Rows.Count = 0 Then Return hasilJenisBayar
+
+        ' Ambil baris pembayaran pertama (atau loop jika ada multi-payment, tapi biasanya ambil yang utama)
+        For Each rowBayar As DataRow In dtBayar.Rows
+            Dim jenis As String = rowBayar("Jenis").ToString().Trim().ToUpper() ' DEBET, CARD, TUNAI, TAGIHAN
+            Dim mesin As String = rowBayar("MesinData").ToString().Trim().ToUpper() ' BCA, MANDIRI, QRIS
+
+            If jenis = "DEBET" OrElse jenis = "CARD" Then
+                ' Jika kartu, kita kembalikan nama mesinnya (Misal: "BCA", "MANDIRI", "QRIS")
+                hasilJenisBayar = mesin
+                Exit For
+            ElseIf jenis = "TAGIHAN" OrElse jenis = "PIUTANG" Then
+                hasilJenisBayar = "TAGIHAN"
+                Exit For
+            ElseIf jenis = "TUNAI" OrElse jenis = "CASH" Then
+                hasilJenisBayar = "TUNAI"
+                Exit For
+            End If
+        Next
+
+        Return hasilJenisBayar
+    End Function
 
     ' API PCare - Bridging Antrean (v2)
     Function SendPCareDataV2() As Boolean
@@ -2068,7 +2702,10 @@ Public Class FormPembayaran
 
     Function CreateXRPictureBox(ByVal imageSignature As Image, ByVal LocX As Integer, ByVal LocY As Integer, ByVal SizeX As Integer, ByVal SizeY As Integer) As XRPictureBox
         Dim PictureBox As XRPictureBox = New XRPictureBox()
-        PictureBox.Name = "QR_Hasil"
+
+        ' Gunakan Guid/Unik agar tidak bentrok jika dipanggil beberapa kali
+        PictureBox.Name = "QR_Hasil_" & Guid.NewGuid().ToString("N")
+
         PictureBox.Image = imageSignature
         PictureBox.Location = New Point(LocX, LocY)
         PictureBox.Size = New Size(SizeX, SizeY)
@@ -2096,67 +2733,52 @@ Public Class FormPembayaran
     End Sub
 
     Private Sub GenerateInvoice(ByVal JenisTransaksi As String, ByVal JenisProses As String, ByVal NomorTransaksi As String)
+        ' Validator
+        Dim validatorURL As String = ReadSQLNIK("SELECT TOP 1 ValidatorURL FROM TransaksiDetail WHERE NoUrut = '" & NomorTransaksi & "'")
+
         ' Validasi Pembayaran
         If CheckBoxLunasBayar.Checked = False Then
             MessageBox.Show("Gagal!. Transaksi belum dilakukan pembayaran.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
             Exit Sub
         End If
 
-        'TransPoliID
+        ' TransPoliID
         Dim transPoliIDDT As DataTable = ReadSQL("SELECT TransPoliID FROM TransaksiPoli WHERE NoUrut ='" & NomorTransaksi & "'")
         Dim transPoliID As String = ""
         If transPoliIDDT.Rows.Count > 0 Then
             transPoliID = transPoliIDDT.Rows(0)("TransPoliID").ToString()
         Else
-            ' Handle jika tidak ditemukan
             MsgBox("TransPoliID tidak ditemukan!")
             Exit Sub
         End If
 
-        'Filter Transaksi
+        ' Filter Transaksi
         Dim filterAwal As String = ""
-
         If JenisTransaksi = "AWAL" Then
             filterAwal = "AND Awal = '1'"
         ElseIf JenisTransaksi = "UMUM" Then
             filterAwal = "AND Awal = '0'"
         End If
 
-        'Dim queryAwal As String = "" & _
-        '     "SELECT " & _
-        '         "TindakanID, " & _
-        '         "MAX(NamaTindakan) AS Tindakan, " & _
-        '         "MAX(JenisTindakan) AS Jenis, " & _
-        '         "MAX(BiayaTindakan) AS [Biaya Tindakan], " & _
-        '         "COUNT(*) AS Qty, " & _
-        '         "SUM(BiayaTindakan) AS SubTotal, " & _
-        '         "MAX(DiscTindakan) AS Diskon, " & _
-        '         "SUM(BiayaTindakan - ISNULL(DiscTindakan, 0)) AS NettBayar " & _
-        '     "FROM TransaksiPoliDetail " & _
-        '     "WHERE TransPoliID = '" & transPoliID & "' " & _
-        '         "AND DeletedBy IS NULL " & _
-        '         filterAwal & " " & _
-        '     "GROUP BY TindakanID"
-
         Dim queryAwal As String = "" & _
             "SELECT " & _
-            "TindakanID, " & _
-            "NamaTindakan AS Tindakan, " & _
-            "JenisTindakan AS Jenis, " & _
-            "BiayaTindakan AS [Biaya Tindakan], " & _
-            "DiscTindakan AS Diskon, " & _
-            "1 AS Qty, " & _
-            "(BiayaTindakan - ISNULL(DiscTindakan, 0)) AS NettBayar, " & _
-            "(BiayaTindakan - ISNULL(DiscTindakan, 0)) AS SubTotal " & _
+            "   TindakanID, " & _
+            "   PaketID, " & _
+            "   MAX(NamaTindakan) AS Tindakan, " & _
+            "   MAX(JenisTindakan) AS Jenis, " & _
+            "   MAX(BiayaTindakan) AS [Biaya Tindakan], " & _
+            "   COUNT(*) AS Qty, " & _
+            "   SUM(BiayaTindakan) AS SubTotal, " & _
+            "   MAX(DiscTindakan) AS Diskon, " & _
+            "   SUM(BiayaTindakan - ISNULL(DiscTindakan, 0)) AS NettBayar " & _
             "FROM TransaksiPoliDetail " & _
             "WHERE TransPoliID = '" & transPoliID & "' " & _
-            "AND DeletedBy IS NULL " & _
-            filterAwal
+            "  AND DeletedBy IS NULL " & _
+            filterAwal & " " & _
+            "GROUP BY TindakanID, PaketID"
 
         ' Eksekusi query ke DataTable
         Dim tblTindakan As DataTable = ReadSQL(queryAwal)
-
-
 
         ' Set Data Pasien
         Dim tblsPasien As DataTable = ReadSQL("SELECT NoHandphone, Email, NoRekamMedis, Nama + ' / (' + JenisKelamin + ')' AS 'Nama', YEAR(TglLahir) AS 'TahunLahir', MONTH(TglLahir) AS 'BulanLahir', DAY(TglLahir) AS 'TanggalLahir', " & _
@@ -2177,6 +2799,7 @@ Public Class FormPembayaran
 
         Dim NewHeader As DataTable = CreateTable()
         NewHeader.Rows.Clear()
+
         For Each rowTindakan As DataRow In tblTindakan.Rows
             Dim Tnew As DataRow = NewHeader.NewRow
 
@@ -2204,88 +2827,47 @@ Public Class FormPembayaran
                 Tnew("lbltitikStatusAmbil") = ""
             End If
 
-            'MsgBox("Debug Info:" & vbCrLf & _
-            '           "harga awal: " & rowTindakan("Harga Awal") & _
-            '           "biaya:" & rowTindakan("Biaya Tindakan"))
-
-            If statusQR = True Then
-                ' Gunakan kolom "DiscNilai" dari hasil query, bukan "Diskon"
-                Dim diskon As Decimal = 0
-                If rowTindakan.Table.Columns.Contains("Diskon") AndAlso Not IsDBNull(rowTindakan("Diskon")) Then
-                    diskon = Convert.ToDecimal(rowTindakan("Diskon"))
-                End If
-
-                ' Hitung persentase diskon
-                Dim hargaAwal As Decimal = Convert.ToDecimal(rowTindakan("Biaya Tindakan"))
-                Dim discTindakan As Decimal = 0
-                If hargaAwal > 0 Then
-                    discTindakan = (diskon / hargaAwal) * 100
-                End If
-
-                'Debug.WriteLine("Biaya: " & hargaAwal)
-                'Debug.WriteLine("Diskon: " & diskon)
-                'Debug.WriteLine("Diskon Persen: " & discTindakan)
-
-                ' Assign data ke row baru
-                Tnew("TindakanID") = rowTindakan("TindakanID").ToString()
-                Tnew("Tindakan") = rowTindakan("Tindakan")
-                Tnew("Jenis") = rowTindakan("Jenis")
-                Tnew("Biaya Tindakan") = hargaAwal
-                Tnew("DiscTindakan") = discTindakan.ToString("0.##") & "%"
-                Tnew("DiscNilai") = diskon
-                Tnew("NettBayar") = rowTindakan("NettBayar")
-                Tnew("Qty") = rowTindakan("Qty")
-                Tnew("SubTotal") = Convert.ToDecimal(Tnew("NettBayar")) * Convert.ToInt32(Tnew("Qty"))
-
-            Else
-                Dim diskon As Decimal = 0
-                If rowTindakan.Table.Columns.Contains("Diskon") AndAlso Not IsDBNull(rowTindakan("Diskon")) Then
-                    diskon = Convert.ToDecimal(rowTindakan("Diskon"))
-                End If
-
-                Dim hargaAwal As Decimal = Convert.ToDecimal(rowTindakan("Biaya Tindakan"))
-                Dim discTindakan As Decimal = 0
-                If hargaAwal > 0 Then
-                    discTindakan = (diskon / hargaAwal) * 100
-                End If
-
-                Tnew("TindakanID") = rowTindakan("TindakanID")
-                Tnew("Tindakan") = rowTindakan("Tindakan")
-                Tnew("Jenis") = rowTindakan("Jenis")
-                Tnew("Biaya Tindakan") = hargaAwal
-                Tnew("DiscTindakan") = discTindakan.ToString("0.##") & "%"
-                Tnew("DiscNilai") = diskon
-                Tnew("NettBayar") = rowTindakan("NettBayar")
-                Tnew("Qty") = rowTindakan("Qty")
-                Tnew("SubTotal") = Convert.ToDecimal(Tnew("NettBayar")) * Convert.ToInt32(Tnew("Qty"))
+            Dim diskon As Decimal = 0
+            If rowTindakan.Table.Columns.Contains("Diskon") AndAlso Not IsDBNull(rowTindakan("Diskon")) Then
+                diskon = Convert.ToDecimal(rowTindakan("Diskon"))
             End If
 
+            Dim hargaAwal As Decimal = Convert.ToDecimal(rowTindakan("Biaya Tindakan"))
+            Dim discTindakan As Decimal = 0
+            If hargaAwal > 0 Then
+                discTindakan = (diskon / hargaAwal) * 100
+            End If
+
+            Tnew("TindakanID") = rowTindakan("TindakanID")
+            Tnew("Tindakan") = rowTindakan("Tindakan")
+            Tnew("Jenis") = rowTindakan("Jenis")
+            Tnew("Biaya Tindakan") = rowTindakan("SubTotal")
+            Tnew("DiscTindakan") = discTindakan.ToString("0.##") & "%"
+            Tnew("DiscNilai") = diskon
+            Tnew("NettBayar") = rowTindakan("NettBayar")
+            Tnew("Qty") = rowTindakan("Qty")
+            Tnew("SubTotal") = Convert.ToDecimal(Tnew("NettBayar")) * Convert.ToInt32(Tnew("Qty"))
 
             NewHeader.Rows.Add(Tnew)
         Next
 
-        Report = New XtraReport
-
-        ' Set report berdasarkan jenis proses
-        Select Case JenisProses
-            Case "Preview"
-                Report = XtraReport.FromFile(Application.StartupPath + "\reports\Resource\PrintInvoiceTransaksiKop.repx", True)
-            Case "Cetak"
-                Report = XtraReport.FromFile(Application.StartupPath + "\reports\Resource\PrintInvoiceTransaksiKop.repx", True)
-            Case "Export PDF"
-                Report = XtraReport.FromFile(Application.StartupPath + "\reports\Resource\PrintInvoiceTransaksiKop.repx", True)
-            Case "WhatsApp"
-                Report = XtraReport.FromFile(Application.StartupPath + "\reports\Resource\PrintInvoiceTransaksiKop.repx", True)
-            Case "Email"
-                Report = XtraReport.FromFile(Application.StartupPath + "\reports\Resource\PrintInvoiceTransaksiKop.repx", True)
-        End Select
-
+        Report = New XtraReport()
+        Report = XtraReport.FromFile(Application.StartupPath & "\reports\Resource\PrintInvoiceTransaksiKop.repx", True)
         Report.DataSource = NewHeader
-        'Report.RunDesigner()
 
-        Dim tblPembayaran As New DataTable
-        Dim nominalTotalInvoice As Double
-        Dim nominalKembaliInvoice As Double
+        If validatorURL <> "" Then
+            Dim Generator As New MessagingToolkit.Barcode.BarcodeEncoder()
+            Dim qrImage As Bitmap = Generator.Encode(MessagingToolkit.Barcode.BarcodeFormat.QRCode, validatorURL)
+
+            Dim picQR As XRPictureBox = CType(Report.FindControl("xrValidator", True), XRPictureBox)
+            If Not picQR Is Nothing Then
+                picQR.Image = qrImage
+            End If
+        End If
+
+        Dim tblPembayaran As New DataTable()
+        Dim nominalTotalInvoice As Double = 0
+        Dim nominalKembaliInvoice As Double = 0
 
         ' Set data pembayaran transaksi
         Select Case JenisTransaksi
@@ -2300,20 +2882,6 @@ Public Class FormPembayaran
             Case "AWALGIGI"
                 tblPembayaran = ReadSQL("SELECT * FROM TransaksiGigiBayarAwal WHERE TransGigiID IN (SELECT TransGigiID FROM TransaksiGigi WHERE NoUrut = '" & NomorTransaksi & "')")
         End Select
-
-        'For i As Integer = 1 To tblPembayaran.Rows.Count
-        '    Dim rowPembayaran As DataRow = tblPembayaran.Rows(i - 1)
-        '    Dim Tket As String = "bayar" & i
-        '    Report.Bands.Item(BandKind.ReportFooter).Controls(Tket).Visible = True
-        '    If rowPembayaran("JenisBayar") = "TAGIHAN" Or rowPembayaran("JenisBayar") = "TUNAI" Then
-        '        Report.Bands.Item(BandKind.ReportFooter).Controls(Tket).Text = rowPembayaran("JenisBayar") & " - Jumlah : " & Splitmoney(rowPembayaran("JumlahBayar")) & " (" & rowPembayaran("NoJenisBayar").ToString & ")"
-        '    Else
-        '        Report.Bands.Item(BandKind.ReportFooter).Controls(Tket).Text = rowPembayaran("JenisBayar") & " - No Kartu : " & "*".PadRight(Len(rowPembayaran("NoJenisBayar")) - 3) & Strings.Right(rowPembayaran("NoJenisBayar"), 3) & rowPembayaran("kartu") & " - Jumlah : " & Splitmoney(rowPembayaran("JumlahBayar"))
-        '    End If
-
-        '    nominalTotalInvoice = nominalTotalInvoice + rowPembayaran("JumlahBayar")
-        '    nominalKembaliInvoice = nominalKembaliInvoice + rowPembayaran("Kembali")
-        'Next
 
         For i As Integer = 1 To tblPembayaran.Rows.Count
             Dim rowPembayaran As DataRow = tblPembayaran.Rows(i - 1)
@@ -2340,51 +2908,47 @@ Public Class FormPembayaran
         Report.Bands.Item(BandKind.ReportFooter).Controls("lblBayar").Text = Splitmoney(nominalTotalInvoice)
         Report.Bands.Item(BandKind.ReportFooter).Controls("lblKembalian").Text = Splitmoney(nominalKembaliInvoice)
         Report.Bands.Item(BandKind.BottomMargin).Controls("lbladmin").Text = userInput
-        Report.Bands.Item(BandKind.BottomMargin).Controls("lbltanggalcetak").Text = Format(DateAndTime.Now, "dd-MMM-yyyy HH:mmm:ss")
+        Report.Bands.Item(BandKind.BottomMargin).Controls("lbltanggalcetak").Text = Format(DateAndTime.Now, "dd-MMM-yyyy HH:mm:ss")
 
         ' Set QR (Report)
         If statusQR = True Then
-            Dim Generator As New MessagingToolkit.Barcode.BarcodeEncoder
+            Dim Generator As New MessagingToolkit.Barcode.BarcodeEncoder()
             Dim qrImage As Bitmap = New Bitmap(Generator.Encode(MessagingToolkit.Barcode.BarcodeFormat.QRCode, keteranganQR))
 
             Dim pictureBox As XRPictureBox = CreateXRPictureBox(qrImage, 0, 0, 175, 100)
             Dim panelQR As XRPanel = CType(Report.Bands(BandKind.ReportFooter).Controls("xrPanelQR"), XRPanel)
 
-            ' Add pictureBox
             panelQR.Controls.Add(pictureBox)
-
-            ' Set Visible
             panelQR.Visible = True
             Report.Bands.Item(BandKind.ReportFooter).Controls("xrLabelKodeVoucher").Visible = True
         End If
 
-        ' Simpan Softfile PDF jika memilih WhatsApp & Email
+        ' 🟢 1. SIMPAN PDF DAHULU (Wajib diselesaikan sebelum dikirim via WA / Email)
         If JenisProses = "WhatsApp" Or JenisProses = "Email" Then
-            ' Save PDF
             Dim NameFile As String = NomorTransaksi & "_" & JenisTransaksi
-            Dim folderPath As String = "FileDownload\Invoice\" & JenisTransaksi
+            Dim folderPath As String = Application.StartupPath & "\FileDownload\Invoice\" & JenisTransaksi
             Dim filepath As String = folderPath & "\" & NameFile & ".pdf"
 
-            ' Cek dan buat folder jika belum ada
             If Not System.IO.Directory.Exists(folderPath) Then
                 System.IO.Directory.CreateDirectory(folderPath)
             End If
 
-            ' Hapus file lama jika ada
             If System.IO.File.Exists(filepath) Then
                 System.IO.File.Delete(filepath)
             End If
 
-            ' Simpan PDF
+            ' Simpan file PDF
             Report.CreatePdfDocument(filepath)
         End If
 
-        ' Set report berdasarkan jenis proses
+        ' 🟢 2. EKSEKUSI SESUAI JENIS PROSES
         Select Case JenisProses
             Case "Preview"
                 Report.ShowPreview()
+
             Case "Cetak"
                 Report.Print()
+
             Case "Export PDF"
                 Dim sfd As New SaveFileDialog()
                 sfd.Title = "Simpan PDF"
@@ -2393,119 +2957,656 @@ Public Class FormPembayaran
 
                 If sfd.ShowDialog() = Windows.Forms.DialogResult.OK Then
                     Dim filepath As String = sfd.FileName
-
-                    ' Hapus file lama jika ada
                     If System.IO.File.Exists(filepath) Then
                         System.IO.File.Delete(filepath)
                     End If
-
-                    ' Simpan PDF ke lokasi yang dipilih user
                     Report.CreatePdfDocument(filepath)
                 End If
-            Case "WhatsApp"
-                thread = New System.Threading.Thread(AddressOf KirimInvoiceWhatsApp)
-                thread.Start()
-            Case "Email"
 
+            Case "WhatsApp"
+                ' Cek jika background worker sedang sibuk
+                If bgwKirimInvoiceWA.IsBusy Then
+                    MsgBox("Proses pengiriman invoice WhatsApp sebelumnya masih berjalan. Silakan tunggu.", MsgBoxStyle.Information, "Mohon Tunggu")
+                    Exit Select
+                End If
+
+                ' Jalankan background worker untuk mengirim PDF yang sudah siap
+                Dim p As New KirimInvoiceParams()
+                p.JenisTransaksi = JenisTransaksi
+                p.NomorTransaksi = NomorTransaksi
+                p.NamaPasien = TextBoxNama.Text
+                p.NoRekamMedis = _noRekamMedis
+
+                bgwKirimInvoiceWA.RunWorkerAsync(p)
+
+            Case "Email"
+                ' Tempat penanganan email
         End Select
     End Sub
 
-    Public Sub KirimInvoiceWhatsApp()
+    'Private Sub GenerateInvoice(ByVal JenisTransaksi As String, ByVal JenisProses As String, ByVal NomorTransaksi As String)
+    '    ' validator
+    '    Dim validatorURL As String = ReadSQLNIK("SELECT TOP 1 ValidatorURL FROM TransaksiDetail WHERE NoUrut = '" & NomorTransaksi & "'")
+
+    '    ' Validasi Pembayaran
+    '    If CheckBoxLunasBayar.Checked = False Then
+    '        MessageBox.Show("Gagal!. Transaksi belum dilakukan pembayaran.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+    '        Exit Sub
+    '    End If
+
+    '    'TransPoliID
+    '    Dim transPoliIDDT As DataTable = ReadSQL("SELECT TransPoliID FROM TransaksiPoli WHERE NoUrut ='" & NomorTransaksi & "'")
+    '    Dim transPoliID As String = ""
+    '    If transPoliIDDT.Rows.Count > 0 Then
+    '        transPoliID = transPoliIDDT.Rows(0)("TransPoliID").ToString()
+    '    Else
+    '        ' Handle jika tidak ditemukan
+    '        MsgBox("TransPoliID tidak ditemukan!")
+    '        Exit Sub
+    '    End If
+
+    '    'Filter Transaksi
+    '    Dim filterAwal As String = ""
+
+    '    If JenisTransaksi = "AWAL" Then
+    '        filterAwal = "AND Awal = '1'"
+    '    ElseIf JenisTransaksi = "UMUM" Then
+    '        filterAwal = "AND Awal = '0'"
+    '    End If
+
+    '    Dim queryAwal As String = "" & _
+    '        "SELECT " & _
+    '        "   TindakanID, " & _
+    '        "   PaketID, " & _
+    '        "   MAX(NamaTindakan) AS Tindakan, " & _
+    '        "   MAX(JenisTindakan) AS Jenis, " & _
+    '        "   MAX(BiayaTindakan) AS [Biaya Tindakan], " & _
+    '        "   COUNT(*) AS Qty, " & _
+    '        "   SUM(BiayaTindakan) AS SubTotal, " & _
+    '        "   MAX(DiscTindakan) AS Diskon, " & _
+    '        "   SUM(BiayaTindakan - ISNULL(DiscTindakan, 0)) AS NettBayar " & _
+    '        "FROM TransaksiPoliDetail " & _
+    '        "WHERE TransPoliID = '" & transPoliID & "' " & _
+    '        "  AND DeletedBy IS NULL " & _
+    '        filterAwal & " " & _
+    '        "GROUP BY TindakanID, PaketID"
+
+    '    'Dim queryAwal As String = "" & _
+    '    '    "SELECT " & _
+    '    '    "TindakanID, " & _
+    '    '    "NamaTindakan AS Tindakan, " & _
+    '    '    "JenisTindakan AS Jenis, " & _
+    '    '    "BiayaTindakan AS [Biaya Tindakan], " & _
+    '    '    "DiscTindakan AS Diskon, " & _
+    '    '    "1 AS Qty, " & _
+    '    '    "(BiayaTindakan - ISNULL(DiscTindakan, 0)) AS NettBayar, " & _
+    '    '    "(BiayaTindakan - ISNULL(DiscTindakan, 0)) AS SubTotal " & _
+    '    '    "FROM TransaksiPoliDetail " & _
+    '    '    "WHERE TransPoliID = '" & transPoliID & "' " & _
+    '    '    "AND DeletedBy IS NULL " & _
+    '    '    filterAwal
+
+    '    ' Eksekusi query ke DataTable
+    '    Dim tblTindakan As DataTable = ReadSQL(queryAwal)
+
+    '    ' Set Data Pasien
+    '    Dim tblsPasien As DataTable = ReadSQL("SELECT NoHandphone, Email, NoRekamMedis, Nama + ' / (' + JenisKelamin + ')' AS 'Nama', YEAR(TglLahir) AS 'TahunLahir', MONTH(TglLahir) AS 'BulanLahir', DAY(TglLahir) AS 'TanggalLahir', " & _
+    '                                          "CONVERT(VARCHAR(11),TglLahir,106) AS 'TanggalLengkap', DomisiliAlamat AS 'Alamat' " & _
+    '                                          "FROM MasterPasien WHERE NoRekamMedis = '" & TextBoxNomorRM.Text & "'")
+    '    Dim rowPasien As DataRow = tblsPasien.Rows(0)
+    '    Dim Tdate As Date = DateSerial(rowPasien("TahunLahir"), rowPasien("BulanLahir"), rowPasien("TanggalLahir"))
+
+    '    ' Set Nama Dokter
+    '    Dim namaDokter As String = ""
+    '    If JenisTransaksi = "LAB" Then
+    '        namaDokter = ReadSQLNIK("SELECT a.DrNama FROM MasterDokterKirim a LEFT JOIN MasterDokterTempatPraktek b ON a.IdKirim = b.IdKirim WHERE b.IdPraktek IN (SELECT DokterRequest FROM transaksilab WHERE NoUrut = '" & NomorTransaksi & "')")
+    '    ElseIf JenisTransaksi = "AWAL" Or JenisTransaksi = "UMUM" Then
+    '        namaDokter = ReadSQLNIK("SELECT DokterPoli FROM TransaksiPoli WHERE NoUrut = '" & NomorTransaksi & "'")
+    '    ElseIf JenisTransaksi = "AWALGIGI" Or JenisTransaksi = "GIGI" Then
+    '        namaDokter = ReadSQLNIK("SELECT DokterGigi FROM TransaksiGigi WHERE NoUrut = '" & NomorTransaksi & "'")
+    '    End If
+
+    '    Dim NewHeader As DataTable = CreateTable()
+    '    NewHeader.Rows.Clear()
+
+    '    For Each rowTindakan As DataRow In tblTindakan.Rows
+    '        Dim Tnew As DataRow = NewHeader.NewRow
+
+    '        ' Set Header
+    '        Tnew("Registrasi") = rowPasien("NoRekamMedis")
+    '        Tnew("Nama") = rowPasien("Nama")
+    '        Tnew("Umur") = rowPasien("TanggalLengkap") & " / " & Umur(Tdate.Date)
+    '        Tnew("Alamat") = rowPasien("Alamat")
+    '        Tnew("Tanggal") = Format(DateAndTime.Now, "dd-MMM-yyyy")
+    '        Tnew("NoTransaksi") = NomorTransaksi
+
+    '        If JenisTransaksi = "LAB" Then
+    '            Tnew("DrPengirim") = namaDokter
+    '            Tnew("StatusAmbil") = ReadSQLNIK("SELECT CaraAmbil FROM TransaksiLab WHERE NoUrut = '" & NomorTransaksi & "'")
+    '            Tnew("lblDokter") = "Dr. Pengirim"
+    '            Tnew("lblStatusAmbil") = "Status Ambil"
+    '            Tnew("lbltitikDokter") = ":"
+    '            Tnew("lbltitikStatusAmbil") = ":"
+    '        Else
+    '            Tnew("DrPengirim") = namaDokter
+    '            Tnew("StatusAmbil") = ""
+    '            Tnew("lblDokter") = "Dr. Pelaksana"
+    '            Tnew("lblStatusAmbil") = ""
+    '            Tnew("lbltitikDokter") = ":"
+    '            Tnew("lbltitikStatusAmbil") = ""
+    '        End If
+
+    '        'MsgBox("Debug Info:" & vbCrLf & _
+    '        '           "harga awal: " & rowTindakan("Harga Awal") & _
+    '        '           "biaya:" & rowTindakan("Biaya Tindakan"))
+
+    '        If statusQR = True Then
+    '            ' Gunakan kolom "DiscNilai" dari hasil query, bukan "Diskon"
+    '            Dim diskon As Decimal = 0
+    '            If rowTindakan.Table.Columns.Contains("Diskon") AndAlso Not IsDBNull(rowTindakan("Diskon")) Then
+    '                diskon = Convert.ToDecimal(rowTindakan("Diskon"))
+    '            End If
+
+    '            ' Hitung persentase diskon
+    '            Dim hargaAwal As Decimal = Convert.ToDecimal(rowTindakan("Biaya Tindakan"))
+    '            Dim discTindakan As Decimal = 0
+    '            If hargaAwal > 0 Then
+    '                discTindakan = (diskon / hargaAwal) * 100
+    '            End If
+
+    '            'Debug.WriteLine("Biaya: " & hargaAwal)
+    '            'Debug.WriteLine("Diskon: " & diskon)
+    '            'Debug.WriteLine("Diskon Persen: " & discTindakan)
+
+    '            ' Assign data ke row baru
+    '            Tnew("TindakanID") = rowTindakan("TindakanID").ToString()
+    '            Tnew("Tindakan") = rowTindakan("Tindakan")
+    '            Tnew("Jenis") = rowTindakan("Jenis")
+    '            Tnew("Biaya Tindakan") = rowTindakan("SubTotal")
+    '            Tnew("DiscTindakan") = discTindakan.ToString("0.##") & "%"
+    '            Tnew("DiscNilai") = diskon
+    '            Tnew("NettBayar") = rowTindakan("NettBayar")
+    '            Tnew("Qty") = rowTindakan("Qty")
+    '            Tnew("SubTotal") = Convert.ToDecimal(Tnew("NettBayar")) * Convert.ToInt32(Tnew("Qty"))
+
+    '        Else
+    '            Dim diskon As Decimal = 0
+    '            If rowTindakan.Table.Columns.Contains("Diskon") AndAlso Not IsDBNull(rowTindakan("Diskon")) Then
+    '                diskon = Convert.ToDecimal(rowTindakan("Diskon"))
+    '            End If
+
+    '            Dim hargaAwal As Decimal = Convert.ToDecimal(rowTindakan("Biaya Tindakan"))
+    '            Dim discTindakan As Decimal = 0
+    '            If hargaAwal > 0 Then
+    '                discTindakan = (diskon / hargaAwal) * 100
+    '            End If
+
+    '            Tnew("TindakanID") = rowTindakan("TindakanID")
+    '            Tnew("Tindakan") = rowTindakan("Tindakan")
+    '            Tnew("Jenis") = rowTindakan("Jenis")
+    '            Tnew("Biaya Tindakan") = rowTindakan("SubTotal")
+    '            Tnew("DiscTindakan") = discTindakan.ToString("0.##") & "%"
+    '            Tnew("DiscNilai") = diskon
+    '            Tnew("NettBayar") = rowTindakan("NettBayar")
+    '            Tnew("Qty") = rowTindakan("Qty")
+    '            Tnew("SubTotal") = Convert.ToDecimal(Tnew("NettBayar")) * Convert.ToInt32(Tnew("Qty"))
+    '        End If
+
+
+    '        NewHeader.Rows.Add(Tnew)
+    '    Next
+
+    '    Report = New XtraReport
+
+    '    ' Set report berdasarkan jenis proses
+    '    Select Case JenisProses
+    '        Case "Preview"
+    '            Report = XtraReport.FromFile(Application.StartupPath + "\reports\Resource\PrintInvoiceTransaksiKop.repx", True)
+    '        Case "Cetak"
+    '            Report = XtraReport.FromFile(Application.StartupPath + "\reports\Resource\PrintInvoiceTransaksiKop.repx", True)
+    '        Case "Export PDF"
+    '            Report = XtraReport.FromFile(Application.StartupPath + "\reports\Resource\PrintInvoiceTransaksiKop.repx", True)
+    '        Case "WhatsApp"
+    '            If bgwKirimInvoiceWA.IsBusy Then
+    '                MsgBox("Proses pengiriman invoice WhatsApp sebelumnya masih berjalan. Silakan tunggu.", MsgBoxStyle.Information, "Mohon Tunggu")
+    '                Exit Select
+    '            End If
+
+    '            ' Siapkan parameter dari UI thread
+    '            Dim p As New KirimInvoiceParams()
+    '            p.JenisTransaksi = JenisTransaksi
+    '            p.NomorTransaksi = NomorTransaksi
+    '            p.NamaPasien = TextBoxNama.Text
+    '            p.NoRekamMedis = _noRekamMedis
+
+    '            ' Jalankan background worker
+    '            bgwKirimInvoiceWA.RunWorkerAsync(p)
+    '        Case "Email"
+    '            Report = XtraReport.FromFile(Application.StartupPath + "\reports\Resource\PrintInvoiceTransaksiKop.repx", True)
+    '    End Select
+
+    '    Report.DataSource = NewHeader
+    '    'Report.RunDesigner()
+
+    '    If validatorURL <> "" Then
+
+    '        Dim Generator As New MessagingToolkit.Barcode.BarcodeEncoder
+    '        Dim qrImage As Bitmap = Generator.Encode(MessagingToolkit.Barcode.BarcodeFormat.QRCode, validatorURL)
+
+    '        Dim picQR As XRPictureBox
+    '        picQR = CType(Report.FindControl("xrValidator", True), XRPictureBox)
+
+    '        If Not picQR Is Nothing Then
+    '            picQR.Image = qrImage
+    '        Else
+    '            MsgBox("Control xrValidator tidak ditemukan di report.")
+    '        End If
+
+    '    End If
+
+    '    Dim tblPembayaran As New DataTable
+    '    Dim nominalTotalInvoice As Double
+    '    Dim nominalKembaliInvoice As Double
+
+    '    ' Set data pembayaran transaksi
+    '    Select Case JenisTransaksi
+    '        Case "UMUM"
+    '            tblPembayaran = ReadSQL("SELECT * FROM TransaksiPoliBayar WHERE TransPoliID IN (SELECT TransPoliID FROM TransaksiPoli WHERE NoUrut = '" & NomorTransaksi & "')")
+    '        Case "GIGI"
+    '            tblPembayaran = ReadSQL("SELECT * FROM TransaksiGigiBayar WHERE TransGigiID IN (SELECT TransGigiID FROM TransaksiGigi WHERE NoUrut = '" & NomorTransaksi & "')")
+    '        Case "LAB"
+    '            tblPembayaran = ReadSQL("SELECT * FROM TransaksiLabBayar WHERE TransLabID IN (SELECT TransLabID FROM TransaksiLab WHERE NoUrut = '" & NomorTransaksi & "')")
+    '        Case "AWAL"
+    '            tblPembayaran = ReadSQL("SELECT * FROM TransaksiPoliBayarAwal WHERE TransPoliID IN (SELECT TransPoliID FROM TransaksiPoli WHERE NoUrut = '" & NomorTransaksi & "')")
+    '        Case "AWALGIGI"
+    '            tblPembayaran = ReadSQL("SELECT * FROM TransaksiGigiBayarAwal WHERE TransGigiID IN (SELECT TransGigiID FROM TransaksiGigi WHERE NoUrut = '" & NomorTransaksi & "')")
+    '    End Select
+
+    '    'For i As Integer = 1 To tblPembayaran.Rows.Count
+    '    '    Dim rowPembayaran As DataRow = tblPembayaran.Rows(i - 1)
+    '    '    Dim Tket As String = "bayar" & i
+    '    '    Report.Bands.Item(BandKind.ReportFooter).Controls(Tket).Visible = True
+    '    '    If rowPembayaran("JenisBayar") = "TAGIHAN" Or rowPembayaran("JenisBayar") = "TUNAI" Then
+    '    '        Report.Bands.Item(BandKind.ReportFooter).Controls(Tket).Text = rowPembayaran("JenisBayar") & " - Jumlah : " & Splitmoney(rowPembayaran("JumlahBayar")) & " (" & rowPembayaran("NoJenisBayar").ToString & ")"
+    '    '    Else
+    '    '        Report.Bands.Item(BandKind.ReportFooter).Controls(Tket).Text = rowPembayaran("JenisBayar") & " - No Kartu : " & "*".PadRight(Len(rowPembayaran("NoJenisBayar")) - 3) & Strings.Right(rowPembayaran("NoJenisBayar"), 3) & rowPembayaran("kartu") & " - Jumlah : " & Splitmoney(rowPembayaran("JumlahBayar"))
+    '    '    End If
+
+    '    '    nominalTotalInvoice = nominalTotalInvoice + rowPembayaran("JumlahBayar")
+    '    '    nominalKembaliInvoice = nominalKembaliInvoice + rowPembayaran("Kembali")
+    '    'Next
+
+    '    For i As Integer = 1 To tblPembayaran.Rows.Count
+    '        Dim rowPembayaran As DataRow = tblPembayaran.Rows(i - 1)
+    '        Dim Tket As String = "bayar" & i
+    '        Report.Bands.Item(BandKind.ReportFooter).Controls(Tket).Visible = True
+
+    '        Dim jenisBayar As String = rowPembayaran("JenisBayar").ToString()
+    '        Dim noJenis As String = If(rowPembayaran("NoJenisBayar"), "").ToString()
+    '        Dim kartuExtra As String = If(rowPembayaran("kartu"), "").ToString()
+    '        Dim jumlahBayar As Decimal = If(rowPembayaran("JumlahBayar"), 0)
+    '        Dim kembaliBayar As Decimal = If(rowPembayaran("Kembali"), 0)
+
+    '        If jenisBayar = "TAGIHAN" Or jenisBayar = "TUNAI" Then
+    '            Report.Bands.Item(BandKind.ReportFooter).Controls(Tket).Text = jenisBayar & " - Jumlah : " & Splitmoney(jumlahBayar) & " (" & noJenis & ")"
+    '        Else
+    '            Dim maskCount As Integer = Math.Max(0, noJenis.Length - 3)
+    '            Report.Bands.Item(BandKind.ReportFooter).Controls(Tket).Text = jenisBayar & " - No Kartu : " & "*".PadRight(maskCount) & noJenis.Substring(Math.Max(0, noJenis.Length - 3)) & kartuExtra & " - Jumlah : " & Splitmoney(jumlahBayar)
+    '        End If
+
+    '        nominalTotalInvoice += jumlahBayar
+    '        nominalKembaliInvoice += kembaliBayar
+    '    Next
+
+    '    Report.Bands.Item(BandKind.ReportFooter).Controls("lblBayar").Text = Splitmoney(nominalTotalInvoice)
+    '    Report.Bands.Item(BandKind.ReportFooter).Controls("lblKembalian").Text = Splitmoney(nominalKembaliInvoice)
+    '    Report.Bands.Item(BandKind.BottomMargin).Controls("lbladmin").Text = userInput
+    '    Report.Bands.Item(BandKind.BottomMargin).Controls("lbltanggalcetak").Text = Format(DateAndTime.Now, "dd-MMM-yyyy HH:mmm:ss")
+
+    '    ' Set QR (Report)
+    '    If statusQR = True Then
+    '        Dim Generator As New MessagingToolkit.Barcode.BarcodeEncoder
+    '        Dim qrImage As Bitmap = New Bitmap(Generator.Encode(MessagingToolkit.Barcode.BarcodeFormat.QRCode, keteranganQR))
+
+    '        Dim pictureBox As XRPictureBox = CreateXRPictureBox(qrImage, 0, 0, 175, 100)
+    '        Dim panelQR As XRPanel = CType(Report.Bands(BandKind.ReportFooter).Controls("xrPanelQR"), XRPanel)
+
+    '        ' Add pictureBox
+    '        panelQR.Controls.Add(pictureBox)
+
+    '        ' Set Visible
+    '        panelQR.Visible = True
+    '        Report.Bands.Item(BandKind.ReportFooter).Controls("xrLabelKodeVoucher").Visible = True
+    '    End If
+
+    '    ' Simpan Softfile PDF jika memilih WhatsApp & Email
+    '    If JenisProses = "WhatsApp" Or JenisProses = "Email" Then
+    '        ' Save PDF
+    '        Dim NameFile As String = NomorTransaksi & "_" & JenisTransaksi
+    '        Dim folderPath As String = "FileDownload\Invoice\" & JenisTransaksi
+    '        Dim filepath As String = folderPath & "\" & NameFile & ".pdf"
+
+    '        ' Cek dan buat folder jika belum ada
+    '        If Not System.IO.Directory.Exists(folderPath) Then
+    '            System.IO.Directory.CreateDirectory(folderPath)
+    '        End If
+
+    '        ' Hapus file lama jika ada
+    '        If System.IO.File.Exists(filepath) Then
+    '            System.IO.File.Delete(filepath)
+    '        End If
+
+    '        ' Simpan PDF
+    '        Report.CreatePdfDocument(filepath)
+    '    End If
+
+    '    ' Set report berdasarkan jenis proses
+    '    Select Case JenisProses
+    '        Case "Preview"
+    '            'Report.RunDesigner()
+    '            Report.ShowPreview()
+    '        Case "Cetak"
+    '            'Report.RunDesigner()
+    '            Report.Print()
+    '        Case "Export PDF"
+    '            Dim sfd As New SaveFileDialog()
+    '            sfd.Title = "Simpan PDF"
+    '            sfd.Filter = "PDF Files (*.pdf)|*.pdf"
+    '            sfd.FileName = NomorTransaksi & "_" & JenisTransaksi & ".pdf"
+
+    '            If sfd.ShowDialog() = Windows.Forms.DialogResult.OK Then
+    '                Dim filepath As String = sfd.FileName
+
+    '                ' Hapus file lama jika ada
+    '                If System.IO.File.Exists(filepath) Then
+    '                    System.IO.File.Delete(filepath)
+    '                End If
+
+    '                ' Simpan PDF ke lokasi yang dipilih user
+    '                'Report.RunDesigner()
+    '                Report.CreatePdfDocument(filepath)
+    '            End If
+    '        Case "WhatsApp"
+    '            thread = New System.Threading.Thread(AddressOf KirimInvoiceWhatsApp)
+    '            thread.Start()
+    '        Case "Email"
+
+    '    End Select
+    'End Sub
+
+    Private Sub bgwKirimInvoiceWA_DoWork(ByVal sender As Object, ByVal e As System.ComponentModel.DoWorkEventArgs) Handles bgwKirimInvoiceWA.DoWork
+        Dim p As KirimInvoiceParams = CType(e.Argument, KirimInvoiceParams)
+        Dim result As New KirimInvoiceResult()
+
+        ' Deklarasi variabel di luar blok kondisional
+        Dim NoWhatsappCustomer As String = ""
+
         Try
-            Dim JenisTransaksi As String = _jenisTransaksi
-            Dim NomorTransaksi As String = _nomorUrutTransaksi
-            Dim namaPasien As String = TextBoxNama.Text
-            Dim NoWhatsappCustomer As String = ReadSQLNIK("SELECT NoHandphone FROM MasterPasien WHERE NoRekamMedis = '" & _noRekamMedis & "'")
+            ' Ambil nomor WhatsApp customer
+            NoWhatsappCustomer = ReadSQLNIK("SELECT NoHandphone FROM MasterPasien WHERE NoRekamMedis = '" & p.NoRekamMedis & "'")
 
-            ' Ganti format nomor WhatsApp
-            If NoWhatsappCustomer.StartsWith("08") Then
-                ' Format lokal Indonesia, ubah ke format internasional
-                NoWhatsappCustomer = "62" & NoWhatsappCustomer.Substring(1)
-            ElseIf NoWhatsappCustomer.StartsWith("+") Then
-                ' Sudah format internasional dengan tanda +, hapus + saja
-                NoWhatsappCustomer = NoWhatsappCustomer.Substring(1)
-            End If
-
-            ' Set Variabel WhatsApp
-            Dim whatsAppStatus As String = ""
-            Dim whatsAppIP As String = ""
-            Dim keteranganLokasi As String = ""
-
-            If _jenisTransaksi = "LAB" Then ' Set Nomor WhatsApp Lab
-                whatsAppStatus = ReadSQLNIK("SELECT StrValue FROM msconfig WHERE ConfigName = 'whatsapp_laboratorium_status'")
-                whatsAppIP = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_laboratorium_ip'")
-                keteranganLokasi = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'InvoiceTempat_Lab'")
-            Else ' Set Nomor WhatsApp Klinik
-                whatsAppStatus = ReadSQLNIK("SELECT StrValue FROM msconfig WHERE ConfigName = 'whatsapp_klinik_status'")
-                whatsAppIP = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_klinik_ip'")
-                keteranganLokasi = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'InvoiceTempat_Klinik'")
-            End If
-
-            ' Validasi Setting WhatsApp
-            If whatsAppStatus <> "Yes" Then
-                MessageBox.Show("Gagal!. WhatsApp belum di setting, hubungi tim IT.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+            If String.IsNullOrEmpty(NoWhatsappCustomer) Then
+                result.IsSuccess = False
+                result.Message = "Nomor WhatsApp pelanggan tidak ditemukan pada Master Pasien."
+                e.Result = result
                 Exit Sub
             End If
 
-            ' Set Variabel API
-            Dim fileBase64 As String = ""
-            Dim parameter As String = ""
-            Dim urlSendPDF As String = ""
-            Dim urlSendMessage As String = ""
-            Dim statusKirim As String = ""
+            ' Format nomor HP ke standar internasional
+            NoWhatsappCustomer = NoWhatsappCustomer.Trim()
+            If NoWhatsappCustomer.StartsWith("0") Then
+                NoWhatsappCustomer = "62" & NoWhatsappCustomer.Substring(1)
+            ElseIf NoWhatsappCustomer.StartsWith("+") Then
+                NoWhatsappCustomer = NoWhatsappCustomer.Substring(1)
+            End If
 
-            ' Set PDF
-            Dim fileName As String = NomorTransaksi & "_" & JenisTransaksi
-            Dim folderPath As String = "FileDownload\Invoice\" & JenisTransaksi
+            result.NoHp = NoWhatsappCustomer
+
+            ' Validasi Status Pengaktifan Fitur WA (Lab / Klinik)
+            Dim whatsAppStatus As String = ""
+            Dim keteranganLokasi As String = ""
+
+            If p.JenisTransaksi = "LAB" Then
+                whatsAppStatus = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_laboratorium_status'")
+                keteranganLokasi = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'InvoiceTempat_Lab'")
+            Else
+                whatsAppStatus = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_klinik_status'")
+                keteranganLokasi = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'InvoiceTempat_Klinik'")
+            End If
+
+            If String.IsNullOrEmpty(keteranganLokasi) Then
+                keteranganLokasi = "Klinik Utama"
+            End If
+
+            If whatsAppStatus.Trim().ToUpper() <> "YES" Then
+                result.IsSuccess = False
+                result.Message = "Fitur pengiriman WhatsApp sedang nonaktif. Silakan aktifkan di Setting WhatsApp."
+                e.Result = result
+                Exit Sub
+            End If
+
+            ' Path File PDF Invoice
+            Dim fileName As String = p.NomorTransaksi & "_" & p.JenisTransaksi
+            Dim folderPath As String = Application.StartupPath & "\FileDownload\Invoice\" & p.JenisTransaksi
             Dim filePath As String = folderPath & "\" & fileName & ".pdf"
 
-            ' Set File Base64
-            fileBase64 = Convert.ToBase64String(System.IO.File.ReadAllBytes(filePath))
+            If Not IO.File.Exists(filePath) Then
+                result.IsSuccess = False
+                result.Message = "File PDF Invoice tidak ditemukan di: " & filePath
+                e.Result = result
+                Exit Sub
+            End If
 
-            ' Set Pesan WhatsApp
-            Dim pesanWhatsApp As String = "Halo " & namaPasien & ".\n\n" & _
-                                          "Kami mengucapkan terima kasih atas kepercayaan Bapak/Ibu/Saudara/i sudah melakukan pemeriksaan di " & keteranganLokasi & ".\n" & _
-                                          "Berikut nomor nota transaksi Anda:\n" & _
-                                          "" & NomorTransaksi & "\n" & _
-                                          "Harap simpan nomor nota ini untuk referensi dan keperluan selanjutnya.\n\n" & _
-                                          "Best regards,\n\n" & _
-                                          "" & keteranganLokasi & ".\n\n" & _
-                                          "----- Pesan ini adalah pesan otomatis, mohon agar tidak membalas -----"
+            ' 🟢 Cek Mode Provider dari Database (OFFICIAL vs BAILEYS)
+            Dim providerMode As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_provider_mode'").Trim().ToUpper()
 
-            ' Set Parameter WhatsApp
-            parameter = SetParameterWhatsappKlinik(NoWhatsappCustomer, fileBase64, fileName, pesanWhatsApp)
+            ' =========================================================================
+            ' 1. MODE WHATSAPP OFFICIAL API
+            ' =========================================================================
+            If providerMode = "OFFICIAL" Then
+                Dim baseUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_official_url'")
+                Dim apiKey As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_official_apikey'")
+                Dim templateName As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_official_template'")
 
-            ' Set URL WhatsApp
-            urlSendMessage = "http://" & whatsAppIP & ":4444/send"
-            urlSendPDF = "http://" & whatsAppIP & ":4444/send-pdf"
+                If String.IsNullOrEmpty(templateName) Then
+                    templateName = "send_invoice_message_by_lumiera_luzelle"
+                End If
 
-            ' Validasi Kirim WhatsApp
-            If CheckSQL("SELECT * FROM LogSendingWhatsappEmail WHERE NoUrut = '" & NomorTransaksi & "' AND SendingNamaFile = '" & fileName & "' AND SendingStatus = 1 AND CONVERT(DATE, SendingDate) = '" & Format(DateTime.Now, "yyyy-MM-dd") & "'") = True Then
-                ' Validasi Kirim Ulang
-                If MessageBox.Show("WhatsApp sudah pernah dikirim, yakin tetap kirim invoice transaksi ke nomor " & NoWhatsappCustomer & "?", "Validasi", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.No Then Exit Sub
+                ' Tangani trailing slash
+                If Not baseUrl.EndsWith("/") Then baseUrl &= "/"
+                Dim urlSendMessage As String = baseUrl & "whatsapp/api/message_templates/send-media-upload"
 
-                ' Kirim PDF
-                statusKirim = SendDataWhatsapp(parameter, urlSendPDF)
+                ' Eksekusi Kirim via Helper Official
+                Dim isSuccess As Boolean = SendDataWhatsappOfficial( _
+                    urlApi:=urlSendMessage, _
+                    apiKey:=apiKey, _
+                    recipientNumber:=NoWhatsappCustomer, _
+                    filePath:=filePath, _
+                    fileName:=fileName & ".pdf", _
+                    patientName:=p.NamaPasien, _
+                    clinicName:=keteranganLokasi, _
+                    transactionNumber:=p.NomorTransaksi, _
+                    transactionDate:=DateTime.Now.ToString("dd-MM-yyyy"), _
+                    templateName:=templateName _
+                )
+
+                If isSuccess Then
+                    WriteSQL("INSERT INTO LogSendingWhatsappEmail (SendingJenis, SendingTujuan, SendingNamaFile, SendingStatus, SendingDate, SendingBy, NoUrut, JenisSending) VALUES ('Whatsapp', '" & NoWhatsappCustomer & "', '" & fileName & "', 1, GETDATE(), '" & userInput & "', '" & p.NomorTransaksi & "', 'PASIEN')", 4)
+                    result.IsSuccess = True
+                    result.Message = "Invoice berhasil dikirim via WhatsApp Official ke " & NoWhatsappCustomer & "."
+                Else
+                    result.IsSuccess = False
+                    result.Message = "Gagal mengirim via WhatsApp Official ke " & NoWhatsappCustomer & ". Periksa API Key / koneksi server."
+                End If
+
+                ' =========================================================================
+                ' 2. MODE WHATSAPP BAILEYS (UNOFFICIAL)
+                ' =========================================================================
             Else
-                If MessageBox.Show("Yakin kirim invoice transaksi ke nomor " & NoWhatsappCustomer & "?", "Validasi", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.No Then Exit Sub
+                Dim whatsAppIP As String = ""
+                If p.JenisTransaksi = "LAB" Then
+                    whatsAppIP = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_laboratorium_ip'")
+                Else
+                    whatsAppIP = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_klinik_ip'")
+                End If
 
-                ' Kirim Text & PDF
-                SendDataWhatsapp(parameter, urlSendMessage)
-                statusKirim = SendDataWhatsapp(parameter, urlSendPDF)
+                Dim fileBase64 As String = Convert.ToBase64String(IO.File.ReadAllBytes(filePath))
+
+                Dim pesanWhatsApp As String = "Halo " & p.NamaPasien & ".\n\n" & _
+                                              "Kami mengucapkan terima kasih atas kepercayaan Bapak/Ibu/Saudara/i sudah melakukan pemeriksaan di " & keteranganLokasi & ".\n" & _
+                                              "Berikut nomor nota transaksi Anda:\n" & _
+                                              "" & p.NomorTransaksi & "\n" & _
+                                              "Harap simpan nomor nota ini untuk referensi dan keperluan selanjutnya.\n\n" & _
+                                              "Best regards,\n\n" & _
+                                              "" & keteranganLokasi & ".\n\n" & _
+                                              "----- Pesan ini adalah pesan otomatis, mohon agar tidak membalas -----"
+
+                Dim parameter As String = SetParameterWhatsappKlinik(NoWhatsappCustomer, fileBase64, fileName, pesanWhatsApp)
+                Dim urlSendMessage As String = "http://" & whatsAppIP & ":4444/send"
+                Dim urlSendPDF As String = "http://" & whatsAppIP & ":4444/send-pdf"
+                Dim statusKirim As String = ""
+
+                ' Cek log pengiriman hari ini
+                Dim queryCekLog As String = "SELECT * FROM LogSendingWhatsappEmail WHERE NoUrut = '" & p.NomorTransaksi & "' AND SendingNamaFile = '" & fileName & "' AND SendingStatus = 1 AND CONVERT(DATE, SendingDate) = '" & Format(DateTime.Now, "yyyy-MM-dd") & "'"
+
+                If CheckSQL(queryCekLog) = True Then
+                    statusKirim = SendDataWhatsapp(parameter, urlSendPDF)
+                Else
+                    SendDataWhatsapp(parameter, urlSendMessage)
+                    statusKirim = SendDataWhatsapp(parameter, urlSendPDF)
+                End If
+
+                If Not String.IsNullOrEmpty(statusKirim) AndAlso (statusKirim.ToLower().Contains("success") OrElse statusKirim.ToLower().Contains("ok") OrElse statusKirim.ToLower().Contains("true")) Then
+                    WriteSQL("INSERT INTO LogSendingWhatsappEmail (SendingJenis, SendingTujuan, SendingNamaFile, SendingStatus, SendingDate, SendingBy, NoUrut, JenisSending) VALUES ('Whatsapp', '" & NoWhatsappCustomer & "', '" & fileName & "', 1, GETDATE(), '" & userInput & "', '" & p.NomorTransaksi & "', 'PASIEN')", 4)
+                    result.IsSuccess = True
+                    result.Message = "Berhasil mengirim Whatsapp ke " & NoWhatsappCustomer & "."
+                Else
+                    result.IsSuccess = False
+                    result.Message = "Gagal Mengirim Whatsapp ke " & NoWhatsappCustomer & ". (Respons Server: " & statusKirim & ")"
+                End If
             End If
 
-            If statusKirim = "Success" Then
-                ' Insert Log
-                WriteSQL("INSERT INTO LogSendingWhatsappEmail (SendingJenis, SendingTujuan, SendingNamaFile, SendingStatus, SendingDate, SendingBy, NoUrut, JenisSending) VALUES ('Whatsapp', '" & NoWhatsappCustomer & "', '" & fileName & "', 1, GETDATE(), '" & userInput & "', '" & NomorTransaksi & "', 'PASIEN')", 4)
-
-                MsgBox("Berhasil mengirim Whatsapp ke " & NoWhatsappCustomer.Trim & ".", MsgBoxStyle.Information, "Success!")
-            ElseIf statusKirim = "Nothing" Then
-                MsgBox("Gagal Mengirim Whatsapp ke " & NoWhatsappCustomer.Trim & ". Cek koneksi jaringan atau hubungi IT untuk restart server Whatsapp.", MsgBoxStyle.Exclamation, "Warning!")
-            End If
         Catch ex As Exception
-            MsgBox(ex.Message)
+            result.IsSuccess = False
+            result.Message = "Terjadi kesalahan saat pengiriman invoice: " & ex.Message
         End Try
+
+        e.Result = result
     End Sub
+
+    Private Sub bgwKirimInvoiceWA_RunWorkerCompleted(ByVal sender As Object, ByVal e As System.ComponentModel.RunWorkerCompletedEventArgs) Handles bgwKirimInvoiceWA.RunWorkerCompleted
+        If e.Error IsNot Nothing Then
+            MsgBox("Terjadi kesalahan sistem pengiriman: " & e.Error.Message, MsgBoxStyle.Critical, "Error")
+            Exit Sub
+        End If
+
+        If e.Result IsNot Nothing AndAlso TypeOf e.Result Is KirimInvoiceResult Then
+            Dim res As KirimInvoiceResult = CType(e.Result, KirimInvoiceResult)
+
+            If res.IsSuccess Then
+                MsgBox(res.Message, MsgBoxStyle.Information, "Success!")
+            Else
+                MsgBox(res.Message, MsgBoxStyle.Exclamation, "Warning!")
+            End If
+        End If
+    End Sub
+
+    'Public Sub KirimInvoiceWhatsApp()
+    '    Try
+    '        Dim JenisTransaksi As String = _jenisTransaksi
+    '        Dim NomorTransaksi As String = _nomorUrutTransaksi
+    '        Dim namaPasien As String = TextBoxNama.Text
+    '        Dim NoWhatsappCustomer As String = ReadSQLNIK("SELECT NoHandphone FROM MasterPasien WHERE NoRekamMedis = '" & _noRekamMedis & "'")
+
+    '        ' Ganti format nomor WhatsApp
+    '        If NoWhatsappCustomer.StartsWith("08") Then
+    '            ' Format lokal Indonesia, ubah ke format internasional
+    '            NoWhatsappCustomer = "62" & NoWhatsappCustomer.Substring(1)
+    '        ElseIf NoWhatsappCustomer.StartsWith("+") Then
+    '            ' Sudah format internasional dengan tanda +, hapus + saja
+    '            NoWhatsappCustomer = NoWhatsappCustomer.Substring(1)
+    '        End If
+
+    '        ' Set Variabel WhatsApp
+    '        Dim whatsAppStatus As String = ""
+    '        Dim whatsAppIP As String = ""
+    '        Dim keteranganLokasi As String = ""
+
+    '        If _jenisTransaksi = "LAB" Then ' Set Nomor WhatsApp Lab
+    '            whatsAppStatus = ReadSQLNIK("SELECT StrValue FROM msconfig WHERE ConfigName = 'whatsapp_laboratorium_status'")
+    '            whatsAppIP = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_laboratorium_ip'")
+    '            keteranganLokasi = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'InvoiceTempat_Lab'")
+    '        Else ' Set Nomor WhatsApp Klinik
+    '            whatsAppStatus = ReadSQLNIK("SELECT StrValue FROM msconfig WHERE ConfigName = 'whatsapp_klinik_status'")
+    '            whatsAppIP = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_klinik_ip'")
+    '            keteranganLokasi = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'InvoiceTempat_Klinik'")
+    '        End If
+
+    '        ' Validasi Setting WhatsApp
+    '        If whatsAppStatus <> "Yes" Then
+    '            MessageBox.Show("Gagal!. WhatsApp belum di setting, hubungi tim IT.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+    '            Exit Sub
+    '        End If
+
+    '        ' Set Variabel API
+    '        Dim fileBase64 As String = ""
+    '        Dim parameter As String = ""
+    '        Dim urlSendPDF As String = ""
+    '        Dim urlSendMessage As String = ""
+    '        Dim statusKirim As String = ""
+
+    '        ' Set PDF
+    '        Dim fileName As String = NomorTransaksi & "_" & JenisTransaksi
+    '        Dim folderPath As String = "FileDownload\Invoice\" & JenisTransaksi
+    '        Dim filePath As String = folderPath & "\" & fileName & ".pdf"
+
+    '        ' Set File Base64
+    '        fileBase64 = Convert.ToBase64String(System.IO.File.ReadAllBytes(filePath))
+
+    '        ' Set Pesan WhatsApp
+    '        Dim pesanWhatsApp As String = "Halo " & namaPasien & ".\n\n" & _
+    '                                      "Kami mengucapkan terima kasih atas kepercayaan Bapak/Ibu/Saudara/i sudah melakukan pemeriksaan di " & keteranganLokasi & ".\n" & _
+    '                                      "Berikut nomor nota transaksi Anda:\n" & _
+    '                                      "" & NomorTransaksi & "\n" & _
+    '                                      "Harap simpan nomor nota ini untuk referensi dan keperluan selanjutnya.\n\n" & _
+    '                                      "Best regards,\n\n" & _
+    '                                      "" & keteranganLokasi & ".\n\n" & _
+    '                                      "----- Pesan ini adalah pesan otomatis, mohon agar tidak membalas -----"
+
+    '        ' Set Parameter WhatsApp
+    '        parameter = SetParameterWhatsappKlinik(NoWhatsappCustomer, fileBase64, fileName, pesanWhatsApp)
+
+    '        ' Set URL WhatsApp
+    '        urlSendMessage = "http://" & whatsAppIP & ":4444/send"
+    '        urlSendPDF = "http://" & whatsAppIP & ":4444/send-pdf"
+
+    '        ' Validasi Kirim WhatsApp
+    '        If CheckSQL("SELECT * FROM LogSendingWhatsappEmail WHERE NoUrut = '" & NomorTransaksi & "' AND SendingNamaFile = '" & fileName & "' AND SendingStatus = 1 AND CONVERT(DATE, SendingDate) = '" & Format(DateTime.Now, "yyyy-MM-dd") & "'") = True Then
+    '            ' Validasi Kirim Ulang
+    '            If MessageBox.Show("WhatsApp sudah pernah dikirim, yakin tetap kirim invoice transaksi ke nomor " & NoWhatsappCustomer & "?", "Validasi", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.No Then Exit Sub
+
+    '            ' Kirim PDF
+    '            statusKirim = SendDataWhatsapp(parameter, urlSendPDF)
+    '        Else
+    '            If MessageBox.Show("Yakin kirim invoice transaksi ke nomor " & NoWhatsappCustomer & "?", "Validasi", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.No Then Exit Sub
+
+    '            ' Kirim Text & PDF
+    '            SendDataWhatsapp(parameter, urlSendMessage)
+    '            statusKirim = SendDataWhatsapp(parameter, urlSendPDF)
+    '        End If
+
+    '        If statusKirim = "Success" Then
+    '            ' Insert Log
+    '            WriteSQL("INSERT INTO LogSendingWhatsappEmail (SendingJenis, SendingTujuan, SendingNamaFile, SendingStatus, SendingDate, SendingBy, NoUrut, JenisSending) VALUES ('Whatsapp', '" & NoWhatsappCustomer & "', '" & fileName & "', 1, GETDATE(), '" & userInput & "', '" & NomorTransaksi & "', 'PASIEN')", 4)
+
+    '            MsgBox("Berhasil mengirim Whatsapp ke " & NoWhatsappCustomer.Trim & ".", MsgBoxStyle.Information, "Success!")
+    '        ElseIf statusKirim = "Nothing" Then
+    '            MsgBox("Gagal Mengirim Whatsapp ke " & NoWhatsappCustomer.Trim & ". Cek koneksi jaringan atau hubungi IT untuk restart server Whatsapp.", MsgBoxStyle.Exclamation, "Warning!")
+    '        End If
+    '    Catch ex As Exception
+    '        MsgBox(ex.Message)
+    '    End Try
+    'End Sub
 
     Private Sub ButtonCetakInvoice_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCetakInvoice.Click
         GenerateInvoice(_jenisTransaksi, "Cetak", _nomorUrutTransaksi)
@@ -2527,5 +3628,10 @@ Public Class FormPembayaran
         End If
 
         Return True
+    End Function
+
+    Private Function BaseKeteranganJson(ByVal inputKeterangan As String) As String
+        Dim cleanText As String = inputKeterangan.Replace("""", "'").Replace(vbCrLf, " ").Replace(vbCr, " ").Replace(vbLf, " ")
+        Return """keterangan"":""" & cleanText & """"
     End Function
 End Class

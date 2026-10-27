@@ -61,6 +61,7 @@ Partial Class FormPembayaran
         Me.ButtonCetakInvoice = New System.Windows.Forms.Button
         Me.ButtonExportInvoice = New System.Windows.Forms.Button
         Me.ButtonWhatsAppInvoice = New System.Windows.Forms.Button
+        Me.bgwKirimInvoiceWA = New System.ComponentModel.BackgroundWorker
         CType(Me.GridControlPembayaran, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.GridView1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.PanelTop.SuspendLayout()
@@ -379,7 +380,7 @@ Partial Class FormPembayaran
         '
         Me.TextBoxJumlahBayar.Font = New System.Drawing.Font("Segoe UI", 9.75!)
         Me.TextBoxJumlahBayar.Location = New System.Drawing.Point(145, 139)
-        Me.TextBoxJumlahBayar.Maximum = New Decimal(New Integer() {1000000000, 0, 0, 0})
+        Me.TextBoxJumlahBayar.Maximum = New Decimal(New Integer() {-727379969, 232, 0, 0})
         Me.TextBoxJumlahBayar.Name = "TextBoxJumlahBayar"
         Me.TextBoxJumlahBayar.Size = New System.Drawing.Size(100, 25)
         Me.TextBoxJumlahBayar.TabIndex = 598
@@ -415,7 +416,7 @@ Partial Class FormPembayaran
         Me.TextBoxTotalTagihan.BackColor = System.Drawing.Color.White
         Me.TextBoxTotalTagihan.Font = New System.Drawing.Font("Segoe UI", 9.75!)
         Me.TextBoxTotalTagihan.Location = New System.Drawing.Point(145, 13)
-        Me.TextBoxTotalTagihan.Maximum = New Decimal(New Integer() {1000000000, 0, 0, 0})
+        Me.TextBoxTotalTagihan.Maximum = New Decimal(New Integer() {-727379969, 232, 0, 0})
         Me.TextBoxTotalTagihan.Name = "TextBoxTotalTagihan"
         Me.TextBoxTotalTagihan.ReadOnly = True
         Me.TextBoxTotalTagihan.Size = New System.Drawing.Size(113, 25)
@@ -484,7 +485,7 @@ Partial Class FormPembayaran
         Me.TextBoxTotalKembali.BackColor = System.Drawing.Color.White
         Me.TextBoxTotalKembali.Font = New System.Drawing.Font("Segoe UI", 9.75!)
         Me.TextBoxTotalKembali.Location = New System.Drawing.Point(145, 75)
-        Me.TextBoxTotalKembali.Maximum = New Decimal(New Integer() {1000000000, 0, 0, 0})
+        Me.TextBoxTotalKembali.Maximum = New Decimal(New Integer() {-727379969, 232, 0, 0})
         Me.TextBoxTotalKembali.Name = "TextBoxTotalKembali"
         Me.TextBoxTotalKembali.ReadOnly = True
         Me.TextBoxTotalKembali.Size = New System.Drawing.Size(113, 25)
@@ -495,7 +496,7 @@ Partial Class FormPembayaran
         Me.TextBoxTotalBayar.BackColor = System.Drawing.Color.White
         Me.TextBoxTotalBayar.Font = New System.Drawing.Font("Segoe UI", 9.75!)
         Me.TextBoxTotalBayar.Location = New System.Drawing.Point(145, 44)
-        Me.TextBoxTotalBayar.Maximum = New Decimal(New Integer() {1000000000, 0, 0, 0})
+        Me.TextBoxTotalBayar.Maximum = New Decimal(New Integer() {-727379969, 232, 0, 0})
         Me.TextBoxTotalBayar.Name = "TextBoxTotalBayar"
         Me.TextBoxTotalBayar.ReadOnly = True
         Me.TextBoxTotalBayar.Size = New System.Drawing.Size(113, 25)
@@ -667,4 +668,5 @@ Partial Class FormPembayaran
     Friend WithEvents TextBoxTotalBayar As PoliKlinik_Net2.NumericUpDownWithThousands
     Friend WithEvents Label8 As System.Windows.Forms.Label
     Friend WithEvents CheckBoxLunasBayar As System.Windows.Forms.CheckBox
+    Friend WithEvents bgwKirimInvoiceWA As System.ComponentModel.BackgroundWorker
 End Class

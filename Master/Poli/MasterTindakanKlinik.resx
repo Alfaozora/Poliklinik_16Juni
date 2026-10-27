@@ -286,6 +286,16 @@
         AAAASUVORK5CYII=
 </value>
   </data>
+  <data name="ButtonPreOrder.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
+        EwAACxMBAJqcGAAAAO1JREFUOE/N0z1LBEEMxvEVhFMLX+CaEw/B3tJOG7EQBAtfsBU8LC1sbKwEwcqr
+        tFA70ULEj+HX+kkkK8e5y66dgaeYmeSfmSRTFEVRoIPDP6oTsd+GLt6x1VLh2x0H3P5sNFj41gIwwEWN
+        Bm0AfazUqN8IaGP/HIAhdnCKtzEN2wBmMYUZLIxoEos5RLuYrgOcYx17uEld4hhPOMAJPtCrAkQb53Kv
+        bN9SBOf5Va5Dj1WAGKQ1bI8M0FFmvsYn7rGP51+AKsNmXnsZd9jIuryWDk2faTXfHNeO2swn8KwENH3n
+        gPTwgJfIHMGY+AJyMzw+SzuPoQAAAABJRU5ErkJggg==
+</value>
+  </data>
   <data name="ButtonSimpanAlat.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAABGdBTUEAALGPC/xhBQAAANZJREFUSEtj

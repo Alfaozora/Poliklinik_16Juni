@@ -24,16 +24,21 @@ Partial Class FormPenerimaanBarang
     Private Sub InitializeComponent()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer
         Me.ButtonAmbilData = New System.Windows.Forms.Button
+        Me.TextBoxIdRuangan = New System.Windows.Forms.TextBox
+        Me.ComboBoxNamaAlat = New System.Windows.Forms.ComboBox
         Me.SplitContainer2 = New System.Windows.Forms.SplitContainer
         Me.DataGridViewBarang = New System.Windows.Forms.DataGridView
         Me.CheckPersetujuan = New System.Windows.Forms.CheckBox
-        Me.LabelKuota = New System.Windows.Forms.Label
+        Me.LabelSaldoAlat = New System.Windows.Forms.Label
         Me.LabelDipilih = New System.Windows.Forms.Label
         Me.Label4 = New System.Windows.Forms.Label
         Me.Label3 = New System.Windows.Forms.Label
         Me.Label2 = New System.Windows.Forms.Label
         Me.Label1 = New System.Windows.Forms.Label
         Me.ButtonSubmit = New System.Windows.Forms.Button
+        Me.LabelSelisih = New System.Windows.Forms.Label
+        Me.Label6 = New System.Windows.Forms.Label
+        Me.Label7 = New System.Windows.Forms.Label
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
@@ -53,6 +58,8 @@ Partial Class FormPenerimaanBarang
         'SplitContainer1.Panel1
         '
         Me.SplitContainer1.Panel1.Controls.Add(Me.ButtonAmbilData)
+        Me.SplitContainer1.Panel1.Controls.Add(Me.TextBoxIdRuangan)
+        Me.SplitContainer1.Panel1.Controls.Add(Me.ComboBoxNamaAlat)
         '
         'SplitContainer1.Panel2
         '
@@ -67,12 +74,36 @@ Partial Class FormPenerimaanBarang
         Me.ButtonAmbilData.FlatAppearance.BorderSize = 0
         Me.ButtonAmbilData.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonAmbilData.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.ButtonAmbilData.Location = New System.Drawing.Point(22, 12)
+        Me.ButtonAmbilData.Location = New System.Drawing.Point(268, 16)
         Me.ButtonAmbilData.Name = "ButtonAmbilData"
-        Me.ButtonAmbilData.Size = New System.Drawing.Size(108, 29)
-        Me.ButtonAmbilData.TabIndex = 0
+        Me.ButtonAmbilData.Size = New System.Drawing.Size(101, 25)
+        Me.ButtonAmbilData.TabIndex = 655
         Me.ButtonAmbilData.Text = "Ambil Data"
         Me.ButtonAmbilData.UseVisualStyleBackColor = False
+        '
+        'TextBoxIdRuangan
+        '
+        Me.TextBoxIdRuangan.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
+        Me.TextBoxIdRuangan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxIdRuangan.Cursor = System.Windows.Forms.Cursors.No
+        Me.TextBoxIdRuangan.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxIdRuangan.Location = New System.Drawing.Point(225, 16)
+        Me.TextBoxIdRuangan.Multiline = True
+        Me.TextBoxIdRuangan.Name = "TextBoxIdRuangan"
+        Me.TextBoxIdRuangan.ReadOnly = True
+        Me.TextBoxIdRuangan.Size = New System.Drawing.Size(37, 25)
+        Me.TextBoxIdRuangan.TabIndex = 654
+        Me.TextBoxIdRuangan.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'ComboBoxNamaAlat
+        '
+        Me.ComboBoxNamaAlat.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ComboBoxNamaAlat.FormattingEnabled = True
+        Me.ComboBoxNamaAlat.Location = New System.Drawing.Point(12, 16)
+        Me.ComboBoxNamaAlat.Name = "ComboBoxNamaAlat"
+        Me.ComboBoxNamaAlat.Size = New System.Drawing.Size(207, 25)
+        Me.ComboBoxNamaAlat.TabIndex = 653
+        Me.ComboBoxNamaAlat.TabStop = False
         '
         'SplitContainer2
         '
@@ -87,8 +118,11 @@ Partial Class FormPenerimaanBarang
         '
         'SplitContainer2.Panel2
         '
+        Me.SplitContainer2.Panel2.Controls.Add(Me.LabelSelisih)
+        Me.SplitContainer2.Panel2.Controls.Add(Me.Label6)
+        Me.SplitContainer2.Panel2.Controls.Add(Me.Label7)
         Me.SplitContainer2.Panel2.Controls.Add(Me.CheckPersetujuan)
-        Me.SplitContainer2.Panel2.Controls.Add(Me.LabelKuota)
+        Me.SplitContainer2.Panel2.Controls.Add(Me.LabelSaldoAlat)
         Me.SplitContainer2.Panel2.Controls.Add(Me.LabelDipilih)
         Me.SplitContainer2.Panel2.Controls.Add(Me.Label4)
         Me.SplitContainer2.Panel2.Controls.Add(Me.Label3)
@@ -123,15 +157,15 @@ Partial Class FormPenerimaanBarang
         Me.CheckPersetujuan.Text = "Saya menyetujui penambahan kuota alat"
         Me.CheckPersetujuan.UseVisualStyleBackColor = True
         '
-        'LabelKuota
+        'LabelSaldoAlat
         '
-        Me.LabelKuota.AutoSize = True
-        Me.LabelKuota.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.LabelKuota.Location = New System.Drawing.Point(106, 42)
-        Me.LabelKuota.Name = "LabelKuota"
-        Me.LabelKuota.Size = New System.Drawing.Size(13, 15)
-        Me.LabelKuota.TabIndex = 7
-        Me.LabelKuota.Text = "1"
+        Me.LabelSaldoAlat.AutoSize = True
+        Me.LabelSaldoAlat.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.LabelSaldoAlat.Location = New System.Drawing.Point(106, 42)
+        Me.LabelSaldoAlat.Name = "LabelSaldoAlat"
+        Me.LabelSaldoAlat.Size = New System.Drawing.Size(13, 15)
+        Me.LabelSaldoAlat.TabIndex = 7
+        Me.LabelSaldoAlat.Text = "1"
         '
         'LabelDipilih
         '
@@ -169,9 +203,9 @@ Partial Class FormPenerimaanBarang
         Me.Label2.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Label2.Location = New System.Drawing.Point(22, 40)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(67, 15)
+        Me.Label2.Size = New System.Drawing.Size(62, 15)
         Me.Label2.TabIndex = 3
-        Me.Label2.Text = "Total Kuota"
+        Me.Label2.Text = "Saldo Fisik"
         '
         'Label1
         '
@@ -196,6 +230,36 @@ Partial Class FormPenerimaanBarang
         Me.ButtonSubmit.Text = "Setujui dan Proses"
         Me.ButtonSubmit.UseVisualStyleBackColor = False
         '
+        'LabelSelisih
+        '
+        Me.LabelSelisih.AutoSize = True
+        Me.LabelSelisih.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.LabelSelisih.Location = New System.Drawing.Point(242, 16)
+        Me.LabelSelisih.Name = "LabelSelisih"
+        Me.LabelSelisih.Size = New System.Drawing.Size(13, 15)
+        Me.LabelSelisih.TabIndex = 11
+        Me.LabelSelisih.Text = "1"
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label6.Location = New System.Drawing.Point(234, 15)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(10, 15)
+        Me.Label6.TabIndex = 10
+        Me.Label6.Text = ":"
+        '
+        'Label7
+        '
+        Me.Label7.AutoSize = True
+        Me.Label7.Font = New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Label7.Location = New System.Drawing.Point(195, 15)
+        Me.Label7.Name = "Label7"
+        Me.Label7.Size = New System.Drawing.Size(40, 15)
+        Me.Label7.TabIndex = 9
+        Me.Label7.Text = "Selisih"
+        '
         'FormPenerimaanBarang
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -206,6 +270,7 @@ Partial Class FormPenerimaanBarang
         Me.Name = "FormPenerimaanBarang"
         Me.Text = "FormPenerimaanBarang"
         Me.SplitContainer1.Panel1.ResumeLayout(False)
+        Me.SplitContainer1.Panel1.PerformLayout()
         Me.SplitContainer1.Panel2.ResumeLayout(False)
         Me.SplitContainer1.ResumeLayout(False)
         Me.SplitContainer2.Panel1.ResumeLayout(False)
@@ -217,7 +282,6 @@ Partial Class FormPenerimaanBarang
 
     End Sub
     Friend WithEvents SplitContainer1 As System.Windows.Forms.SplitContainer
-    Friend WithEvents ButtonAmbilData As System.Windows.Forms.Button
     Friend WithEvents SplitContainer2 As System.Windows.Forms.SplitContainer
     Friend WithEvents DataGridViewBarang As System.Windows.Forms.DataGridView
     Friend WithEvents ButtonSubmit As System.Windows.Forms.Button
@@ -226,6 +290,12 @@ Partial Class FormPenerimaanBarang
     Friend WithEvents Label2 As System.Windows.Forms.Label
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents CheckPersetujuan As System.Windows.Forms.CheckBox
-    Friend WithEvents LabelKuota As System.Windows.Forms.Label
+    Friend WithEvents LabelSaldoAlat As System.Windows.Forms.Label
     Friend WithEvents LabelDipilih As System.Windows.Forms.Label
+    Friend WithEvents ComboBoxNamaAlat As System.Windows.Forms.ComboBox
+    Friend WithEvents TextBoxIdRuangan As System.Windows.Forms.TextBox
+    Friend WithEvents ButtonAmbilData As System.Windows.Forms.Button
+    Friend WithEvents LabelSelisih As System.Windows.Forms.Label
+    Friend WithEvents Label6 As System.Windows.Forms.Label
+    Friend WithEvents Label7 As System.Windows.Forms.Label
 End Class

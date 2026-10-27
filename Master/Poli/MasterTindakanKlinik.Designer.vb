@@ -42,12 +42,15 @@ Partial Class MasterTindakanKlinik
         Me.ButtonExportMasterTindakan = New System.Windows.Forms.Button
         Me.SplitContainer3 = New System.Windows.Forms.SplitContainer
         Me.PanelMasterTindakan = New System.Windows.Forms.Panel
+        Me.DataGridViewAlatTindakan = New System.Windows.Forms.DataGridView
         Me.GroupBox2 = New System.Windows.Forms.GroupBox
+        Me.ButtonTambahAlat = New System.Windows.Forms.Button
+        Me.ComboBoxAlatTindakan = New System.Windows.Forms.ComboBox
+        Me.Label37 = New System.Windows.Forms.Label
+        Me.ComboBoxCartridgeTindakan = New System.Windows.Forms.ComboBox
+        Me.Label36 = New System.Windows.Forms.Label
         Me.Label41 = New System.Windows.Forms.Label
-        Me.ButtonCariAlatTindakan = New System.Windows.Forms.Button
         Me.NumericShootPerTindakan = New System.Windows.Forms.NumericUpDown
-        Me.TextBoxNamaAlatTindakan = New System.Windows.Forms.TextBox
-        Me.TextBoxAlatIdTindakan = New System.Windows.Forms.TextBox
         Me.CheckBoxPakaiAlat = New System.Windows.Forms.CheckBox
         Me.ComboBoxKategori = New System.Windows.Forms.ComboBox
         Me.Label34 = New System.Windows.Forms.Label
@@ -65,6 +68,8 @@ Partial Class MasterTindakanKlinik
         Me.RadioButtonAktifFee = New System.Windows.Forms.RadioButton
         Me.RadioButtonNonAktifFee = New System.Windows.Forms.RadioButton
         Me.Label12 = New System.Windows.Forms.Label
+        Me.TextBoxPersentaseFeePerawat = New System.Windows.Forms.TextBox
+        Me.Label42 = New System.Windows.Forms.Label
         Me.Panel7 = New System.Windows.Forms.Panel
         Me.TextBox10 = New System.Windows.Forms.TextBox
         Me.TextBox11 = New System.Windows.Forms.TextBox
@@ -73,6 +78,7 @@ Partial Class MasterTindakanKlinik
         Me.RadioButton3 = New System.Windows.Forms.RadioButton
         Me.RadioButton4 = New System.Windows.Forms.RadioButton
         Me.Label31 = New System.Windows.Forms.Label
+        Me.Label47 = New System.Windows.Forms.Label
         Me.Panel6 = New System.Windows.Forms.Panel
         Me.TextBox4 = New System.Windows.Forms.TextBox
         Me.TextBox6 = New System.Windows.Forms.TextBox
@@ -177,6 +183,12 @@ Partial Class MasterTindakanKlinik
         Me.GridViewTindakan = New DevExpress.XtraGrid.Views.Grid.GridView
         Me.TabPageMasterAlat = New System.Windows.Forms.TabPage
         Me.SplitContainer4 = New System.Windows.Forms.SplitContainer
+        Me.TabControl1 = New System.Windows.Forms.TabControl
+        Me.TabPage1 = New System.Windows.Forms.TabPage
+        Me.TextBoxIdRuangan = New System.Windows.Forms.TextBox
+        Me.Label59 = New System.Windows.Forms.Label
+        Me.TextBoxNamaRuangan = New System.Windows.Forms.TextBox
+        Me.ButtonGetAlatSarpras = New System.Windows.Forms.Button
         Me.GroupBox3 = New System.Windows.Forms.GroupBox
         Me.ButtonCetakRiwayat = New System.Windows.Forms.Button
         Me.Label46 = New System.Windows.Forms.Label
@@ -184,22 +196,41 @@ Partial Class MasterTindakanKlinik
         Me.Label44 = New System.Windows.Forms.Label
         Me.dtAkhir = New System.Windows.Forms.DateTimePicker
         Me.dtAwal = New System.Windows.Forms.DateTimePicker
-        Me.Label42 = New System.Windows.Forms.Label
-        Me.TextBoxKuotaTotal = New System.Windows.Forms.TextBox
         Me.Label40 = New System.Windows.Forms.Label
         Me.TextBoxKodeAlat = New System.Windows.Forms.TextBox
-        Me.NumericKuotaAwal = New System.Windows.Forms.NumericUpDown
-        Me.Label38 = New System.Windows.Forms.Label
-        Me.TextBoxKuotaSisa = New System.Windows.Forms.TextBox
-        Me.Label37 = New System.Windows.Forms.Label
-        Me.TextBoxKuotaTerpakai = New System.Windows.Forms.TextBox
-        Me.Label36 = New System.Windows.Forms.Label
         Me.CheckBoxAlatAktif = New System.Windows.Forms.CheckBox
         Me.TextBoxAlatId = New System.Windows.Forms.TextBox
         Me.Label39 = New System.Windows.Forms.Label
         Me.ButtonCariAlat = New System.Windows.Forms.Button
         Me.TextBoxNamaAlat = New System.Windows.Forms.TextBox
         Me.Label43 = New System.Windows.Forms.Label
+        Me.TabPage2 = New System.Windows.Forms.TabPage
+        Me.ButtonGetAlatCartridge = New System.Windows.Forms.Button
+        Me.Label49 = New System.Windows.Forms.Label
+        Me.TextBox17 = New System.Windows.Forms.TextBox
+        Me.Label48 = New System.Windows.Forms.Label
+        Me.TextBoxHargaBeli = New System.Windows.Forms.TextBox
+        Me.NumericKuotaMinimumCartridge = New System.Windows.Forms.TextBox
+        Me.NumericKuotaAwalCartridge = New System.Windows.Forms.TextBox
+        Me.ButtonPreOrder = New System.Windows.Forms.Button
+        Me.Label38 = New System.Windows.Forms.Label
+        Me.Label58 = New System.Windows.Forms.Label
+        Me.ComboBoxNamaAlat = New System.Windows.Forms.ComboBox
+        Me.Label50 = New System.Windows.Forms.Label
+        Me.TextBoxKuotaTotalCartridge = New System.Windows.Forms.TextBox
+        Me.Label51 = New System.Windows.Forms.Label
+        Me.TextBoxKodeCartridge = New System.Windows.Forms.TextBox
+        Me.Label52 = New System.Windows.Forms.Label
+        Me.TextBoxKuotaSisaCartridge = New System.Windows.Forms.TextBox
+        Me.Label53 = New System.Windows.Forms.Label
+        Me.TextBoxKuotaTerpakaiCartridge = New System.Windows.Forms.TextBox
+        Me.Label55 = New System.Windows.Forms.Label
+        Me.CheckBoxCartridge = New System.Windows.Forms.CheckBox
+        Me.TextBoxIdCartridge = New System.Windows.Forms.TextBox
+        Me.Label56 = New System.Windows.Forms.Label
+        Me.ButtonCariCartridge = New System.Windows.Forms.Button
+        Me.TextBoxNamaCartridge = New System.Windows.Forms.TextBox
+        Me.Label57 = New System.Windows.Forms.Label
         Me.DataGridViewAlat = New System.Windows.Forms.DataGridView
         Me.Panel9 = New System.Windows.Forms.Panel
         Me.ButtonSimpanAlat = New System.Windows.Forms.Button
@@ -222,6 +253,7 @@ Partial Class MasterTindakanKlinik
         Me.SplitContainer3.Panel1.SuspendLayout()
         Me.SplitContainer3.SuspendLayout()
         Me.PanelMasterTindakan.SuspendLayout()
+        CType(Me.DataGridViewAlatTindakan, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox2.SuspendLayout()
         CType(Me.NumericShootPerTindakan, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.GroupBox1.SuspendLayout()
@@ -252,8 +284,10 @@ Partial Class MasterTindakanKlinik
         Me.SplitContainer4.Panel1.SuspendLayout()
         Me.SplitContainer4.Panel2.SuspendLayout()
         Me.SplitContainer4.SuspendLayout()
+        Me.TabControl1.SuspendLayout()
+        Me.TabPage1.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
-        CType(Me.NumericKuotaAwal, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.TabPage2.SuspendLayout()
         CType(Me.DataGridViewAlat, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.Panel9.SuspendLayout()
         Me.SuspendLayout()
@@ -527,13 +561,14 @@ Partial Class MasterTindakanKlinik
         '
         Me.SplitContainer3.Panel2.AutoScroll = True
         Me.SplitContainer3.Size = New System.Drawing.Size(757, 581)
-        Me.SplitContainer3.SplitterDistance = 500
+        Me.SplitContainer3.SplitterDistance = 552
         Me.SplitContainer3.SplitterWidth = 1
         Me.SplitContainer3.TabIndex = 462
         '
         'PanelMasterTindakan
         '
         Me.PanelMasterTindakan.AutoScroll = True
+        Me.PanelMasterTindakan.Controls.Add(Me.DataGridViewAlatTindakan)
         Me.PanelMasterTindakan.Controls.Add(Me.GroupBox2)
         Me.PanelMasterTindakan.Controls.Add(Me.ComboBoxKategori)
         Me.PanelMasterTindakan.Controls.Add(Me.Label34)
@@ -566,88 +601,122 @@ Partial Class MasterTindakanKlinik
         Me.PanelMasterTindakan.Dock = System.Windows.Forms.DockStyle.Fill
         Me.PanelMasterTindakan.Location = New System.Drawing.Point(0, 0)
         Me.PanelMasterTindakan.Name = "PanelMasterTindakan"
-        Me.PanelMasterTindakan.Size = New System.Drawing.Size(757, 500)
+        Me.PanelMasterTindakan.Size = New System.Drawing.Size(757, 552)
         Me.PanelMasterTindakan.TabIndex = 563
+        '
+        'DataGridViewAlatTindakan
+        '
+        Me.DataGridViewAlatTindakan.AllowUserToAddRows = False
+        Me.DataGridViewAlatTindakan.AllowUserToDeleteRows = False
+        Me.DataGridViewAlatTindakan.BackgroundColor = System.Drawing.Color.White
+        Me.DataGridViewAlatTindakan.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.DataGridViewAlatTindakan.Location = New System.Drawing.Point(808, 301)
+        Me.DataGridViewAlatTindakan.Name = "DataGridViewAlatTindakan"
+        Me.DataGridViewAlatTindakan.ReadOnly = True
+        Me.DataGridViewAlatTindakan.Size = New System.Drawing.Size(428, 130)
+        Me.DataGridViewAlatTindakan.TabIndex = 579
         '
         'GroupBox2
         '
+        Me.GroupBox2.Controls.Add(Me.ButtonTambahAlat)
+        Me.GroupBox2.Controls.Add(Me.ComboBoxAlatTindakan)
+        Me.GroupBox2.Controls.Add(Me.Label37)
+        Me.GroupBox2.Controls.Add(Me.ComboBoxCartridgeTindakan)
+        Me.GroupBox2.Controls.Add(Me.Label36)
         Me.GroupBox2.Controls.Add(Me.Label41)
-        Me.GroupBox2.Controls.Add(Me.ButtonCariAlatTindakan)
         Me.GroupBox2.Controls.Add(Me.NumericShootPerTindakan)
-        Me.GroupBox2.Controls.Add(Me.TextBoxNamaAlatTindakan)
-        Me.GroupBox2.Controls.Add(Me.TextBoxAlatIdTindakan)
         Me.GroupBox2.Controls.Add(Me.CheckBoxPakaiAlat)
-        Me.GroupBox2.Location = New System.Drawing.Point(537, 293)
+        Me.GroupBox2.Location = New System.Drawing.Point(629, 293)
         Me.GroupBox2.Name = "GroupBox2"
-        Me.GroupBox2.Size = New System.Drawing.Size(174, 154)
+        Me.GroupBox2.Size = New System.Drawing.Size(174, 215)
         Me.GroupBox2.TabIndex = 578
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Pakai Alat ?"
+        '
+        'ButtonTambahAlat
+        '
+        Me.ButtonTambahAlat.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonTambahAlat.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+        Me.ButtonTambahAlat.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonTambahAlat.FlatAppearance.BorderSize = 0
+        Me.ButtonTambahAlat.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonTambahAlat.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.ButtonTambahAlat.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonTambahAlat.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.ButtonTambahAlat.ForeColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(254, Byte), Integer))
+        Me.ButtonTambahAlat.Location = New System.Drawing.Point(92, 180)
+        Me.ButtonTambahAlat.Name = "ButtonTambahAlat"
+        Me.ButtonTambahAlat.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.ButtonTambahAlat.Size = New System.Drawing.Size(73, 25)
+        Me.ButtonTambahAlat.TabIndex = 587
+        Me.ButtonTambahAlat.Text = " + Tambah"
+        Me.ButtonTambahAlat.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.ButtonTambahAlat.UseVisualStyleBackColor = False
+        '
+        'ComboBoxAlatTindakan
+        '
+        Me.ComboBoxAlatTindakan.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBoxAlatTindakan.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ComboBoxAlatTindakan.FormattingEnabled = True
+        Me.ComboBoxAlatTindakan.Location = New System.Drawing.Point(11, 66)
+        Me.ComboBoxAlatTindakan.Name = "ComboBoxAlatTindakan"
+        Me.ComboBoxAlatTindakan.Size = New System.Drawing.Size(154, 25)
+        Me.ComboBoxAlatTindakan.TabIndex = 586
+        '
+        'Label37
+        '
+        Me.Label37.AutoSize = True
+        Me.Label37.Location = New System.Drawing.Point(7, 47)
+        Me.Label37.Name = "Label37"
+        Me.Label37.Size = New System.Drawing.Size(28, 15)
+        Me.Label37.TabIndex = 585
+        Me.Label37.Text = "Alat"
+        '
+        'ComboBoxCartridgeTindakan
+        '
+        Me.ComboBoxCartridgeTindakan.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.ComboBoxCartridgeTindakan.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ComboBoxCartridgeTindakan.FormattingEnabled = True
+        Me.ComboBoxCartridgeTindakan.Location = New System.Drawing.Point(12, 115)
+        Me.ComboBoxCartridgeTindakan.Name = "ComboBoxCartridgeTindakan"
+        Me.ComboBoxCartridgeTindakan.Size = New System.Drawing.Size(154, 25)
+        Me.ComboBoxCartridgeTindakan.TabIndex = 584
+        '
+        'Label36
+        '
+        Me.Label36.AutoSize = True
+        Me.Label36.Location = New System.Drawing.Point(8, 96)
+        Me.Label36.Name = "Label36"
+        Me.Label36.Size = New System.Drawing.Size(56, 15)
+        Me.Label36.TabIndex = 583
+        Me.Label36.Text = "Cartridge"
         '
         'Label41
         '
         Me.Label41.AutoSize = True
         Me.Label41.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label41.Location = New System.Drawing.Point(79, 88)
+        Me.Label41.Location = New System.Drawing.Point(76, 154)
         Me.Label41.Name = "Label41"
         Me.Label41.Size = New System.Drawing.Size(78, 17)
         Me.Label41.TabIndex = 582
-        Me.Label41.Text = "Kali / Shoot"
-        '
-        'ButtonCariAlatTindakan
-        '
-        Me.ButtonCariAlatTindakan.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
-        Me.ButtonCariAlatTindakan.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
-        Me.ButtonCariAlatTindakan.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.ButtonCariAlatTindakan.FlatAppearance.BorderSize = 0
-        Me.ButtonCariAlatTindakan.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
-        Me.ButtonCariAlatTindakan.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.ButtonCariAlatTindakan.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.ButtonCariAlatTindakan.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
-        Me.ButtonCariAlatTindakan.ForeColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(254, Byte), Integer))
-        Me.ButtonCariAlatTindakan.Location = New System.Drawing.Point(14, 47)
-        Me.ButtonCariAlatTindakan.Name = "ButtonCariAlatTindakan"
-        Me.ButtonCariAlatTindakan.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.ButtonCariAlatTindakan.Size = New System.Drawing.Size(46, 25)
-        Me.ButtonCariAlatTindakan.TabIndex = 581
-        Me.ButtonCariAlatTindakan.Text = " Cari"
-        Me.ButtonCariAlatTindakan.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
-        Me.ButtonCariAlatTindakan.UseVisualStyleBackColor = False
+        Me.Label41.Text = "Shoot / Kali"
         '
         'NumericShootPerTindakan
         '
-        Me.NumericShootPerTindakan.Location = New System.Drawing.Point(15, 86)
+        Me.NumericShootPerTindakan.Location = New System.Drawing.Point(12, 152)
+        Me.NumericShootPerTindakan.Maximum = New Decimal(New Integer() {100000, 0, 0, 0})
         Me.NumericShootPerTindakan.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.NumericShootPerTindakan.Name = "NumericShootPerTindakan"
         Me.NumericShootPerTindakan.Size = New System.Drawing.Size(58, 23)
         Me.NumericShootPerTindakan.TabIndex = 580
+        Me.NumericShootPerTindakan.ThousandsSeparator = True
         Me.NumericShootPerTindakan.Value = New Decimal(New Integer() {1, 0, 0, 0})
-        '
-        'TextBoxNamaAlatTindakan
-        '
-        Me.TextBoxNamaAlatTindakan.BackColor = System.Drawing.Color.White
-        Me.TextBoxNamaAlatTindakan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBoxNamaAlatTindakan.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
-        Me.TextBoxNamaAlatTindakan.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxNamaAlatTindakan.Location = New System.Drawing.Point(66, 47)
-        Me.TextBoxNamaAlatTindakan.Multiline = True
-        Me.TextBoxNamaAlatTindakan.Name = "TextBoxNamaAlatTindakan"
-        Me.TextBoxNamaAlatTindakan.Size = New System.Drawing.Size(102, 25)
-        Me.TextBoxNamaAlatTindakan.TabIndex = 579
-        '
-        'TextBoxAlatIdTindakan
-        '
-        Me.TextBoxAlatIdTindakan.Location = New System.Drawing.Point(14, 121)
-        Me.TextBoxAlatIdTindakan.Name = "TextBoxAlatIdTindakan"
-        Me.TextBoxAlatIdTindakan.Size = New System.Drawing.Size(76, 23)
-        Me.TextBoxAlatIdTindakan.TabIndex = 578
-        Me.TextBoxAlatIdTindakan.Visible = False
         '
         'CheckBoxPakaiAlat
         '
         Me.CheckBoxPakaiAlat.AutoSize = True
         Me.CheckBoxPakaiAlat.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.CheckBoxPakaiAlat.Location = New System.Drawing.Point(14, 22)
+        Me.CheckBoxPakaiAlat.Location = New System.Drawing.Point(10, 22)
         Me.CheckBoxPakaiAlat.Name = "CheckBoxPakaiAlat"
         Me.CheckBoxPakaiAlat.Size = New System.Drawing.Size(42, 19)
         Me.CheckBoxPakaiAlat.TabIndex = 577
@@ -659,7 +728,7 @@ Partial Class MasterTindakanKlinik
         Me.ComboBoxKategori.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ComboBoxKategori.FormattingEnabled = True
         Me.ComboBoxKategori.Items.AddRange(New Object() {"Face", "Hair", "Body", "IV"})
-        Me.ComboBoxKategori.Location = New System.Drawing.Point(537, 259)
+        Me.ComboBoxKategori.Location = New System.Drawing.Point(629, 259)
         Me.ComboBoxKategori.Name = "ComboBoxKategori"
         Me.ComboBoxKategori.Size = New System.Drawing.Size(174, 25)
         Me.ComboBoxKategori.TabIndex = 576
@@ -668,7 +737,7 @@ Partial Class MasterTindakanKlinik
         '
         Me.Label34.AutoSize = True
         Me.Label34.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label34.Location = New System.Drawing.Point(534, 238)
+        Me.Label34.Location = New System.Drawing.Point(626, 238)
         Me.Label34.Name = "Label34"
         Me.Label34.Size = New System.Drawing.Size(118, 17)
         Me.Label34.TabIndex = 575
@@ -677,7 +746,7 @@ Partial Class MasterTindakanKlinik
         'CheckedListBoxPoli
         '
         Me.CheckedListBoxPoli.FormattingEnabled = True
-        Me.CheckedListBoxPoli.Location = New System.Drawing.Point(537, 139)
+        Me.CheckedListBoxPoli.Location = New System.Drawing.Point(629, 139)
         Me.CheckedListBoxPoli.Name = "CheckedListBoxPoli"
         Me.CheckedListBoxPoli.ScrollAlwaysVisible = True
         Me.CheckedListBoxPoli.Size = New System.Drawing.Size(174, 94)
@@ -688,7 +757,7 @@ Partial Class MasterTindakanKlinik
         Me.GroupBox1.Controls.Add(Me.Label33)
         Me.GroupBox1.Controls.Add(Me.TextBoxHariReminder)
         Me.GroupBox1.Controls.Add(Me.CheckBoxReminder)
-        Me.GroupBox1.Location = New System.Drawing.Point(537, 17)
+        Me.GroupBox1.Location = New System.Drawing.Point(629, 17)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(174, 116)
         Me.GroupBox1.TabIndex = 573
@@ -786,8 +855,11 @@ Partial Class MasterTindakanKlinik
         '
         'SplitContainerFeeTindakan.Panel2
         '
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.TextBoxPersentaseFeePerawat)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label42)
         Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Panel7)
         Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label31)
+        Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label47)
         Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Panel6)
         Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label28)
         Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.TextBoxPersentaseFeeKaryawan)
@@ -808,7 +880,7 @@ Partial Class MasterTindakanKlinik
         Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label22)
         Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Panel4)
         Me.SplitContainerFeeTindakan.Panel2.Controls.Add(Me.Label13)
-        Me.SplitContainerFeeTindakan.Size = New System.Drawing.Size(521, 320)
+        Me.SplitContainerFeeTindakan.Size = New System.Drawing.Size(604, 320)
         Me.SplitContainerFeeTindakan.SplitterDistance = 31
         Me.SplitContainerFeeTindakan.SplitterWidth = 1
         Me.SplitContainerFeeTindakan.TabIndex = 567
@@ -856,6 +928,27 @@ Partial Class MasterTindakanKlinik
         Me.Label12.Size = New System.Drawing.Size(148, 17)
         Me.Label12.TabIndex = 563
         Me.Label12.Text = "Aktifkan Fee Tindakan?"
+        '
+        'TextBoxPersentaseFeePerawat
+        '
+        Me.TextBoxPersentaseFeePerawat.BackColor = System.Drawing.Color.White
+        Me.TextBoxPersentaseFeePerawat.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxPersentaseFeePerawat.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxPersentaseFeePerawat.Location = New System.Drawing.Point(525, 34)
+        Me.TextBoxPersentaseFeePerawat.Name = "TextBoxPersentaseFeePerawat"
+        Me.TextBoxPersentaseFeePerawat.Size = New System.Drawing.Size(50, 23)
+        Me.TextBoxPersentaseFeePerawat.TabIndex = 594
+        '
+        'Label42
+        '
+        Me.Label42.AutoSize = True
+        Me.Label42.BackColor = System.Drawing.Color.Transparent
+        Me.Label42.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.Label42.Location = New System.Drawing.Point(581, 37)
+        Me.Label42.Name = "Label42"
+        Me.Label42.Size = New System.Drawing.Size(17, 15)
+        Me.Label42.TabIndex = 593
+        Me.Label42.Text = "%"
         '
         'Panel7
         '
@@ -950,6 +1043,16 @@ Partial Class MasterTindakanKlinik
         Me.Label31.TabIndex = 590
         Me.Label31.Text = "Fee Perawat"
         Me.Label31.Visible = False
+        '
+        'Label47
+        '
+        Me.Label47.AutoSize = True
+        Me.Label47.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.Label47.Location = New System.Drawing.Point(472, 37)
+        Me.Label47.Name = "Label47"
+        Me.Label47.Size = New System.Drawing.Size(49, 15)
+        Me.Label47.TabIndex = 592
+        Me.Label47.Text = "Perawat"
         '
         'Panel6
         '
@@ -1050,7 +1153,7 @@ Partial Class MasterTindakanKlinik
         Me.TextBoxPersentaseFeeKaryawan.BackColor = System.Drawing.Color.White
         Me.TextBoxPersentaseFeeKaryawan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.TextBoxPersentaseFeeKaryawan.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxPersentaseFeeKaryawan.Location = New System.Drawing.Point(421, 34)
+        Me.TextBoxPersentaseFeeKaryawan.Location = New System.Drawing.Point(393, 34)
         Me.TextBoxPersentaseFeeKaryawan.Name = "TextBoxPersentaseFeeKaryawan"
         Me.TextBoxPersentaseFeeKaryawan.Size = New System.Drawing.Size(50, 23)
         Me.TextBoxPersentaseFeeKaryawan.TabIndex = 587
@@ -1166,7 +1269,7 @@ Partial Class MasterTindakanKlinik
         Me.Label26.AutoSize = True
         Me.Label26.BackColor = System.Drawing.Color.Transparent
         Me.Label26.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.Label26.Location = New System.Drawing.Point(477, 36)
+        Me.Label26.Location = New System.Drawing.Point(449, 36)
         Me.Label26.Name = "Label26"
         Me.Label26.Size = New System.Drawing.Size(17, 15)
         Me.Label26.TabIndex = 576
@@ -1176,7 +1279,7 @@ Partial Class MasterTindakanKlinik
         '
         Me.Label25.AutoSize = True
         Me.Label25.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.Label25.Location = New System.Drawing.Point(357, 36)
+        Me.Label25.Location = New System.Drawing.Point(329, 36)
         Me.Label25.Name = "Label25"
         Me.Label25.Size = New System.Drawing.Size(58, 15)
         Me.Label25.TabIndex = 574
@@ -2215,23 +2318,7 @@ Partial Class MasterTindakanKlinik
         '
         'SplitContainer4.Panel1
         '
-        Me.SplitContainer4.Panel1.Controls.Add(Me.GroupBox3)
-        Me.SplitContainer4.Panel1.Controls.Add(Me.Label42)
-        Me.SplitContainer4.Panel1.Controls.Add(Me.TextBoxKuotaTotal)
-        Me.SplitContainer4.Panel1.Controls.Add(Me.Label40)
-        Me.SplitContainer4.Panel1.Controls.Add(Me.TextBoxKodeAlat)
-        Me.SplitContainer4.Panel1.Controls.Add(Me.NumericKuotaAwal)
-        Me.SplitContainer4.Panel1.Controls.Add(Me.Label38)
-        Me.SplitContainer4.Panel1.Controls.Add(Me.TextBoxKuotaSisa)
-        Me.SplitContainer4.Panel1.Controls.Add(Me.Label37)
-        Me.SplitContainer4.Panel1.Controls.Add(Me.TextBoxKuotaTerpakai)
-        Me.SplitContainer4.Panel1.Controls.Add(Me.Label36)
-        Me.SplitContainer4.Panel1.Controls.Add(Me.CheckBoxAlatAktif)
-        Me.SplitContainer4.Panel1.Controls.Add(Me.TextBoxAlatId)
-        Me.SplitContainer4.Panel1.Controls.Add(Me.Label39)
-        Me.SplitContainer4.Panel1.Controls.Add(Me.ButtonCariAlat)
-        Me.SplitContainer4.Panel1.Controls.Add(Me.TextBoxNamaAlat)
-        Me.SplitContainer4.Panel1.Controls.Add(Me.Label43)
+        Me.SplitContainer4.Panel1.Controls.Add(Me.TabControl1)
         '
         'SplitContainer4.Panel2
         '
@@ -2241,6 +2328,93 @@ Partial Class MasterTindakanKlinik
         Me.SplitContainer4.SplitterWidth = 1
         Me.SplitContainer4.TabIndex = 2
         '
+        'TabControl1
+        '
+        Me.TabControl1.Controls.Add(Me.TabPage1)
+        Me.TabControl1.Controls.Add(Me.TabPage2)
+        Me.TabControl1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.TabControl1.Location = New System.Drawing.Point(0, 0)
+        Me.TabControl1.Name = "TabControl1"
+        Me.TabControl1.SelectedIndex = 0
+        Me.TabControl1.Size = New System.Drawing.Size(757, 250)
+        Me.TabControl1.TabIndex = 0
+        '
+        'TabPage1
+        '
+        Me.TabPage1.BackColor = System.Drawing.Color.White
+        Me.TabPage1.Controls.Add(Me.TextBoxIdRuangan)
+        Me.TabPage1.Controls.Add(Me.Label59)
+        Me.TabPage1.Controls.Add(Me.TextBoxNamaRuangan)
+        Me.TabPage1.Controls.Add(Me.ButtonGetAlatSarpras)
+        Me.TabPage1.Controls.Add(Me.GroupBox3)
+        Me.TabPage1.Controls.Add(Me.Label40)
+        Me.TabPage1.Controls.Add(Me.TextBoxKodeAlat)
+        Me.TabPage1.Controls.Add(Me.CheckBoxAlatAktif)
+        Me.TabPage1.Controls.Add(Me.TextBoxAlatId)
+        Me.TabPage1.Controls.Add(Me.Label39)
+        Me.TabPage1.Controls.Add(Me.ButtonCariAlat)
+        Me.TabPage1.Controls.Add(Me.TextBoxNamaAlat)
+        Me.TabPage1.Controls.Add(Me.Label43)
+        Me.TabPage1.Location = New System.Drawing.Point(4, 24)
+        Me.TabPage1.Name = "TabPage1"
+        Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage1.Size = New System.Drawing.Size(749, 222)
+        Me.TabPage1.TabIndex = 0
+        Me.TabPage1.Text = "Alat"
+        '
+        'TextBoxIdRuangan
+        '
+        Me.TextBoxIdRuangan.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
+        Me.TextBoxIdRuangan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxIdRuangan.Cursor = System.Windows.Forms.Cursors.No
+        Me.TextBoxIdRuangan.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxIdRuangan.Location = New System.Drawing.Point(364, 125)
+        Me.TextBoxIdRuangan.Name = "TextBoxIdRuangan"
+        Me.TextBoxIdRuangan.Size = New System.Drawing.Size(37, 23)
+        Me.TextBoxIdRuangan.TabIndex = 638
+        Me.TextBoxIdRuangan.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'Label59
+        '
+        Me.Label59.AutoSize = True
+        Me.Label59.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label59.Location = New System.Drawing.Point(27, 131)
+        Me.Label59.Name = "Label59"
+        Me.Label59.Size = New System.Drawing.Size(102, 17)
+        Me.Label59.TabIndex = 637
+        Me.Label59.Text = "Nama Ruangan"
+        '
+        'TextBoxNamaRuangan
+        '
+        Me.TextBoxNamaRuangan.BackColor = System.Drawing.Color.White
+        Me.TextBoxNamaRuangan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxNamaRuangan.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
+        Me.TextBoxNamaRuangan.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxNamaRuangan.Location = New System.Drawing.Point(194, 125)
+        Me.TextBoxNamaRuangan.Name = "TextBoxNamaRuangan"
+        Me.TextBoxNamaRuangan.Size = New System.Drawing.Size(167, 23)
+        Me.TextBoxNamaRuangan.TabIndex = 636
+        '
+        'ButtonGetAlatSarpras
+        '
+        Me.ButtonGetAlatSarpras.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonGetAlatSarpras.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+        Me.ButtonGetAlatSarpras.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonGetAlatSarpras.FlatAppearance.BorderSize = 0
+        Me.ButtonGetAlatSarpras.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonGetAlatSarpras.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.ButtonGetAlatSarpras.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonGetAlatSarpras.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.ButtonGetAlatSarpras.ForeColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(254, Byte), Integer))
+        Me.ButtonGetAlatSarpras.Location = New System.Drawing.Point(260, 22)
+        Me.ButtonGetAlatSarpras.Name = "ButtonGetAlatSarpras"
+        Me.ButtonGetAlatSarpras.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.ButtonGetAlatSarpras.Size = New System.Drawing.Size(67, 25)
+        Me.ButtonGetAlatSarpras.TabIndex = 635
+        Me.ButtonGetAlatSarpras.Text = "Get Alat"
+        Me.ButtonGetAlatSarpras.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.ButtonGetAlatSarpras.UseVisualStyleBackColor = False
+        '
         'GroupBox3
         '
         Me.GroupBox3.Controls.Add(Me.ButtonCetakRiwayat)
@@ -2249,12 +2423,12 @@ Partial Class MasterTindakanKlinik
         Me.GroupBox3.Controls.Add(Me.Label44)
         Me.GroupBox3.Controls.Add(Me.dtAkhir)
         Me.GroupBox3.Controls.Add(Me.dtAwal)
-        Me.GroupBox3.Location = New System.Drawing.Point(420, 14)
+        Me.GroupBox3.Location = New System.Drawing.Point(407, 53)
         Me.GroupBox3.Name = "GroupBox3"
         Me.GroupBox3.Size = New System.Drawing.Size(301, 113)
-        Me.GroupBox3.TabIndex = 617
+        Me.GroupBox3.TabIndex = 634
         Me.GroupBox3.TabStop = False
-        Me.GroupBox3.Text = "Riwayat Penggunaan Alat"
+        Me.GroupBox3.Text = "Periode Penggunaan Alat"
         '
         'ButtonCetakRiwayat
         '
@@ -2331,37 +2505,15 @@ Partial Class MasterTindakanKlinik
         Me.dtAwal.Size = New System.Drawing.Size(125, 25)
         Me.dtAwal.TabIndex = 453
         '
-        'Label42
-        '
-        Me.Label42.AutoSize = True
-        Me.Label42.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label42.Location = New System.Drawing.Point(28, 136)
-        Me.Label42.Name = "Label42"
-        Me.Label42.Size = New System.Drawing.Size(77, 17)
-        Me.Label42.TabIndex = 615
-        Me.Label42.Text = "Kuota Total"
-        '
-        'TextBoxKuotaTotal
-        '
-        Me.TextBoxKuotaTotal.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
-        Me.TextBoxKuotaTotal.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBoxKuotaTotal.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
-        Me.TextBoxKuotaTotal.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxKuotaTotal.Location = New System.Drawing.Point(194, 136)
-        Me.TextBoxKuotaTotal.Name = "TextBoxKuotaTotal"
-        Me.TextBoxKuotaTotal.ReadOnly = True
-        Me.TextBoxKuotaTotal.Size = New System.Drawing.Size(77, 23)
-        Me.TextBoxKuotaTotal.TabIndex = 616
-        '
         'Label40
         '
         Me.Label40.AutoSize = True
         Me.Label40.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label40.Location = New System.Drawing.Point(27, 45)
+        Me.Label40.Location = New System.Drawing.Point(27, 56)
         Me.Label40.Name = "Label40"
-        Me.Label40.Size = New System.Drawing.Size(67, 17)
-        Me.Label40.TabIndex = 613
-        Me.Label40.Text = "Kode Alat"
+        Me.Label40.Size = New System.Drawing.Size(70, 17)
+        Me.Label40.TabIndex = 630
+        Me.Label40.Text = "Kode Aset"
         '
         'TextBoxKodeAlat
         '
@@ -2369,83 +2521,21 @@ Partial Class MasterTindakanKlinik
         Me.TextBoxKodeAlat.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.TextBoxKodeAlat.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.TextBoxKodeAlat.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxKodeAlat.Location = New System.Drawing.Point(194, 45)
+        Me.TextBoxKodeAlat.Location = New System.Drawing.Point(194, 56)
         Me.TextBoxKodeAlat.Name = "TextBoxKodeAlat"
         Me.TextBoxKodeAlat.Size = New System.Drawing.Size(207, 23)
-        Me.TextBoxKodeAlat.TabIndex = 614
-        '
-        'NumericKuotaAwal
-        '
-        Me.NumericKuotaAwal.Location = New System.Drawing.Point(194, 107)
-        Me.NumericKuotaAwal.Maximum = New Decimal(New Integer() {10000, 0, 0, 0})
-        Me.NumericKuotaAwal.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
-        Me.NumericKuotaAwal.Name = "NumericKuotaAwal"
-        Me.NumericKuotaAwal.Size = New System.Drawing.Size(77, 23)
-        Me.NumericKuotaAwal.TabIndex = 612
-        Me.NumericKuotaAwal.Value = New Decimal(New Integer() {1, 0, 0, 0})
-        '
-        'Label38
-        '
-        Me.Label38.AutoSize = True
-        Me.Label38.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label38.Location = New System.Drawing.Point(28, 196)
-        Me.Label38.Name = "Label38"
-        Me.Label38.Size = New System.Drawing.Size(71, 17)
-        Me.Label38.TabIndex = 610
-        Me.Label38.Text = "Kuota Sisa"
-        '
-        'TextBoxKuotaSisa
-        '
-        Me.TextBoxKuotaSisa.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
-        Me.TextBoxKuotaSisa.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBoxKuotaSisa.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
-        Me.TextBoxKuotaSisa.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxKuotaSisa.Location = New System.Drawing.Point(194, 196)
-        Me.TextBoxKuotaSisa.Name = "TextBoxKuotaSisa"
-        Me.TextBoxKuotaSisa.ReadOnly = True
-        Me.TextBoxKuotaSisa.Size = New System.Drawing.Size(77, 23)
-        Me.TextBoxKuotaSisa.TabIndex = 611
-        '
-        'Label37
-        '
-        Me.Label37.AutoSize = True
-        Me.Label37.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label37.Location = New System.Drawing.Point(27, 167)
-        Me.Label37.Name = "Label37"
-        Me.Label37.Size = New System.Drawing.Size(98, 17)
-        Me.Label37.TabIndex = 608
-        Me.Label37.Text = "Kuota Terpakai"
-        '
-        'TextBoxKuotaTerpakai
-        '
-        Me.TextBoxKuotaTerpakai.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
-        Me.TextBoxKuotaTerpakai.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.TextBoxKuotaTerpakai.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
-        Me.TextBoxKuotaTerpakai.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxKuotaTerpakai.Location = New System.Drawing.Point(194, 167)
-        Me.TextBoxKuotaTerpakai.Name = "TextBoxKuotaTerpakai"
-        Me.TextBoxKuotaTerpakai.ReadOnly = True
-        Me.TextBoxKuotaTerpakai.Size = New System.Drawing.Size(77, 23)
-        Me.TextBoxKuotaTerpakai.TabIndex = 609
-        '
-        'Label36
-        '
-        Me.Label36.AutoSize = True
-        Me.Label36.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label36.Location = New System.Drawing.Point(27, 107)
-        Me.Label36.Name = "Label36"
-        Me.Label36.Size = New System.Drawing.Size(77, 17)
-        Me.Label36.TabIndex = 607
-        Me.Label36.Text = "Kuota Awal"
+        Me.TextBoxKodeAlat.TabIndex = 631
         '
         'CheckBoxAlatAktif
         '
         Me.CheckBoxAlatAktif.AutoSize = True
+        Me.CheckBoxAlatAktif.Checked = True
+        Me.CheckBoxAlatAktif.CheckState = System.Windows.Forms.CheckState.Checked
         Me.CheckBoxAlatAktif.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.CheckBoxAlatAktif.Location = New System.Drawing.Point(350, 17)
+        Me.CheckBoxAlatAktif.Location = New System.Drawing.Point(425, 25)
         Me.CheckBoxAlatAktif.Name = "CheckBoxAlatAktif"
         Me.CheckBoxAlatAktif.Size = New System.Drawing.Size(51, 19)
-        Me.CheckBoxAlatAktif.TabIndex = 606
+        Me.CheckBoxAlatAktif.TabIndex = 623
         Me.CheckBoxAlatAktif.Text = "Aktif"
         Me.CheckBoxAlatAktif.UseVisualStyleBackColor = True
         '
@@ -2455,21 +2545,21 @@ Partial Class MasterTindakanKlinik
         Me.TextBoxAlatId.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.TextBoxAlatId.Cursor = System.Windows.Forms.Cursors.No
         Me.TextBoxAlatId.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxAlatId.Location = New System.Drawing.Point(260, 16)
+        Me.TextBoxAlatId.Location = New System.Drawing.Point(335, 24)
         Me.TextBoxAlatId.Name = "TextBoxAlatId"
         Me.TextBoxAlatId.ReadOnly = True
         Me.TextBoxAlatId.Size = New System.Drawing.Size(84, 23)
-        Me.TextBoxAlatId.TabIndex = 602
+        Me.TextBoxAlatId.TabIndex = 619
         Me.TextBoxAlatId.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
         '
         'Label39
         '
         Me.Label39.AutoSize = True
         Me.Label39.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label39.Location = New System.Drawing.Point(27, 78)
+        Me.Label39.Location = New System.Drawing.Point(27, 92)
         Me.Label39.Name = "Label39"
         Me.Label39.Size = New System.Drawing.Size(72, 17)
-        Me.Label39.TabIndex = 601
+        Me.Label39.TabIndex = 618
         Me.Label39.Text = "Nama Alat"
         '
         'ButtonCariAlat
@@ -2483,11 +2573,11 @@ Partial Class MasterTindakanKlinik
         Me.ButtonCariAlat.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonCariAlat.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
         Me.ButtonCariAlat.ForeColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(254, Byte), Integer))
-        Me.ButtonCariAlat.Location = New System.Drawing.Point(194, 14)
+        Me.ButtonCariAlat.Location = New System.Drawing.Point(194, 22)
         Me.ButtonCariAlat.Name = "ButtonCariAlat"
         Me.ButtonCariAlat.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.ButtonCariAlat.Size = New System.Drawing.Size(60, 25)
-        Me.ButtonCariAlat.TabIndex = 603
+        Me.ButtonCariAlat.TabIndex = 620
         Me.ButtonCariAlat.Text = " Cari"
         Me.ButtonCariAlat.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
         Me.ButtonCariAlat.UseVisualStyleBackColor = False
@@ -2498,20 +2588,373 @@ Partial Class MasterTindakanKlinik
         Me.TextBoxNamaAlat.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.TextBoxNamaAlat.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.TextBoxNamaAlat.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxNamaAlat.Location = New System.Drawing.Point(194, 78)
+        Me.TextBoxNamaAlat.Location = New System.Drawing.Point(194, 92)
         Me.TextBoxNamaAlat.Name = "TextBoxNamaAlat"
         Me.TextBoxNamaAlat.Size = New System.Drawing.Size(207, 23)
-        Me.TextBoxNamaAlat.TabIndex = 604
+        Me.TextBoxNamaAlat.TabIndex = 621
         '
         'Label43
         '
         Me.Label43.AutoSize = True
         Me.Label43.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label43.Location = New System.Drawing.Point(27, 17)
+        Me.Label43.Location = New System.Drawing.Point(27, 25)
         Me.Label43.Name = "Label43"
         Me.Label43.Size = New System.Drawing.Size(49, 17)
-        Me.Label43.TabIndex = 605
+        Me.Label43.TabIndex = 622
         Me.Label43.Text = "Alat ID"
+        '
+        'TabPage2
+        '
+        Me.TabPage2.BackColor = System.Drawing.Color.White
+        Me.TabPage2.Controls.Add(Me.ButtonGetAlatCartridge)
+        Me.TabPage2.Controls.Add(Me.Label49)
+        Me.TabPage2.Controls.Add(Me.TextBox17)
+        Me.TabPage2.Controls.Add(Me.Label48)
+        Me.TabPage2.Controls.Add(Me.TextBoxHargaBeli)
+        Me.TabPage2.Controls.Add(Me.NumericKuotaMinimumCartridge)
+        Me.TabPage2.Controls.Add(Me.NumericKuotaAwalCartridge)
+        Me.TabPage2.Controls.Add(Me.ButtonPreOrder)
+        Me.TabPage2.Controls.Add(Me.Label38)
+        Me.TabPage2.Controls.Add(Me.Label58)
+        Me.TabPage2.Controls.Add(Me.ComboBoxNamaAlat)
+        Me.TabPage2.Controls.Add(Me.Label50)
+        Me.TabPage2.Controls.Add(Me.TextBoxKuotaTotalCartridge)
+        Me.TabPage2.Controls.Add(Me.Label51)
+        Me.TabPage2.Controls.Add(Me.TextBoxKodeCartridge)
+        Me.TabPage2.Controls.Add(Me.Label52)
+        Me.TabPage2.Controls.Add(Me.TextBoxKuotaSisaCartridge)
+        Me.TabPage2.Controls.Add(Me.Label53)
+        Me.TabPage2.Controls.Add(Me.TextBoxKuotaTerpakaiCartridge)
+        Me.TabPage2.Controls.Add(Me.Label55)
+        Me.TabPage2.Controls.Add(Me.CheckBoxCartridge)
+        Me.TabPage2.Controls.Add(Me.TextBoxIdCartridge)
+        Me.TabPage2.Controls.Add(Me.Label56)
+        Me.TabPage2.Controls.Add(Me.ButtonCariCartridge)
+        Me.TabPage2.Controls.Add(Me.TextBoxNamaCartridge)
+        Me.TabPage2.Controls.Add(Me.Label57)
+        Me.TabPage2.Location = New System.Drawing.Point(4, 24)
+        Me.TabPage2.Name = "TabPage2"
+        Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage2.Size = New System.Drawing.Size(749, 222)
+        Me.TabPage2.TabIndex = 1
+        Me.TabPage2.Text = "Cardtridge"
+        '
+        'ButtonGetAlatCartridge
+        '
+        Me.ButtonGetAlatCartridge.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonGetAlatCartridge.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+        Me.ButtonGetAlatCartridge.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonGetAlatCartridge.FlatAppearance.BorderSize = 0
+        Me.ButtonGetAlatCartridge.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonGetAlatCartridge.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.ButtonGetAlatCartridge.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonGetAlatCartridge.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.ButtonGetAlatCartridge.ForeColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(254, Byte), Integer))
+        Me.ButtonGetAlatCartridge.Location = New System.Drawing.Point(260, 9)
+        Me.ButtonGetAlatCartridge.Name = "ButtonGetAlatCartridge"
+        Me.ButtonGetAlatCartridge.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.ButtonGetAlatCartridge.Size = New System.Drawing.Size(67, 25)
+        Me.ButtonGetAlatCartridge.TabIndex = 663
+        Me.ButtonGetAlatCartridge.Text = "Get Alat"
+        Me.ButtonGetAlatCartridge.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.ButtonGetAlatCartridge.UseVisualStyleBackColor = False
+        '
+        'Label49
+        '
+        Me.Label49.AutoSize = True
+        Me.Label49.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label49.Location = New System.Drawing.Point(636, 45)
+        Me.Label49.Name = "Label49"
+        Me.Label49.Size = New System.Drawing.Size(53, 17)
+        Me.Label49.TabIndex = 662
+        Me.Label49.Text = "/ Shoot"
+        '
+        'TextBox17
+        '
+        Me.TextBox17.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
+        Me.TextBox17.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBox17.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.TextBox17.Location = New System.Drawing.Point(501, 45)
+        Me.TextBox17.Name = "TextBox17"
+        Me.TextBox17.Size = New System.Drawing.Size(35, 23)
+        Me.TextBox17.TabIndex = 661
+        Me.TextBox17.Text = "Rp"
+        Me.TextBox17.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'Label48
+        '
+        Me.Label48.AutoSize = True
+        Me.Label48.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label48.Location = New System.Drawing.Point(425, 45)
+        Me.Label48.Name = "Label48"
+        Me.Label48.Size = New System.Drawing.Size(70, 17)
+        Me.Label48.TabIndex = 660
+        Me.Label48.Text = "Harga Beli"
+        '
+        'TextBoxHargaBeli
+        '
+        Me.TextBoxHargaBeli.BackColor = System.Drawing.Color.White
+        Me.TextBoxHargaBeli.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxHargaBeli.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
+        Me.TextBoxHargaBeli.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxHargaBeli.Location = New System.Drawing.Point(539, 45)
+        Me.TextBoxHargaBeli.Name = "TextBoxHargaBeli"
+        Me.TextBoxHargaBeli.Size = New System.Drawing.Size(91, 23)
+        Me.TextBoxHargaBeli.TabIndex = 659
+        Me.TextBoxHargaBeli.Text = "0"
+        Me.TextBoxHargaBeli.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'NumericKuotaMinimumCartridge
+        '
+        Me.NumericKuotaMinimumCartridge.BackColor = System.Drawing.Color.White
+        Me.NumericKuotaMinimumCartridge.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.NumericKuotaMinimumCartridge.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
+        Me.NumericKuotaMinimumCartridge.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.NumericKuotaMinimumCartridge.Location = New System.Drawing.Point(194, 178)
+        Me.NumericKuotaMinimumCartridge.MaxLength = 5000000
+        Me.NumericKuotaMinimumCartridge.Name = "NumericKuotaMinimumCartridge"
+        Me.NumericKuotaMinimumCartridge.Size = New System.Drawing.Size(93, 23)
+        Me.NumericKuotaMinimumCartridge.TabIndex = 658
+        '
+        'NumericKuotaAwalCartridge
+        '
+        Me.NumericKuotaAwalCartridge.BackColor = System.Drawing.Color.White
+        Me.NumericKuotaAwalCartridge.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.NumericKuotaAwalCartridge.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
+        Me.NumericKuotaAwalCartridge.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.NumericKuotaAwalCartridge.Location = New System.Drawing.Point(194, 144)
+        Me.NumericKuotaAwalCartridge.MaxLength = 50000000
+        Me.NumericKuotaAwalCartridge.Name = "NumericKuotaAwalCartridge"
+        Me.NumericKuotaAwalCartridge.Size = New System.Drawing.Size(93, 23)
+        Me.NumericKuotaAwalCartridge.TabIndex = 657
+        '
+        'ButtonPreOrder
+        '
+        Me.ButtonPreOrder.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonPreOrder.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+        Me.ButtonPreOrder.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonPreOrder.FlatAppearance.BorderSize = 0
+        Me.ButtonPreOrder.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonPreOrder.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.ButtonPreOrder.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonPreOrder.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.ButtonPreOrder.ForeColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(254, Byte), Integer))
+        Me.ButtonPreOrder.Image = CType(resources.GetObject("ButtonPreOrder.Image"), System.Drawing.Image)
+        Me.ButtonPreOrder.ImageAlign = System.Drawing.ContentAlignment.MiddleRight
+        Me.ButtonPreOrder.Location = New System.Drawing.Point(528, 175)
+        Me.ButtonPreOrder.Name = "ButtonPreOrder"
+        Me.ButtonPreOrder.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.ButtonPreOrder.Size = New System.Drawing.Size(119, 25)
+        Me.ButtonPreOrder.TabIndex = 656
+        Me.ButtonPreOrder.Text = "Pre-Order"
+        Me.ButtonPreOrder.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.ButtonPreOrder.UseVisualStyleBackColor = False
+        '
+        'Label38
+        '
+        Me.Label38.AutoSize = True
+        Me.Label38.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label38.Location = New System.Drawing.Point(27, 178)
+        Me.Label38.Name = "Label38"
+        Me.Label38.Size = New System.Drawing.Size(106, 17)
+        Me.Label38.TabIndex = 655
+        Me.Label38.Text = "Kuota Minimum"
+        '
+        'Label58
+        '
+        Me.Label58.AutoSize = True
+        Me.Label58.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label58.Location = New System.Drawing.Point(27, 45)
+        Me.Label58.Name = "Label58"
+        Me.Label58.Size = New System.Drawing.Size(72, 17)
+        Me.Label58.TabIndex = 653
+        Me.Label58.Text = "Nama Alat"
+        '
+        'ComboBoxNamaAlat
+        '
+        Me.ComboBoxNamaAlat.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.ComboBoxNamaAlat.FormattingEnabled = True
+        Me.ComboBoxNamaAlat.Location = New System.Drawing.Point(194, 45)
+        Me.ComboBoxNamaAlat.Name = "ComboBoxNamaAlat"
+        Me.ComboBoxNamaAlat.Size = New System.Drawing.Size(207, 25)
+        Me.ComboBoxNamaAlat.TabIndex = 652
+        '
+        'Label50
+        '
+        Me.Label50.AutoSize = True
+        Me.Label50.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label50.Location = New System.Drawing.Point(293, 144)
+        Me.Label50.Name = "Label50"
+        Me.Label50.Size = New System.Drawing.Size(77, 17)
+        Me.Label50.TabIndex = 649
+        Me.Label50.Text = "Kuota Total"
+        '
+        'TextBoxKuotaTotalCartridge
+        '
+        Me.TextBoxKuotaTotalCartridge.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
+        Me.TextBoxKuotaTotalCartridge.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxKuotaTotalCartridge.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
+        Me.TextBoxKuotaTotalCartridge.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxKuotaTotalCartridge.Location = New System.Drawing.Point(383, 144)
+        Me.TextBoxKuotaTotalCartridge.MaxLength = 50000000
+        Me.TextBoxKuotaTotalCartridge.Name = "TextBoxKuotaTotalCartridge"
+        Me.TextBoxKuotaTotalCartridge.ReadOnly = True
+        Me.TextBoxKuotaTotalCartridge.Size = New System.Drawing.Size(77, 23)
+        Me.TextBoxKuotaTotalCartridge.TabIndex = 650
+        '
+        'Label51
+        '
+        Me.Label51.AutoSize = True
+        Me.Label51.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label51.Location = New System.Drawing.Point(27, 80)
+        Me.Label51.Name = "Label51"
+        Me.Label51.Size = New System.Drawing.Size(71, 17)
+        Me.Label51.TabIndex = 647
+        Me.Label51.Text = "Kode Item"
+        '
+        'TextBoxKodeCartridge
+        '
+        Me.TextBoxKodeCartridge.BackColor = System.Drawing.Color.White
+        Me.TextBoxKodeCartridge.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxKodeCartridge.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
+        Me.TextBoxKodeCartridge.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxKodeCartridge.Location = New System.Drawing.Point(194, 80)
+        Me.TextBoxKodeCartridge.Name = "TextBoxKodeCartridge"
+        Me.TextBoxKodeCartridge.Size = New System.Drawing.Size(207, 23)
+        Me.TextBoxKodeCartridge.TabIndex = 648
+        '
+        'Label52
+        '
+        Me.Label52.AutoSize = True
+        Me.Label52.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label52.Location = New System.Drawing.Point(293, 178)
+        Me.Label52.Name = "Label52"
+        Me.Label52.Size = New System.Drawing.Size(71, 17)
+        Me.Label52.TabIndex = 644
+        Me.Label52.Text = "Kuota Sisa"
+        '
+        'TextBoxKuotaSisaCartridge
+        '
+        Me.TextBoxKuotaSisaCartridge.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
+        Me.TextBoxKuotaSisaCartridge.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxKuotaSisaCartridge.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
+        Me.TextBoxKuotaSisaCartridge.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxKuotaSisaCartridge.Location = New System.Drawing.Point(383, 178)
+        Me.TextBoxKuotaSisaCartridge.MaxLength = 50000000
+        Me.TextBoxKuotaSisaCartridge.Name = "TextBoxKuotaSisaCartridge"
+        Me.TextBoxKuotaSisaCartridge.ReadOnly = True
+        Me.TextBoxKuotaSisaCartridge.Size = New System.Drawing.Size(77, 23)
+        Me.TextBoxKuotaSisaCartridge.TabIndex = 645
+        '
+        'Label53
+        '
+        Me.Label53.AutoSize = True
+        Me.Label53.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label53.Location = New System.Drawing.Point(466, 144)
+        Me.Label53.Name = "Label53"
+        Me.Label53.Size = New System.Drawing.Size(98, 17)
+        Me.Label53.TabIndex = 642
+        Me.Label53.Text = "Kuota Terpakai"
+        '
+        'TextBoxKuotaTerpakaiCartridge
+        '
+        Me.TextBoxKuotaTerpakaiCartridge.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
+        Me.TextBoxKuotaTerpakaiCartridge.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxKuotaTerpakaiCartridge.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
+        Me.TextBoxKuotaTerpakaiCartridge.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxKuotaTerpakaiCartridge.Location = New System.Drawing.Point(570, 144)
+        Me.TextBoxKuotaTerpakaiCartridge.MaxLength = 50000000
+        Me.TextBoxKuotaTerpakaiCartridge.Name = "TextBoxKuotaTerpakaiCartridge"
+        Me.TextBoxKuotaTerpakaiCartridge.ReadOnly = True
+        Me.TextBoxKuotaTerpakaiCartridge.Size = New System.Drawing.Size(77, 23)
+        Me.TextBoxKuotaTerpakaiCartridge.TabIndex = 643
+        '
+        'Label55
+        '
+        Me.Label55.AutoSize = True
+        Me.Label55.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label55.Location = New System.Drawing.Point(27, 144)
+        Me.Label55.Name = "Label55"
+        Me.Label55.Size = New System.Drawing.Size(77, 17)
+        Me.Label55.TabIndex = 641
+        Me.Label55.Text = "Kuota Awal"
+        '
+        'CheckBoxCartridge
+        '
+        Me.CheckBoxCartridge.AutoSize = True
+        Me.CheckBoxCartridge.Checked = True
+        Me.CheckBoxCartridge.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.CheckBoxCartridge.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.CheckBoxCartridge.Location = New System.Drawing.Point(425, 11)
+        Me.CheckBoxCartridge.Name = "CheckBoxCartridge"
+        Me.CheckBoxCartridge.Size = New System.Drawing.Size(51, 19)
+        Me.CheckBoxCartridge.TabIndex = 640
+        Me.CheckBoxCartridge.Text = "Aktif"
+        Me.CheckBoxCartridge.UseVisualStyleBackColor = True
+        '
+        'TextBoxIdCartridge
+        '
+        Me.TextBoxIdCartridge.BackColor = System.Drawing.Color.FromArgb(CType(CType(223, Byte), Integer), CType(CType(240, Byte), Integer), CType(CType(216, Byte), Integer))
+        Me.TextBoxIdCartridge.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxIdCartridge.Cursor = System.Windows.Forms.Cursors.No
+        Me.TextBoxIdCartridge.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxIdCartridge.Location = New System.Drawing.Point(335, 10)
+        Me.TextBoxIdCartridge.Name = "TextBoxIdCartridge"
+        Me.TextBoxIdCartridge.ReadOnly = True
+        Me.TextBoxIdCartridge.Size = New System.Drawing.Size(84, 23)
+        Me.TextBoxIdCartridge.TabIndex = 636
+        Me.TextBoxIdCartridge.TextAlign = System.Windows.Forms.HorizontalAlignment.Center
+        '
+        'Label56
+        '
+        Me.Label56.AutoSize = True
+        Me.Label56.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label56.Location = New System.Drawing.Point(27, 113)
+        Me.Label56.Name = "Label56"
+        Me.Label56.Size = New System.Drawing.Size(104, 17)
+        Me.Label56.TabIndex = 635
+        Me.Label56.Text = "Nama Cartridge"
+        '
+        'ButtonCariCartridge
+        '
+        Me.ButtonCariCartridge.BackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonCariCartridge.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None
+        Me.ButtonCariCartridge.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.ButtonCariCartridge.FlatAppearance.BorderSize = 0
+        Me.ButtonCariCartridge.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
+        Me.ButtonCariCartridge.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(CType(CType(81, Byte), Integer), CType(CType(168, Byte), Integer), CType(CType(255, Byte), Integer))
+        Me.ButtonCariCartridge.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.ButtonCariCartridge.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Bold)
+        Me.ButtonCariCartridge.ForeColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(254, Byte), Integer))
+        Me.ButtonCariCartridge.Location = New System.Drawing.Point(194, 9)
+        Me.ButtonCariCartridge.Name = "ButtonCariCartridge"
+        Me.ButtonCariCartridge.RightToLeft = System.Windows.Forms.RightToLeft.No
+        Me.ButtonCariCartridge.Size = New System.Drawing.Size(60, 25)
+        Me.ButtonCariCartridge.TabIndex = 637
+        Me.ButtonCariCartridge.Text = " Cari"
+        Me.ButtonCariCartridge.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText
+        Me.ButtonCariCartridge.UseVisualStyleBackColor = False
+        '
+        'TextBoxNamaCartridge
+        '
+        Me.TextBoxNamaCartridge.BackColor = System.Drawing.Color.White
+        Me.TextBoxNamaCartridge.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.TextBoxNamaCartridge.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
+        Me.TextBoxNamaCartridge.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.TextBoxNamaCartridge.Location = New System.Drawing.Point(194, 113)
+        Me.TextBoxNamaCartridge.Name = "TextBoxNamaCartridge"
+        Me.TextBoxNamaCartridge.Size = New System.Drawing.Size(207, 23)
+        Me.TextBoxNamaCartridge.TabIndex = 638
+        '
+        'Label57
+        '
+        Me.Label57.AutoSize = True
+        Me.Label57.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
+        Me.Label57.Location = New System.Drawing.Point(27, 12)
+        Me.Label57.Name = "Label57"
+        Me.Label57.Size = New System.Drawing.Size(81, 17)
+        Me.Label57.TabIndex = 639
+        Me.Label57.Text = "Cartridge ID"
         '
         'DataGridViewAlat
         '
@@ -2660,6 +3103,7 @@ Partial Class MasterTindakanKlinik
         Me.SplitContainer3.ResumeLayout(False)
         Me.PanelMasterTindakan.ResumeLayout(False)
         Me.PanelMasterTindakan.PerformLayout()
+        CType(Me.DataGridViewAlatTindakan, System.ComponentModel.ISupportInitialize).EndInit()
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox2.PerformLayout()
         CType(Me.NumericShootPerTindakan, System.ComponentModel.ISupportInitialize).EndInit()
@@ -2702,12 +3146,15 @@ Partial Class MasterTindakanKlinik
         Me.TabPageMasterAlat.ResumeLayout(False)
         Me.TabPageMasterAlat.PerformLayout()
         Me.SplitContainer4.Panel1.ResumeLayout(False)
-        Me.SplitContainer4.Panel1.PerformLayout()
         Me.SplitContainer4.Panel2.ResumeLayout(False)
         Me.SplitContainer4.ResumeLayout(False)
+        Me.TabControl1.ResumeLayout(False)
+        Me.TabPage1.ResumeLayout(False)
+        Me.TabPage1.PerformLayout()
         Me.GroupBox3.ResumeLayout(False)
         Me.GroupBox3.PerformLayout()
-        CType(Me.NumericKuotaAwal, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.TabPage2.ResumeLayout(False)
+        Me.TabPage2.PerformLayout()
         CType(Me.DataGridViewAlat, System.ComponentModel.ISupportInitialize).EndInit()
         Me.Panel9.ResumeLayout(False)
         Me.ResumeLayout(False)
@@ -2759,76 +3206,6 @@ Partial Class MasterTindakanKlinik
     Friend WithEvents FlowLayoutPanel4 As System.Windows.Forms.FlowLayoutPanel
     Friend WithEvents SplitContainer2 As System.Windows.Forms.SplitContainer
     Friend WithEvents FlowLayoutPanel1 As System.Windows.Forms.FlowLayoutPanel
-    Friend WithEvents SplitContainer3 As System.Windows.Forms.SplitContainer
-    Friend WithEvents TextBox5 As System.Windows.Forms.TextBox
-    Friend WithEvents Label10 As System.Windows.Forms.Label
-    Friend WithEvents TextBoxMaksimalBHP_Tindakan As System.Windows.Forms.TextBox
-    Friend WithEvents TextBox7 As System.Windows.Forms.TextBox
-    Friend WithEvents Label17 As System.Windows.Forms.Label
-    Friend WithEvents TextBoxBiayaTindakan As System.Windows.Forms.TextBox
-    Friend WithEvents TextBoxNamaTindakan As System.Windows.Forms.TextBox
-    Friend WithEvents Label18 As System.Windows.Forms.Label
-    Friend WithEvents ButtonFindTindakan As System.Windows.Forms.Button
-    Friend WithEvents Label19 As System.Windows.Forms.Label
-    Friend WithEvents TextBoxTindakanID As System.Windows.Forms.TextBox
-    Friend WithEvents RadioButtonPoliUmum As System.Windows.Forms.RadioButton
-    Friend WithEvents RadioButtonPoliGigi As System.Windows.Forms.RadioButton
-    Friend WithEvents Label9 As System.Windows.Forms.Label
-    Friend WithEvents Label20 As System.Windows.Forms.Label
-    Friend WithEvents ComboBoxGroupJenisTindakan As System.Windows.Forms.ComboBox
-    Friend WithEvents Label15 As System.Windows.Forms.Label
-    Friend WithEvents RadioButtonBHP As System.Windows.Forms.RadioButton
-    Friend WithEvents RadioButtonNonBHP As System.Windows.Forms.RadioButton
-    Friend WithEvents Label14 As System.Windows.Forms.Label
-    Friend WithEvents PanelMasterTindakan As System.Windows.Forms.Panel
-    Friend WithEvents ComboBoxInformedConsent As System.Windows.Forms.ComboBox
-    Friend WithEvents Label11 As System.Windows.Forms.Label
-    Friend WithEvents CheckBoxInformedConsent As System.Windows.Forms.CheckBox
-    Friend WithEvents SplitContainerFeeTindakan As System.Windows.Forms.SplitContainer
-    Friend WithEvents Panel3 As System.Windows.Forms.Panel
-    Friend WithEvents RadioButtonAktifFee As System.Windows.Forms.RadioButton
-    Friend WithEvents RadioButtonNonAktifFee As System.Windows.Forms.RadioButton
-    Friend WithEvents Label12 As System.Windows.Forms.Label
-    Friend WithEvents Panel4 As System.Windows.Forms.Panel
-    Friend WithEvents RadioButtonOpsiPersentase As System.Windows.Forms.RadioButton
-    Friend WithEvents RadioButtonOpsiNominal As System.Windows.Forms.RadioButton
-    Friend WithEvents Label13 As System.Windows.Forms.Label
-    Friend WithEvents Label22 As System.Windows.Forms.Label
-    Friend WithEvents Label26 As System.Windows.Forms.Label
-    Friend WithEvents Label25 As System.Windows.Forms.Label
-    Friend WithEvents Label24 As System.Windows.Forms.Label
-    Friend WithEvents Label23 As System.Windows.Forms.Label
-    Friend WithEvents Label27 As System.Windows.Forms.Label
-    Friend WithEvents TextBox14 As System.Windows.Forms.TextBox
-    Friend WithEvents TextBoxFeePerawatTambahan As System.Windows.Forms.TextBox
-    Friend WithEvents Label21 As System.Windows.Forms.Label
-    Friend WithEvents TextBox9 As System.Windows.Forms.TextBox
-    Friend WithEvents TextBoxFeeDokterTambahan As System.Windows.Forms.TextBox
-    Friend WithEvents Label16 As System.Windows.Forms.Label
-    Friend WithEvents TextBox2 As System.Windows.Forms.TextBox
-    Friend WithEvents TextBoxNominalFee As System.Windows.Forms.TextBox
-    Friend WithEvents CheckBoxStatusAktifTindakan As System.Windows.Forms.CheckBox
-    Friend WithEvents TextBoxPersentaseFeePerusahaan As System.Windows.Forms.TextBox
-    Friend WithEvents TextBoxPersentaseFeeKaryawan As System.Windows.Forms.TextBox
-    Friend WithEvents Panel5 As System.Windows.Forms.Panel
-    Friend WithEvents RadioButtonPelaksanaDokter As System.Windows.Forms.RadioButton
-    Friend WithEvents RadioButtonPelaksanaPerawat As System.Windows.Forms.RadioButton
-    Friend WithEvents Panel7 As System.Windows.Forms.Panel
-    Friend WithEvents TextBox10 As System.Windows.Forms.TextBox
-    Friend WithEvents TextBox11 As System.Windows.Forms.TextBox
-    Friend WithEvents TextBox13 As System.Windows.Forms.TextBox
-    Friend WithEvents Label30 As System.Windows.Forms.Label
-    Friend WithEvents RadioButton3 As System.Windows.Forms.RadioButton
-    Friend WithEvents RadioButton4 As System.Windows.Forms.RadioButton
-    Friend WithEvents Label31 As System.Windows.Forms.Label
-    Friend WithEvents Panel6 As System.Windows.Forms.Panel
-    Friend WithEvents TextBox4 As System.Windows.Forms.TextBox
-    Friend WithEvents TextBox6 As System.Windows.Forms.TextBox
-    Friend WithEvents TextBox8 As System.Windows.Forms.TextBox
-    Friend WithEvents Label29 As System.Windows.Forms.Label
-    Friend WithEvents RadioButton1 As System.Windows.Forms.RadioButton
-    Friend WithEvents RadioButton2 As System.Windows.Forms.RadioButton
-    Friend WithEvents Label28 As System.Windows.Forms.Label
     Private WithEvents GridControlTindakan As DevExpress.XtraGrid.GridControl
     Friend WithEvents GridViewTindakan As DevExpress.XtraGrid.Views.Grid.GridView
     Friend WithEvents Panel8 As System.Windows.Forms.Panel
@@ -2844,14 +3221,7 @@ Partial Class MasterTindakanKlinik
     Friend WithEvents ButtonSimpanMasterPaket As System.Windows.Forms.Button
     Friend WithEvents ButtonClearMasterPaket As System.Windows.Forms.Button
     Friend WithEvents ButtonExportMasterPaket As System.Windows.Forms.Button
-    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
-    Friend WithEvents Label33 As System.Windows.Forms.Label
-    Friend WithEvents TextBoxHariReminder As System.Windows.Forms.TextBox
-    Friend WithEvents CheckBoxReminder As System.Windows.Forms.CheckBox
-    Friend WithEvents CheckedListBoxPoli As System.Windows.Forms.CheckedListBox
     Friend WithEvents CheckedListBoxPoli2 As System.Windows.Forms.CheckedListBox
-    Friend WithEvents ComboBoxKategori As System.Windows.Forms.ComboBox
-    Friend WithEvents Label34 As System.Windows.Forms.Label
     Friend WithEvents ComboBoxICPaket As System.Windows.Forms.ComboBox
     Friend WithEvents CheckBoxICPaket As System.Windows.Forms.CheckBox
     Friend WithEvents Label35 As System.Windows.Forms.Label
@@ -2864,37 +3234,145 @@ Partial Class MasterTindakanKlinik
     Friend WithEvents ButtonClearAlat As System.Windows.Forms.Button
     Friend WithEvents Button4 As System.Windows.Forms.Button
     Friend WithEvents SplitContainer4 As System.Windows.Forms.SplitContainer
+    Friend WithEvents DataGridViewAlat As System.Windows.Forms.DataGridView
+    Friend WithEvents TabControl1 As System.Windows.Forms.TabControl
+    Friend WithEvents TabPage1 As System.Windows.Forms.TabPage
+    Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox
+    Friend WithEvents ButtonCetakRiwayat As System.Windows.Forms.Button
+    Friend WithEvents Label46 As System.Windows.Forms.Label
+    Friend WithEvents Label45 As System.Windows.Forms.Label
+    Friend WithEvents Label44 As System.Windows.Forms.Label
+    Friend WithEvents dtAkhir As System.Windows.Forms.DateTimePicker
+    Friend WithEvents dtAwal As System.Windows.Forms.DateTimePicker
     Friend WithEvents Label40 As System.Windows.Forms.Label
     Friend WithEvents TextBoxKodeAlat As System.Windows.Forms.TextBox
-    Friend WithEvents NumericKuotaAwal As System.Windows.Forms.NumericUpDown
-    Friend WithEvents Label38 As System.Windows.Forms.Label
-    Friend WithEvents TextBoxKuotaSisa As System.Windows.Forms.TextBox
-    Friend WithEvents Label37 As System.Windows.Forms.Label
-    Friend WithEvents TextBoxKuotaTerpakai As System.Windows.Forms.TextBox
-    Friend WithEvents Label36 As System.Windows.Forms.Label
     Friend WithEvents CheckBoxAlatAktif As System.Windows.Forms.CheckBox
     Friend WithEvents TextBoxAlatId As System.Windows.Forms.TextBox
     Friend WithEvents Label39 As System.Windows.Forms.Label
     Friend WithEvents ButtonCariAlat As System.Windows.Forms.Button
     Friend WithEvents TextBoxNamaAlat As System.Windows.Forms.TextBox
     Friend WithEvents Label43 As System.Windows.Forms.Label
-    Friend WithEvents DataGridViewAlat As System.Windows.Forms.DataGridView
-    Friend WithEvents Panel2 As System.Windows.Forms.Panel
-    Friend WithEvents Panel1 As System.Windows.Forms.Panel
-    Friend WithEvents CheckBoxPakaiAlat As System.Windows.Forms.CheckBox
+    Friend WithEvents TabPage2 As System.Windows.Forms.TabPage
+    Friend WithEvents Label50 As System.Windows.Forms.Label
+    Friend WithEvents TextBoxKuotaTotalCartridge As System.Windows.Forms.TextBox
+    Friend WithEvents Label51 As System.Windows.Forms.Label
+    Friend WithEvents TextBoxKodeCartridge As System.Windows.Forms.TextBox
+    Friend WithEvents Label52 As System.Windows.Forms.Label
+    Friend WithEvents TextBoxKuotaSisaCartridge As System.Windows.Forms.TextBox
+    Friend WithEvents Label53 As System.Windows.Forms.Label
+    Friend WithEvents TextBoxKuotaTerpakaiCartridge As System.Windows.Forms.TextBox
+    Friend WithEvents Label55 As System.Windows.Forms.Label
+    Friend WithEvents CheckBoxCartridge As System.Windows.Forms.CheckBox
+    Friend WithEvents TextBoxIdCartridge As System.Windows.Forms.TextBox
+    Friend WithEvents Label56 As System.Windows.Forms.Label
+    Friend WithEvents ButtonCariCartridge As System.Windows.Forms.Button
+    Friend WithEvents TextBoxNamaCartridge As System.Windows.Forms.TextBox
+    Friend WithEvents Label57 As System.Windows.Forms.Label
+    Friend WithEvents Label58 As System.Windows.Forms.Label
+    Friend WithEvents ComboBoxNamaAlat As System.Windows.Forms.ComboBox
+    Friend WithEvents Label38 As System.Windows.Forms.Label
+    Friend WithEvents ButtonPreOrder As System.Windows.Forms.Button
+    Friend WithEvents NumericKuotaMinimumCartridge As System.Windows.Forms.TextBox
+    Friend WithEvents NumericKuotaAwalCartridge As System.Windows.Forms.TextBox
+    Friend WithEvents TextBox17 As System.Windows.Forms.TextBox
+    Friend WithEvents Label48 As System.Windows.Forms.Label
+    Friend WithEvents TextBoxHargaBeli As System.Windows.Forms.TextBox
+    Friend WithEvents Label49 As System.Windows.Forms.Label
+    Friend WithEvents ButtonGetAlatSarpras As System.Windows.Forms.Button
+    Friend WithEvents ButtonGetAlatCartridge As System.Windows.Forms.Button
+    Friend WithEvents TextBoxIdRuangan As System.Windows.Forms.TextBox
+    Friend WithEvents Label59 As System.Windows.Forms.Label
+    Friend WithEvents TextBoxNamaRuangan As System.Windows.Forms.TextBox
+    Friend WithEvents SplitContainer3 As System.Windows.Forms.SplitContainer
+    Friend WithEvents PanelMasterTindakan As System.Windows.Forms.Panel
+    Friend WithEvents DataGridViewAlatTindakan As System.Windows.Forms.DataGridView
     Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
-    Friend WithEvents NumericShootPerTindakan As System.Windows.Forms.NumericUpDown
-    Friend WithEvents TextBoxNamaAlatTindakan As System.Windows.Forms.TextBox
-    Friend WithEvents TextBoxAlatIdTindakan As System.Windows.Forms.TextBox
-    Friend WithEvents ButtonCariAlatTindakan As System.Windows.Forms.Button
+    Friend WithEvents ButtonTambahAlat As System.Windows.Forms.Button
+    Friend WithEvents ComboBoxAlatTindakan As System.Windows.Forms.ComboBox
+    Friend WithEvents Label37 As System.Windows.Forms.Label
+    Friend WithEvents ComboBoxCartridgeTindakan As System.Windows.Forms.ComboBox
+    Friend WithEvents Label36 As System.Windows.Forms.Label
     Friend WithEvents Label41 As System.Windows.Forms.Label
+    Friend WithEvents NumericShootPerTindakan As System.Windows.Forms.NumericUpDown
+    Friend WithEvents CheckBoxPakaiAlat As System.Windows.Forms.CheckBox
+    Friend WithEvents ComboBoxKategori As System.Windows.Forms.ComboBox
+    Friend WithEvents Label34 As System.Windows.Forms.Label
+    Friend WithEvents CheckedListBoxPoli As System.Windows.Forms.CheckedListBox
+    Friend WithEvents GroupBox1 As System.Windows.Forms.GroupBox
+    Friend WithEvents Label33 As System.Windows.Forms.Label
+    Friend WithEvents TextBoxHariReminder As System.Windows.Forms.TextBox
+    Friend WithEvents CheckBoxReminder As System.Windows.Forms.CheckBox
+    Friend WithEvents Panel5 As System.Windows.Forms.Panel
+    Friend WithEvents RadioButtonPelaksanaDokter As System.Windows.Forms.RadioButton
+    Friend WithEvents RadioButtonPelaksanaPerawat As System.Windows.Forms.RadioButton
+    Friend WithEvents CheckBoxStatusAktifTindakan As System.Windows.Forms.CheckBox
+    Friend WithEvents SplitContainerFeeTindakan As System.Windows.Forms.SplitContainer
+    Friend WithEvents Panel3 As System.Windows.Forms.Panel
+    Friend WithEvents RadioButtonAktifFee As System.Windows.Forms.RadioButton
+    Friend WithEvents RadioButtonNonAktifFee As System.Windows.Forms.RadioButton
+    Friend WithEvents Label12 As System.Windows.Forms.Label
+    Friend WithEvents TextBoxPersentaseFeePerawat As System.Windows.Forms.TextBox
     Friend WithEvents Label42 As System.Windows.Forms.Label
-    Friend WithEvents TextBoxKuotaTotal As System.Windows.Forms.TextBox
-    Friend WithEvents GroupBox3 As System.Windows.Forms.GroupBox
-    Friend WithEvents Label44 As System.Windows.Forms.Label
-    Friend WithEvents dtAkhir As System.Windows.Forms.DateTimePicker
-    Friend WithEvents dtAwal As System.Windows.Forms.DateTimePicker
-    Friend WithEvents ButtonCetakRiwayat As System.Windows.Forms.Button
-    Friend WithEvents Label46 As System.Windows.Forms.Label
-    Friend WithEvents Label45 As System.Windows.Forms.Label
+    Friend WithEvents Panel7 As System.Windows.Forms.Panel
+    Friend WithEvents TextBox10 As System.Windows.Forms.TextBox
+    Friend WithEvents TextBox11 As System.Windows.Forms.TextBox
+    Friend WithEvents TextBox13 As System.Windows.Forms.TextBox
+    Friend WithEvents Label30 As System.Windows.Forms.Label
+    Friend WithEvents RadioButton3 As System.Windows.Forms.RadioButton
+    Friend WithEvents RadioButton4 As System.Windows.Forms.RadioButton
+    Friend WithEvents Label31 As System.Windows.Forms.Label
+    Friend WithEvents Label47 As System.Windows.Forms.Label
+    Friend WithEvents Panel6 As System.Windows.Forms.Panel
+    Friend WithEvents TextBox4 As System.Windows.Forms.TextBox
+    Friend WithEvents TextBox6 As System.Windows.Forms.TextBox
+    Friend WithEvents TextBox8 As System.Windows.Forms.TextBox
+    Friend WithEvents Label29 As System.Windows.Forms.Label
+    Friend WithEvents RadioButton1 As System.Windows.Forms.RadioButton
+    Friend WithEvents RadioButton2 As System.Windows.Forms.RadioButton
+    Friend WithEvents Label28 As System.Windows.Forms.Label
+    Friend WithEvents TextBoxPersentaseFeeKaryawan As System.Windows.Forms.TextBox
+    Friend WithEvents TextBoxPersentaseFeePerusahaan As System.Windows.Forms.TextBox
+    Friend WithEvents Label27 As System.Windows.Forms.Label
+    Friend WithEvents TextBox14 As System.Windows.Forms.TextBox
+    Friend WithEvents TextBoxFeePerawatTambahan As System.Windows.Forms.TextBox
+    Friend WithEvents Label21 As System.Windows.Forms.Label
+    Friend WithEvents TextBox9 As System.Windows.Forms.TextBox
+    Friend WithEvents TextBoxFeeDokterTambahan As System.Windows.Forms.TextBox
+    Friend WithEvents Label16 As System.Windows.Forms.Label
+    Friend WithEvents TextBox2 As System.Windows.Forms.TextBox
+    Friend WithEvents TextBoxNominalFee As System.Windows.Forms.TextBox
+    Friend WithEvents Label26 As System.Windows.Forms.Label
+    Friend WithEvents Label25 As System.Windows.Forms.Label
+    Friend WithEvents Label24 As System.Windows.Forms.Label
+    Friend WithEvents Label23 As System.Windows.Forms.Label
+    Friend WithEvents Label22 As System.Windows.Forms.Label
+    Friend WithEvents Panel4 As System.Windows.Forms.Panel
+    Friend WithEvents RadioButtonOpsiPersentase As System.Windows.Forms.RadioButton
+    Friend WithEvents RadioButtonOpsiNominal As System.Windows.Forms.RadioButton
+    Friend WithEvents Label13 As System.Windows.Forms.Label
+    Friend WithEvents ComboBoxInformedConsent As System.Windows.Forms.ComboBox
+    Friend WithEvents Label11 As System.Windows.Forms.Label
+    Friend WithEvents CheckBoxInformedConsent As System.Windows.Forms.CheckBox
+    Friend WithEvents Label18 As System.Windows.Forms.Label
+    Friend WithEvents Panel2 As System.Windows.Forms.Panel
+    Friend WithEvents RadioButtonBHP As System.Windows.Forms.RadioButton
+    Friend WithEvents RadioButtonNonBHP As System.Windows.Forms.RadioButton
+    Friend WithEvents TextBoxTindakanID As System.Windows.Forms.TextBox
+    Friend WithEvents Label14 As System.Windows.Forms.Label
+    Friend WithEvents Label19 As System.Windows.Forms.Label
+    Friend WithEvents Label15 As System.Windows.Forms.Label
+    Friend WithEvents ButtonFindTindakan As System.Windows.Forms.Button
+    Friend WithEvents TextBoxNamaTindakan As System.Windows.Forms.TextBox
+    Friend WithEvents Label20 As System.Windows.Forms.Label
+    Friend WithEvents TextBoxBiayaTindakan As System.Windows.Forms.TextBox
+    Friend WithEvents ComboBoxGroupJenisTindakan As System.Windows.Forms.ComboBox
+    Friend WithEvents Label17 As System.Windows.Forms.Label
+    Friend WithEvents Label9 As System.Windows.Forms.Label
+    Friend WithEvents Panel1 As System.Windows.Forms.Panel
+    Friend WithEvents RadioButtonPoliUmum As System.Windows.Forms.RadioButton
+    Friend WithEvents RadioButtonPoliGigi As System.Windows.Forms.RadioButton
+    Friend WithEvents TextBox7 As System.Windows.Forms.TextBox
+    Friend WithEvents TextBox5 As System.Windows.Forms.TextBox
+    Friend WithEvents TextBoxMaksimalBHP_Tindakan As System.Windows.Forms.TextBox
+    Friend WithEvents Label10 As System.Windows.Forms.Label
 End Class

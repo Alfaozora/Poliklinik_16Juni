@@ -401,6 +401,169 @@ Public Class RekapFeeKaryawan
         Return Tbls
     End Function
 
+    'ERROR
+    'Private Sub ViewListTindakan()
+    '    Dim tglTransaksiAwal As Date = DateTimeAwalTransaksi.Value
+    '    Dim tglTransaksiAkhir As Date = DateTimePickerAkhirTransaksi.Value
+    '    Dim jenisPelaksana As String = ""
+
+    '    ' Set Jenis Pelaksana
+    '    If RadioButtonPelaksanaDokter.Checked = True Then jenisPelaksana = "Dokter"
+    '    If RadioButtonPelaksanaPerawat.Checked = True Then jenisPelaksana = "Perawat"
+
+    '    SetGridTindakan()
+
+    '    Dim queryString As New StringBuilder()
+
+    '    queryString.AppendLine("WITH FilteredTransaksiPoli AS (")
+    '    queryString.AppendLine("    SELECT TransPoliID, NoUrut, IDInternet, CONVERT(DATE, TglPoli) AS 'Tgl Transaksi', ClosingTindakanDokter, ClosingTindakanPerawat")
+    '    queryString.AppendLine("    FROM TransaksiPoli")
+    '    queryString.AppendLine("    WHERE (CONVERT(DATE, TglPoli) BETWEEN '" & Format(tglTransaksiAwal.Date, "yyyyMMdd") & "' AND '" & Format(tglTransaksiAkhir.Date, "yyyyMMdd") & "') AND Deleted=0 ")
+    '    If jenisPelaksana = "Dokter" Then
+    '        queryString.AppendLine("AND KodeDokter='" & TextBoxPelaksanaID.Text & "'")
+    '    ElseIf jenisPelaksana = "Perawat" Then
+    '        queryString.AppendLine("AND PerawatPoli='" & TextBoxNamaPelaksana.Text & "'")
+    '    End If
+    '    queryString.AppendLine(")")
+    '    queryString.AppendLine("SELECT b.TransPoliIDDetail AS ID, tblTrans.[Tgl Transaksi], tblPasien.Nama, tblTrans.NoUrut, b.NamaTindakan, b.NettBayar, c.FeeDokter, c.FeePerawat, c.JenisDokter, c.StatusBHP, c.PersentaseFeeKaryawan, c.PersentaseFeePerawat, c.StatusPersentaseFee, c.StatusNominalFee, c.FeePerTindakan, b.TotalBayarBHP, b.ClosedFeeDokter, b.ClosedFeePerawat, tblTrans.ClosingTindakanDokter, tblTrans.ClosingTindakanPerawat")
+    '    queryString.AppendLine("FROM FilteredTransaksiPoli tblTrans")
+    '    queryString.AppendLine("LEFT JOIN TransaksiPoliDetail b ON tblTrans.TransPoliID=b.TransPoliID AND b.Awal=1")
+    '    queryString.AppendLine("LEFT JOIN MasterTindakan c ON b.TindakanID=c.TindakanID")
+    '    queryString.AppendLine("LEFT JOIN TransaksiPoliBayarAwal d ON tblTrans.TransPoliID=d.TransPoliID")
+    '    queryString.AppendLine("LEFT JOIN MasterPasien tblPasien ON tblTrans.IDInternet=tblPasien.NoRekamMedis")
+    '    queryString.AppendLine("WHERE b.DeletedDate IS NULL AND c.JenisTindakan NOT LIKE '%Konsul%' AND c.StatusFeeTindakan='1'")
+    '    queryString.AppendLine("  AND (b.NettBayar > 0 OR b.KodeVoucher IS NOT NULL)")
+    '    queryString.AppendLine("  AND (c.JenisDokter LIKE '%" & jenisPelaksana & "%' OR c.FeePerawat > 0)")
+    '    queryString.AppendLine("  AND d.JenisBayar IN ('TUNAI', 'DEBET', 'CARD', 'VOUCHER', 'TAGIHAN')")
+    '    queryString.AppendLine("UNION")
+    '    queryString.AppendLine("SELECT b.TransPoliIDDetail AS ID, tblTrans.[Tgl Transaksi], tblPasien.Nama, tblTrans.NoUrut, b.NamaTindakan, b.NettBayar, c.FeeDokter, c.FeePerawat, c.JenisDokter, c.StatusBHP, c.PersentaseFeeKaryawan, c.PersentaseFeePerawat, c.StatusPersentaseFee, c.StatusNominalFee, c.FeePerTindakan, b.TotalBayarBHP, b.ClosedFeeDokter, b.ClosedFeePerawat, tblTrans.ClosingTindakanDokter, tblTrans.ClosingTindakanPerawat")
+    '    queryString.AppendLine("FROM FilteredTransaksiPoli tblTrans")
+    '    queryString.AppendLine("LEFT JOIN TransaksiPoliDetail b ON tblTrans.TransPoliID=b.TransPoliID AND b.Awal=0")
+    '    queryString.AppendLine("LEFT JOIN MasterTindakan c ON b.TindakanID=c.TindakanID")
+    '    queryString.AppendLine("LEFT JOIN TransaksiPoliBayar e ON tblTrans.TransPoliID=e.TransPoliID")
+    '    queryString.AppendLine("LEFT JOIN MasterPasien tblPasien ON tblTrans.IDInternet=tblPasien.NoRekamMedis")
+    '    queryString.AppendLine("WHERE b.DeletedDate IS NULL AND c.JenisTindakan NOT LIKE '%Konsul%' AND c.StatusFeeTindakan='1'")
+    '    queryString.AppendLine("  AND (b.NettBayar > 0 OR b.KodeVoucher IS NOT NULL)")
+    '    queryString.AppendLine("  AND (c.JenisDokter LIKE '%" & jenisPelaksana & "%' OR c.FeePerawat > 0)")
+    '    queryString.AppendLine("  AND e.JenisBayar IN ('TUNAI', 'DEBET', 'CARD', 'VOUCHER', 'TAGIHAN')")
+
+    '    Dim tblTindakan As DataTable = ReadSQL(queryString.ToString())
+    '    Dim tblGridControl As DataTable = CreateTableTindakan()
+    '    tblGridControl.Rows.Clear()
+
+    '    For Each rowTindakan As DataRow In tblTindakan.Rows
+    '        Dim NominalFee As Double = 0
+    '        Dim PersentaseFee As Double = 0
+
+    '        Dim statusBHP As Boolean = False
+    '        Dim statusPersentase As Boolean = False
+    '        Dim statusNominal As Boolean = False
+
+    '        If Convert.ToInt32(rowTindakan("StatusBHP")) = 1 Then statusBHP = True
+    '        If Convert.ToInt32(rowTindakan("StatusPersentaseFee")) = 1 Then statusPersentase = True
+    '        If Convert.ToInt32(rowTindakan("StatusNominalFee")) = 1 Then statusNominal = True
+
+    '        Dim NominalBHP As Double = 0
+    '        If Not IsDBNull(rowTindakan("TotalBayarBHP")) AndAlso rowTindakan("TotalBayarBHP").ToString() <> "" Then
+    '            NominalBHP = CDbl(ConvertToInteger(rowTindakan("TotalBayarBHP").ToString()))
+    '        End If
+
+    '        If rowTindakan("JenisDokter").ToString.Contains(jenisPelaksana) = True Then
+    '            ' Cek Persentase / Nominal
+    '            If statusPersentase = True Then
+    '                ' Cek BHP / Non BHP
+    '                If statusBHP = True Then
+    '                    NominalFee = CDbl(rowTindakan("NettBayar").ToString) - NominalBHP
+    '                Else
+    '                    NominalFee = CDbl(rowTindakan("NettBayar").ToString)
+    '                End If
+
+    '                ' Set Persentase Fee
+    '                'PersentaseFee = CDbl(rowTindakan("PersentaseFeeKaryawan").ToString)
+
+    '                ' Ambil Persentase Dokter (dari kolom PersentaseFeeKaryawan)
+    '                Dim PersentaseFeeDokter As Double = CDbl(rowTindakan("PersentaseFeeKaryawan").ToString)
+
+    '                ' Ambil Persentase Perawat dengan aman (Cegah error DBNull)
+    '                Dim PersentaseFeePwt As Double = 0
+    '                If Not IsDBNull(rowTindakan("PersentaseFeePerawat")) AndAlso rowTindakan("PersentaseFeePerawat").ToString() <> "" Then
+    '                    PersentaseFeePwt = CDbl(rowTindakan("PersentaseFeePerawat").ToString)
+    '                End If
+
+    '                'If jenisPelaksana = "Dokter" Then NominalFee = ((NominalFee - CDbl(rowTindakan("FeePerawat"))) * CDbl(PersentaseFee)) / 100
+    '                'If jenisPelaksana = "Perawat" Then NominalFee = (NominalFee * CDbl(PersentaseFee)) / 100
+
+    '                ' Hitung Pembagian Fee
+    '                If jenisPelaksana = "Dokter" Then
+    '                    ' Logika awal: Dokter dipotong nominal fee perawat dulu baru dikali persentase
+    '                    NominalFee = ((NominalFee - CDbl(rowTindakan("FeePerawat"))) * PersentaseFeeDokter) / 100
+    '                ElseIf jenisPelaksana = "Perawat" Then
+    '                    ' Sekarang Perawat menggunakan persentase miliknya sendiri
+    '                    NominalFee = (NominalFee * PersentaseFeePwt) / 100
+    '                End If
+
+    '            ElseIf statusNominal = True Then
+    '                If jenisPelaksana = "Dokter" Then NominalFee = CDbl(rowTindakan("FeePerTindakan").ToString) - CDbl(rowTindakan("FeePerawat"))
+    '                If jenisPelaksana = "Perawat" Then NominalFee = CDbl(rowTindakan("FeePerTindakan").ToString)
+    '            End If
+
+    '        ElseIf CDbl(rowTindakan("FeePerawat")) > 0 And rowTindakan("JenisDokter").ToString.Trim <> jenisPelaksana And jenisPelaksana = "Perawat" Then
+    '            ' Jika jenis tindakan milik dokter & terdapat fee tambahan untuk perawat
+    '            NominalFee = CDbl(rowTindakan("FeePerawat").ToString)
+    '        End If
+
+    '        Dim newRow As DataRow = tblGridControl.NewRow
+    '        newRow("Transaksi ID") = rowTindakan("ID")
+    '        newRow("Tgl Value") = rowTindakan("Tgl Transaksi")
+    '        newRow("Tgl Transaksi") = Format(rowTindakan("Tgl Transaksi"), "dd") & " " & BulanIndonesia(Format(rowTindakan("Tgl Transaksi"), "MM")) & " " & Format(rowTindakan("Tgl Transaksi"), "yyyy")
+    '        newRow("No Transaksi") = rowTindakan("NoUrut")
+    '        newRow("Nama Pasien") = rowTindakan("Nama")
+    '        newRow("Tindakan") = rowTindakan("NamaTindakan")
+    '        newRow("Nominal Bayar") = rowTindakan("NettBayar")
+    '        newRow("Nominal BHP") = NominalBHP
+    '        newRow("Status BHP") = statusBHP
+    '        newRow("Total Fee") = NominalFee
+
+    '        If jenisPelaksana = "Dokter" Then
+    '            If rowTindakan("ClosedFeeDokter").ToString() = True Or rowTindakan("ClosingTindakanDokter").ToString() = True Then
+    '                newRow("Status") = "CLOSED"
+    '                newRow("Checked") = True
+    '            Else
+    '                newRow("Status") = "-"
+    '                newRow("Checked") = False
+    '            End If
+    '        ElseIf jenisPelaksana = "Perawat" Then
+    '            If rowTindakan("ClosedFeePerawat").ToString() = True Or rowTindakan("ClosingTindakanPerawat").ToString() = True Then
+    '                newRow("Status") = "CLOSED"
+    '                newRow("Checked") = True
+    '            Else
+    '                newRow("Status") = "-"
+    '                newRow("Checked") = False
+    '            End If
+    '        End If
+
+    '        tblGridControl.Rows.Add(newRow)
+    '    Next
+
+    '    If tblGridControl.Rows.Count > 0 Then
+    '        ' Disable Button & TextBox
+    '        ButtonFindTransaksi.BackColor = Color.FromArgb(225, 225, 225)
+    '        ButtonFindTransaksi.Enabled = False
+
+    '        DateTimeAwalTransaksi.Enabled = False
+    '        DateTimePickerAkhirTransaksi.Enabled = False
+    '        RadioButtonPilihanKonsultasi.Enabled = False
+
+    '        If RadioButtonPelaksanaDokter.Checked = True Then
+    '            RadioButtonPelaksanaPerawat.Enabled = False
+    '        ElseIf RadioButtonPelaksanaPerawat.Checked = True Then
+    '            RadioButtonPelaksanaDokter.Enabled = False
+    '        End If
+    '    End If
+
+    '    GridControlTransaksi.DataSource = tblGridControl
+    'End Sub
+
     Private Sub ViewListTindakan()
         Dim tglTransaksiAwal As Date = DateTimeAwalTransaksi.Value
         Dim tglTransaksiAkhir As Date = DateTimePickerAkhirTransaksi.Value
@@ -419,32 +582,32 @@ Public Class RekapFeeKaryawan
         queryString.AppendLine("    FROM TransaksiPoli")
         queryString.AppendLine("    WHERE (CONVERT(DATE, TglPoli) BETWEEN '" & Format(tglTransaksiAwal.Date, "yyyyMMdd") & "' AND '" & Format(tglTransaksiAkhir.Date, "yyyyMMdd") & "') AND Deleted=0 ")
         If jenisPelaksana = "Dokter" Then
-            queryString.AppendLine("AND KodeDokter='" & TextBoxPelaksanaID.Text & "'")
+            queryString.AppendLine("AND KodeDokter='" & TextBoxPelaksanaID.Text.Replace("'", "''") & "'")
         ElseIf jenisPelaksana = "Perawat" Then
-            queryString.AppendLine("AND PerawatPoli='" & TextBoxNamaPelaksana.Text & "'")
+            queryString.AppendLine("AND PerawatPoli='" & TextBoxNamaPelaksana.Text.Replace("'", "''") & "'")
         End If
         queryString.AppendLine(")")
-        queryString.AppendLine("SELECT b.TransPoliIDDetail AS ID, tblTrans.[Tgl Transaksi], tblPasien.Nama, tblTrans.NoUrut, b.NamaTindakan, b.NettBayar, c.FeeDokter, c.FeePerawat, c.JenisDokter, c.StatusBHP, c.PersentaseFeeKaryawan, c.StatusPersentaseFee, c.StatusNominalFee, c.FeePerTindakan, b.TotalBayarBHP, b.ClosedFeeDokter, b.ClosedFeePerawat, tblTrans.ClosingTindakanDokter, tblTrans.ClosingTindakanPerawat")
+        queryString.AppendLine("SELECT b.TransPoliIDDetail AS ID, tblTrans.[Tgl Transaksi], tblPasien.Nama, tblTrans.NoUrut, b.NamaTindakan, b.NettBayar, c.FeeDokter, c.FeePerawat, c.JenisDokter, c.StatusBHP, c.PersentaseFeeKaryawan, c.PersentaseFeePerawat, c.StatusPersentaseFee, c.StatusNominalFee, c.FeePerTindakan, b.TotalBayarBHP, b.ClosedFeeDokter, b.ClosedFeePerawat, tblTrans.ClosingTindakanDokter, tblTrans.ClosingTindakanPerawat")
         queryString.AppendLine("FROM FilteredTransaksiPoli tblTrans")
-        queryString.AppendLine("LEFT JOIN TransaksiPoliDetail b ON tblTrans.TransPoliID=b.TransPoliID AND b.Awal=1")
+        queryString.AppendLine("INNER JOIN TransaksiPoliDetail b ON tblTrans.TransPoliID=b.TransPoliID AND b.Awal=1")
         queryString.AppendLine("LEFT JOIN MasterTindakan c ON b.TindakanID=c.TindakanID")
-        queryString.AppendLine("LEFT JOIN TransaksiPoliBayarAwal d ON tblTrans.TransPoliID=d.TransPoliID")
         queryString.AppendLine("LEFT JOIN MasterPasien tblPasien ON tblTrans.IDInternet=tblPasien.NoRekamMedis")
         queryString.AppendLine("WHERE b.DeletedDate IS NULL AND c.JenisTindakan NOT LIKE '%Konsul%' AND c.StatusFeeTindakan='1'")
         queryString.AppendLine("  AND (b.NettBayar > 0 OR b.KodeVoucher IS NOT NULL)")
-        queryString.AppendLine("  AND (c.JenisDokter LIKE '%" & jenisPelaksana & "%' OR c.FeePerawat > 0)")
-        queryString.AppendLine("  AND d.JenisBayar IN ('TUNAI', 'DEBET', 'CARD', 'VOUCHER', 'TAGIHAN')")
-        queryString.AppendLine("UNION")
-        queryString.AppendLine("SELECT b.TransPoliIDDetail AS ID, tblTrans.[Tgl Transaksi], tblPasien.Nama, tblTrans.NoUrut, b.NamaTindakan, b.NettBayar, c.FeeDokter, c.FeePerawat, c.JenisDokter, c.StatusBHP, c.PersentaseFeeKaryawan, c.StatusPersentaseFee, c.StatusNominalFee, c.FeePerTindakan, b.TotalBayarBHP, b.ClosedFeeDokter, b.ClosedFeePerawat, tblTrans.ClosingTindakanDokter, tblTrans.ClosingTindakanPerawat")
+        ' --- PERBAIKAN FILTER QUERY SQL (Memungkinkan Persentase Perawat Tertarik) ---
+        queryString.AppendLine("  AND (c.JenisDokter LIKE '%" & jenisPelaksana & "%' OR c.FeePerawat > 0 OR ISNULL(c.PersentaseFeePerawat, 0) > 0)")
+        queryString.AppendLine("  AND EXISTS (SELECT 1 FROM TransaksiPoliBayarAwal d WHERE d.TransPoliID = tblTrans.TransPoliID AND d.JenisBayar IN ('TUNAI', 'DEBET', 'CARD', 'VOUCHER', 'TAGIHAN'))")
+        queryString.AppendLine("UNION ALL")
+        queryString.AppendLine("SELECT b.TransPoliIDDetail AS ID, tblTrans.[Tgl Transaksi], tblPasien.Nama, tblTrans.NoUrut, b.NamaTindakan, b.NettBayar, c.FeeDokter, c.FeePerawat, c.JenisDokter, c.StatusBHP, c.PersentaseFeeKaryawan, c.PersentaseFeePerawat, c.StatusPersentaseFee, c.StatusNominalFee, c.FeePerTindakan, b.TotalBayarBHP, b.ClosedFeeDokter, b.ClosedFeePerawat, tblTrans.ClosingTindakanDokter, tblTrans.ClosingTindakanPerawat")
         queryString.AppendLine("FROM FilteredTransaksiPoli tblTrans")
-        queryString.AppendLine("LEFT JOIN TransaksiPoliDetail b ON tblTrans.TransPoliID=b.TransPoliID AND b.Awal=0")
+        queryString.AppendLine("INNER JOIN TransaksiPoliDetail b ON tblTrans.TransPoliID=b.TransPoliID AND b.Awal=0")
         queryString.AppendLine("LEFT JOIN MasterTindakan c ON b.TindakanID=c.TindakanID")
-        queryString.AppendLine("LEFT JOIN TransaksiPoliBayar e ON tblTrans.TransPoliID=e.TransPoliID")
         queryString.AppendLine("LEFT JOIN MasterPasien tblPasien ON tblTrans.IDInternet=tblPasien.NoRekamMedis")
         queryString.AppendLine("WHERE b.DeletedDate IS NULL AND c.JenisTindakan NOT LIKE '%Konsul%' AND c.StatusFeeTindakan='1'")
         queryString.AppendLine("  AND (b.NettBayar > 0 OR b.KodeVoucher IS NOT NULL)")
-        queryString.AppendLine("  AND (c.JenisDokter LIKE '%" & jenisPelaksana & "%' OR c.FeePerawat > 0)")
-        queryString.AppendLine("  AND e.JenisBayar IN ('TUNAI', 'DEBET', 'CARD', 'VOUCHER', 'TAGIHAN')")
+        ' --- PERBAIKAN FILTER QUERY SQL (Memungkinkan Persentase Perawat Tertarik) ---
+        queryString.AppendLine("  AND (c.JenisDokter LIKE '%" & jenisPelaksana & "%' OR c.FeePerawat > 0 OR ISNULL(c.PersentaseFeePerawat, 0) > 0)")
+        queryString.AppendLine("  AND EXISTS (SELECT 1 FROM TransaksiPoliBayar e WHERE e.TransPoliID = tblTrans.TransPoliID AND e.JenisBayar IN ('TUNAI', 'DEBET', 'CARD', 'VOUCHER', 'TAGIHAN'))")
 
         Dim tblTindakan As DataTable = ReadSQL(queryString.ToString())
         Dim tblGridControl As DataTable = CreateTableTindakan()
@@ -452,7 +615,6 @@ Public Class RekapFeeKaryawan
 
         For Each rowTindakan As DataRow In tblTindakan.Rows
             Dim NominalFee As Double = 0
-            Dim NominalBHP As Double = 0
             Dim PersentaseFee As Double = 0
 
             Dim statusBHP As Boolean = False
@@ -463,30 +625,73 @@ Public Class RekapFeeKaryawan
             If Convert.ToInt32(rowTindakan("StatusPersentaseFee")) = 1 Then statusPersentase = True
             If Convert.ToInt32(rowTindakan("StatusNominalFee")) = 1 Then statusNominal = True
 
-            If rowTindakan("JenisDokter").ToString.Contains(jenisPelaksana) = True Then
-                ' Cek Persentase / Nominal
-                If statusPersentase = True Then
-                    ' Cek BHP / Non BHP
-                    If statusBHP = True Then
-                        NominalFee = CDbl(rowTindakan("NettBayar").ToString) - CDbl(ConvertToInteger(rowTindakan("TotalBayarBHP").ToString))
-                        NominalBHP = NominalBHP + CDbl(ConvertToInteger(rowTindakan("TotalBayarBHP").ToString))
-                    Else
-                        NominalFee = CDbl(rowTindakan("NettBayar").ToString)
-                    End If
-
-                    ' Set Persentase Fee
-                    PersentaseFee = CDbl(rowTindakan("PersentaseFeeKaryawan").ToString)
-
-                    If jenisPelaksana = "Dokter" Then NominalFee = ((NominalFee - CDbl(rowTindakan("FeePerawat"))) * CDbl(PersentaseFee)) / 100
-                    If jenisPelaksana = "Perawat" Then NominalFee = (NominalFee * CDbl(PersentaseFee)) / 100
-                ElseIf statusNominal = True Then
-                    If jenisPelaksana = "Dokter" Then NominalFee = CDbl(rowTindakan("FeePerTindakan").ToString) - CDbl(rowTindakan("FeePerawat"))
-                    If jenisPelaksana = "Perawat" Then NominalFee = CDbl(rowTindakan("FeePerTindakan").ToString)
-                End If
-            ElseIf CDbl(rowTindakan("FeePerawat")) > 0 And rowTindakan("JenisDokter").ToString.Trim <> jenisPelaksana And jenisPelaksana = "Perawat" Then
-                ' Jika jenis tindakan milik dokter & terdapat fee tambahan untuk perawat
-                NominalFee = CDbl(rowTindakan("FeePerawat").ToString)
+            Dim NominalBHP As Double = 0
+            If Not IsDBNull(rowTindakan("TotalBayarBHP")) AndAlso rowTindakan("TotalBayarBHP").ToString() <> "" Then
+                NominalBHP = CDbl(ConvertToInteger(rowTindakan("TotalBayarBHP").ToString()))
             End If
+
+            ' --- PERBAIKAN LOGIKA PERHITUNGAN FEE ---
+            If jenisPelaksana = "Dokter" Then
+                If statusPersentase = True Then
+                    Dim dasarNominal As Double = If(statusBHP, CDbl(rowTindakan("NettBayar").ToString) - NominalBHP, CDbl(rowTindakan("NettBayar").ToString))
+                    Dim PersentaseFeeDokter As Double = CDbl(rowTindakan("PersentaseFeeKaryawan").ToString)
+                    NominalFee = ((dasarNominal - CDbl(rowTindakan("FeePerawat"))) * PersentaseFeeDokter) / 100
+                ElseIf statusNominal = True Then
+                    NominalFee = CDbl(rowTindakan("FeePerTindakan").ToString) - CDbl(rowTindakan("FeePerawat"))
+                End If
+
+            ElseIf jenisPelaksana = "Perawat" Then
+                ' Ambil Persentase Perawat dengan aman
+                Dim PersentaseFeePwt As Double = 0
+                If Not IsDBNull(rowTindakan("PersentaseFeePerawat")) AndAlso rowTindakan("PersentaseFeePerawat").ToString() <> "" Then
+                    PersentaseFeePwt = CDbl(rowTindakan("PersentaseFeePerawat").ToString)
+                End If
+
+                If statusPersentase = True AndAlso PersentaseFeePwt > 0 Then
+                    ' Perhitungan Persentase Perawat
+                    Dim dasarNominal As Double = If(statusBHP, CDbl(rowTindakan("NettBayar").ToString) - NominalBHP, CDbl(rowTindakan("NettBayar").ToString))
+                    NominalFee = (dasarNominal * PersentaseFeePwt) / 100
+                ElseIf statusNominal = True AndAlso rowTindakan("JenisDokter").ToString.Contains("Perawat") Then
+                    NominalFee = CDbl(rowTindakan("FeePerTindakan").ToString)
+                ElseIf CDbl(rowTindakan("FeePerawat")) > 0 Then
+                    NominalFee = CDbl(rowTindakan("FeePerawat").ToString)
+                End If
+            End If
+
+            'If rowTindakan("JenisDokter").ToString.Contains(jenisPelaksana) = True Then
+            '    ' Cek Persentase / Nominal
+            '    If statusPersentase = True Then
+            '        ' Cek BHP / Non BHP
+            '        If statusBHP = True Then
+            '            NominalFee = CDbl(rowTindakan("NettBayar").ToString) - NominalBHP
+            '        Else
+            '            NominalFee = CDbl(rowTindakan("NettBayar").ToString)
+            '        End If
+
+            '        ' Ambil Persentase Dokter (dari kolom PersentaseFeeKaryawan)
+            '        Dim PersentaseFeeDokter As Double = CDbl(rowTindakan("PersentaseFeeKaryawan").ToString)
+
+            '        ' Ambil Persentase Perawat dengan aman (Cegah error DBNull)
+            '        Dim PersentaseFeePwt As Double = 0
+            '        If Not IsDBNull(rowTindakan("PersentaseFeePerawat")) AndAlso rowTindakan("PersentaseFeePerawat").ToString() <> "" Then
+            '            PersentaseFeePwt = CDbl(rowTindakan("PersentaseFeePerawat").ToString)
+            '        End If
+
+            '        ' Hitung Pembagian Fee
+            '        If jenisPelaksana = "Dokter" Then
+            '            NominalFee = ((NominalFee - CDbl(rowTindakan("FeePerawat"))) * PersentaseFeeDokter) / 100
+            '        ElseIf jenisPelaksana = "Perawat" Then
+            '            NominalFee = (NominalFee * PersentaseFeePwt) / 100
+            '        End If
+
+            '    ElseIf statusNominal = True Then
+            '        If jenisPelaksana = "Dokter" Then NominalFee = CDbl(rowTindakan("FeePerTindakan").ToString) - CDbl(rowTindakan("FeePerawat"))
+            '        If jenisPelaksana = "Perawat" Then NominalFee = CDbl(rowTindakan("FeePerTindakan").ToString)
+            '    End If
+
+            'ElseIf CDbl(rowTindakan("FeePerawat")) > 0 And rowTindakan("JenisDokter").ToString.Trim <> jenisPelaksana And jenisPelaksana = "Perawat" Then
+            '    NominalFee = CDbl(rowTindakan("FeePerawat").ToString)
+            'End If
 
             Dim newRow As DataRow = tblGridControl.NewRow
             newRow("Transaksi ID") = rowTindakan("ID")
@@ -744,57 +949,316 @@ Public Class RekapFeeKaryawan
         End If
     End Sub
 
+    'NEW
     Private Sub CetakLaporanTindakan()
         Dim tglTransaksiAwal As Date = DateTimeAwalTransaksi.Value
         Dim tglTransaksiAkhir As Date = DateTimePickerAkhirTransaksi.Value
         Dim jenisPelaksana As String = ""
+        Dim pelaksanaID As String = ""
 
         ' Set Jenis Pelaksana
-        If RadioButtonPelaksanaDokter.Checked = True Then jenisPelaksana = "Dokter"
-        If RadioButtonPelaksanaPerawat.Checked = True Then jenisPelaksana = "Perawat"
+        If RadioButtonPelaksanaDokter.Checked = True Then
+            jenisPelaksana = "Dokter"
+            pelaksanaID = TextBoxPelaksanaID.Text.Trim()
+        ElseIf RadioButtonPelaksanaPerawat.Checked = True Then
+            jenisPelaksana = "Perawat"
+            pelaksanaID = TextBoxNamaPelaksana.Text.Trim()
+        End If
 
         Dim queryString As New StringBuilder()
 
-        queryString.AppendLine("SELECT *")
-        queryString.AppendLine("FROM RekapFeeTindakan a")
-        queryString.AppendLine("WHERE (CONVERT(DATE, TglTransaksi) BETWEEN '" & Format(tglTransaksiAwal.Date, "yyyyMMdd") & "' AND '" & Format(tglTransaksiAkhir.Date, "yyyyMMdd") & "')")
-        queryString.AppendLine("  AND a.KodeKaryawan = '" & TextBoxPelaksanaID.Text & "'")
-        queryString.AppendLine("ORDER BY a.NoTransaksi, CONVERT(date, a.TglTransaksi)")
+        queryString.AppendLine("WITH FilteredTransaksiPoli AS (")
+        queryString.AppendLine("    SELECT TransPoliID, NoUrut, IDInternet, CONVERT(DATE, TglPoli) AS [Tgl Transaksi], ClosingTindakanDokter, ClosingTindakanPerawat")
+        queryString.AppendLine("    FROM TransaksiPoli WITH(NOLOCK)")
+        queryString.AppendLine("    WHERE (CONVERT(DATE, TglPoli) BETWEEN '" & Format(tglTransaksiAwal.Date, "yyyyMMdd") & "' AND '" & Format(tglTransaksiAkhir.Date, "yyyyMMdd") & "') AND Deleted = 0 ")
 
-        Dim tbls As DataTable = ReadSQL(queryString.ToString())
+        If jenisPelaksana = "Dokter" Then
+            queryString.AppendLine("      AND KodeDokter = '" & pelaksanaID.Replace("'", "''") & "'")
+        ElseIf jenisPelaksana = "Perawat" Then
+            queryString.AppendLine("      AND PerawatPoli = '" & pelaksanaID.Replace("'", "''") & "'")
+        End If
 
-        Dim Tdata As DataTable = CreateTableTindakan()
-        Tdata.Rows.Clear()
+        queryString.AppendLine("),")
+        queryString.AppendLine("RawData AS (")
+        queryString.AppendLine("    SELECT ")
+        queryString.AppendLine("        tblTrans.[Tgl Transaksi],")
+        queryString.AppendLine("        tblTrans.NoUrut AS [No Transaksi],")
+        queryString.AppendLine("        b.NamaTindakan AS [Tindakan],")
+        queryString.AppendLine("        tblPasien.Nama AS [Nama Pasien],")
+        queryString.AppendLine("        ISNULL(b.NettBayar, 0) AS NominalBayar,")
+        queryString.AppendLine("        ISNULL(b.TotalBayarBHP, 0) AS NominalBHP,")
+        queryString.AppendLine("        c.JenisDokter,")
+        queryString.AppendLine("        ISNULL(c.StatusBHP, 0) AS StatusBHP,")
+        queryString.AppendLine("        ISNULL(c.StatusPersentaseFee, 0) AS StatusPersentaseFee,")
+        queryString.AppendLine("        ISNULL(c.StatusNominalFee, 0) AS StatusNominalFee,")
+        queryString.AppendLine("        ISNULL(c.PersentaseFeeKaryawan, 0) AS PersentaseFeeDokter,")
+        queryString.AppendLine("        ISNULL(c.PersentaseFeePerawat, 0) AS PersentaseFeePerawat,")
+        queryString.AppendLine("        ISNULL(c.FeePerawat, 0) AS FeePerawat,")
+        queryString.AppendLine("        ISNULL(c.FeePerTindakan, 0) AS FeePerTindakan")
+        queryString.AppendLine("    FROM FilteredTransaksiPoli tblTrans")
+        queryString.AppendLine("    INNER JOIN TransaksiPoliDetail b WITH(NOLOCK) ON tblTrans.TransPoliID = b.TransPoliID AND b.Awal = 1")
+        queryString.AppendLine("    LEFT JOIN MasterTindakan c WITH(NOLOCK) ON b.TindakanID = c.TindakanID")
+        queryString.AppendLine("    OUTER APPLY (SELECT TOP 1 Nama FROM MasterPasien WITH(NOLOCK) WHERE NoRekamMedis = tblTrans.IDInternet) tblPasien")
+        queryString.AppendLine("    WHERE b.DeletedDate IS NULL AND c.JenisTindakan NOT LIKE '%Konsul%' AND c.StatusFeeTindakan = '1'")
+        queryString.AppendLine("      AND (b.NettBayar > 0 OR b.KodeVoucher IS NOT NULL)")
+        queryString.AppendLine("      AND (c.JenisDokter LIKE '%" & jenisPelaksana & "%' OR c.FeePerawat > 0)")
+        queryString.AppendLine("      AND EXISTS (SELECT 1 FROM TransaksiPoliBayarAwal d WITH(NOLOCK) WHERE d.TransPoliID = tblTrans.TransPoliID AND d.JenisBayar IN ('TUNAI', 'DEBET', 'CARD', 'VOUCHER', 'TAGIHAN'))")
 
-        For Each TrowData As DataRow In tbls.Rows
-            Dim Tnew As DataRow = Tdata.NewRow
-            Tnew("Tgl Value") = TrowData("TglTransaksi")
-            Tnew("Tgl Transaksi") = Format(TrowData("TglTransaksi"), "dd") & " " & BulanIndonesia(Format(TrowData("TglTransaksi"), "MM")) & " " & Format(TrowData("TglTransaksi"), "yyyy")
-            Tnew("No Transaksi") = TrowData("NoTransaksi")
-            Tnew("Tindakan") = TrowData("Tindakan")
-            Tnew("Nominal Bayar") = Val(TrowData("NominalBayar"))
-            Tnew("Nominal BHP") = Val(TrowData("NominalBHP"))
-            Tnew("Total Fee") = Val(TrowData("NominalFee"))
-            Tnew("Nama Pasien") = TrowData("NamaPasien")
-            Tdata.Rows.Add(Tnew)
-        Next
+        If jenisPelaksana = "Dokter" Then
+            queryString.AppendLine("      AND b.ClosedFeeDokter = 1")
+        ElseIf jenisPelaksana = "Perawat" Then
+            queryString.AppendLine("      AND b.ClosedFeePerawat = 1")
+        End If
 
-        Report = New XtraReport
-        Report = XtraReport.FromFile(Application.StartupPath + "\reports\Klinik\RekapFeeTindakanDokter.repx", True)
-        Report.DataSource = Tdata
+        queryString.AppendLine("    UNION ALL")
 
-        Report.Bands.Item(BandKind.ReportHeader).Controls("lbltanggal").Text = Format(tglTransaksiAwal.Date, "dd-MM-yyyy") & " s/d " & Format(tglTransaksiAkhir.Date, "dd-MM-yyyy")
-        Report.Bands.Item(BandKind.ReportHeader).Controls("lbldokter").Text = TextBoxNamaPelaksana.Text
-        Report.Bands.Item(BandKind.ReportHeader).Controls("lblheader").Text = "REKAPAN FEE TINDAKAN " & jenisPelaksana.ToUpper()
-        Report.Bands.Item(BandKind.PageFooter).Controls("lblprinted").Text = Format(DateAndTime.Now, "dd-MMM-yyyy HH:mm:ss") & " By " & PoliKlinik.Lbluser.Text
+        queryString.AppendLine("    SELECT ")
+        queryString.AppendLine("        tblTrans.[Tgl Transaksi],")
+        queryString.AppendLine("        tblTrans.NoUrut AS [No Transaksi],")
+        queryString.AppendLine("        b.NamaTindakan AS [Tindakan],")
+        queryString.AppendLine("        tblPasien.Nama AS [Nama Pasien],")
+        queryString.AppendLine("        ISNULL(b.NettBayar, 0) AS NominalBayar,")
+        queryString.AppendLine("        ISNULL(b.TotalBayarBHP, 0) AS NominalBHP,")
+        queryString.AppendLine("        c.JenisDokter,")
+        queryString.AppendLine("        ISNULL(c.StatusBHP, 0) AS StatusBHP,")
+        queryString.AppendLine("        ISNULL(c.StatusPersentaseFee, 0) AS StatusPersentaseFee,")
+        queryString.AppendLine("        ISNULL(c.StatusNominalFee, 0) AS StatusNominalFee,")
+        queryString.AppendLine("        ISNULL(c.PersentaseFeeKaryawan, 0) AS PersentaseFeeDokter,")
+        queryString.AppendLine("        ISNULL(c.PersentaseFeePerawat, 0) AS PersentaseFeePerawat,")
+        queryString.AppendLine("        ISNULL(c.FeePerawat, 0) AS FeePerawat,")
+        queryString.AppendLine("        ISNULL(c.FeePerTindakan, 0) AS FeePerTindakan")
+        queryString.AppendLine("    FROM FilteredTransaksiPoli tblTrans")
+        queryString.AppendLine("    INNER JOIN TransaksiPoliDetail b WITH(NOLOCK) ON tblTrans.TransPoliID = b.TransPoliID AND b.Awal = 0")
+        queryString.AppendLine("    LEFT JOIN MasterTindakan c WITH(NOLOCK) ON b.TindakanID = c.TindakanID")
+        queryString.AppendLine("    OUTER APPLY (SELECT TOP 1 Nama FROM MasterPasien WITH(NOLOCK) WHERE NoRekamMedis = tblTrans.IDInternet) tblPasien")
+        queryString.AppendLine("    WHERE b.DeletedDate IS NULL AND c.JenisTindakan NOT LIKE '%Konsul%' AND c.StatusFeeTindakan = '1'")
+        queryString.AppendLine("      AND (b.NettBayar > 0 OR b.KodeVoucher IS NOT NULL)")
+        queryString.AppendLine("      AND (c.JenisDokter LIKE '%" & jenisPelaksana & "%' OR c.FeePerawat > 0)")
+        queryString.AppendLine("      AND EXISTS (SELECT 1 FROM TransaksiPoliBayar e WITH(NOLOCK) WHERE e.TransPoliID = tblTrans.TransPoliID AND e.JenisBayar IN ('TUNAI', 'DEBET', 'CARD', 'VOUCHER', 'TAGIHAN'))")
 
-        If tbls.Rows.Count > 0 Then
-            'Report.RunDesigner()
+        If jenisPelaksana = "Dokter" Then
+            queryString.AppendLine("      AND b.ClosedFeeDokter = 1")
+        ElseIf jenisPelaksana = "Perawat" Then
+            queryString.AppendLine("      AND b.ClosedFeePerawat = 1")
+        End If
+
+        queryString.AppendLine(")")
+        queryString.AppendLine("SELECT ")
+        queryString.AppendLine("    [Tgl Transaksi] AS [Tgl Value],")
+        queryString.AppendLine("    RIGHT('0' + CAST(DAY([Tgl Transaksi]) AS VARCHAR(2)), 2) + ' ' + ")
+        queryString.AppendLine("    CASE MONTH([Tgl Transaksi])")
+        queryString.AppendLine("        WHEN 1 THEN 'Januari' WHEN 2 THEN 'Februari' WHEN 3 THEN 'Maret'")
+        queryString.AppendLine("        WHEN 4 THEN 'April' WHEN 5 THEN 'Mei' WHEN 6 THEN 'Juni'")
+        queryString.AppendLine("        WHEN 7 THEN 'Juli' WHEN 8 THEN 'Agustus' WHEN 9 THEN 'September'")
+        queryString.AppendLine("        WHEN 10 THEN 'Oktober' WHEN 11 THEN 'November' WHEN 12 THEN 'Desember'")
+        queryString.AppendLine("    END + ' ' + ")
+        queryString.AppendLine("    CAST(YEAR([Tgl Transaksi]) AS VARCHAR(4)) AS [Tgl Transaksi],")
+        queryString.AppendLine("    [No Transaksi],")
+        queryString.AppendLine("    [Tindakan],")
+        queryString.AppendLine("    [Nama Pasien],")
+        queryString.AppendLine("    NominalBayar AS [Nominal Bayar],")
+        queryString.AppendLine("    NominalBHP AS [Nominal BHP],")
+        queryString.AppendLine("    CAST(")
+        queryString.AppendLine("        CASE ")
+        queryString.AppendLine("            WHEN CHARINDEX('" & jenisPelaksana & "', JenisDokter) > 0 THEN")
+        queryString.AppendLine("                CASE ")
+        queryString.AppendLine("                    WHEN StatusPersentaseFee = 1 THEN")
+        queryString.AppendLine("                        CASE ")
+        queryString.AppendLine("                            WHEN '" & jenisPelaksana & "' = 'Dokter' THEN ")
+        queryString.AppendLine("                                (((NominalBayar - (CASE WHEN StatusBHP = 1 THEN NominalBHP ELSE 0 END)) - FeePerawat) * PersentaseFeeDokter) / 100.0")
+        queryString.AppendLine("                            WHEN '" & jenisPelaksana & "' = 'Perawat' THEN ")
+        queryString.AppendLine("                                ((NominalBayar - (CASE WHEN StatusBHP = 1 THEN NominalBHP ELSE 0 END)) * PersentaseFeePerawat) / 100.0")
+        queryString.AppendLine("                            ELSE 0 ")
+        queryString.AppendLine("                        END")
+        queryString.AppendLine("                    WHEN StatusNominalFee = 1 THEN")
+        queryString.AppendLine("                        CASE ")
+        queryString.AppendLine("                            WHEN '" & jenisPelaksana & "' = 'Dokter' THEN FeePerTindakan - FeePerawat")
+        queryString.AppendLine("                            WHEN '" & jenisPelaksana & "' = 'Perawat' THEN FeePerTindakan")
+        queryString.AppendLine("                            ELSE 0 ")
+        queryString.AppendLine("                        END")
+        queryString.AppendLine("                    ELSE 0 ")
+        queryString.AppendLine("                END")
+        queryString.AppendLine("            WHEN FeePerawat > 0 AND LTRIM(RTRIM(JenisDokter)) <> '" & jenisPelaksana & "' AND '" & jenisPelaksana & "' = 'Perawat' THEN ")
+        queryString.AppendLine("                FeePerawat")
+        queryString.AppendLine("            ELSE 0")
+        queryString.AppendLine("        END AS DECIMAL(18,2)")
+        queryString.AppendLine("    ) AS [Total Fee]")
+        queryString.AppendLine("FROM RawData")
+        queryString.AppendLine("ORDER BY [Tgl Transaksi] ASC, [No Transaksi] ASC")
+
+        ' Eksekusi Query langsung mengembalikan DataTable yang sudah terurut
+        Dim Tdata As DataTable = ReadSQL(queryString.ToString())
+
+        If Tdata.Rows.Count > 0 Then
+            Dim Report As New DevExpress.XtraReports.UI.XtraReport
+            Report = DevExpress.XtraReports.UI.XtraReport.FromFile(Application.StartupPath & "\reports\Klinik\RekapFeeTindakanDokter.repx", True)
+            Report.DataSource = Tdata
+
+            Report.Bands.Item(DevExpress.XtraReports.UI.BandKind.ReportHeader).Controls("lbltanggal").Text = Format(tglTransaksiAwal.Date, "dd-MM-yyyy") & " s/d " & Format(tglTransaksiAkhir.Date, "dd-MM-yyyy")
+            Report.Bands.Item(DevExpress.XtraReports.UI.BandKind.ReportHeader).Controls("lbldokter").Text = TextBoxNamaPelaksana.Text
+            Report.Bands.Item(DevExpress.XtraReports.UI.BandKind.ReportHeader).Controls("lblheader").Text = "REKAPAN FEE TINDAKAN " & jenisPelaksana.ToUpper()
+            Report.Bands.Item(DevExpress.XtraReports.UI.BandKind.PageFooter).Controls("lblprinted").Text = Format(DateAndTime.Now, "dd-MMM-yyyy HH:mm:ss") & " By " & PoliKlinik.Lbluser.Text
+
             Report.ShowPreview()
         Else
             MsgBox("Tidak ada data yang ditampilkan.", MsgBoxStyle.Exclamation, "Warning!")
         End If
     End Sub
+
+
+    'OLD
+    'Private Sub CetakLaporanTindakan()
+    '    Dim tglTransaksiAwal As Date = DateTimeAwalTransaksi.Value
+    '    Dim tglTransaksiAkhir As Date = DateTimePickerAkhirTransaksi.Value
+    '    Dim jenisPelaksana As String = ""
+
+    '    ' Set Jenis Pelaksana
+    '    If RadioButtonPelaksanaDokter.Checked = True Then jenisPelaksana = "Dokter"
+    '    If RadioButtonPelaksanaPerawat.Checked = True Then jenisPelaksana = "Perawat"
+
+    '    Dim queryString As New StringBuilder()
+
+    '    'queryString.AppendLine("SELECT *")
+    '    'queryString.AppendLine("FROM RekapFeeTindakan a")
+    '    'queryString.AppendLine("WHERE (CONVERT(DATE, TglTransaksi) BETWEEN '" & Format(tglTransaksiAwal.Date, "yyyyMMdd") & "' AND '" & Format(tglTransaksiAkhir.Date, "yyyyMMdd") & "')")
+    '    'queryString.AppendLine("  AND a.KodeKaryawan = '" & TextBoxPelaksanaID.Text & "'")
+    '    'queryString.AppendLine("ORDER BY a.NoTransaksi, CONVERT(date, a.TglTransaksi)")
+
+    '    queryString.AppendLine("WITH FilteredTransaksiPoli AS (")
+    '    queryString.AppendLine("    SELECT TransPoliID, NoUrut, IDInternet, CONVERT(DATE, TglPoli) AS 'Tgl Transaksi', ClosingTindakanDokter, ClosingTindakanPerawat")
+    '    queryString.AppendLine("    FROM TransaksiPoli")
+    '    queryString.AppendLine("    WHERE (CONVERT(DATE, TglPoli) BETWEEN '" & Format(tglTransaksiAwal.Date, "yyyyMMdd") & "' AND '" & Format(tglTransaksiAkhir.Date, "yyyyMMdd") & "') AND Deleted=0 ")
+    '    If jenisPelaksana = "Dokter" Then
+    '        queryString.AppendLine("AND KodeDokter='" & TextBoxPelaksanaID.Text & "'")
+    '    ElseIf jenisPelaksana = "Perawat" Then
+    '        queryString.AppendLine("AND PerawatPoli='" & TextBoxNamaPelaksana.Text & "'")
+    '    End If
+    '    queryString.AppendLine(")")
+    '    queryString.AppendLine("SELECT b.TransPoliIDDetail AS ID, tblTrans.[Tgl Transaksi], tblPasien.Nama, tblTrans.NoUrut, b.NamaTindakan, b.NettBayar, c.FeeDokter, c.FeePerawat, c.JenisDokter, c.StatusBHP, c.PersentaseFeeKaryawan, c.StatusPersentaseFee, c.StatusNominalFee, c.FeePerTindakan, b.TotalBayarBHP, b.ClosedFeeDokter, b.ClosedFeePerawat, tblTrans.ClosingTindakanDokter, tblTrans.ClosingTindakanPerawat")
+    '    queryString.AppendLine("FROM FilteredTransaksiPoli tblTrans")
+    '    queryString.AppendLine("LEFT JOIN TransaksiPoliDetail b ON tblTrans.TransPoliID=b.TransPoliID AND b.Awal=1")
+    '    queryString.AppendLine("LEFT JOIN MasterTindakan c ON b.TindakanID=c.TindakanID")
+    '    queryString.AppendLine("LEFT JOIN TransaksiPoliBayarAwal d ON tblTrans.TransPoliID=d.TransPoliID")
+    '    queryString.AppendLine("LEFT JOIN MasterPasien tblPasien ON tblTrans.IDInternet=tblPasien.NoRekamMedis")
+    '    queryString.AppendLine("WHERE b.DeletedDate IS NULL AND c.JenisTindakan NOT LIKE '%Konsul%' AND c.StatusFeeTindakan='1'")
+    '    queryString.AppendLine("  AND (b.NettBayar > 0 OR b.KodeVoucher IS NOT NULL)")
+    '    queryString.AppendLine("  AND (c.JenisDokter LIKE '%" & jenisPelaksana & "%' OR c.FeePerawat > 0)")
+    '    queryString.AppendLine("  AND d.JenisBayar IN ('TUNAI', 'DEBET', 'CARD', 'VOUCHER', 'TAGIHAN')")
+    '    queryString.AppendLine("UNION")
+    '    queryString.AppendLine("SELECT b.TransPoliIDDetail AS ID, tblTrans.[Tgl Transaksi], tblPasien.Nama, tblTrans.NoUrut, b.NamaTindakan, b.NettBayar, c.FeeDokter, c.FeePerawat, c.JenisDokter, c.StatusBHP, c.PersentaseFeeKaryawan, c.StatusPersentaseFee, c.StatusNominalFee, c.FeePerTindakan, b.TotalBayarBHP, b.ClosedFeeDokter, b.ClosedFeePerawat, tblTrans.ClosingTindakanDokter, tblTrans.ClosingTindakanPerawat")
+    '    queryString.AppendLine("FROM FilteredTransaksiPoli tblTrans")
+    '    queryString.AppendLine("LEFT JOIN TransaksiPoliDetail b ON tblTrans.TransPoliID=b.TransPoliID AND b.Awal=0")
+    '    queryString.AppendLine("LEFT JOIN MasterTindakan c ON b.TindakanID=c.TindakanID")
+    '    queryString.AppendLine("LEFT JOIN TransaksiPoliBayar e ON tblTrans.TransPoliID=e.TransPoliID")
+    '    queryString.AppendLine("LEFT JOIN MasterPasien tblPasien ON tblTrans.IDInternet=tblPasien.NoRekamMedis")
+    '    queryString.AppendLine("WHERE b.DeletedDate IS NULL AND c.JenisTindakan NOT LIKE '%Konsul%' AND c.StatusFeeTindakan='1'")
+    '    queryString.AppendLine("  AND (b.NettBayar > 0 OR b.KodeVoucher IS NOT NULL)")
+    '    queryString.AppendLine("  AND (c.JenisDokter LIKE '%" & jenisPelaksana & "%' OR c.FeePerawat > 0)")
+    '    queryString.AppendLine("  AND e.JenisBayar IN ('TUNAI', 'DEBET', 'CARD', 'VOUCHER', 'TAGIHAN')")
+
+    '    Dim tblTindakan As DataTable = ReadSQL(queryString.ToString())
+
+    '    Dim Tdata As DataTable = CreateTableTindakan()
+    '    Tdata.Rows.Clear()
+
+    '    For Each rowTindakan As DataRow In tblTindakan.Rows
+    '        Dim NominalFee As Double = 0
+    '        Dim PersentaseFee As Double = 0
+
+    '        Dim statusBHP As Boolean = False
+    '        Dim statusPersentase As Boolean = False
+    '        Dim statusNominal As Boolean = False
+
+    '        If Convert.ToInt32(rowTindakan("StatusBHP")) = 1 Then statusBHP = True
+    '        If Convert.ToInt32(rowTindakan("StatusPersentaseFee")) = 1 Then statusPersentase = True
+    '        If Convert.ToInt32(rowTindakan("StatusNominalFee")) = 1 Then statusNominal = True
+
+    '        ' Ambil nilai Nominal BHP dari database (Cegah Error DBNull)
+    '        Dim NominalBHP As Double = 0
+    '        If Not IsDBNull(rowTindakan("TotalBayarBHP")) AndAlso rowTindakan("TotalBayarBHP").ToString() <> "" Then
+    '            NominalBHP = CDbl(ConvertToInteger(rowTindakan("TotalBayarBHP").ToString()))
+    '        End If
+
+    '        If rowTindakan("JenisDokter").ToString.Contains(jenisPelaksana) = True Then
+    '            If statusPersentase = True Then
+    '                If statusBHP = True Then
+    '                    NominalFee = CDbl(rowTindakan("NettBayar").ToString) - NominalBHP
+    '                Else
+    '                    NominalFee = CDbl(rowTindakan("NettBayar").ToString)
+    '                End If
+
+    '                PersentaseFee = CDbl(rowTindakan("PersentaseFeeKaryawan").ToString)
+
+    '                If jenisPelaksana = "Dokter" Then NominalFee = ((NominalFee - CDbl(rowTindakan("FeePerawat"))) * CDbl(PersentaseFee)) / 100
+    '                If jenisPelaksana = "Perawat" Then NominalFee = (NominalFee * CDbl(PersentaseFee)) / 100
+    '            ElseIf statusNominal = True Then
+    '                If jenisPelaksana = "Dokter" Then NominalFee = CDbl(rowTindakan("FeePerTindakan").ToString) - CDbl(rowTindakan("FeePerawat"))
+    '                If jenisPelaksana = "Perawat" Then NominalFee = CDbl(rowTindakan("FeePerTindakan").ToString)
+    '            End If
+    '        ElseIf CDbl(rowTindakan("FeePerawat")) > 0 And rowTindakan("JenisDokter").ToString.Trim <> jenisPelaksana And jenisPelaksana = "Perawat" Then
+    '            NominalFee = CDbl(rowTindakan("FeePerawat").ToString)
+    '        End If
+
+    '        ' Masukkan data yang sudah dihitung ke Datatable Report (Tdata)
+    '        Dim Tnew As DataRow = Tdata.NewRow
+    '        Tnew("Tgl Value") = rowTindakan("Tgl Transaksi")
+    '        Tnew("Tgl Transaksi") = Format(rowTindakan("Tgl Transaksi"), "dd") & " " & BulanIndonesia(Format(rowTindakan("Tgl Transaksi"), "MM")) & " " & Format(rowTindakan("Tgl Transaksi"), "yyyy")
+    '        Tnew("No Transaksi") = rowTindakan("NoUrut")
+    '        Tnew("Tindakan") = rowTindakan("NamaTindakan")
+    '        Tnew("Nama Pasien") = rowTindakan("Nama")
+
+    '        ' Pastikan nama kolom di Tdata cocok dengan nama field di Report .repx Anda
+    '        Tnew("Nominal Bayar") = CDbl(rowTindakan("NettBayar"))
+    '        Tnew("Nominal BHP") = NominalBHP
+    '        Tnew("Total Fee") = NominalFee
+
+    '        Tdata.Rows.Add(Tnew)
+    '    Next
+
+    '    If Tdata.Rows.Count > 0 Then
+    '        Dim Report As New DevExpress.XtraReports.UI.XtraReport
+    '        Report = DevExpress.XtraReports.UI.XtraReport.FromFile(Application.StartupPath & "\reports\Klinik\RekapFeeTindakanDokter.repx", True)
+    '        Report.DataSource = Tdata
+
+    '        Report.Bands.Item(DevExpress.XtraReports.UI.BandKind.ReportHeader).Controls("lbltanggal").Text = Format(tglTransaksiAwal.Date, "dd-MM-yyyy") & " s/d " & Format(tglTransaksiAkhir.Date, "dd-MM-yyyy")
+    '        Report.Bands.Item(DevExpress.XtraReports.UI.BandKind.ReportHeader).Controls("lbldokter").Text = TextBoxNamaPelaksana.Text
+    '        Report.Bands.Item(DevExpress.XtraReports.UI.BandKind.ReportHeader).Controls("lblheader").Text = "REKAPAN FEE TINDAKAN " & jenisPelaksana.ToUpper()
+    '        Report.Bands.Item(DevExpress.XtraReports.UI.BandKind.PageFooter).Controls("lblprinted").Text = Format(DateAndTime.Now, "dd-MMM-yyyy HH:mm:ss") & " By " & PoliKlinik.Lbluser.Text
+
+    '        Report.ShowPreview()
+    '    Else
+    '        MsgBox("Tidak ada data yang ditampilkan.", MsgBoxStyle.Exclamation, "Warning!")
+    '    End If
+
+    '    'For Each TrowData As DataRow In tbls.Rows
+    '    '    Dim Tnew As DataRow = Tdata.NewRow
+    '    '    Tnew("Tgl Value") = TrowData("TglTransaksi")
+    '    '    Tnew("Tgl Transaksi") = Format(TrowData("TglTransaksi"), "dd") & " " & BulanIndonesia(Format(TrowData("TglTransaksi"), "MM")) & " " & Format(TrowData("TglTransaksi"), "yyyy")
+    '    '    Tnew("No Transaksi") = TrowData("NoTransaksi")
+    '    '    Tnew("Tindakan") = TrowData("Tindakan")
+    '    '    Tnew("Nominal Bayar") = Val(TrowData("NominalBayar"))
+    '    '    Tnew("Nominal BHP") = Val(TrowData("NominalBHP"))
+    '    '    Tnew("Total Fee") = Val(TrowData("NominalFee"))
+    '    '    Tnew("Nama Pasien") = TrowData("NamaPasien")
+    '    '    Tdata.Rows.Add(Tnew)
+    '    'Next
+
+    '    'Report = New XtraReport
+    '    'Report = XtraReport.FromFile(Application.StartupPath + "\reports\Klinik\RekapFeeTindakanDokter.repx", True)
+    '    'Report.DataSource = Tdata
+
+    '    'Report.Bands.Item(BandKind.ReportHeader).Controls("lbltanggal").Text = Format(tglTransaksiAwal.Date, "dd-MM-yyyy") & " s/d " & Format(tglTransaksiAkhir.Date, "dd-MM-yyyy")
+    '    'Report.Bands.Item(BandKind.ReportHeader).Controls("lbldokter").Text = TextBoxNamaPelaksana.Text
+    '    'Report.Bands.Item(BandKind.ReportHeader).Controls("lblheader").Text = "REKAPAN FEE TINDAKAN " & jenisPelaksana.ToUpper()
+    '    'Report.Bands.Item(BandKind.PageFooter).Controls("lblprinted").Text = Format(DateAndTime.Now, "dd-MMM-yyyy HH:mm:ss") & " By " & PoliKlinik.Lbluser.Text
+
+    '    'If tbls.Rows.Count > 0 Then
+    '    '    'Report.RunDesigner()
+    '    '    Report.ShowPreview()
+    '    'Else
+    '    '    MsgBox("Tidak ada data yang ditampilkan.", MsgBoxStyle.Exclamation, "Warning!")
+    '    'End If
+    'End Sub
 
     Private Sub ButtonExportCSV_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonExportCSV.Click
         Dim Tbls As DataTable = GridControlTransaksi.DataSource

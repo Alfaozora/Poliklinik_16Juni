@@ -26,9 +26,11 @@ Partial Class DialogBoxPaketTindakan
         Me.Panel1 = New System.Windows.Forms.Panel
         Me.SplitContainerMainMenu = New System.Windows.Forms.SplitContainer
         Me.SplitContainerPaket = New System.Windows.Forms.SplitContainer
+        Me.TextBoxRMPasien = New System.Windows.Forms.TextBox
+        Me.CheckBoxPaketLain = New System.Windows.Forms.CheckBox
+        Me.ComboBoxPaketTindakan = New System.Windows.Forms.ComboBox
         Me.ButtonFindPaket = New System.Windows.Forms.Button
         Me.TextBoxKodeVoucher = New System.Windows.Forms.TextBox
-        Me.Label157 = New System.Windows.Forms.Label
         Me.GridControlPaket = New DevExpress.XtraGrid.GridControl
         Me.GridViewPaket = New DevExpress.XtraGrid.Views.Grid.GridView
         Me.ButtonBatal = New System.Windows.Forms.Button
@@ -84,7 +86,7 @@ Partial Class DialogBoxPaketTindakan
         Me.SplitContainerMainMenu.Panel2.Controls.Add(Me.ButtonBatal)
         Me.SplitContainerMainMenu.Panel2.Controls.Add(Me.ButtonSimpan)
         Me.SplitContainerMainMenu.Size = New System.Drawing.Size(838, 413)
-        Me.SplitContainerMainMenu.SplitterDistance = 365
+        Me.SplitContainerMainMenu.SplitterDistance = 360
         Me.SplitContainerMainMenu.SplitterWidth = 5
         Me.SplitContainerMainMenu.TabIndex = 500
         '
@@ -99,18 +101,57 @@ Partial Class DialogBoxPaketTindakan
         '
         'SplitContainerPaket.Panel1
         '
+        Me.SplitContainerPaket.Panel1.Controls.Add(Me.TextBoxRMPasien)
+        Me.SplitContainerPaket.Panel1.Controls.Add(Me.CheckBoxPaketLain)
+        Me.SplitContainerPaket.Panel1.Controls.Add(Me.ComboBoxPaketTindakan)
         Me.SplitContainerPaket.Panel1.Controls.Add(Me.ButtonFindPaket)
         Me.SplitContainerPaket.Panel1.Controls.Add(Me.TextBoxKodeVoucher)
-        Me.SplitContainerPaket.Panel1.Controls.Add(Me.Label157)
         '
         'SplitContainerPaket.Panel2
         '
         Me.SplitContainerPaket.Panel2.AutoScroll = True
         Me.SplitContainerPaket.Panel2.Controls.Add(Me.GridControlPaket)
-        Me.SplitContainerPaket.Size = New System.Drawing.Size(838, 365)
-        Me.SplitContainerPaket.SplitterDistance = 65
+        Me.SplitContainerPaket.Size = New System.Drawing.Size(838, 360)
+        Me.SplitContainerPaket.SplitterDistance = 80
         Me.SplitContainerPaket.SplitterWidth = 1
         Me.SplitContainerPaket.TabIndex = 463
+        '
+        'TextBoxRMPasien
+        '
+        Me.TextBoxRMPasien.BackColor = System.Drawing.Color.White
+        Me.TextBoxRMPasien.Cursor = System.Windows.Forms.Cursors.No
+        Me.TextBoxRMPasien.Enabled = False
+        Me.TextBoxRMPasien.Font = New System.Drawing.Font("Segoe UI", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.TextBoxRMPasien.Location = New System.Drawing.Point(64, 38)
+        Me.TextBoxRMPasien.Name = "TextBoxRMPasien"
+        Me.TextBoxRMPasien.Size = New System.Drawing.Size(183, 25)
+        Me.TextBoxRMPasien.TabIndex = 551
+        Me.TextBoxRMPasien.TabStop = False
+        '
+        'CheckBoxPaketLain
+        '
+        Me.CheckBoxPaketLain.AutoSize = True
+        Me.CheckBoxPaketLain.Location = New System.Drawing.Point(64, 12)
+        Me.CheckBoxPaketLain.Name = "CheckBoxPaketLain"
+        Me.CheckBoxPaketLain.Size = New System.Drawing.Size(159, 17)
+        Me.CheckBoxPaketLain.TabIndex = 550
+        Me.CheckBoxPaketLain.Text = "Gunakan Paket Pasien Lain"
+        Me.CheckBoxPaketLain.UseVisualStyleBackColor = True
+        '
+        'ComboBoxPaketTindakan
+        '
+        Me.ComboBoxPaketTindakan.AutoCompleteCustomSource.AddRange(New String() {"aaaaa"})
+        Me.ComboBoxPaketTindakan.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend
+        Me.ComboBoxPaketTindakan.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource
+        Me.ComboBoxPaketTindakan.Font = New System.Drawing.Font("Segoe UI", 9.75!)
+        Me.ComboBoxPaketTindakan.FormattingEnabled = True
+        Me.ComboBoxPaketTindakan.IntegralHeight = False
+        Me.ComboBoxPaketTindakan.ItemHeight = 17
+        Me.ComboBoxPaketTindakan.Location = New System.Drawing.Point(253, 38)
+        Me.ComboBoxPaketTindakan.Margin = New System.Windows.Forms.Padding(3, 4, 3, 4)
+        Me.ComboBoxPaketTindakan.Name = "ComboBoxPaketTindakan"
+        Me.ComboBoxPaketTindakan.Size = New System.Drawing.Size(318, 25)
+        Me.ComboBoxPaketTindakan.TabIndex = 548
         '
         'ButtonFindPaket
         '
@@ -123,7 +164,7 @@ Partial Class DialogBoxPaketTindakan
         Me.ButtonFindPaket.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonFindPaket.Font = New System.Drawing.Font("Segoe UI", 9.0!)
         Me.ButtonFindPaket.ForeColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(100, Byte), Integer), CType(CType(200, Byte), Integer))
-        Me.ButtonFindPaket.Location = New System.Drawing.Point(515, 19)
+        Me.ButtonFindPaket.Location = New System.Drawing.Point(577, 38)
         Me.ButtonFindPaket.Name = "ButtonFindPaket"
         Me.ButtonFindPaket.RightToLeft = System.Windows.Forms.RightToLeft.No
         Me.ButtonFindPaket.Size = New System.Drawing.Size(175, 25)
@@ -138,20 +179,11 @@ Partial Class DialogBoxPaketTindakan
         Me.TextBoxKodeVoucher.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.TextBoxKodeVoucher.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper
         Me.TextBoxKodeVoucher.Font = New System.Drawing.Font("Segoe UI", 9.0!)
-        Me.TextBoxKodeVoucher.Location = New System.Drawing.Point(234, 20)
+        Me.TextBoxKodeVoucher.Location = New System.Drawing.Point(667, 9)
         Me.TextBoxKodeVoucher.Name = "TextBoxKodeVoucher"
-        Me.TextBoxKodeVoucher.Size = New System.Drawing.Size(275, 23)
+        Me.TextBoxKodeVoucher.Size = New System.Drawing.Size(147, 23)
         Me.TextBoxKodeVoucher.TabIndex = 532
-        '
-        'Label157
-        '
-        Me.Label157.AutoSize = True
-        Me.Label157.Font = New System.Drawing.Font("Segoe UI Semibold", 9.75!, System.Drawing.FontStyle.Bold)
-        Me.Label157.Location = New System.Drawing.Point(120, 20)
-        Me.Label157.Name = "Label157"
-        Me.Label157.Size = New System.Drawing.Size(108, 17)
-        Me.Label157.TabIndex = 528
-        Me.Label157.Text = "Scan QR Pasien :"
+        Me.TextBoxKodeVoucher.Visible = False
         '
         'GridControlPaket
         '
@@ -161,7 +193,7 @@ Partial Class DialogBoxPaketTindakan
         Me.GridControlPaket.Location = New System.Drawing.Point(0, 0)
         Me.GridControlPaket.MainView = Me.GridViewPaket
         Me.GridControlPaket.Name = "GridControlPaket"
-        Me.GridControlPaket.Size = New System.Drawing.Size(838, 299)
+        Me.GridControlPaket.Size = New System.Drawing.Size(838, 279)
         Me.GridControlPaket.TabIndex = 186
         Me.GridControlPaket.ViewCollection.AddRange(New DevExpress.XtraGrid.Views.Base.BaseView() {Me.GridViewPaket})
         '
@@ -190,7 +222,7 @@ Partial Class DialogBoxPaketTindakan
         Me.ButtonBatal.Location = New System.Drawing.Point(488, 0)
         Me.ButtonBatal.Name = "ButtonBatal"
         Me.ButtonBatal.Padding = New System.Windows.Forms.Padding(10, 0, 0, 0)
-        Me.ButtonBatal.Size = New System.Drawing.Size(125, 43)
+        Me.ButtonBatal.Size = New System.Drawing.Size(125, 48)
         Me.ButtonBatal.TabIndex = 7
         Me.ButtonBatal.Text = "  Batal"
         Me.ButtonBatal.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -213,7 +245,7 @@ Partial Class DialogBoxPaketTindakan
         Me.ButtonSimpan.Location = New System.Drawing.Point(613, 0)
         Me.ButtonSimpan.Name = "ButtonSimpan"
         Me.ButtonSimpan.Padding = New System.Windows.Forms.Padding(10, 0, 0, 0)
-        Me.ButtonSimpan.Size = New System.Drawing.Size(225, 43)
+        Me.ButtonSimpan.Size = New System.Drawing.Size(225, 48)
         Me.ButtonSimpan.TabIndex = 5
         Me.ButtonSimpan.Text = "  Simpan Paket Pasien"
         Me.ButtonSimpan.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
@@ -254,9 +286,11 @@ Partial Class DialogBoxPaketTindakan
     Friend WithEvents ButtonSimpan As System.Windows.Forms.Button
     Friend WithEvents ButtonBatal As System.Windows.Forms.Button
     Friend WithEvents SplitContainerPaket As System.Windows.Forms.SplitContainer
-    Friend WithEvents Label157 As System.Windows.Forms.Label
     Private WithEvents GridControlPaket As DevExpress.XtraGrid.GridControl
     Friend WithEvents GridViewPaket As DevExpress.XtraGrid.Views.Grid.GridView
     Friend WithEvents TextBoxKodeVoucher As System.Windows.Forms.TextBox
     Friend WithEvents ButtonFindPaket As System.Windows.Forms.Button
+    Friend WithEvents ComboBoxPaketTindakan As System.Windows.Forms.ComboBox
+    Friend WithEvents CheckBoxPaketLain As System.Windows.Forms.CheckBox
+    Friend WithEvents TextBoxRMPasien As System.Windows.Forms.TextBox
 End Class

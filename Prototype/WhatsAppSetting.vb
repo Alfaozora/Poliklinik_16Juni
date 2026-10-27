@@ -1,6 +1,7 @@
 ﻿Imports System.Net
 Imports System.Net.Sockets
 Imports System.IO
+Imports System.Net.Http
 Imports Newtonsoft.Json.Serialization
 Imports System.Drawing.Drawing2D
 Imports System.ComponentModel
@@ -12,6 +13,62 @@ Public Class WhatsAppSetting
     Private preventEvent As Boolean = False
     Private waProcess As Process = Nothing
     Private Delegate Sub UpdateUIDelegate()
+
+    Private Class KirimWaParams
+        Private _noHp As String
+        Private _isDocument As Boolean
+
+        Public Property NoHp() As String
+            Get
+                Return _noHp
+            End Get
+            Set(ByVal value As String)
+                _noHp = value
+            End Set
+        End Property
+
+        Public Property IsDocument() As Boolean
+            Get
+                Return _isDocument
+            End Get
+            Set(ByVal value As Boolean)
+                _isDocument = value
+            End Set
+        End Property
+    End Class
+
+    Private Class KirimWaResult
+        Private _isSuccess As Boolean
+        Private _message As String
+        Private _providerMode As String
+
+        Public Property IsSuccess() As Boolean
+            Get
+                Return _isSuccess
+            End Get
+            Set(ByVal value As Boolean)
+                _isSuccess = value
+            End Set
+        End Property
+
+        Public Property Message() As String
+            Get
+                Return _message
+            End Get
+            Set(ByVal value As String)
+                _message = value
+            End Set
+        End Property
+
+        Public Property ProviderMode() As String
+            Get
+                Return _providerMode
+            End Get
+            Set(ByVal value As String)
+                _providerMode = value
+            End Set
+        End Property
+    End Class
 
     Public Function Base64ToImage(ByVal base64String As String) As Image
         Dim imageBytes() As Byte = Convert.FromBase64String(base64String)
@@ -36,16 +93,15 @@ Public Class WhatsAppSetting
         isInitializing = True
 
         Dim instance As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_instance'")
-        Dim token As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_token'")
+        Dim token As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_official_apikey'")
         Dim ipKlinik As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_klinik_ip'")
         Dim ipLab As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_laboratorium_ip'")
 
-        TextBoxID.Text = instance
         TextBoxToken.Text = token
         TextBoxIPKlinik.Text = ipKlinik
         TextBoxIPLab.Text = ipLab
 
-        TextBoxNoHp.MaxLength = 13
+        TextBoxNoHp.MaxLength = 16
 
         MakeButtonRound(ButtonStart)
 
@@ -69,7 +125,49 @@ Public Class WhatsAppSetting
         ToggleSwitchKlinik.Checked = (statusWA.Trim().ToUpper() = "YES")
         ToggleSwitchLab.Checked = (statusWALab.Trim().ToUpper() = "YES")
 
+        Dim providerMode As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_provider_mode'")
+        Dim autoFallback As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_auto_fallback'")
+
+        ToggleSwitchProvider.Checked = (providerMode.Trim().ToUpper() = "OFFICIAL")
+        ToggleSwitchFallback.Checked = (autoFallback.Trim().ToUpper() = "YES")
+
         preventEvent = False
+    End Sub
+
+    ' ========================================================
+    ' 🟢 EVENT HANDLER TOGGLE SWITCH PROVIDER (OFFICIAL / BAILEYS)
+    ' ========================================================
+    Private Sub ToggleSwitchProvider_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToggleSwitchProvider.CheckedChanged
+        If isInitializing Or preventEvent Then Exit Sub
+
+        Try
+            ' OFF (Unchecked) = BAILEYS (Default), ON (Checked) = OFFICIAL
+            Dim providerValue As String = If(ToggleSwitchProvider.Checked, "OFFICIAL", "BAILEYS")
+            WriteSQL("UPDATE MsConfig SET StrValue = '" & providerValue & "' WHERE ConfigName = 'whatsapp_provider_mode'", 4)
+
+            Dim modeName As String = If(ToggleSwitchProvider.Checked, "Official API", "Unofficial (Baileys)")
+            MsgBox("Provider WhatsApp berhasil diubah ke Mode: " & modeName, MsgBoxStyle.Information, "Success")
+        Catch ex As Exception
+            MsgBox("Gagal memperbarui Provider WhatsApp:" & vbCrLf & ex.Message, MsgBoxStyle.Critical, "Error!")
+        End Try
+    End Sub
+
+    ' ========================================================
+    ' 🟢 EVENT HANDLER TOGGLE SWITCH FALLBACK (YES / NO)
+    ' ========================================================
+    Private Sub ToggleSwitchFallback_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ToggleSwitchFallback.CheckedChanged
+        If isInitializing Or preventEvent Then Exit Sub
+
+        Try
+            ' OFF (Unchecked) = No (Default), ON (Checked) = Yes
+            Dim fallbackValue As String = If(ToggleSwitchFallback.Checked, "Yes", "No")
+            WriteSQL("UPDATE MsConfig SET StrValue = '" & fallbackValue & "' WHERE ConfigName = 'whatsapp_auto_fallback'", 4)
+
+            Dim statusText As String = If(ToggleSwitchFallback.Checked, "Aktif (Auto-Switch ke Official jika Baileys gagal)", "Nonaktif")
+            MsgBox("Fitur Auto Fallback berhasil diubah ke: " & statusText, MsgBoxStyle.Information, "Success")
+        Catch ex As Exception
+            MsgBox("Gagal memperbarui Status Auto Fallback:" & vbCrLf & ex.Message, MsgBoxStyle.Critical, "Error!")
+        End Try
     End Sub
 
     Private Sub LoadQRCode()
@@ -99,49 +197,44 @@ Public Class WhatsAppSetting
 
     Private Sub CekStatus()
         Try
-            Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
-            Dim apiUrl As String = baseURL & "api/get-status"
+            ' 1. Ambil Base URL dari database (contoh: http://localhost:8000/ atau IP server)
+            Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_official_url'")
 
-            Dim req As Net.HttpWebRequest = Net.WebRequest.Create(apiUrl)
+            ' Pastikan trailing slash ditangani dengan benar
+            If Not baseURL.EndsWith("/") Then baseURL &= "/"
+            Dim apiUrl As String = baseURL & "whatsapp/api/check_health"
+
+            ' 2. Buat request HTTP GET
+            Dim req As Net.HttpWebRequest = CType(Net.WebRequest.Create(apiUrl), Net.HttpWebRequest)
             req.Method = "GET"
+            req.Timeout = 5000 ' Timeout 5 detik
 
-            Dim resp As Net.HttpWebResponse = req.GetResponse()
-            Dim reader As New IO.StreamReader(resp.GetResponseStream())
-            Dim json As String = reader.ReadToEnd()
+            ' 3. Ambil response dari server
+            Using resp As Net.HttpWebResponse = CType(req.GetResponse(), Net.HttpWebResponse)
+                Using reader As New IO.StreamReader(resp.GetResponseStream())
+                    Dim jsonResponse As String = reader.ReadToEnd()
 
-            ' Parse JSON
-            Dim obj = Newtonsoft.Json.Linq.JObject.Parse(json)
+                    ' Parse JSON
+                    Dim obj As Newtonsoft.Json.Linq.JObject = Newtonsoft.Json.Linq.JObject.Parse(jsonResponse)
 
-            Dim statusVal As String = ""
-            Dim substatusVal As String = ""
+                    Dim statusVal As String = If(obj("status") IsNot Nothing, obj("status").ToString().ToLower(), "")
+                    Dim messageVal As String = If(obj("message") IsNot Nothing, obj("message").ToString(), "")
 
-            Try
-                statusVal = obj("decoded_json")("status")("accountStatus")("status").ToString()
-                substatusVal = obj("decoded_json")("status")("accountStatus")("substatus").ToString()
-            Catch ex As Exception
-                statusVal = ""
-                substatusVal = ""
-            End Try
-
-            ' ============================
-            '     LOGIKA STATUS
-            ' ============================
-            If substatusVal.ToLower() = "normal" Then
-                LabelStatus.Text = "Tidak Terkoneksi"
-                LabelStatus.ForeColor = Color.Red
-                ButtonGetQR.Enabled = True
-                ButtonLogout.Enabled = False
-                ButtonRestart.Enabled = False
-            Else
-                LabelStatus.Text = "Terkoneksi"
-                LabelStatus.ForeColor = Color.Green
-                ButtonGetQR.Enabled = False
-                ButtonLogout.Enabled = True
-                ButtonRestart.Enabled = True
-            End If
+                    ' 4. Update UI berdasarkan nilai status JSON
+                    If statusVal = "success" Then
+                        LabelStatus.Text = "Terkoneksi"
+                        LabelStatus.ForeColor = Color.Green
+                    Else
+                        LabelStatus.Text = "Tidak Terkoneksi"
+                        LabelStatus.ForeColor = Color.Red
+                    End If
+                End Using
+            End Using
 
         Catch ex As Exception
-            MessageBox.Show("Error: " & ex.Message)
+            ' Tangani jika terjadi error koneksi / timeout / endpoint offline
+            LabelStatus.Text = "Terputus / Server Off"
+            LabelStatus.ForeColor = Color.Red
         End Try
     End Sub
 
@@ -173,21 +266,6 @@ Public Class WhatsAppSetting
                 nama = ""
                 platform = ""
             End Try
-
-            ' ============================
-            '   LOGIKA STATUS HANDPHONE
-            ' ============================
-            If String.IsNullOrEmpty(id) Then
-                ' Tidak terhubung
-                LabelNoHp.Text = "-"
-                LabelNama.Text = "-"
-                LabelPlatform.Text = "-"
-            Else
-                ' Terhubung
-                LabelNoHp.Text = id
-                LabelNama.Text = nama
-                LabelPlatform.Text = platform
-            End If
 
         Catch ex As Exception
             MessageBox.Show("Error: " & ex.Message)
@@ -302,9 +380,8 @@ Public Class WhatsAppSetting
         End Try
     End Sub
 
-    Private Sub ButtonGetQR_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonGetQR.Click
+    Private Sub ButtonGetQR_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         Me.Cursor = Cursors.WaitCursor
-        ButtonGetQR.Enabled = False
 
         Try
             LoadQRCode()
@@ -312,7 +389,6 @@ Public Class WhatsAppSetting
             MessageBox.Show("Error: " & ex.Message)
         Finally
             Me.Cursor = Cursors.Hand
-            ButtonGetQR.Enabled = True
         End Try
     End Sub
 
@@ -331,9 +407,8 @@ Public Class WhatsAppSetting
         End Try
     End Sub
 
-    Private Sub ButtonLogout_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonLogout.Click
+    Private Sub ButtonLogout_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         Me.Cursor = Cursors.WaitCursor
-        ButtonLogout.Enabled = False
 
         Try
             LogoutWhatsapp()
@@ -341,15 +416,13 @@ Public Class WhatsAppSetting
             MessageBox.Show("Error: " & ex.Message)
         Finally
             Me.Cursor = Cursors.Hand
-            ButtonLogout.Enabled = True
             CekStatus()
             CekInfo()
         End Try
     End Sub
 
-    Private Sub ButtonRestart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonRestart.Click
+    Private Sub ButtonRestart_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         Me.Cursor = Cursors.WaitCursor
-        ButtonRestart.Enabled = False
 
         Try
             RestartWhatsapp()
@@ -357,7 +430,6 @@ Public Class WhatsAppSetting
             MessageBox.Show("Error: " & ex.Message)
         Finally
             Me.Cursor = Cursors.Hand
-            ButtonRestart.Enabled = True
             CekStatus()
             CekInfo()
         End Try
@@ -401,86 +473,181 @@ Public Class WhatsAppSetting
     End Sub
 
     Private Sub ButtonKirim_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonKirim.Click
+        Dim nohp As String = TextBoxNoHp.Text.Trim()
+
+        If nohp = "" Then
+            MsgBox("Nomor HP tidak boleh kosong.", MsgBoxStyle.Exclamation, "Warning")
+            Exit Sub
+        End If
+
+        ' Normalisasi nomor HP[cite: 2]
+        If nohp.StartsWith("0") Then
+            nohp = "62" & nohp.Substring(1)
+        ElseIf nohp.StartsWith("+") Then
+            nohp = nohp.Substring(1)
+        End If
+
+        If nohp.Length < 10 Then
+            MsgBox("Nomor HP terlalu pendek.", MsgBoxStyle.Exclamation, "Warning")
+            Exit Sub
+        End If
+
+        If nohp.Length > 14 Then
+            MsgBox("Nomor HP terlalu panjang.", MsgBoxStyle.Exclamation, "Warning")
+            Exit Sub
+        End If
+
+        ' Cek apakah BackgroundWorker sedang berjalan
+        If bgwKirimWA.IsBusy Then
+            MsgBox("Proses pengiriman pesan sebelumnya masih berjalan.", MsgBoxStyle.Information, "Mohon Tunggu")
+            Exit Sub
+        End If
+
+        ' Nonaktifkan tombol & ubah kursor[cite: 1]
+        ButtonKirim.Enabled = False
+        Me.Cursor = Cursors.WaitCursor
+
+        ' Inisialisasi object parameter gaya VB 2008
+        Dim p As New KirimWaParams()
+        p.NoHp = nohp
+        p.IsDocument = RadioButtonIya.Checked
+
+        ' Jalankan worker
+        bgwKirimWA.RunWorkerAsync(p)
+    End Sub
+
+    Private Sub bgwKirimWA_DoWork(ByVal sender As Object, ByVal e As System.ComponentModel.DoWorkEventArgs) Handles bgwKirimWA.DoWork
+        Dim p As KirimWaParams = CType(e.Argument, KirimWaParams)
+        Dim result As New KirimWaResult()
+
         Try
-            Dim nohp As String = TextBoxNoHp.Text.Trim()
+            ' 🟢 Cek Mode Provider dari Database
+            Dim providerMode As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_provider_mode'").Trim().ToUpper()
+            result.ProviderMode = providerMode
 
-            If nohp = "" Then
-                MsgBox("Nomor HP tidak boleh kosong.", MsgBoxStyle.Exclamation, "Warning")
-                Exit Sub
-            End If
+            ' =========================================================================
+            ' 1. MODE WHATSAPP OFFICIAL
+            ' =========================================================================
+            If providerMode = "OFFICIAL" Then
 
-            ' Normalisasi nomor HP ke format internasional WhatsApp
-            If nohp.StartsWith("0") Then
-                nohp = "62" & nohp.Substring(1)
-            End If
+                Dim baseUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_official_url'")
+                Dim apiKey As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_official_apikey'")
+                Dim templateName As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_official_template'")
+                Dim namaKlinik As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'InvoiceTempat_Klinik'")
 
-            If TextBoxNoHp.TextLength < 10 Then
-                MsgBox("Nomor HP terlalu pendek.", MsgBoxStyle.Exclamation, "Warning")
-                Exit Sub
-            End If
+                If String.IsNullOrEmpty(templateName) Then
+                    templateName = "send_invoice_message_by_lumiera_luzelle"
+                End If
 
-            If TextBoxNoHp.TextLength > 13 Then
-                MsgBox("Nomor HP terlalu panjang.", MsgBoxStyle.Exclamation, "Warning")
-                Exit Sub
-            End If
-
-            ' Ambil IP server WhatsApp yang dipakai klinik
-            Dim baseIP As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_klinik_ip'")
-            Dim baseURL As String = "http://" & baseIP & ":4444/"
-
-            Dim apiUrl As String = ""
-
-            ' =============================
-            '   KIRIM DOKUMEN
-            ' =============================
-            If RadioButtonIya.Checked Then
-
+                Dim urlSendMessage As String = baseUrl & "whatsapp/api/message_templates/send-media-upload"
                 Dim filePath As String = Application.StartupPath & "\Uploads\Test_PDF.pdf"
 
                 If Not IO.File.Exists(filePath) Then
-                    MsgBox("File dokumen tidak ditemukan: " & filePath, MsgBoxStyle.Critical, "Error")
+                    result.IsSuccess = False
+                    result.Message = "File dokumen tes tidak ditemukan di: " & filePath
+                    e.Result = result
                     Exit Sub
                 End If
 
-                ' Baca file PDF → Base64
-                Dim pdfBytes As Byte() = IO.File.ReadAllBytes(filePath)
-                Dim base64Pdf As String = Convert.ToBase64String(pdfBytes)
+                ' Eksekusi Kirim via Helper Official
+                Dim isSuccess As Boolean = SendDataWhatsappOfficial( _
+                    urlApi:=urlSendMessage, _
+                    apiKey:=apiKey, _
+                    recipientNumber:=p.NoHp, _
+                    filePath:=filePath, _
+                    fileName:="Test_PDF.pdf", _
+                    patientName:="Pasien Testing", _
+                    clinicName:=If(String.IsNullOrEmpty(namaKlinik), "Klinik Utama", namaKlinik), _
+                    transactionNumber:="TES-" & Format(DateTime.Now, "yyMMddHHmm"), _
+                    transactionDate:=DateTime.Now.ToString("dd-MM-yyyy"), _
+                    templateName:=templateName _
+                )
 
-                ' Endpoint yang benar
-                apiUrl = baseURL & "send-pdf"
+                result.IsSuccess = isSuccess
+                If isSuccess Then
+                    result.Message = "Tes pesan & dokumen berhasil dikirim via WhatsApp Official!"
+                Else
+                    result.Message = "Gagal mengirim via WhatsApp Official. Periksa API Key / Koneksi Internet."
+                End If
 
-                ' JSON body
-                Dim json As String = _
-                    "{""number"":""" & nohp & """," & _
-                    """caption"":""Tes kirim PDF dari VB.NET""," & _
-                    """filename"":""Test_PDF.pdf""," & _
-                    """src"":""" & base64Pdf & """}"
-
-                Dim client As New Net.WebClient()
-                client.Headers(HttpRequestHeader.ContentType) = "application/json"
-
-                Dim responseJson As String = client.UploadString(apiUrl, "POST", json)
-
-                MsgBox("Dokumen berhasil dikirim." & vbCrLf & responseJson, MsgBoxStyle.Information, "Success")
-
+                ' =========================================================================
+                ' 2. MODE WHATSAPP BAILEYS (UNOFFICIAL)
+                ' =========================================================================
             Else
-                ' =============================
-                '   KIRIM TEKS SAJA
-                ' =============================
+                Dim baseIP As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'whatsapp_klinik_ip'")
+                Dim baseURL As String = "http://" & baseIP.Trim() & ":4444/"
+                Dim apiUrl As String = ""
 
-                Dim pesan As String = "Ini adalah pesan tes WhatsApp dari sistem."
+                ' --- KIRIM DOKUMEN ---
+                If p.IsDocument Then
+                    Dim filePath As String = Application.StartupPath & "\Uploads\Test_PDF.pdf"
 
-                apiUrl = baseURL & "send-msg/" & nohp & "/" & Uri.EscapeDataString(pesan)
+                    If Not IO.File.Exists(filePath) Then
+                        result.IsSuccess = False
+                        result.Message = "File dokumen tidak ditemukan: " & filePath
+                        e.Result = result
+                        Exit Sub
+                    End If
 
-                Dim client As New Net.WebClient()
-                Dim result As String = client.DownloadString(apiUrl)
+                    Dim pdfBytes As Byte() = IO.File.ReadAllBytes(filePath)
+                    Dim base64Pdf As String = Convert.ToBase64String(pdfBytes)
 
-                MsgBox("Pesan berhasil dikirim." & vbCrLf, MsgBoxStyle.Information, "Success")
+                    apiUrl = baseURL & "send-pdf"
+
+                    Dim json As String = _
+                        "{""number"":""" & p.NoHp & """," & _
+                        """caption"":""Tes kirim PDF dari VB.NET""," & _
+                        """filename"":""Test_PDF.pdf""," & _
+                        """src"":""" & base64Pdf & """}"
+
+                    Dim client As New Net.WebClient()
+                    client.Headers(Net.HttpRequestHeader.ContentType) = "application/json"
+
+                    Dim responseJson As String = client.UploadString(apiUrl, "POST", json)
+                    result.IsSuccess = True
+                    result.Message = "Dokumen tes berhasil dikirim via Baileys." & vbCrLf & responseJson
+
+                    ' --- KIRIM TEKS SAJA ---
+                Else
+                    Dim pesan As String = "Ini adalah pesan tes WhatsApp dari sistem."
+                    apiUrl = baseURL & "send-msg/" & p.NoHp & "/" & Uri.EscapeDataString(pesan)
+
+                    Dim client As New Net.WebClient()
+                    Dim resultStr As String = client.DownloadString(apiUrl)
+
+                    result.IsSuccess = True
+                    result.Message = "Pesan tes berhasil dikirim via Baileys."
+                End If
+
             End If
 
         Catch ex As Exception
-            MsgBox("Gagal mengirim pesan:" & vbCrLf & ex.Message, MsgBoxStyle.Critical, "Error")
+            result.IsSuccess = False
+            result.Message = "Gagal mengirim pesan:" & vbCrLf & ex.Message
         End Try
+
+        e.Result = result
+    End Sub
+
+    Private Sub bgwKirimWA_RunWorkerCompleted(ByVal sender As Object, ByVal e As System.ComponentModel.RunWorkerCompletedEventArgs) Handles bgwKirimWA.RunWorkerCompleted
+        ' Kembalikan State UI
+        ButtonKirim.Enabled = True
+        Me.Cursor = Cursors.Default
+
+        If e.Error IsNot Nothing Then
+            MsgBox("Terjadi kesalahan sistem: " & e.Error.Message, MsgBoxStyle.Critical, "Error")
+            Exit Sub
+        End If
+
+        If e.Result IsNot Nothing AndAlso TypeOf e.Result Is KirimWaResult Then
+            Dim res As KirimWaResult = CType(e.Result, KirimWaResult)
+
+            If res.IsSuccess Then
+                MsgBox(res.Message, MsgBoxStyle.Information, "Success")
+            Else
+                MsgBox(res.Message, MsgBoxStyle.Exclamation, "Warning")
+            End If
+        End If
     End Sub
 
     Private Sub StartPollingWA()

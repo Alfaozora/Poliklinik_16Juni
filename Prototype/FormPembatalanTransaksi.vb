@@ -478,6 +478,28 @@ Public Class FormPembatalanTransaksi
 
             For Each rowTransaksi As DataRow In tblTransaksi.Select("[Checked]=True")
                 If rowTransaksi("StatusDelete").ToString = "0" Then
+                    Dim transPoliID As String = rowTransaksi("ID").ToString()
+
+                    If rowTransaksi("JenisTransaksi").ToString() = "POLI" Then
+
+                        WriteSQL( _
+                            "UPDATE MC SET " & _
+                            "MC.KuotaTerpakai = MC.KuotaTerpakai - LPA.ShootDipakai " & _
+                            "FROM MasterCartridge MC " & _
+                            "INNER JOIN LogPemakaianAlat LPA ON MC.CartridgeID = LPA.CartridgeID " & _
+                            "WHERE LPA.TransaksiDetailID IN (SELECT TransPoliIDDetail FROM TransaksiPoliDetail WHERE TransPoliID = '" & transPoliID & "') " & _
+                            "AND LPA.IsVoid = 0", 4)
+
+                        WriteSQL( _
+                            "UPDATE LogPemakaianAlat SET " & _
+                            "IsVoid = 1, " & _
+                            "VoidAt = GETDATE(), " & _
+                            "VoidBy = '" & userInput & "' " & _
+                            "WHERE TransaksiDetailID IN (SELECT TransPoliIDDetail FROM TransaksiPoliDetail WHERE TransPoliID = '" & transPoliID & "') " & _
+                            "AND IsVoid = 0", 4)
+
+                    End If
+
                     ' Delete Data PCare BPJS
                     If Not String.IsNullOrEmpty(rowTransaksi("NoKunjunganBPJS").ToString()) Then
                         uriBPJS = urlPcare + "kunjungan/" & rowTransaksi("NoKunjunganBPJS").ToString()
@@ -491,10 +513,58 @@ Public Class FormPembatalanTransaksi
                     If CheckSQL("SELECT * FROM TransaksiPaketTindakan WHERE NoTransaksi = '" & rowTransaksi("No Transaksi") & "'") = True Then
                         ' Hapus Paket Tindakan (Jika Transaksi Pembelian Paket)
                         WriteSQL("UPDATE TransaksiPaketTindakan SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() WHERE NoTransaksi = '" & rowTransaksi("No Transaksi") & "'", 4)
+
+                        ' =======================================================================
+                        ' BRIDGE KE API CANCEL TRANSAKSI JURNAL (PEMBATALAN PAKET)
+                        ' =======================================================================
+                        Try
+                            Dim noTrans As String = rowTransaksi("No Transaksi").ToString()
+
+                            Dim strNominal As String = ReadSQLNIK("SELECT CAST(ISNULL(HargaNett, 0) AS VARCHAR) FROM TransaksiPaketTindakan WHERE NoTransaksi = '" & noTrans & "'")
+                            Dim nominalBatal As Double = 0.0R
+
+                            If Not String.IsNullOrEmpty(strNominal) Then
+                                Double.TryParse(strNominal.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, nominalBatal)
+                            End If
+
+                            Dim namaPoliLokal As String = "SELECT JenisPoli FROM TransaksiDetail WHERE NoUrut = '" & noTrans & "'"
+                            Dim poliParam As String = ""
+
+                            If namaPoliLokal.Contains("KECANTIKAN") Then
+                                poliParam = "kecantikan"
+                            ElseIf namaPoliLokal.Contains("HBOT") Then
+                                poliParam = "hbot"
+                            ElseIf namaPoliLokal.Contains("FISIO") Then
+                                poliParam = "fisio"
+                            Else
+                                poliParam = "kecantikan"
+                            End If
+
+                            Dim alasanBatal As String = TextBoxAlasan.Text.Trim()
+                            If alasanBatal = "" Then alasanBatal = "Pembatalan Pembelian Paket"
+                            Dim keteranganJurnal As String = "CANCEL PAKET: " & alasanBatal & " - No. Transaksi: " & noTrans
+
+                            Dim jsonCancel As String = "{" & _
+                                """poli"":""" & poliParam & """," & _
+                                """nominal"":" & nominalBatal.ToString().Replace(",", ".") & "," & _
+                                """user_input"":""" & userInput & """," & _
+                                BaseKeteranganJson(keteranganJurnal) & _
+                                "}"
+
+                            Dim baseUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+                            Dim urlApiCancel As String = baseUrl & "api/jurnal/transaksi/batal"
+                            Dim responseCancel As String = InsertDataAPIRMOld(jsonCancel, urlApiCancel)
+
+                            MsgBox("Respon Jurnal API: " & responseCancel, MsgBoxStyle.Information, "Info Jurnal")
+                        Catch exCancel As Exception
+                            MsgBox("Gagal Kirim Cancel Jurnal Paket: " & exCancel.Message, MsgBoxStyle.Critical, "Error Jurnal")
+                        End Try
+                        ' =======================================================================
                     ElseIf CheckSQL("SELECT * FROM LogPenggunaanPaket WHERE NoTransaksi = '" & rowTransaksi("No Transaksi") & "' AND DeletedDate IS NULL") = True Then
                         ' Tambah Kuota Paket Tindakan
                         WriteSQL("UPDATE TransaksiPaketTindakan SET Kuota = Kuota + 1 WHERE KodeVoucher IN (SELECT KodeVoucher FROM LogPenggunaanPaket WHERE NoTransaksi IN ('" & rowTransaksi("No Transaksi") & "'))", 4)
                         WriteSQL("UPDATE LogPenggunaanPaket SET DeletedBy = '" & userInput & "', DeletedDate = GETDATE() WHERE NoTransaksi = '" & rowTransaksi("No Transaksi") & "' AND DeletedDate IS NULL", 4)
+                        WriteSQL("UPDATE TransaksiPoliDetail SET DeletedBY = '" & userInput & "', DeletedDate = GETDATE() WHERE TransPoliID = '" & rowTransaksi("ID").ToString() & "'", 4)
                     End If
 
                     ' Insert Data TransaksiCancel
@@ -543,4 +613,9 @@ Public Class FormPembatalanTransaksi
     Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
         SendingJurnalCancel()
     End Sub
+
+    Private Function BaseKeteranganJson(ByVal inputKeterangan As String) As String
+        Dim cleanText As String = inputKeterangan.Replace("""", "'").Replace(vbCrLf, " ").Replace(vbCr, " ").Replace(vbLf, " ")
+        Return """keterangan"":""" & cleanText & """"
+    End Function
 End Class

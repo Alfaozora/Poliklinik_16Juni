@@ -450,14 +450,12 @@ Module Test
         End Try
     End Function
 
-    Public Function SendDataWhatsapp(ByVal parameter As String, ByVal uri As String) As String
+    Public Function SendDataWhatsapp(ByVal parameter As String, ByVal uri As String) As Boolean
         Try
             Dim bytearr() As Byte = Encoding.UTF8.GetBytes(parameter)
-            Dim str As String = ""
 
             Dim webreq As HttpWebRequest = WebRequest.Create(uri)
             webreq.Accept = "application/json"
-
             webreq.Method = "POST"
             webreq.ContentType = "application/json"
             webreq.ContentLength = bytearr.Length
@@ -470,15 +468,140 @@ Module Test
             Dim stream As Stream = res.GetResponseStream()
             Dim streamReader As New StreamReader(stream)
 
-            'READ RESPONSE
-            str = streamReader.ReadToEnd
+            Dim str As String = streamReader.ReadToEnd()
             streamReader.Close()
 
-            Return "Success"
+            ' 🔥 DEBUG penting
+            'MsgBox("Response API: " & str)
+
+            ' ====== LOGIC SUCCESS ======
+            If str.ToLower().Contains("success") OrElse str.ToLower().Contains("true") Then
+                Return True
+            End If
+
+            Return False
+
         Catch ex As Exception
-            Return "Nothing"
+            MsgBox("Error WA: " & ex.Message)
+            Return False
         End Try
     End Function
+
+    Public Function SendDataWhatsappOfficial( _
+            ByVal urlApi As String, _
+            ByVal apiKey As String, _
+            ByVal recipientNumber As String, _
+            ByVal filePath As String, _
+            ByVal fileName As String, _
+            ByVal patientName As String, _
+            ByVal clinicName As String, _
+            ByVal transactionNumber As String, _
+            ByVal transactionDate As String, _
+            ByVal templateName As String _
+        ) As Boolean
+
+        Try
+            If Not File.Exists(filePath) Then
+                MsgBox("File PDF tidak ditemukan: " & filePath, MsgBoxStyle.Exclamation, "Error File")
+                Return False
+            End If
+
+            Dim boundary As String = "---------------------------" & DateTime.Now.Ticks.ToString("x")
+
+            Dim request As HttpWebRequest = CType(WebRequest.Create(urlApi), HttpWebRequest)
+            request.Method = "POST"
+            request.ContentType = "multipart/form-data; boundary=" & boundary
+            request.Headers.Add("X-API-Key", apiKey)
+            request.Timeout = 30000
+
+            Dim jsonParams As String = "{" & _
+                """patient_name"": """ & patientName.Replace("""", "\""") & """," & _
+                """clinic_name_top"": """ & clinicName.Replace("""", "\""") & """," & _
+                """transaction_number"": """ & transactionNumber.Replace("""", "\""") & """," & _
+                """transaction_date"": """ & transactionDate & """," & _
+                """clinic_name_bottom"": """ & clinicName.Replace("""", "\""") & """" & _
+                "}"
+
+            Using memStream As New MemoryStream()
+                WriteMultipartFormField(memStream, boundary, "to", recipientNumber)
+                WriteMultipartFormField(memStream, boundary, "template_name", templateName)
+                WriteMultipartFormField(memStream, boundary, "language_code", "en")
+                WriteMultipartFormField(memStream, boundary, "header_type", "document")
+                WriteMultipartFormField(memStream, boundary, "filename", fileName)
+                WriteMultipartFormField(memStream, boundary, "body_parameters", jsonParams)
+
+                ' Field File
+                Dim fileHeader As String = "--" & boundary & vbCrLf & _
+                    "Content-Disposition: form-data; name=""file""; filename=""" & Path.GetFileName(filePath) & """" & vbCrLf & _
+                    "Content-Type: application/pdf" & vbCrLf & vbCrLf
+
+                Dim fileHeaderBytes As Byte() = Encoding.UTF8.GetBytes(fileHeader)
+                memStream.Write(fileHeaderBytes, 0, fileHeaderBytes.Length)
+
+                Dim fileBytes As Byte() = File.ReadAllBytes(filePath)
+                memStream.Write(fileBytes, 0, fileBytes.Length)
+
+                ' Penutup Boundary
+                Dim trailer As Byte() = Encoding.ASCII.GetBytes(vbCrLf & "--" & boundary & "--" & vbCrLf)
+                memStream.Write(trailer, 0, trailer.Length)
+
+                ' Kirim Stream
+                request.ContentLength = memStream.Length
+                Using requestStream As Stream = request.GetRequestStream()
+                    memStream.Position = 0
+                    Dim buffer(1024) As Byte
+                    Dim bytesRead As Integer = 0
+                    While True
+                        bytesRead = memStream.Read(buffer, 0, buffer.Length)
+                        If bytesRead = 0 Then Exit While
+                        requestStream.Write(buffer, 0, bytesRead)
+                    End While
+                End Using
+            End Using
+
+            ' 🟢 BACA RESPON SERVER SECARA LENGKAP
+            Using response As HttpWebResponse = CType(request.GetResponse(), HttpWebResponse)
+                Using reader As New StreamReader(response.GetResponseStream())
+                    Dim responseString As String = reader.ReadToEnd()
+
+                    ' Cek apakah dalam teks JSON mengandung "success" atau "accepted"
+                    If responseString.ToLower().Contains("""status"": ""success""") OrElse _
+                       responseString.ToLower().Contains("""message_status"": ""accepted""") OrElse _
+                       responseString.ToLower().Contains("success") Then
+                        Return True
+                    Else
+                        Return False
+                    End If
+                End Using
+            End Using
+
+        Catch ex As WebException
+            If ex.Response IsNot Nothing Then
+                Using reader As New StreamReader(ex.Response.GetResponseStream())
+                    Dim responseString As String = reader.ReadToEnd()
+
+                    ' Fallback jika masuk ke WebException namun respon JSON sebenarnya sukses
+                    If responseString.ToLower().Contains("""status"": ""success""") OrElse _
+                       responseString.ToLower().Contains("""message_status"": ""accepted""") Then
+                        Return True
+                    End If
+                End Using
+            End If
+            Return False
+        Catch ex As Exception
+            Return False
+        End Try
+    End Function
+
+    ' 🟢 HELPER KHUSUS VB.NET 2008 UNTUK MEMBUAT FIELD MULTIPART
+    Private Sub WriteMultipartFormField(ByRef stream As Stream, ByVal boundary As String, ByVal fieldName As String, ByVal fieldValue As String)
+        Dim header As String = "--" & boundary & vbCrLf & _
+            "Content-Disposition: form-data; name=""" & fieldName & """" & vbCrLf & vbCrLf & _
+            fieldValue & vbCrLf
+
+        Dim headerBytes As Byte() = Encoding.UTF8.GetBytes(header)
+        stream.Write(headerBytes, 0, headerBytes.Length)
+    End Sub
 
     Public Sub WriteThemysql(ByVal txt As String, ByVal Tconn As TLcon)
         Dim lblconnect As String = ""
@@ -978,32 +1101,47 @@ Module Test
         End If
     End Function
 
-    Function Splitmoney(ByVal Tnilai As String) As String
-        Dim TSplit() As String = Tnilai.Split(".")
-        Dim Nilai = TSplit(0)
-        Dim Str As String = ""
-        Dim Mark As String = ""
-        If Left(Nilai, 1) = "-" Then
-            Mark = "-"
-            Nilai = Nilai.Replace("-", "")
+    'Function Splitmoney(ByVal Tnilai As String) As String
+    '    Dim TSplit() As String = Tnilai.Split(".")
+    '    Dim Nilai = TSplit(0)
+    '    Dim Str As String = ""
+    '    Dim Mark As String = ""
+    '    If Left(Nilai, 1) = "-" Then
+    '        Mark = "-"
+    '        Nilai = Nilai.Replace("-", "")
+    '    End If
+    '    Dim J As Integer = 0
+    '    For i As Integer = Nilai.Length To 1 Step -1
+    '        If IsNumeric(Mid(Nilai, i, 1)) = True Then
+    '            Str = Mid(Nilai, i, 1) + Str
+    '            J = J + 1
+    '            If J = 3 Then
+    '                J = 0
+    '                Str = "," + Str
+    '            End If
+    '        Else
+    '            Str = Mid(Nilai, i, 1) + Str
+    '        End If
+    '    Next
+    '    If Left(Str, 1) = "," Then Str = Mid(Str, 2, Len(Str) - 1)
+    '    If Str = "" Then Str = "0" Else Str = Mark + Str
+    '    If TSplit.Length > 1 Then Str = Str + "." & TSplit(1)
+    '    Return Str
+    'End Function
+
+    Function Splitmoney(ByVal Tnilai As Object) As String
+        Dim nilaiDecimal As Decimal = 0
+
+        ' Mengubah input string/object menjadi nilai Decimal secara aman
+        If Tnilai IsNot Nothing AndAlso Not String.IsNullOrEmpty(Tnilai.ToString()) Then
+            Decimal.TryParse(Tnilai.ToString().Replace(",", "."), _
+                             System.Globalization.NumberStyles.Any, _
+                             System.Globalization.CultureInfo.InvariantCulture, _
+                             nilaiDecimal)
         End If
-        Dim J As Integer = 0
-        For i As Integer = Nilai.Length To 1 Step -1
-            If IsNumeric(Mid(Nilai, i, 1)) = True Then
-                Str = Mid(Nilai, i, 1) + Str
-                J = J + 1
-                If J = 3 Then
-                    J = 0
-                    Str = "," + Str
-                End If
-            Else
-                Str = Mid(Nilai, i, 1) + Str
-            End If
-        Next
-        If Left(Str, 1) = "," Then Str = Mid(Str, 2, Len(Str) - 1)
-        If Str = "" Then Str = "0" Else Str = Mark + Str
-        If TSplit.Length > 1 Then Str = Str + "." & TSplit(1)
-        Return Str
+
+        ' Mengembalikan format ribuan bulat (Math.Floor/Truncate desimalnya)
+        Return Math.Truncate(nilaiDecimal).ToString("#,##0")
     End Function
 
     Function DetailUang(ByVal Tuang As Integer) As String
@@ -1550,109 +1688,142 @@ Module Test
         _Kamus.Add(100, " Seratus")
     End Sub
 
-    Public Function Terbilang(ByVal Bilangan As Double) As String
-        Dim sRet As String = ""
-        Dim sMinus As String = ""
-        Dim BilCacah As Double = 0
-        Dim BilPecahan As Integer = 0
-
-
-        InitializeKamus()
-
-        Try
-            If Bilangan < 0 Then sMinus = "Minus "
-
-            Dim grp() As String = Split(Math.Abs(Bilangan).ToString(System.Globalization.NumberFormatInfo.CurrentInfo), System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator)
-            If grp.Length > 1 Then
-                BilCacah = CDbl(grp(0))
-                BilPecahan = CInt(grp(1))
-            Else
-                BilCacah = Bilangan
-            End If
-
-            Dim triple() As String = Split(BilCacah.ToString("#,##0", System.Globalization.NumberFormatInfo.CurrentInfo), System.Globalization.NumberFormatInfo.CurrentInfo.NumberGroupSeparator)
-            Array.Reverse(triple)
-
-            For i As Integer = triple.Length - 1 To 0 Step -1
-                sRet = sRet & BacaGroupAngka(triple(i), False, IIf(i > 5, i - 5 + 1, i))
-            Next
-
-            If BilPecahan > 0 Then
-                sRet = sRet & " Koma" & BacaGroupAngka(BilPecahan, True)
-            End If
-
-            sRet = sMinus & sRet
-
-        Catch ex As Exception
-            MsgBox(ex.Message, vbOKOnly, "Parsing Bilangan")
-
-        End Try
-
-        _Kamus.Clear()
-        _Kamus = Nothing
-
-        Return sRet.Trim
+    Public Function Terbilang(ByVal angka As Double) As String
+        Dim bilangan As Long = CLng(angka)
+        Return Trim(BacaAngka(bilangan))
     End Function
 
-    Private Function BacaGroupAngka(ByVal Angka As Integer, _
-                                    Optional ByVal IsPecahan As Boolean = False, _
-                                    Optional ByVal iGroup As Byte = 0) As String
-        Dim sRet As String = ""
-        Dim sAngka As String = Angka.ToString("000")
+    Private Function BacaAngka(ByVal n As Long) As String
+        Dim satuan() As String = {"", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"}
 
-        Select Case IsPecahan
-            Case True
-                Try
-                    For i As Integer = 0 To sAngka.Length - 1
-                        If CInt(sAngka.Substring(i, 1)) = 0 Then
-                            sRet = sRet & "Nol"
-                        Else
-                            sRet = sRet & _Kamus(CInt(sAngka.Substring(i, 1)))
-                        End If
-                    Next
-                Catch ex As Exception
-                    MsgBox(ex.Message, vbOKOnly, "Baca Pecahan")
-                End Try
-            Case Else
-                Try
-                    If Angka = 1 And iGroup = 1 Then
-                        sRet = " Seribu"
-                    ElseIf _Kamus.ContainsKey(Angka) Then
-                        sRet = _Kamus(Angka) & _ArGroup(iGroup)
-                    Else
-                        Dim Satuan As String = _Kamus(CInt(sAngka.Substring(2, 1)))
-                        Dim puluhan As String = ""
-                        Dim ratusan As String = ""
+        Dim hasil As String = ""
 
-                        If _Kamus.ContainsKey(CInt(sAngka.Substring(1, 2))) Then
-                            puluhan = _Kamus(CInt(sAngka.Substring(1, 2)))
-                        Else
-                            If CInt(sAngka.Substring(1, 1)) = 0 Then
-                                puluhan = Satuan
-                            ElseIf CInt(sAngka.Substring(1, 1)) = 1 Then
-                                puluhan = Satuan & " Belas"
-                            Else
-                                puluhan = _Kamus(CInt(sAngka.Substring(1, 1))) & " Puluh" & Satuan
-                            End If
-                        End If
+        If n < 12 Then
+            hasil = " " & satuan(n)
+        ElseIf n < 20 Then
+            hasil = BacaAngka(n - 10) & " Belas"
+        ElseIf n < 100 Then
+            hasil = BacaAngka(n \ 10) & " Puluh" & BacaAngka(n Mod 10)
+        ElseIf n < 200 Then
+            hasil = " Seratus" & BacaAngka(n - 100)
+        ElseIf n < 1000 Then
+            hasil = BacaAngka(n \ 100) & " Ratus" & BacaAngka(n Mod 100)
+        ElseIf n < 1000000 Then
+            hasil = BacaAngka(n \ 1000) & " Ribu" & BacaAngka(n Mod 1000)
+        ElseIf n < 1000000000 Then
+            hasil = BacaAngka(n \ 1000000) & " Juta" & BacaAngka(n Mod 1000000)
+        ElseIf n < 1000000000000 Then
+            hasil = BacaAngka(n \ 1000000000) & " Milyar" & BacaAngka(n Mod 1000000000)
+        Else
+            hasil = BacaAngka(n \ 1000000000000) & " Triliun" & BacaAngka(n Mod 1000000000000)
+        End If
 
-                        If CInt(sAngka.Substring(0, 1)) = 0 Then
-                            ratusan = puluhan
-                        ElseIf CInt(sAngka.Substring(0, 1)) = 1 Then
-                            ratusan = " Seratus" & puluhan
-                        Else
-                            ratusan = _Kamus(CInt(sAngka.Substring(0, 1))) & " Ratus" & puluhan
-                        End If
-
-                        sRet = ratusan & _ArGroup(iGroup)
-                    End If
-                Catch ex As Exception
-                    MsgBox(ex.Message, vbOKOnly, "Baca Bilangan Bulat")
-                End Try
-        End Select
-
-        Return sRet
+        Return hasil
     End Function
+
+    'Public Function Terbilang(ByVal Bilangan As Double) As String
+    '    Dim sRet As String = ""
+    '    Dim sMinus As String = ""
+    '    Dim BilCacah As Double = 0
+    '    Dim BilPecahan As Integer = 0
+
+
+    '    InitializeKamus()
+
+    '    Try
+    '        If Bilangan < 0 Then sMinus = "Minus "
+
+    '        Dim grp() As String = Split(Math.Abs(Bilangan).ToString(System.Globalization.NumberFormatInfo.CurrentInfo), System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator)
+    '        If grp.Length > 1 Then
+    '            BilCacah = CDbl(grp(0))
+    '            BilPecahan = CInt(grp(1))
+    '        Else
+    '            BilCacah = Bilangan
+    '        End If
+
+    '        Dim triple() As String = Split(BilCacah.ToString("#,##0", System.Globalization.NumberFormatInfo.CurrentInfo), System.Globalization.NumberFormatInfo.CurrentInfo.NumberGroupSeparator)
+    '        Array.Reverse(triple)
+
+    '        For i As Integer = triple.Length - 1 To 0 Step -1
+    '            sRet = sRet & BacaGroupAngka(triple(i), False, IIf(i > 5, i - 5 + 1, i))
+    '        Next
+
+    '        If BilPecahan > 0 Then
+    '            sRet = sRet & " Koma" & BacaGroupAngka(BilPecahan, True)
+    '        End If
+
+    '        sRet = sMinus & sRet
+
+    '    Catch ex As Exception
+    '        MsgBox(ex.Message, vbOKOnly, "Parsing Bilangan")
+
+    '    End Try
+
+    '    _Kamus.Clear()
+    '    _Kamus = Nothing
+
+    '    Return sRet.Trim
+    'End Function
+
+    'Private Function BacaGroupAngka(ByVal Angka As Integer, _
+    '                                Optional ByVal IsPecahan As Boolean = False, _
+    '                                Optional ByVal iGroup As Byte = 0) As String
+    '    Dim sRet As String = ""
+    '    Dim sAngka As String = Angka.ToString("000")
+
+    '    Select Case IsPecahan
+    '        Case True
+    '            Try
+    '                For i As Integer = 0 To sAngka.Length - 1
+    '                    If CInt(sAngka.Substring(i, 1)) = 0 Then
+    '                        sRet = sRet & "Nol"
+    '                    Else
+    '                        sRet = sRet & _Kamus(CInt(sAngka.Substring(i, 1)))
+    '                    End If
+    '                Next
+    '            Catch ex As Exception
+    '                MsgBox(ex.Message, vbOKOnly, "Baca Pecahan")
+    '            End Try
+    '        Case Else
+    '            Try
+    '                If Angka = 1 And iGroup = 1 Then
+    '                    sRet = " Seribu"
+    '                ElseIf _Kamus.ContainsKey(Angka) Then
+    '                    sRet = _Kamus(Angka) & _ArGroup(iGroup)
+    '                Else
+    '                    Dim Satuan As String = _Kamus(CInt(sAngka.Substring(2, 1)))
+    '                    Dim puluhan As String = ""
+    '                    Dim ratusan As String = ""
+
+    '                    If _Kamus.ContainsKey(CInt(sAngka.Substring(1, 2))) Then
+    '                        puluhan = _Kamus(CInt(sAngka.Substring(1, 2)))
+    '                    Else
+    '                        If CInt(sAngka.Substring(1, 1)) = 0 Then
+    '                            puluhan = Satuan
+    '                        ElseIf CInt(sAngka.Substring(1, 1)) = 1 Then
+    '                            puluhan = Satuan & " Belas"
+    '                        Else
+    '                            puluhan = _Kamus(CInt(sAngka.Substring(1, 1))) & " Puluh" & Satuan
+    '                        End If
+    '                    End If
+
+    '                    If CInt(sAngka.Substring(0, 1)) = 0 Then
+    '                        ratusan = puluhan
+    '                    ElseIf CInt(sAngka.Substring(0, 1)) = 1 Then
+    '                        ratusan = " Seratus" & puluhan
+    '                    Else
+    '                        ratusan = _Kamus(CInt(sAngka.Substring(0, 1))) & " Ratus" & puluhan
+    '                    End If
+
+    '                    sRet = ratusan & _ArGroup(iGroup)
+    '                End If
+    '            Catch ex As Exception
+    '                MsgBox(ex.Message, vbOKOnly, "Baca Bilangan Bulat")
+    '            End Try
+    '    End Select
+
+    '    Return sRet
+    'End Function
 
     Function ReadMySQL(ByVal Txt As String) As DataTable
         Dim Dttable As New DataTable
@@ -2403,14 +2574,14 @@ Module Test
         Dim noUrut As String = ""
 
         noUrut = ReadSQLNIK("SELECT TOP (1) " & _
-                            "RIGHT(NoNIK, 10) + 1 as 'No NIK' " & _
+                            "CAST(RIGHT(NoNIK, 10) AS BIGINT) + 1 as 'No NIK' " & _
                             "FROM MasterPasien " & _
                             "WHERE NoNIK IS NOT NULL AND PasienTanpaNIK = 1 " & _
-                            "ORDER BY RIGHT(NoNIK, 10) DESC")
+                            "ORDER BY CAST(RIGHT(NoNIK, 10) AS BIGINT) DESC")
 
-        If noUrut = "" Or noUrut = "-" Then noUrut = "0000000001"
+        If noUrut = "" OrElse noUrut = "-" Then noUrut = "1"
 
-        tempNomorNIK = tempNomorNIK & kodeLokasi & noUrut.ToString().PadLeft(10, "0")
+        tempNomorNIK = tempNomorNIK & kodeLokasi & noUrut.PadLeft(10, "0"c)
 
         Return tempNomorNIK
     End Function
@@ -3393,6 +3564,52 @@ Module Test
     '    End Try
     'End Function
 
+    Private Function GenerateSignature(ByVal data As String, ByVal apiKey As String) As String
+        Dim raw As String = data & apiKey
+        Dim bytes As Byte() = Encoding.UTF8.GetBytes(raw)
+
+        Using sha As SHA256 = SHA256.Create()
+            Dim hash As Byte() = sha.ComputeHash(bytes)
+            Return BitConverter.ToString(hash).Replace("-", "").ToLower()
+        End Using
+    End Function
+
+    Public Function InsertDataAPIRMOld(ByVal parameter As String, ByVal uri As String) As String
+        Dim bytearr() As Byte = Encoding.UTF8.GetBytes(parameter)
+        Try
+            Dim webreq As HttpWebRequest = WebRequest.Create(uri)
+            webreq.Accept = "application/json"
+            webreq.Method = "POST"
+            webreq.ContentType = "application/json"
+            webreq.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+            webreq.Headers.Add("X-API-KEY", "M1tR4M3D1c@rECaH4Y42025")
+            webreq.ContentLength = bytearr.Length
+
+            Using dataStream As Stream = webreq.GetRequestStream()
+                dataStream.Write(bytearr, 0, bytearr.Length)
+            End Using
+
+            Dim res As WebResponse = webreq.GetResponse()
+            Using stream As Stream = res.GetResponseStream()
+                Using streamReader As New StreamReader(stream)
+                    Return streamReader.ReadToEnd()
+                End Using
+            End Using
+
+        Catch ex As WebException
+            If ex.Response IsNot Nothing Then
+                Using responseStream As Stream = ex.Response.GetResponseStream()
+                    Using reader As New StreamReader(responseStream)
+                        Return reader.ReadToEnd()
+                    End Using
+                End Using
+            Else
+                ' Buat JSON error agar tetap bisa di-parse
+                Return "{""status"":""error"",""message"":""" & ex.Message & """}"
+            End If
+        End Try
+    End Function
+
     Public Function InsertDataAPIRM(ByVal json As String, ByVal url As String) As String
         Try
             ServicePointManager.Expect100Continue = True
@@ -3401,8 +3618,138 @@ Module Test
             Dim client As New Net.WebClient()
             client.Encoding = Encoding.UTF8
 
+            Dim API_KEY As String = "M1tR4M3D1c@rECaH4Y42025"
+            Dim encrypted As String = Newtonsoft.Json.Linq.JObject.Parse(json)("payload").ToString()
+
+            Dim signature As String = GenerateSignature(encrypted, API_KEY)
+
             client.Headers.Clear()
             client.Headers.Add("Content-Type", "application/json")
+            client.Headers.Add("Accept", "application/json")
+            client.Headers.Add("X-API-KEY", API_KEY)
+            client.Headers.Add("X-SIGNATURE", signature)
+            client.Headers.Add("User-Agent", "PostmanRuntime/7.36.0")
+
+            Dim response As String = client.UploadString(url, "POST", json)
+
+            Return response
+
+        Catch ex As WebException
+            If ex.Response IsNot Nothing Then
+                Using sr As New StreamReader(ex.Response.GetResponseStream())
+                    Return sr.ReadToEnd()
+                End Using
+            End If
+
+            Return "{""metaData"":{""code"":500},""message"":""" & ex.Message & """}"
+        End Try
+    End Function
+
+    Public Function DownloadPdfFromAPI(ByVal jsonParameter As String, ByVal uri As String) As Byte()
+        Dim bytearr() As Byte = Encoding.UTF8.GetBytes(jsonParameter)
+
+        Try
+            Dim webreq As HttpWebRequest = CType(WebRequest.Create(uri), HttpWebRequest)
+            webreq.Accept = "application/pdf"
+            webreq.Method = "POST"
+            webreq.ContentType = "application/json"
+            webreq.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+            webreq.Headers.Add("X-API-KEY", "M1tR4M3D1c@rECaH4Y42025")
+            webreq.Timeout = 120000 ' 2 Menit Timeout
+            webreq.ContentLength = bytearr.Length
+
+            ' Kirim Data JSON
+            Using dataStream As Stream = webreq.GetRequestStream()
+                dataStream.Write(bytearr, 0, bytearr.Length)
+            End Using
+
+            ' Tangkap Respon Stream Binary PDF
+            Using res As WebResponse = webreq.GetResponse()
+                Using stream As Stream = res.GetResponseStream()
+                    Using ms As New MemoryStream()
+                        Dim buffer(4095) As Byte
+                        Dim bytesRead As Integer = 0
+                        Do
+                            bytesRead = stream.Read(buffer, 0, buffer.Length)
+                            If bytesRead = 0 Then Exit Do
+                            ms.Write(buffer, 0, bytesRead)
+                        Loop
+                        Return ms.ToArray() ' Kembalikan byte array PDF murni
+                    End Using
+                End Using
+            End Using
+
+        Catch ex As WebException
+            Dim errMessage As String = ex.Message
+            If ex.Response IsNot Nothing Then
+                Using responseStream As Stream = ex.Response.GetResponseStream()
+                    Using reader As New StreamReader(responseStream)
+                        errMessage = reader.ReadToEnd()
+                    End Using
+                End Using
+            End If
+            ' Throw exception agar ditangkap oleh Try-Catch utama
+            Throw New Exception("API Error: " & errMessage)
+        End Try
+    End Function
+
+    Public Function InsertDataAPIRMInformConsent(ByVal json As String, ByVal url As String) As String
+        Try
+            ServicePointManager.Expect100Continue = True
+            ServicePointManager.SecurityProtocol = CType(3072, SecurityProtocolType)
+
+            Dim client As New Net.WebClient()
+            client.Encoding = Encoding.UTF8
+
+            Dim API_KEY As String = "M1tR4M3D1c@rECaH4Y42025"
+            Dim obj As JObject = Nothing
+
+            Try
+                obj = JObject.Parse(json)
+            Catch ex As Exception
+                Throw New Exception("JSON tidak valid: " & ex.Message)
+            End Try
+
+            If obj Is Nothing OrElse obj("payload") Is Nothing Then
+                Throw New Exception("Payload kosong / format salah")
+            End If
+
+            Dim encrypted As String = obj("payload").ToString()
+
+            Dim signature As String = GenerateSignature(encrypted, API_KEY)
+
+            client.Headers.Clear()
+            client.Headers.Add("Content-Type", "application/json")
+            client.Headers.Add("Accept", "application/json")
+            client.Headers.Add("X-API-KEY", API_KEY)
+            client.Headers.Add("X-SIGNATURE", signature)
+            client.Headers.Add("User-Agent", "PostmanRuntime/7.36.0")
+
+            Dim response As String = client.UploadString(url, "POST", json)
+
+            Return response
+
+        Catch ex As WebException
+            If ex.Response IsNot Nothing Then
+                Using sr As New StreamReader(ex.Response.GetResponseStream())
+                    Return sr.ReadToEnd()
+                End Using
+            End If
+
+            Return "{""metaData"":{""code"":500},""message"":""" & ex.Message & """}"
+        End Try
+    End Function
+
+    Public Function InsertDataAPIRMUrlEncode(ByVal json As String, ByVal url As String) As String
+        Try
+            ServicePointManager.Expect100Continue = True
+            ServicePointManager.SecurityProtocol = CType(3072, SecurityProtocolType)
+
+            Dim client As New Net.WebClient()
+            client.Encoding = Encoding.UTF8
+
+            client.Headers.Clear()
+            client.Headers.Add("Content-Type", "application/x-www-form-urlencoded")
             client.Headers.Add("Accept", "application/json")
             client.Headers.Add("X-API-KEY", "M1tR4M3D1c@rECaH4Y42025")
 
@@ -3422,7 +3769,6 @@ Module Test
             Return "{""metaData"":{""code"":500},""message"":""" & ex.Message & """}"
         End Try
     End Function
-
 
     Public Function GetDataAPIRM(ByVal uri As String) As String
         Try

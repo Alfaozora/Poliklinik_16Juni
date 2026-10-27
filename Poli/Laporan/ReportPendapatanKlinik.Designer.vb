@@ -40,12 +40,15 @@ Partial Class ReportPendapatanKlinik
         Me.ButtonCetakLaporanPendapatan = New System.Windows.Forms.Button
         Me.ButtonClearDataLaporanPendapatan = New System.Windows.Forms.Button
         Me.SplitContainerLaporanPendapatanHeader = New System.Windows.Forms.SplitContainer
+        Me.CheckBoxPaket = New System.Windows.Forms.CheckBox
+        Me.CheckBoxVoucher = New System.Windows.Forms.CheckBox
         Me.CheckBoxTransaksiNolRupiah = New System.Windows.Forms.CheckBox
         Me.CheckBoxCard = New System.Windows.Forms.CheckBox
         Me.CheckBoxDebet = New System.Windows.Forms.CheckBox
         Me.CheckBoxTunai = New System.Windows.Forms.CheckBox
         Me.CheckBoxTagihan = New System.Windows.Forms.CheckBox
         Me.Panel9 = New System.Windows.Forms.Panel
+        Me.RadioButtonOptionPendapatanV3 = New System.Windows.Forms.RadioButton
         Me.RadioButtonOptionLaporanPendapatanTagihan = New System.Windows.Forms.RadioButton
         Me.RadioButtonOptionLaporanPendapatan = New System.Windows.Forms.RadioButton
         Me.ComboBoxPoliTujuanLaporanPendapatan = New System.Windows.Forms.ComboBox
@@ -404,6 +407,8 @@ Partial Class ReportPendapatanKlinik
         'SplitContainerLaporanPendapatanHeader.Panel1
         '
         Me.SplitContainerLaporanPendapatanHeader.Panel1.BackColor = System.Drawing.Color.White
+        Me.SplitContainerLaporanPendapatanHeader.Panel1.Controls.Add(Me.CheckBoxPaket)
+        Me.SplitContainerLaporanPendapatanHeader.Panel1.Controls.Add(Me.CheckBoxVoucher)
         Me.SplitContainerLaporanPendapatanHeader.Panel1.Controls.Add(Me.CheckBoxTransaksiNolRupiah)
         Me.SplitContainerLaporanPendapatanHeader.Panel1.Controls.Add(Me.CheckBoxCard)
         Me.SplitContainerLaporanPendapatanHeader.Panel1.Controls.Add(Me.CheckBoxDebet)
@@ -431,6 +436,30 @@ Partial Class ReportPendapatanKlinik
         Me.SplitContainerLaporanPendapatanHeader.SplitterDistance = 250
         Me.SplitContainerLaporanPendapatanHeader.SplitterWidth = 1
         Me.SplitContainerLaporanPendapatanHeader.TabIndex = 462
+        '
+        'CheckBoxPaket
+        '
+        Me.CheckBoxPaket.AutoSize = True
+        Me.CheckBoxPaket.Font = New System.Drawing.Font("Segoe UI", 9.75!)
+        Me.CheckBoxPaket.Location = New System.Drawing.Point(510, 79)
+        Me.CheckBoxPaket.Name = "CheckBoxPaket"
+        Me.CheckBoxPaket.Size = New System.Drawing.Size(58, 21)
+        Me.CheckBoxPaket.TabIndex = 573
+        Me.CheckBoxPaket.Tag = ""
+        Me.CheckBoxPaket.Text = "Paket"
+        Me.CheckBoxPaket.UseVisualStyleBackColor = True
+        '
+        'CheckBoxVoucher
+        '
+        Me.CheckBoxVoucher.AutoSize = True
+        Me.CheckBoxVoucher.Font = New System.Drawing.Font("Segoe UI", 9.75!)
+        Me.CheckBoxVoucher.Location = New System.Drawing.Point(430, 79)
+        Me.CheckBoxVoucher.Name = "CheckBoxVoucher"
+        Me.CheckBoxVoucher.Size = New System.Drawing.Size(74, 21)
+        Me.CheckBoxVoucher.TabIndex = 572
+        Me.CheckBoxVoucher.Tag = ""
+        Me.CheckBoxVoucher.Text = "Voucher"
+        Me.CheckBoxVoucher.UseVisualStyleBackColor = True
         '
         'CheckBoxTransaksiNolRupiah
         '
@@ -503,12 +532,24 @@ Partial Class ReportPendapatanKlinik
         'Panel9
         '
         Me.Panel9.BackColor = System.Drawing.Color.Transparent
+        Me.Panel9.Controls.Add(Me.RadioButtonOptionPendapatanV3)
         Me.Panel9.Controls.Add(Me.RadioButtonOptionLaporanPendapatanTagihan)
         Me.Panel9.Controls.Add(Me.RadioButtonOptionLaporanPendapatan)
         Me.Panel9.Location = New System.Drawing.Point(159, 151)
         Me.Panel9.Name = "Panel9"
-        Me.Panel9.Size = New System.Drawing.Size(387, 25)
+        Me.Panel9.Size = New System.Drawing.Size(577, 25)
         Me.Panel9.TabIndex = 564
+        '
+        'RadioButtonOptionPendapatanV3
+        '
+        Me.RadioButtonOptionPendapatanV3.AutoSize = True
+        Me.RadioButtonOptionPendapatanV3.Font = New System.Drawing.Font("Segoe UI", 9.0!)
+        Me.RadioButtonOptionPendapatanV3.Location = New System.Drawing.Point(373, 3)
+        Me.RadioButtonOptionPendapatanV3.Name = "RadioButtonOptionPendapatanV3"
+        Me.RadioButtonOptionPendapatanV3.Size = New System.Drawing.Size(178, 19)
+        Me.RadioButtonOptionPendapatanV3.TabIndex = 249
+        Me.RadioButtonOptionPendapatanV3.Text = "Laporan Pendapatan (Versi 3)"
+        Me.RadioButtonOptionPendapatanV3.UseVisualStyleBackColor = True
         '
         'RadioButtonOptionLaporanPendapatanTagihan
         '
@@ -1692,4 +1733,7 @@ Partial Class ReportPendapatanKlinik
     Friend WithEvents ButtonKirimUlangJurnal As System.Windows.Forms.Button
     Friend WithEvents TextBoxNoTagihan As System.Windows.Forms.TextBox
     Friend WithEvents CheckBoxTransaksiNolRupiah As System.Windows.Forms.CheckBox
+    Friend WithEvents CheckBoxVoucher As System.Windows.Forms.CheckBox
+    Friend WithEvents CheckBoxPaket As System.Windows.Forms.CheckBox
+    Friend WithEvents RadioButtonOptionPendapatanV3 As System.Windows.Forms.RadioButton
 End Class

@@ -9,11 +9,11 @@ Imports System.Runtime.InteropServices
 ' Review the values of the assembly attributes
 
 <Assembly: AssemblyTitle("PoliKlinik@Net 2.0")> 
-<Assembly: AssemblyDescription("21 Januari 2026")> 
-<Assembly: AssemblyCompany("")> 
+<Assembly: AssemblyDescription("03 Oktober 2026")> 
+<Assembly: AssemblyCompany("PT. Cahaya Medika Healthcare")> 
 <Assembly: AssemblyProduct("PoliKlinik@Net 2.0")> 
-<Assembly: AssemblyCopyright("Copyright ©  2023")> 
-<Assembly: AssemblyTrademark("")> 
+<Assembly: AssemblyCopyright("Copyright © 2023-2026")> 
+<Assembly: AssemblyTrademark("Poliklinik Mitramedicare")> 
 
 <Assembly: ComVisible(False)>
 
@@ -32,4 +32,4 @@ Imports System.Runtime.InteropServices
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
 <Assembly: AssemblyVersion("2.0.0.0")> 
-<Assembly: AssemblyFileVersion("2.0.0.56")> 
+<Assembly: AssemblyFileVersion("2.0.0.61")> 

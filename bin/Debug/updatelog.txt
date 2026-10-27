@@ -1,3 +1,79 @@
+Version : 2.0.0.61 (03 Oktober 2026)
+# [Usability Improvement] Menambahkan digit maximum pada textbox pembayaran menjadi 12 digit
+# [New Feature] Fitur baru WhatsApp official sebagai alternatif kirim pesan
+# [New Feature] Menambahkan kolom referral pada masterpasien
+# [New Feature] Penambahan laporan pasien
+# [Bug Fix] Perbaikan tanggal transaksi saat cetak ulang invoice
+# [Bug Fix] Perbaikan Logo Lumiera saat di cek stik
+
+Version : 2.0.0.60 (25 September 2026)
+# [Usability Improvement] Menambahkan GroupID Ketika Pemotongan paket
+# [Usability Improvement] Perbaikan dalam laporan mutasi paket
+# [Usability Improvement] Memperbaiki tampilan laporan paket
+
+Version : 2.0.0.59 (01 Agustus 2026)
+# [Usability Improvement] Jurnal Pemakaian dan Pembelian Paket
+# [Usability Improvement] Menampilkan saldo awal per periode untuk laporan penggunaan alat
+# [Usability Improvement] Menambahkan validasi hari untuk pemotongan paket
+# [New Feature] Laporan Pendapatan v3
+# [New Feature] Sending Laporan Pendapatan V3 ke Dashboard
+# [New Feature] Bridging Okupansi Booking
+# [Bug Fix] Perbaikan Querry untuk laporan Revenue
+# [Usability Improvement] Perbaikan dalam sending data ke dashboard pendapatan dan selling revenue (pembelian paket sejak 1 Agustus 2026)
+
+Version : 2.0.0.58 (07 Juli 2026)
+# [New Feature] Penambahan Qty untuk Informed Consent
+# [New Feature] Laporan ulang tahun pasien pada menu Daftar Kunjungan pasien
+# [New Feature] Penambahan Perencanaan Tindakan
+# [New Feature] Bridging dengan API Sarpras untuk alat
+# [New Feature] Sending Jurnal untuk Pembelian Paket, Penggunaan Paket dan Pembatalan Paket
+# [New Feature] Sending Jurnal untuk Penggunaan Alat
+# [New Feature] Laporan Harian Lumiera Luzelle (Selling & Revenue)
+# [New Feature] Laporan Costumer New, Existing, Sleeping
+# [New Feature] Bridging Poin Of Sale ERM Web dengan ERM Lokal
+# [New Feature] Laporan Alat Bisa diakses selain Admin
+# [New Feature] Sending Selling dan Revenue ke web Dashboard
+# [New Feature] Sending Jurnal Pemakaian Alat Batch per Hari
+# [Usability Improvement] Terintegrasi dengan SATUSEHAT untuk Poli Kecantikan
+# [Usability Improvement] Group by Tindakan + Qty pada Rekap Tagihan
+# [Usability Improvement] Meperbaiki Terbilang pada Rekap Invoice
+# [Usability Improvement] Update untuk detail alat pada master Tindakan
+# [Usability Improvement] Memisahkan Laporan penggunaan paket jika alat memiliki lebih dari 1 cartridge
+# [Usability Improvement] Menambahkan nama perawat pada kunjungan
+# [Bug Fix] Memperbaiki NominalBHP pada Rekap Fee Practitioner
+# [Bug Fix] Memperbaiki Penggunaan Voucher Diskon
+# [Bug Fix] Memperbaiki Pemotongan Paket
+# [Bug Fix] Memperbaiki Upload Omset
+# [Bug Fix] Memperbaiki Bug error rentang tanggal pada cek Riwayat paket tindakan
+
+Version : 2.0.0.57 (08 Mei 2026)
+# [New Feature] Penambahan laporan penggunaan paket Tindakan
+# [New Feature] Penambahan laporan Tindakan
+# [New Feature] Penambahan laporan 10 Tindakan Terbanyak
+# [New Feature] Pemfilteran berdasarkan Poli pada Laporan Riwayat paket dan Tindakan
+# [New Feature] Penambahan Fitur WA Blast
+# [New Feature] Penambahan Qty copy untuk Tindakan lebih dari 1
+# [Usability Improvement] Meyesuaikan pencarian potong paket agar tidak scan lagi
+# [Usability Improvement] Menghapus Fitur Voucher pada Form Perencanaan
+# [Usability Improvement] Menambahkan Range Number pada Master Alat
+# [Usability Improvement] Penggunaan Enkripsi payload dan signature pada keamanan API
+# [Bug Fix] Fix Bug Laporan Closed/Unclosed Klinik tidak bisa ditarik.
+----------------------------------------------------------------------------------
+# [New Feature] Penambahan Pasien MCU ke Database InBody
+# [Usability Imporvement] Isi otomatis Weight dan Height saat klik nilai normal pemeriksaan fisik online
+# [New Feature] Cetak hasil Inbody di Form Lab
+
+Version : 2.0.0.56 (26 Februari 2026)
+# [New Feature] Penambahan API Untuk integrasi dengan Alat InBody
+# [New Feature] Penambahan API Untuk integrasi dengan Informed Consent
+# [New Feature] Penambahan API Untuk integrasi dengan Kirim Alat
+# [New Feature] Penambahan Master Alat Cartridge
+# [New Feature] Penambahan QR Validator Invoice
+# [New Feature] Penambahan Download Excel pada Laporan Kunjungan
+# [Usability Improvement] Menambahkan Kategori Tindakan dan Alat pada Master Tindakan
+# [Usability Improvement] Menambahkan Fitur Tanpa Tanggal di Riwayat Penggunaan Paket
+# [Bug Fix] Memperbaiki Bug saat menampilkan Rekap Pendapatan Klinik
+
 Version : 2.0.0.55 (29 Desember 2025)
 # [New Feature] Penambahan Master Voucher dan penerapan voucher
 # [New Feature] Penambahan Fitur Ucapan Selamat Ulang Tahun kepada Pasien

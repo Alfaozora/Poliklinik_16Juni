@@ -23,79 +23,7 @@ Imports System.Net
 Public Class FormPenerimaanBarang
 
     Private userInput As String = PoliKlinik.Lbluser.Text
-
-    Private Sub ButtonAmbilData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonAmbilData.Click
-        Try
-
-            Dim baseURL As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
-
-            If Not baseURL.EndsWith("/") Then baseURL &= "/"
-
-            Dim url As String = baseURL & "api/lumiera-luzelle/get-kuota"
-
-            Dim client As New WebClient()
-            client.Headers.Add("X-API-KEY", "M1tR4M3D1c@rECaH4Y42025")
-
-            Dim response As String = client.DownloadString(url)
-            Dim json As JObject = JObject.Parse(response)
-
-            Dim dataArray As JArray = CType(json("data"), JArray)
-
-            If dataArray Is Nothing OrElse dataArray.Count = 0 Then
-                MsgBox("Data kuota dari API kosong.", MsgBoxStyle.Information)
-                Exit Sub
-            End If
-
-            WriteSQL("DELETE FROM TempApiKuotaAlat WHERE CreatedBy = '" & userInput & "'", 4)
-
-            For Each item As JObject In dataArray
-
-                Dim trmerm As String = item("id").ToString()
-                Dim kodeAset As String = item("kode_aset").ToString()
-                Dim namaAset As String = item("nama_aset").ToString()
-                Dim jumlah As Integer = CInt(item("jumlah"))
-
-                ' Mapping ke MasterAlat
-                Dim alatIDObj As Object = ReadSQLNIK("SELECT AlatID FROM MasterAlat WHERE KodeAlat = '" & kodeAset & "'")
-
-                Dim alatIDValue As String = "NULL"
-
-                If alatIDObj IsNot Nothing _
-                   AndAlso alatIDObj.ToString().Trim() <> "" _
-                   AndAlso IsNumeric(alatIDObj.ToString()) Then
-
-                    alatIDValue = alatIDObj.ToString()
-
-                End If
-
-                'Debug.Print( _
-                '    "INSERT INTO TempApiKuotaAlat (KodeAset, NamaAset, Jumlah, AlatID, CreatedBy) VALUES (" & _
-                '    "'" & kodeAset & "','" & namaAset & "'," & jumlah & "," & alatIDValue & ",'" & userInput & "')")
-
-
-                ' Insert ke staging
-                WriteSQL( _
-                    "INSERT INTO TempApiKuotaAlat " & _
-                    "(KodeAset, NamaAset, Jumlah, AlatID, CreatedBy, Trmerm) VALUES (" & _
-                    "'" & kodeAset & "'," & _
-                    "'" & namaAset.Replace("'", "''") & "'," & _
-                    jumlah & "," & _
-                    alatIDValue & "," & _
-                    "'" & userInput & "'," & _
-                    "'" & trmerm & "'" & _
-                    ")", 4)
-
-            Next
-
-            LoadGridTempApiKuota()
-
-            MsgBox("Data kuota dari API berhasil dimuat.", MsgBoxStyle.Information)
-        Catch ex As WebException
-            MsgBox("Gagal mengambil data API: " & ex.Message, MsgBoxStyle.Critical)
-        Catch ex As Exception
-            MsgBox("Error: " & ex.Message, MsgBoxStyle.Critical)
-        End Try
-    End Sub
+    Private dtCartridge As DataTable
 
     Private Sub LoadGridTempApiKuota()
 
@@ -122,10 +50,7 @@ Public Class FormPenerimaanBarang
     End Sub
 
     Private Sub FormatGridTempApiKuota()
-
         With DataGridViewBarang
-            .Dock = DockStyle.Fill
-            .AutoGenerateColumns = True
             .AllowUserToAddRows = False
             .AllowUserToDeleteRows = False
             .SelectionMode = DataGridViewSelectionMode.FullRowSelect
@@ -133,7 +58,7 @@ Public Class FormPenerimaanBarang
             .AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
         End With
 
-        ' Checkbox → BOLEH DIPILIH
+        ' 1. Pengaturan Kolom Checkbox
         With DataGridViewBarang.Columns("IsSelected")
             .HeaderText = "Pilih"
             .ReadOnly = False
@@ -141,20 +66,19 @@ Public Class FormPenerimaanBarang
             .AutoSizeMode = DataGridViewAutoSizeColumnMode.None
         End With
 
-        ' Kolom lain → READ ONLY
-        DataGridViewBarang.Columns("TempID").Visible = False
-        DataGridViewBarang.Columns("IsSelected").ReadOnly = False
-        DataGridViewBarang.Columns("KodeAset").ReadOnly = True
-        DataGridViewBarang.Columns("NamaAset").ReadOnly = True
-        DataGridViewBarang.Columns("Jumlah").ReadOnly = True
-        DataGridViewBarang.Columns("StatusMapping").ReadOnly = True
-        DataGridViewBarang.Columns("Trmerm").Visible = True
+        ' 2. Pengaturan Kolom Data menjadi ReadOnly
+        DataGridViewBarang.Columns("ItemCode").ReadOnly = True
+        DataGridViewBarang.Columns("ItemName").ReadOnly = True
+        DataGridViewBarang.Columns("RoomName").ReadOnly = True
+        DataGridViewBarang.Columns("Qty").ReadOnly = False
+        DataGridViewBarang.Columns("Satuan").ReadOnly = True
 
-        ' Alignment
-        DataGridViewBarang.Columns("Jumlah").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
+        ' 3. Pengaturan Alignment / Perataan Teks
+        DataGridViewBarang.Columns("Qty").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
+        DataGridViewBarang.Columns("Satuan").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
 
-        DataGridViewBarang.Columns("StatusMapping").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
-
+        ' Tempatkan penguncian kolom di baris paling akhir
+        DataGridViewBarang.AutoGenerateColumns = False
     End Sub
 
     Private Sub DataGridViewBarang_CellFormatting(ByVal sender As Object, ByVal e As DataGridViewCellFormattingEventArgs) _
@@ -177,29 +101,27 @@ Public Class FormPenerimaanBarang
     End Sub
 
 
-    Private Sub DataGridViewBarang_CellBeginEdit(ByVal sender As Object, ByVal e As DataGridViewCellCancelEventArgs) _
-    Handles DataGridViewBarang.CellBeginEdit
+    'Private Sub DataGridViewBarang_CellBeginEdit(ByVal sender As Object, ByVal e As DataGridViewCellCancelEventArgs) _
+    'Handles DataGridViewBarang.CellBeginEdit
 
-        If DataGridViewBarang.Columns(e.ColumnIndex).Name = "IsSelected" Then
+    '    If DataGridViewBarang.Columns(e.ColumnIndex).Name = "IsSelected" Then
 
-            Dim isMapped As Boolean = CBool(DataGridViewBarang.Rows(e.RowIndex).Cells("IsMapped").Value)
+    '        Dim isMapped As Boolean = CBool(DataGridViewBarang.Rows(e.RowIndex).Cells("IsMapped").Value)
 
-            If Not isMapped Then
-                e.Cancel = True
-                Beep()
-            End If
+    '        If Not isMapped Then
+    '            e.Cancel = True
+    '            Beep()
+    '        End If
 
-        End If
+    '    End If
 
-    End Sub
+    'End Sub
 
-    Private Sub DataGridViewBarang_CurrentCellDirtyStateChanged(ByVal sender As Object, ByVal e As EventArgs) _
-    Handles DataGridViewBarang.CurrentCellDirtyStateChanged
-
-        If DataGridViewBarang.IsCurrentCellDirty Then
+    Private Sub DataGridViewBarang_CurrentCellDirtyStateChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles DataGridViewBarang.CurrentCellDirtyStateChanged
+        ' Jika yang diklik adalah kolom checkbox, paksa grid untuk langsung menyimpan perubahan nilai (Commit)
+        If TypeOf DataGridViewBarang.CurrentCell Is DataGridViewCheckBoxCell Then
             DataGridViewBarang.CommitEdit(DataGridViewDataErrorContexts.Commit)
         End If
-
     End Sub
 
     Private Sub DataGridViewBarang_DataError(ByVal sender As Object, ByVal e As DataGridViewDataErrorEventArgs) _
@@ -208,38 +130,60 @@ Public Class FormPenerimaanBarang
         e.ThrowException = False
     End Sub
 
-    Private Sub DataGridViewBarang_CellValueChanged(ByVal sender As Object, ByVal e As DataGridViewCellEventArgs) _
-    Handles DataGridViewBarang.CellValueChanged
+    Private Sub DataGridViewBarang_CellValueChanged(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellEventArgs) Handles DataGridViewBarang.CellValueChanged
+        ' Pastikan baris data valid dan perubahan terjadi di kolom Checkbox "IsSelected"
+        If e.RowIndex >= 0 AndAlso DataGridViewBarang.Columns(e.ColumnIndex).Name = "IsSelected" Then
+            Dim totalStokDipilih As Integer = 0
 
-        If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Exit Sub
+            ' Lakukan looping untuk memeriksa setiap baris di DataGridViewBarang
+            For Each row As DataGridViewRow In DataGridViewBarang.Rows
+                ' Ambil status centang (Boolean)
+                Dim isChecked As Boolean = Convert.ToBoolean(row.Cells("IsSelected").Value)
 
-        ' 👉 GANTI DI SINI
-        If DataGridViewBarang.Columns(e.ColumnIndex).Name <> "IsSelected" Then Exit Sub
+                If isChecked Then
+                    ' Jika dicentang, ambil nilai dari kolom Qty dan jumlahkan
+                    Dim qty As Integer = Convert.ToInt32(row.Cells("Qty").Value)
+                    totalStokDipilih += qty
+                End If
+            Next
 
-        ' Ambil TempID
-        Dim cellTempID = DataGridViewBarang.Rows(e.RowIndex).Cells("TempID").Value
-        If cellTempID Is Nothing OrElse IsDBNull(cellTempID) Then Exit Sub
-
-        Dim tempID As Integer
-        If Not Integer.TryParse(cellTempID.ToString(), tempID) Then Exit Sub
-
-        ' Ambil nilai checkbox
-        Dim isChecked As Boolean = False
-        Dim cellValue = DataGridViewBarang.Rows(e.RowIndex).Cells("IsSelected").Value
-        If cellValue IsNot Nothing AndAlso Not IsDBNull(cellValue) Then
-            Boolean.TryParse(cellValue.ToString(), isChecked)
+            ' Tampilkan hasil penjumlahan ke LabelDipilih
+            LabelDipilih.Text = totalStokDipilih.ToString()
         End If
-
-        ' Update DB
-        WriteSQL( _
-            "UPDATE TempApiKuotaAlat SET IsSelected = " & _
-            If(isChecked, 1, 0) & _
-            " WHERE TempID = " & tempID, 4)
-
-        ' Update total
-        HitungTotalPilihan()
-
     End Sub
+
+    'Private Sub DataGridViewBarang_CellValueChanged(ByVal sender As Object, ByVal e As DataGridViewCellEventArgs) _
+    'Handles DataGridViewBarang.CellValueChanged
+
+    '    If e.RowIndex < 0 OrElse e.ColumnIndex < 0 Then Exit Sub
+
+    '    ' 👉 GANTI DI SINI
+    '    If DataGridViewBarang.Columns(e.ColumnIndex).Name <> "IsSelected" Then Exit Sub
+
+    '    ' Ambil TempID
+    '    Dim cellTempID = DataGridViewBarang.Rows(e.RowIndex).Cells("TempID").Value
+    '    If cellTempID Is Nothing OrElse IsDBNull(cellTempID) Then Exit Sub
+
+    '    Dim tempID As Integer
+    '    If Not Integer.TryParse(cellTempID.ToString(), tempID) Then Exit Sub
+
+    '    ' Ambil nilai checkbox
+    '    Dim isChecked As Boolean = False
+    '    Dim cellValue = DataGridViewBarang.Rows(e.RowIndex).Cells("IsSelected").Value
+    '    If cellValue IsNot Nothing AndAlso Not IsDBNull(cellValue) Then
+    '        Boolean.TryParse(cellValue.ToString(), isChecked)
+    '    End If
+
+    '    ' Update DB
+    '    WriteSQL( _
+    '        "UPDATE TempApiKuotaAlat SET IsSelected = " & _
+    '        If(isChecked, 1, 0) & _
+    '        " WHERE TempID = " & tempID, 4)
+
+    '    ' Update total
+    '    HitungTotalPilihan()
+
+    'End Sub
 
     Private Sub HitungTotalPilihan()
 
@@ -266,14 +210,14 @@ Public Class FormPenerimaanBarang
         Next
 
         LabelDipilih.Text = totalDipilih.ToString()
-        LabelKuota.Text = totalKuota.ToString()
+        LabelSaldoAlat.Text = totalKuota.ToString()
 
-        LabelKuota.ForeColor = If(totalKuota > 0, Color.Green, Color.Black)
+        LabelSaldoAlat.ForeColor = If(totalKuota > 0, Color.Green, Color.Black)
 
     End Sub
 
     Private Sub ButtonSubmit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonSubmit.Click
-        If CInt(LabelKuota.Text) = 0 Then
+        If CInt(LabelSaldoAlat.Text) = 0 Then
             MsgBox("Tidak ada alat yang dipilih.", MsgBoxStyle.Exclamation)
             Exit Sub
         End If
@@ -395,6 +339,130 @@ Public Class FormPenerimaanBarang
         Catch ex As Exception
             dbTran.Rollback()
             MsgBox("Gagal memproses top up kuota: " & ex.Message, MsgBoxStyle.Critical)
+        End Try
+    End Sub
+
+    Private Sub LoadComboCartridge()
+        Try
+            Dim sql As String = _
+                "SELECT MC.NamaCartridge, MC.KodeCartridge, MA.IdRuangan " & _
+                "FROM MasterAlat MA " & _
+                "INNER JOIN MasterCartridge MC ON MA.AlatID = MC.AlatID"
+
+            ' Gunakan fungsi ReadSQL milikmu untuk mengambil data ke DataTable
+            dtCartridge = ReadSQL(sql)
+
+            If dtCartridge IsNot Nothing AndAlso dtCartridge.Rows.Count > 0 Then
+                ' Putus hubungan event sementara agar tidak memicu error saat binding data
+                RemoveHandler ComboBoxNamaAlat.SelectedIndexChanged, AddressOf ComboBoxNamaAlat_SelectedIndexChanged
+
+                ' Proses Binding Data ke ComboBox
+                ComboBoxNamaAlat.DataSource = dtCartridge
+                ComboBoxNamaAlat.DisplayMember = "NamaCartridge" ' Yang tampil di layar (Nama)
+                ComboBoxNamaAlat.ValueMember = "KodeCartridge"   ' Value di balik layar (Kode)
+
+                ' Hubungkan kembali event setelah binding selesai
+                AddHandler ComboBoxNamaAlat.SelectedIndexChanged, AddressOf ComboBoxNamaAlat_SelectedIndexChanged
+
+                ' Set TextBox pertama kali berdasarkan item index 0
+                UpdateIdRuanganTextBox()
+            Else
+                ComboBoxNamaAlat.DataSource = Nothing
+                TextBoxIdRuangan.Text = ""
+            End If
+
+        Catch ex As Exception
+            MsgBox("Gagal meload data cartridge: " & ex.Message, MsgBoxStyle.Critical)
+        End Try
+    End Sub
+
+    Private Sub UpdateIdRuanganTextBox()
+        ' Pastikan ComboBox ada isinya dan datanya valid
+        If ComboBoxNamaAlat.SelectedIndex <> -1 AndAlso dtCartridge IsNot Nothing Then
+            ' Ambil baris data yang sesuai dengan index yang dipilih pada ComboBox
+            Dim selectedIndex As Integer = ComboBoxNamaAlat.SelectedIndex
+
+            If selectedIndex < dtCartridge.Rows.Count Then
+                Dim row As DataRow = dtCartridge.Rows(selectedIndex)
+                TextBoxIdRuangan.Text = row("IdRuangan").ToString()
+            End If
+        End If
+    End Sub
+
+    Private Sub ComboBoxNamaAlat_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ComboBoxNamaAlat.SelectedIndexChanged
+        UpdateIdRuanganTextBox()
+    End Sub
+
+    Private Sub FormPenerimaanBarang_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+        LoadComboCartridge()
+    End Sub
+
+    Private Sub ButtonAmbilData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonAmbilData.Click
+        If ComboBoxNamaAlat.SelectedValue Is Nothing Then
+            MsgBox("Silakan pilih Cartridge terlebih dahulu!", MsgBoxStyle.Exclamation)
+            Exit Sub
+        End If
+        If String.IsNullOrEmpty(TextBoxIdRuangan.Text) Then
+            MsgBox("ID Ruangan tidak boleh kosong!", MsgBoxStyle.Exclamation)
+            Exit Sub
+        End If
+
+        Try
+            Dim itemCode As String = ComboBoxNamaAlat.SelectedValue.ToString()
+            Dim roomId As String = TextBoxIdRuangan.Text.Trim()
+            Dim baseUrl As String = ReadSQLNIK("SELECT StrValue FROM MsConfig WHERE ConfigName = 'ws_RM'")
+
+            ' FIX: Menghapus spasi setelah tanda '=' pada room_id
+            Dim apiUrl As String = baseUrl & "api/bridging/stock-item?item_code=" & itemCode & "&room_id=" & roomId
+
+            Dim apiResponse As String = GetDataAPIRM(apiUrl)
+            Dim jsonResult As Newtonsoft.Json.Linq.JObject = Newtonsoft.Json.Linq.JObject.Parse(apiResponse)
+
+            If jsonResult("error") IsNot Nothing AndAlso jsonResult("error").ToString().ToLower() = "false" Then
+                Dim dataObj As Newtonsoft.Json.Linq.JObject = jsonResult("data")
+
+                ' Bersihkan kolom lama terlebih dahulu jika ingin memastikan pembuatan ulang bersih
+                DataGridViewBarang.Columns.Clear()
+
+                ' 1. Tambah Kolom Checkbox
+                Dim chkCol As New DataGridViewCheckBoxColumn()
+                chkCol.Name = "IsSelected"
+                chkCol.HeaderText = "Pilih"
+                DataGridViewBarang.Columns.Add(chkCol)
+
+                ' 2. Tambah Kolom Data Biasa
+                DataGridViewBarang.Columns.Add("ItemCode", "Kode Item")
+                DataGridViewBarang.Columns.Add("ItemName", "Nama Item")
+                DataGridViewBarang.Columns.Add("RoomName", "Nama Ruangan")
+                DataGridViewBarang.Columns.Add("Qty", "Stok")
+                DataGridViewBarang.Columns.Add("Satuan", "Satuan")
+
+                ' Panggil format grid SETELAH kolom dipastikan sukses dibuat
+                FormatGridTempApiKuota()
+
+                ' Bersihkan data baris lama
+                DataGridViewBarang.Rows.Clear()
+
+                ' Masukkan data ke baris baru
+                Dim n As Integer = DataGridViewBarang.Rows.Add()
+
+                DataGridViewBarang.Rows(n).Cells("IsSelected").Value = True
+                DataGridViewBarang.Rows(n).Cells("ItemCode").Value = dataObj("item_code").ToString()
+                DataGridViewBarang.Rows(n).Cells("ItemName").Value = dataObj("item_name").ToString()
+                DataGridViewBarang.Rows(n).Cells("RoomName").Value = dataObj("room_name").ToString()
+                DataGridViewBarang.Rows(n).Cells("Qty").Value = Convert.ToInt32(dataObj("qty"))
+                DataGridViewBarang.Rows(n).Cells("Satuan").Value = "Shoot"
+
+                LabelDipilih.Text = dataObj("qty").ToString()
+
+                MsgBox("Data stock berhasil ditampilkan di tabel!", MsgBoxStyle.Information)
+            Else
+                Dim msg As String = If(jsonResult("message") IsNot Nothing, jsonResult("message").ToString(), "Gagal mengambil data.")
+                MsgBox("Pesan API: " & msg, MsgBoxStyle.Critical)
+            End If
+
+        Catch ex As Exception
+            MsgBox("Terjadi kesalahan saat memuat ke tabel: " & ex.Message, MsgBoxStyle.Critical)
         End Try
     End Sub
 End Class

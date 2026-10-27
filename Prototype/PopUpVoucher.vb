@@ -210,7 +210,7 @@
         Dim sql As String = _
             "SELECT COUNT(*) FROM TransaksiPoli TP " & _
             "INNER JOIN TransaksiPoliDetail TPD ON TP.TransPoliID = TPD.TransPoliID " & _
-            "WHERE TP.IDInterner = '" & noRM.Replace("'", "''") & "' " & _
+            "WHERE TP.IDInternet = '" & noRM.Replace("'", "''") & "' " & _
             "AND TPD.KodeVoucher = '" & kodeVoucher.Replace("'", "''") & "'"
 
         Dim dt As DataTable = ReadSQL(sql)
@@ -250,7 +250,7 @@
 
     Private Sub ButtonSubmit_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonSubmit.Click
         For Each row As DataGridViewRow In DataGridVoucher.Rows
-            If Convert.ToBoolean(row.Cells("Pilih").Value) = True Then
+            If Not IsDBNull(row.Cells("Pilih").Value) AndAlso Convert.ToBoolean(row.Cells("Pilih").Value) Then
 
                 Dim kode As String = row.Cells("Kode Voucher").Value.ToString()
                 Dim jenis As String = row.Cells("Jenis Voucher").Value.ToString()

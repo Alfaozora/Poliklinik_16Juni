@@ -32,6 +32,17 @@ Public Class FormInputInformedConsent
         End Class
     End Class
 
+    Private _KodeVoucher As String = ""
+
+    Public Property KodeVoucher() As String
+        Get
+            Return _KodeVoucher
+        End Get
+        Set(ByVal value As String)
+            _KodeVoucher = value
+        End Set
+    End Property
+
     Private Sub PanelTop_Paint(ByVal sender As System.Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles PanelTop.Paint
         Try
             e.Graphics.DrawString(formName, New Font("Arial", 12, FontStyle.Bold), Brushes.White, New Point(10, 10))
@@ -61,6 +72,8 @@ Public Class FormInputInformedConsent
         Me.CenterToScreen()
     End Sub
 
+    Private hargaAwal As Decimal = 0
+
     Public Sub SetForm(ByRef Form As String, ByRef tbls As DataTable, ByRef txTindakanID As String, ByRef txStatusPersetujuan As Boolean, ByRef txJenisTransaksi As String)
         Me.BringToFront()
         TForm = Form
@@ -77,6 +90,10 @@ Public Class FormInputInformedConsent
         SetAwal()
         SetClear()
         SetData()
+
+
+        Decimal.TryParse(TextBoxBiayaTindakan.Text, hargaAwal)
+        TextBoxQty.Text = "1"
     End Sub
 
     Private Sub SetClear()
@@ -124,7 +141,7 @@ Public Class FormInputInformedConsent
                 ComboBoxTujuanTindakan.Items.Add(Trow("KeteranganInformasi"))
             ElseIf Trow("NamaInformasi") = "Risiko" Then
                 ComboBoxResiko.Items.Add(Trow("KeteranganInformasi"))
-            ElseIf Trow("NamaInformasi") = "Komplikasi " Then
+            ElseIf Trow("NamaInformasi") = "Komplikasi" Then
                 ComboBoxKomplikasi.Items.Add(Trow("KeteranganInformasi"))
             ElseIf Trow("NamaInformasi") = "Prognosis" Then
                 ComboBoxPrognosa.Items.Add(Trow("KeteranganInformasi"))
@@ -147,11 +164,11 @@ Public Class FormInputInformedConsent
             For Each Trow2 As DataRow In tblsRekamMedis.Rows
                 idTransaksi = Trow2("NoUrut")
 
-                If Trow2("KeluhanTambahan") <> "-" And Trow2("KeluhanTambahan") <> "" Then
-                    TextBoxDasarDiagnosa.Text = Trow2("KeluhanUtama") & ", " & Trow2("KeluhanTambahan")
-                Else
-                    TextBoxDasarDiagnosa.Text = Trow2("KeluhanUtama")
-                End If
+                'If Trow2("KeluhanTambahan") <> "-" And Trow2("KeluhanTambahan") <> "" Then
+                '    TextBoxDasarDiagnosa.Text = Trow2("KeluhanUtama") & ", " & Trow2("KeluhanTambahan")
+                'Else
+                '    TextBoxDasarDiagnosa.Text = Trow2("KeluhanUtama")
+                'End If
             Next
         End If
 
@@ -194,13 +211,17 @@ Public Class FormInputInformedConsent
         Try
             If ValidasiPostInformedConsent() = True Then
                 Dim Trow As DataRow = tblsRekamMedis.Rows(0)
-                Dim urlWebService As String = "https://mmc-online.mitramedicare.com/api/lumiera-luzelle/ic"
+                Dim urlWebService As String = "http://mmc-online.mitramedicare.com/api/lumiera-luzelle/ic"
                 Dim parameter As String = ""
                 Dim uri_message As String = ""
 
                 Dim kodeLokasi As String = ReadSQLNIK("select StrValue from MsConfig where ConfigName = 'NoPoli'")
                 Dim keteranganLokasi As String = ReadSQLNIK("select StrValue from MsConfig where ConfigName = 'Kota'")
                 Dim noHP As String = ReadSQLNIK("SELECT NoHandphone FROM MasterPasien WHERE NoRekamMedis = '" & Trow("IDInternet") & "'")
+
+                'Kode Voucher
+                Dim voucher As String = _KodeVoucher
+                If voucher = "" Then voucher = "-"
 
                 ' Set Jenis Kelamin
                 Dim jenisKelamin As String = ""
@@ -218,6 +239,10 @@ Public Class FormInputInformedConsent
                     statusSaksiPasien = "true"
                 End If
 
+                Dim tataCaraClean As String = ComboBoxTataCara.Text.Replace(vbCr, "").Replace(vbLf, " ")
+                Dim alamatClean As String = Trow("DomisiliAlamat").ToString().Replace(vbCr, "").Replace(vbLf, " ")
+                Dim dasarDiagnosisClean As String = TextBoxDasarDiagnosa.Text.Replace(vbCr, "").Replace(vbLf, " ")
+
                 parameter = "{" & _
                     """nama"":""" & Trow("Nama") & """," & _
                     """no_rm"":""" & Trow("IDInternet") & """," & _
@@ -225,7 +250,7 @@ Public Class FormInputInformedConsent
                     """no_nik"":""" & Trow("NoNIK") & """," & _
                     """umur"":""" & HitungUsia(Trow("TglLahir")) & """," & _
                     """sex"":""" & Trow("JenisKelamin") & """," & _
-                    """alamat"":""" & Trow("DomisiliAlamat") & """," & _
+                    """alamat"":""" & alamatClean & """," & _
                     """no_transaksi"":""" & Trow("NoUrut") & """," & _
                     """tgl"":""" & Format(Trow("TglTransaksi"), "yyyy-MM-dd") & """," & _
                     """perawatan"":""" & TextBoxNamaTindakan.Text & """," & _
@@ -233,11 +258,11 @@ Public Class FormInputInformedConsent
                     """kode_dokter"":""" & Trow("KodeDokter") & """," & _
                     """perawat"":""" & Trow("NamaPerawat") & """," & _
                     """ket_diagnosis"":""" & TextBoxDiagnosa.Text & """," & _
-                    """dasar_diagnosis"":""" & TextBoxDasarDiagnosa.Text & """," & _
+                    """dasar_diagnosis"":""" & dasarDiagnosisClean & """," & _
                     """id_tindakan"":""" & tindakanID & """," & _
                     """ket_tindakan"":""" & TextBoxNamaTindakan.Text & """," & _
                     """indikasi_tindakan"":""" & ComboBoxIndikasiTindakan.Text & """," & _
-                    """tata_cara"":""" & ComboBoxTataCara.Text & """," & _
+                    """tata_cara"":""" & tataCaraClean & """," & _
                     """tujuan_tindakan"":""" & ComboBoxTujuanTindakan.Text & """," & _
                     """risiko"":""" & ComboBoxResiko.Text & """," & _
                     """komplikasi"":""" & ComboBoxKomplikasi.Text & """," & _
@@ -250,12 +275,18 @@ Public Class FormInputInformedConsent
                     """hubungan_penanggung_jawab"":""" & TextBoxPenanggungJawabHubunganPasien.Text & """," & _
                     """alamat_penanggung_jawab"":""" & TextBoxPenanggungJawabAlamat.Text & """," & _
                     """status_persetujuan"":" & statusPersetujuan & "," & _
+                    """kode_voucher"":""" & voucher & """," & _
                     """status_transaksi"":""pending""" & _
                 "}"
+                'Dim logPath As String = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) & "\debug_api_log.txt"
+                'System.IO.File.WriteAllText(logPath, "Data dikirim pada: " & Now.ToString() & vbCrLf & parameter)
+                'MsgBox("Log tersimpan di: " & logPath)
+
+                'MsgBox(parameter, MsgBoxStyle.Information, "Cek Format JSON")
 
                 uri_message = urlWebService
 
-                Dim response As String = InsertDataAPIRM(parameter, uri_message)
+                Dim response As String = InsertDataAPIRMOld(parameter, uri_message)
 
                 Dim jsonObj As JObject = JObject.Parse(response)
 
@@ -535,5 +566,32 @@ Public Class FormInputInformedConsent
 
             PanelDetailSaksiPasien.Visible = True
         End If
+    End Sub
+
+    Private Sub ButtonKalkulasi_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonKalkulasi.Click
+        Try
+            Dim qty As Integer = 1
+
+            Integer.TryParse(TextBoxQty.Text, qty)
+
+            ' Hitung total
+            Dim total As Decimal = hargaAwal * qty
+
+            ' Tampilkan hasil ke textbox biaya
+            'TextBoxBiayaTindakan.Text = total.ToString("N0")
+            TextBoxBiayaTindakan.Text = total.ToString()
+
+        Catch ex As Exception
+            MsgBox(ex.Message)
+        End Try
+    End Sub
+
+    Private Sub ButtonReset_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonReset.Click
+        TextBoxQty.Text = "1"
+
+        ' Kembalikan harga awal
+        'TextBoxBiayaTindakan.Text = hargaAwal.ToString("N0")
+
+        TextBoxBiayaTindakan.Text = hargaAwal.ToString()
     End Sub
 End Class

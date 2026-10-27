@@ -24,6 +24,7 @@
     <GenerateManifests>true</GenerateManifests>
     <SignManifests>true</SignManifests>
     <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
+    <SignAssembly>false</SignAssembly>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -59,6 +60,18 @@
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AForge, Version=2.2.5.0, Culture=neutral, PublicKeyToken=c1db6ff4eaa06aeb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Poliklinik_Klinik\Lib\AForge.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge.Video, Version=2.2.5.0, Culture=neutral, PublicKeyToken=cbfb6e07d173c401, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Poliklinik_Klinik\Lib\AForge.Video.dll</HintPath>
+    </Reference>
+    <Reference Include="AForge.Video.DirectShow, Version=2.2.5.0, Culture=neutral, PublicKeyToken=61ea4348d43881b7, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Poliklinik_Klinik\Lib\AForge.Video.DirectShow.dll</HintPath>
+    </Reference>
     <Reference Include="BouncyCastle, Version=9.1.92.0, Culture=neutral, PublicKeyToken=918865e4538669a4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Users\IT-PST02\Downloads\DLL\BouncyCastle.dll</HintPath>
@@ -373,6 +386,7 @@
     <Compile Include="Form_Trial\UserControl1.vb">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Master\Poli\DetailAlatClass.vb" />
     <Compile Include="Master\Poli\MasterTindakanKlinik.Designer.vb">
       <DependentUpon>MasterTindakanKlinik.vb</DependentUpon>
     </Compile>
@@ -435,12 +449,25 @@
     <Compile Include="Poli\Laporan\ReportPendapatanKlinik.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Poli\Pendapatan\ReportTagihanPoli.Designer.vb">
+      <DependentUpon>ReportTagihanPoli.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Poli\Pendapatan\ReportTagihanPoli.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Poli\Rekap\RekapFeeKaryawan.Designer.vb">
       <DependentUpon>RekapFeeKaryawan.vb</DependentUpon>
     </Compile>
     <Compile Include="Poli\Rekap\RekapFeeKaryawan.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Poli\UploadPasienMCU.designer.vb">
+      <DependentUpon>UploadPasienMCU.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Poli\UploadPasienMCU.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Prototype\CheckinModels.vb" />
     <Compile Include="Prototype\Dashboard.Designer.vb">
       <DependentUpon>Dashboard.vb</DependentUpon>
     </Compile>
@@ -495,10 +522,40 @@
     <Compile Include="Prototype\FindRujukanTACC.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Prototype\Form Laporan Pasien.Designer.vb">
+      <DependentUpon>Form Laporan Pasien.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\Form Laporan Pasien.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Prototype\FormAdjustmentAlat.Designer.vb">
+      <DependentUpon>FormAdjustmentAlat.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormAdjustmentAlat.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Prototype\FormBandingGambar.Designer.vb">
       <DependentUpon>FormBandingGambar.vb</DependentUpon>
     </Compile>
     <Compile Include="Prototype\FormBandingGambar.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Prototype\FormBirthdaySender.Designer.vb">
+      <DependentUpon>FormBirthdaySender.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormBirthdaySender.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Prototype\FormBrigdingPosWeb.Designer.vb">
+      <DependentUpon>FormBrigdingPosWeb.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormBrigdingPosWeb.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Prototype\FormCamera.Designer.vb">
+      <DependentUpon>FormCamera.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormCamera.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Prototype\FormICPaket.Designer.vb">
@@ -519,6 +576,12 @@
     <Compile Include="Prototype\FormKodeVoucher.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Prototype\FormLaporanRiwayatAlat.Designer.vb">
+      <DependentUpon>FormLaporanRiwayatAlat.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormLaporanRiwayatAlat.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Prototype\FormMasterDokter.Designer.vb">
       <DependentUpon>FormMasterDokter.vb</DependentUpon>
     </Compile>
@@ -531,10 +594,22 @@
     <Compile Include="Prototype\FormMasterPasien.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Prototype\FormPasienBooking.Designer.vb">
+      <DependentUpon>FormPasienBooking.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormPasienBooking.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Prototype\FormPembayaran.Designer.vb">
       <DependentUpon>FormPembayaran.vb</DependentUpon>
     </Compile>
     <Compile Include="Prototype\FormPembayaran.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Prototype\FormPencarianAlatSarpras.Designer.vb">
+      <DependentUpon>FormPencarianAlatSarpras.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormPencarianAlatSarpras.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Prototype\FormPendaftaranAwal.Designer.vb">
@@ -818,10 +893,40 @@
     <Compile Include="Prototype\FormPenerimaanBarang.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Prototype\FormPreOrderAlat.Designer.vb">
+      <DependentUpon>FormPreOrderAlat.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormPreOrderAlat.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Prototype\FormPreOrderCartridge.Designer.vb">
+      <DependentUpon>FormPreOrderCartridge.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormPreOrderCartridge.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Prototype\FormRekamMedisDokter.Designer.vb">
       <DependentUpon>FormRekamMedisDokter.vb</DependentUpon>
     </Compile>
     <Compile Include="Prototype\FormRekamMedisDokter.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Prototype\FormRevenueSelling.Designer.vb">
+      <DependentUpon>FormRevenueSelling.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormRevenueSelling.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Prototype\FormSimulasiBHP.Designer.vb">
+      <DependentUpon>FormSimulasiBHP.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormSimulasiBHP.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Prototype\FormSupplier.Designer.vb">
+      <DependentUpon>FormSupplier.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormSupplier.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Prototype\FormValidasiFaskesPasien.Designer.vb">
@@ -836,12 +941,19 @@
     <Compile Include="Prototype\FormRiwayatKunjungan.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Prototype\FormWABlast.Designer.vb">
+      <DependentUpon>FormWABlast.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\FormWABlast.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Prototype\KYC.Designer.vb">
       <DependentUpon>KYC.vb</DependentUpon>
     </Compile>
     <Compile Include="Prototype\KYC.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Prototype\ModelPosWeb.vb" />
     <Compile Include="Prototype\ModuleInformedConsent.vb" />
     <Compile Include="Prototype\PCareModule.vb" />
     <Compile Include="Prototype\PopUpVoucher.Designer.vb">
@@ -855,6 +967,12 @@
     </Compile>
     <Compile Include="Prototype\ToggleSwitch.vb">
       <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Prototype\TripleDES.Designer.vb">
+      <DependentUpon>TripleDES.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Prototype\TripleDES.vb">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Prototype\UploadTindakan.Designer.vb">
       <DependentUpon>UploadTindakan.vb</DependentUpon>
@@ -1016,22 +1134,10 @@
     <Compile Include="Poli\Pendapatan\RekapPendapatanPoli.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Poli\Pendapatan\ReportTagihanPoli.Designer.vb">
-      <DependentUpon>ReportTagihanPoli.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Poli\Pendapatan\ReportTagihanPoli.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Poli\RujukLab.Designer.vb">
       <DependentUpon>RujukLab.vb</DependentUpon>
     </Compile>
     <Compile Include="Poli\RujukLab.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Poli\UploadPasienMCU.Designer.vb">
-      <DependentUpon>UploadPasienMCU.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Poli\UploadPasienMCU.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Prototype\FormTransaksiPoli.Designer.vb">
@@ -1464,8 +1570,14 @@
     <EmbeddedResource Include="Poli\Laporan\ReportPendapatanKlinik.resx">
       <DependentUpon>ReportPendapatanKlinik.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Poli\Pendapatan\ReportTagihanPoli.resx">
+      <DependentUpon>ReportTagihanPoli.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Poli\Rekap\RekapFeeKaryawan.resx">
       <DependentUpon>RekapFeeKaryawan.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Poli\UploadPasienMCU.resx">
+      <DependentUpon>UploadPasienMCU.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\Dashboard.resx">
       <DependentUpon>Dashboard.vb</DependentUpon>
@@ -1494,8 +1606,23 @@
     <EmbeddedResource Include="Prototype\FindRujukanTACC.resx">
       <DependentUpon>FindRujukanTACC.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\Form Laporan Pasien.resx">
+      <DependentUpon>Form Laporan Pasien.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormAdjustmentAlat.resx">
+      <DependentUpon>FormAdjustmentAlat.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormBandingGambar.resx">
       <DependentUpon>FormBandingGambar.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormBirthdaySender.resx">
+      <DependentUpon>FormBirthdaySender.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormBrigdingPosWeb.resx">
+      <DependentUpon>FormBrigdingPosWeb.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormCamera.resx">
+      <DependentUpon>FormCamera.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormICPaket.resx">
       <DependentUpon>FormICPaket.vb</DependentUpon>
@@ -1506,14 +1633,23 @@
     <EmbeddedResource Include="Prototype\FormKodeVoucher.resx">
       <DependentUpon>FormKodeVoucher.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormLaporanRiwayatAlat.resx">
+      <DependentUpon>FormLaporanRiwayatAlat.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormMasterDokter.resx">
       <DependentUpon>FormMasterDokter.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormMasterPasien.resx">
       <DependentUpon>FormMasterPasien.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormPasienBooking.resx">
+      <DependentUpon>FormPasienBooking.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormPembayaran.resx">
       <DependentUpon>FormPembayaran.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormPencarianAlatSarpras.resx">
+      <DependentUpon>FormPencarianAlatSarpras.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormPendaftaranAwal.resx">
       <DependentUpon>FormPendaftaranAwal.vb</DependentUpon>
@@ -1671,14 +1807,32 @@
     <EmbeddedResource Include="Prototype\FormPenerimaanBarang.resx">
       <DependentUpon>FormPenerimaanBarang.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormPreOrderAlat.resx">
+      <DependentUpon>FormPreOrderAlat.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormPreOrderCartridge.resx">
+      <DependentUpon>FormPreOrderCartridge.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormRekamMedisDokter.resx">
       <DependentUpon>FormRekamMedisDokter.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormRevenueSelling.resx">
+      <DependentUpon>FormRevenueSelling.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormSimulasiBHP.resx">
+      <DependentUpon>FormSimulasiBHP.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormSupplier.resx">
+      <DependentUpon>FormSupplier.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormValidasiFaskesPasien.resx">
       <DependentUpon>FormValidasiFaskesPasien.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormRiwayatKunjungan.resx">
       <DependentUpon>FormRiwayatKunjungan.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\FormWABlast.resx">
+      <DependentUpon>FormWABlast.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\KYC.resx">
       <DependentUpon>KYC.vb</DependentUpon>
@@ -1688,6 +1842,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\ToggleSwitch.resx">
       <DependentUpon>ToggleSwitch.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Prototype\TripleDES.resx">
+      <DependentUpon>TripleDES.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\UploadTindakan.resx">
       <DependentUpon>UploadTindakan.vb</DependentUpon>
@@ -1781,15 +1938,8 @@
     <EmbeddedResource Include="Poli\Pendapatan\RekapPendapatanPoli.resx">
       <DependentUpon>RekapPendapatanPoli.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Poli\Pendapatan\ReportTagihanPoli.resx">
-      <DependentUpon>ReportTagihanPoli.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Poli\RujukLab.resx">
       <DependentUpon>RujukLab.vb</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Poli\UploadPasienMCU.resx">
-      <DependentUpon>UploadPasienMCU.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Prototype\FormTransaksiPoli.resx">

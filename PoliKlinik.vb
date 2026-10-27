@@ -1580,4 +1580,49 @@ Public Class PoliKlinik
         FormPenerimaanBarang.Show()
         FormPenerimaanBarang.Focus()
     End Sub
+
+    Private Sub TripleDSToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TripleDSToolStripMenuItem.Click
+        TripleDES.Show()
+        TripleDES.Focus()
+    End Sub
+
+    Private Sub WaBlastToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles WaBlastToolStripMenuItem.Click
+        FormWABlast.Show()
+        FormWABlast.Focus()
+    End Sub
+
+    Private Sub BirthdaySenderToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BirthdaySenderToolStripMenuItem.Click
+        FormBirthdaySender.Show()
+        FormBirthdaySender.Focus()
+    End Sub
+
+    Private Sub AdjustmentAlatToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AdjustmentAlatToolStripMenuItem.Click
+        FormAdjustmentAlat.Show()
+        FormAdjustmentAlat.Focus()
+    End Sub
+
+    Private Sub SimulasiBHPToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SimulasiBHPToolStripMenuItem.Click
+        FormSimulasiBHP.Show()
+        FormSimulasiBHP.Focus()
+    End Sub
+
+    Private Sub LaporanRevenueDanSellingToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles LaporanRevenueDanSellingToolStripMenuItem.Click
+        FormRevenueSelling.Show()
+        FormRevenueSelling.Focus()
+    End Sub
+
+    Private Sub LaporanPenggunaanAlatToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles LaporanPenggunaanAlatToolStripMenuItem.Click
+        FormLaporanRiwayatAlat.Show()
+        FormLaporanRiwayatAlat.Focus()
+    End Sub
+
+    Private Sub BridgingPOSWebToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BridgingPOSWebToolStripMenuItem.Click
+        FormBrigdingPosWeb.Show()
+        FormBrigdingPosWeb.Focus()
+    End Sub
+
+    Private Sub LaporanToolStripMenuItem1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles LaporanToolStripMenuItem1.Click
+        FormLaporanPasien.Show()
+        FormLaporanPasien.Focus()
+    End Sub
 End Class
