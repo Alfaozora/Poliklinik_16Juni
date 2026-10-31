@@ -956,7 +956,6 @@ Public Class RekapFeeKaryawan
         Dim jenisPelaksana As String = ""
         Dim pelaksanaID As String = ""
 
-        ' Set Jenis Pelaksana
         If RadioButtonPelaksanaDokter.Checked = True Then
             jenisPelaksana = "Dokter"
             pelaksanaID = TextBoxPelaksanaID.Text.Trim()
@@ -1001,7 +1000,8 @@ Public Class RekapFeeKaryawan
         queryString.AppendLine("    OUTER APPLY (SELECT TOP 1 Nama FROM MasterPasien WITH(NOLOCK) WHERE NoRekamMedis = tblTrans.IDInternet) tblPasien")
         queryString.AppendLine("    WHERE b.DeletedDate IS NULL AND c.JenisTindakan NOT LIKE '%Konsul%' AND c.StatusFeeTindakan = '1'")
         queryString.AppendLine("      AND (b.NettBayar > 0 OR b.KodeVoucher IS NOT NULL)")
-        queryString.AppendLine("      AND (c.JenisDokter LIKE '%" & jenisPelaksana & "%' OR c.FeePerawat > 0)")
+        ' FIX 1: Ditambahkan filter ISNULL(c.PersentaseFeePerawat, 0) > 0
+        queryString.AppendLine("      AND (c.JenisDokter LIKE '%" & jenisPelaksana & "%' OR c.FeePerawat > 0 OR ISNULL(c.PersentaseFeePerawat, 0) > 0)")
         queryString.AppendLine("      AND EXISTS (SELECT 1 FROM TransaksiPoliBayarAwal d WITH(NOLOCK) WHERE d.TransPoliID = tblTrans.TransPoliID AND d.JenisBayar IN ('TUNAI', 'DEBET', 'CARD', 'VOUCHER', 'TAGIHAN'))")
 
         If jenisPelaksana = "Dokter" Then
@@ -1033,7 +1033,8 @@ Public Class RekapFeeKaryawan
         queryString.AppendLine("    OUTER APPLY (SELECT TOP 1 Nama FROM MasterPasien WITH(NOLOCK) WHERE NoRekamMedis = tblTrans.IDInternet) tblPasien")
         queryString.AppendLine("    WHERE b.DeletedDate IS NULL AND c.JenisTindakan NOT LIKE '%Konsul%' AND c.StatusFeeTindakan = '1'")
         queryString.AppendLine("      AND (b.NettBayar > 0 OR b.KodeVoucher IS NOT NULL)")
-        queryString.AppendLine("      AND (c.JenisDokter LIKE '%" & jenisPelaksana & "%' OR c.FeePerawat > 0)")
+        ' FIX 1: Ditambahkan filter ISNULL(c.PersentaseFeePerawat, 0) > 0
+        queryString.AppendLine("      AND (c.JenisDokter LIKE '%" & jenisPelaksana & "%' OR c.FeePerawat > 0 OR ISNULL(c.PersentaseFeePerawat, 0) > 0)")
         queryString.AppendLine("      AND EXISTS (SELECT 1 FROM TransaksiPoliBayar e WITH(NOLOCK) WHERE e.TransPoliID = tblTrans.TransPoliID AND e.JenisBayar IN ('TUNAI', 'DEBET', 'CARD', 'VOUCHER', 'TAGIHAN'))")
 
         If jenisPelaksana = "Dokter" Then
@@ -1044,6 +1045,7 @@ Public Class RekapFeeKaryawan
 
         queryString.AppendLine(")")
         queryString.AppendLine("SELECT ")
+        queryString.AppendLine("    ROW_NUMBER() OVER(ORDER BY [Tgl Transaksi] ASC, [No Transaksi] ASC) AS [No],")
         queryString.AppendLine("    [Tgl Transaksi] AS [Tgl Value],")
         queryString.AppendLine("    RIGHT('0' + CAST(DAY([Tgl Transaksi]) AS VARCHAR(2)), 2) + ' ' + ")
         queryString.AppendLine("    CASE MONTH([Tgl Transaksi])")
@@ -1060,33 +1062,25 @@ Public Class RekapFeeKaryawan
         queryString.AppendLine("    NominalBHP AS [Nominal BHP],")
         queryString.AppendLine("    CAST(")
         queryString.AppendLine("        CASE ")
-        queryString.AppendLine("            WHEN CHARINDEX('" & jenisPelaksana & "', JenisDokter) > 0 THEN")
+        queryString.AppendLine("            WHEN '" & jenisPelaksana & "' = 'Dokter' THEN")
         queryString.AppendLine("                CASE ")
-        queryString.AppendLine("                    WHEN StatusPersentaseFee = 1 THEN")
-        queryString.AppendLine("                        CASE ")
-        queryString.AppendLine("                            WHEN '" & jenisPelaksana & "' = 'Dokter' THEN ")
-        queryString.AppendLine("                                (((NominalBayar - (CASE WHEN StatusBHP = 1 THEN NominalBHP ELSE 0 END)) - FeePerawat) * PersentaseFeeDokter) / 100.0")
-        queryString.AppendLine("                            WHEN '" & jenisPelaksana & "' = 'Perawat' THEN ")
-        queryString.AppendLine("                                ((NominalBayar - (CASE WHEN StatusBHP = 1 THEN NominalBHP ELSE 0 END)) * PersentaseFeePerawat) / 100.0")
-        queryString.AppendLine("                            ELSE 0 ")
-        queryString.AppendLine("                        END")
-        queryString.AppendLine("                    WHEN StatusNominalFee = 1 THEN")
-        queryString.AppendLine("                        CASE ")
-        queryString.AppendLine("                            WHEN '" & jenisPelaksana & "' = 'Dokter' THEN FeePerTindakan - FeePerawat")
-        queryString.AppendLine("                            WHEN '" & jenisPelaksana & "' = 'Perawat' THEN FeePerTindakan")
-        queryString.AppendLine("                            ELSE 0 ")
-        queryString.AppendLine("                        END")
+        queryString.AppendLine("                    WHEN StatusPersentaseFee = 1 THEN (((NominalBayar - (CASE WHEN StatusBHP = 1 THEN NominalBHP ELSE 0 END)) - FeePerawat) * PersentaseFeeDokter) / 100.0")
+        queryString.AppendLine("                    WHEN StatusNominalFee = 1 THEN FeePerTindakan - FeePerawat")
         queryString.AppendLine("                    ELSE 0 ")
         queryString.AppendLine("                END")
-        queryString.AppendLine("            WHEN FeePerawat > 0 AND LTRIM(RTRIM(JenisDokter)) <> '" & jenisPelaksana & "' AND '" & jenisPelaksana & "' = 'Perawat' THEN ")
-        queryString.AppendLine("                FeePerawat")
+        queryString.AppendLine("            WHEN '" & jenisPelaksana & "' = 'Perawat' THEN")
+        queryString.AppendLine("                CASE ")
+        queryString.AppendLine("                    WHEN StatusPersentaseFee = 1 AND PersentaseFeePerawat > 0 THEN ((NominalBayar - (CASE WHEN StatusBHP = 1 THEN NominalBHP ELSE 0 END)) * PersentaseFeePerawat) / 100.0")
+        queryString.AppendLine("                    WHEN StatusNominalFee = 1 AND CHARINDEX('Perawat', JenisDokter) > 0 THEN FeePerTindakan")
+        queryString.AppendLine("                    WHEN FeePerawat > 0 THEN FeePerawat")
+        queryString.AppendLine("                    ELSE 0 ")
+        queryString.AppendLine("                END")
         queryString.AppendLine("            ELSE 0")
         queryString.AppendLine("        END AS DECIMAL(18,2)")
         queryString.AppendLine("    ) AS [Total Fee]")
         queryString.AppendLine("FROM RawData")
         queryString.AppendLine("ORDER BY [Tgl Transaksi] ASC, [No Transaksi] ASC")
 
-        ' Eksekusi Query langsung mengembalikan DataTable yang sudah terurut
         Dim Tdata As DataTable = ReadSQL(queryString.ToString())
 
         If Tdata.Rows.Count > 0 Then
@@ -1100,6 +1094,7 @@ Public Class RekapFeeKaryawan
             Report.Bands.Item(DevExpress.XtraReports.UI.BandKind.PageFooter).Controls("lblprinted").Text = Format(DateAndTime.Now, "dd-MMM-yyyy HH:mm:ss") & " By " & PoliKlinik.Lbluser.Text
 
             Report.ShowPreview()
+            'Report.RunDesigner()
         Else
             MsgBox("Tidak ada data yang ditampilkan.", MsgBoxStyle.Exclamation, "Warning!")
         End If
